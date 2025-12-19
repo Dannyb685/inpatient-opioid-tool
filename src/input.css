@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ensure Tailwind doesn't conflict with Obsidian too much, though proper scoping is hard without a prefix. 
+   Ideally we might want a prefix, e.g. 'tw-', but the user provided code doesn't have it.
+   We will rely on the fact that we are rendering in a specific container. 
+*/
