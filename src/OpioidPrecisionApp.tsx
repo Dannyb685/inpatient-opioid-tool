@@ -15,125 +15,23 @@ import {
     Zap
 } from 'lucide-react';
 
-// --- Clinical Data ---
-
-const DRUG_DATA = [
-    {
-        id: 'morphine',
-        name: 'Morphine',
-        type: 'Full Agonist',
-        iv_onset: '5-10 min',
-        iv_duration: '3-4 hrs',
-        renal_safety: 'Unsafe',
-        hepatic_safety: 'Caution',
-        clinical_nuance: 'M6G (analgesic) accumulates in renal failure = prolonged sedation. M3G (neuroexcitatory) accumulates = myoclonus/seizures. Histamine release is dose-dependent; avoid in hemodynamic instability.',
-        pharmacokinetics: 'Glucuronidation (UGT2B7). High first-pass metabolism (PO Bioavail ~30%).',
-        tags: ['Standard', 'Histamine Release', 'Vasodilation'],
-        bioavailability: 30
-    },
-    {
-        id: 'hydromorphone',
-        name: 'Hydromorphone',
-        type: 'Full Agonist',
-        iv_onset: '5 min',
-        iv_duration: '2-3 hrs',
-        renal_safety: 'Caution',
-        hepatic_safety: 'Safe',
-        clinical_nuance: 'H3G metabolite is solely neuroexcitatory. In renal failure, accumulation causes allodynia and agitation (often mistaken for pain, leading to dangerous dose escalation). 5-7x potency of morphine.',
-        pharmacokinetics: 'Glucuronidation. No CYP interactions. Cleaner than morphine but not risk-free.',
-        tags: ['Potent', 'Low Volume', 'Neuroexcitation Risk'],
-        bioavailability: 40 // Low and variable
-    },
-    {
-        id: 'fentanyl',
-        name: 'Fentanyl',
-        type: 'Phenylpiperidine',
-        iv_onset: '1-2 min',
-        iv_duration: '30-60 min',
-        renal_safety: 'Safe',
-        hepatic_safety: 'Safe',
-        clinical_nuance: 'Context-Sensitive Half-Life: With continuous infusion >24h, lipid saturation occurs, prolonging elimination (t1/2 rises from 4h to >12h). Rigid chest wall syndrome possible with rapid high-dose push.',
-        pharmacokinetics: 'CYP3A4 substrate. Highly lipophilic. No active metabolites.',
-        tags: ['Renal Safe', 'Cardio Stable', 'Lipid Storage'],
-        bioavailability: 0
-    },
-    {
-        id: 'oxycodone',
-        name: 'Oxycodone',
-        type: 'Full Agonist',
-        iv_onset: 'N/A',
-        iv_duration: '3-4 hrs',
-        renal_safety: 'Caution',
-        hepatic_safety: 'Caution',
-        clinical_nuance: 'Interaction Alert: Strong CYP3A4 inhibitors (Voriconazole, Posaconazole, Ritonavir) significantly increase AUC. Active metabolite Oxymorphone (via CYP2D6) is minor but relevant in ultra-metabolizers.',
-        pharmacokinetics: 'High oral bioavailability (60-87%). Dual metabolism (3A4 > 2D6).',
-        tags: ['Oral Standard', 'CYP3A4 Interaction'],
-        bioavailability: 75
-    },
-    {
-        id: 'methadone',
-        name: 'Methadone',
-        type: 'Complex Agonist',
-        iv_onset: 'Variable',
-        iv_duration: '6-8 hrs (Analgesia)',
-        renal_safety: 'Safe',
-        hepatic_safety: 'Caution',
-        clinical_nuance: 'The Dissociation Trap: Analgesia lasts 6-8h, but elimination t1/2 is 15-60h. "Stacking" toxicity typically occurs on Day 3-5. EKG mandatory (hERG blockade). NMDA antagonism reverses tolerance.',
-        pharmacokinetics: 'CYP3A4/2B6/2D6. Auto-induction occurs. Fecal excretion protects kidneys.',
-        tags: ['Neuropathic', 'Stacking Risk', 'QT Prolongation'],
-        bioavailability: 80
-    },
-    {
-        id: 'buprenorphine',
-        name: 'Buprenorphine',
-        type: 'Partial Agonist',
-        iv_onset: '10-15 min',
-        iv_duration: '6-8 hrs',
-        renal_safety: 'Safe',
-        hepatic_safety: 'Safe',
-        clinical_nuance: 'Binding Affinity (Ki ~0.22 nM) is stronger than Fentanyl (~1.35 nM). To treat acute pain, you must maintain baseline occupancy and use high-affinity full agonists to cover remaining receptors. Do not stop maintenance.',
-        pharmacokinetics: 'CYP3A4. Ceiling effect on respiratory depression, but NOT on sedation if combined with benzos.',
-        tags: ['High Affinity', 'Split Dosing', 'Ceiling Effect'],
-        bioavailability: 30
-    }
-];
-
-const WARNING_DATA = [
-    {
-        id: 'tramadol',
-        name: 'Tramadol',
-        risk: 'Serotonin Syndrome / Seizure',
-        desc: 'Low efficacy but high toxicity. Risk increases 5x with Linezolid (MAOI activity) or SSRIs. Hypoglycemia risk in elderly. 30% of analgesia is non-opioid (SNRI).'
-    },
-    {
-        id: 'combo',
-        name: 'Combination (APAP)',
-        risk: 'Hepatotoxicity Masking',
-        desc: 'Inpatients often receive IV Acetaminophen (Ofirmev). Adding Percocet/Norco creates invisible APAP overdose. Always uncouple.'
-    },
-    {
-        id: 'codeine',
-        name: 'Codeine',
-        risk: 'Genetic Lottery',
-        desc: '10% of Caucasians lack CYP2D6 (no effect). 30% of Ethiopians/Saudis are Ultra-Rapid Metabolizers (morphine overdose). Clinically indefensible to use.'
-    }
-];
+import { DRUG_DATA, WARNING_DATA } from './data';
 
 // --- Components ---
 
 const Card = ({ children, className = "", onClick }: { children: React.ReactNode, className?: string, onClick?: () => void }) => (
-    <div onClick={onClick} className={`bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden ${className} ${onClick ? 'cursor-pointer hover:border-blue-400 transition-colors' : ''}`}>
+    <div onClick={onClick} className={`bg-[var(--background-secondary)] rounded-xl shadow-sm border border-[var(--background-modifier-border)] overflow-hidden ${className} ${onClick ? 'cursor-pointer hover:border-[var(--interactive-accent)] transition-colors' : ''}`}>
         {children}
     </div>
 );
 
 const Badge = ({ type, text }: { type?: string, text: string }) => {
     const styles: { [key: string]: string } = {
-        safe: "bg-emerald-50 text-emerald-700 border-emerald-200",
-        caution: "bg-amber-50 text-amber-700 border-amber-200",
-        unsafe: "bg-rose-50 text-rose-700 border-rose-200",
-        neutral: "bg-slate-50 text-slate-700 border-slate-200",
-        purple: "bg-purple-50 text-purple-700 border-purple-200"
+        safe: "bg-[var(--background-modifier-success)] text-white border-transparent",
+        caution: "bg-[var(--background-modifier-warning)] text-black border-transparent",
+        unsafe: "bg-[var(--status-error)] text-white border-transparent",
+        neutral: "bg-[var(--background-modifier-border)] text-[var(--text-muted)] border-transparent",
+        purple: "bg-[var(--interactive-accent)] text-white border-transparent"
     };
 
     let styleKey = type || 'neutral';
@@ -207,33 +105,33 @@ const DecisionSupportView = () => {
             {/* Input Matrix */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase">Renal Status</label>
+                    <label className="text-xs font-bold text-[var(--text-muted)] uppercase">Renal Status</label>
                     <div className="flex flex-col gap-1">
                         {[{ id: 'normal', l: 'GFR > 60' }, { id: 'impaired', l: 'GFR < 30' }, { id: 'dialysis', l: 'Dialysis' }].map(o => (
                             <button key={o.id} onClick={() => setRenal(o.id)}
-                                className={`px-3 py-2 text-sm rounded-lg border text-left ${renal === o.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
+                                className={`px-3 py-2 text-sm rounded-lg border text-left ${renal === o.id ? 'bg-[var(--interactive-accent)] text-[var(--text-on-accent)] border-[var(--interactive-accent)]' : 'bg-[var(--background-primary)] text-[var(--text-normal)] border-[var(--background-modifier-border)] hover:bg-[var(--background-modifier-hover)]'}`}>
                                 {o.l}
                             </button>
                         ))}
                     </div>
                 </div>
                 <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase">Hemodynamics</label>
+                    <label className="text-xs font-bold text-[var(--text-muted)] uppercase">Hemodynamics</label>
                     <div className="flex flex-col gap-1">
                         {[{ id: 'stable', l: 'Stable BP' }, { id: 'unstable', l: 'Shock / Hypotensive' }].map(o => (
                             <button key={o.id} onClick={() => setHemo(o.id)}
-                                className={`px-3 py-2 text-sm rounded-lg border text-left ${hemo === o.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
+                                className={`px-3 py-2 text-sm rounded-lg border text-left ${hemo === o.id ? 'bg-[var(--interactive-accent)] text-[var(--text-on-accent)] border-[var(--interactive-accent)]' : 'bg-[var(--background-primary)] text-[var(--text-normal)] border-[var(--background-modifier-border)] hover:bg-[var(--background-modifier-hover)]'}`}>
                                 {o.l}
                             </button>
                         ))}
                     </div>
                 </div>
                 <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase">Route</label>
+                    <label className="text-xs font-bold text-[var(--text-muted)] uppercase">Route</label>
                     <div className="flex flex-col gap-1">
                         {[{ id: 'iv', l: 'Intravenous' }, { id: 'po', l: 'Oral' }].map(o => (
                             <button key={o.id} onClick={() => setRoute(o.id)}
-                                className={`px-3 py-2 text-sm rounded-lg border text-left ${route === o.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
+                                className={`px-3 py-2 text-sm rounded-lg border text-left ${route === o.id ? 'bg-[var(--interactive-accent)] text-[var(--text-on-accent)] border-[var(--interactive-accent)]' : 'bg-[var(--background-primary)] text-[var(--text-normal)] border-[var(--background-modifier-border)] hover:bg-[var(--background-modifier-hover)]'}`}>
                                 {o.l}
                             </button>
                         ))}
@@ -245,32 +143,32 @@ const DecisionSupportView = () => {
             <div className="min-h-[200px]">
                 {recs.length > 0 ? (
                     <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2">
-                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                        <h3 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
                             <Microscope className="w-4 h-4" /> Clinical Recommendations
                         </h3>
                         {recs.map((rec, i) => (
-                            <Card key={i} className={`p-4 border-l-4 ${rec.type === 'safe' ? 'border-l-emerald-500' : 'border-l-amber-500'}`}>
+                            <Card key={i} className={`p-4 border-l-4 ${rec.type === 'safe' ? 'border-l-[var(--background-modifier-success)]' : 'border-l-[var(--background-modifier-warning)]'}`}>
                                 <div className="flex justify-between items-center mb-1">
-                                    <span className="font-bold text-slate-800">{rec.name}</span>
+                                    <span className="font-bold text-[var(--text-normal)]">{rec.name}</span>
                                     <Badge type={rec.type} text={rec.type === 'safe' ? 'Preferred' : 'Proceed with Caution'} />
                                 </div>
-                                <div className="text-sm text-slate-600 font-medium">{rec.reason}</div>
-                                <div className="text-xs text-slate-500 mt-1 italic border-t pt-1 border-slate-100">{rec.detail}</div>
+                                <div className="text-sm text-[var(--text-muted)] font-medium">{rec.reason}</div>
+                                <div className="text-xs text-[var(--text-faint)] mt-1 italic border-t pt-1 border-[var(--background-modifier-border)]">{rec.detail}</div>
                             </Card>
                         ))}
                         {warnings.length > 0 && (
-                            <div className="bg-rose-50 p-4 rounded-xl border border-rose-100">
-                                <div className="flex items-center gap-2 text-rose-800 font-bold text-sm mb-2">
+                            <div className="bg-[var(--background-modifier-error)] p-4 rounded-xl border border-[var(--background-modifier-border)]">
+                                <div className="flex items-center gap-2 text-white font-bold text-sm mb-2">
                                     <ShieldAlert className="w-4 h-4" /> Contraindications
                                 </div>
-                                <ul className="text-xs text-rose-700 space-y-1 list-disc pl-4">
+                                <ul className="text-xs text-white/90 space-y-1 list-disc pl-4">
                                     {warnings.map((w, i) => <li key={i}>{w}</li>)}
                                 </ul>
                             </div>
                         )}
                     </div>
                 ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-slate-300 border-2 border-dashed border-slate-200 rounded-xl p-8">
+                    <div className="h-full flex flex-col items-center justify-center text-[var(--text-faint)] border-2 border-dashed border-[var(--background-modifier-border)] rounded-xl p-8">
                         <Activity className="w-8 h-8 mb-2" />
                         <span className="text-sm">Awaiting Clinical Parameters</span>
                     </div>
@@ -293,10 +191,10 @@ const CalculatorView = () => {
     return (
         <div className="space-y-6 max-w-2xl mx-auto">
             {/* Input */}
-            <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-lg">
+            <div className="bg-[var(--background-secondary-alt)] text-[var(--text-normal)] p-6 rounded-2xl shadow-lg border border-[var(--background-modifier-border)]">
                 <div className="flex justify-between items-start mb-6">
                     <div>
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Input Dose</label>
+                        <label className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Input Dose</label>
                         <div className="text-2xl font-bold">IV Morphine Equivalent</div>
                     </div>
                     <div className="flex items-baseline gap-2">
@@ -304,16 +202,16 @@ const CalculatorView = () => {
                             type="number"
                             value={ivMorphine}
                             onChange={(e) => setIvMorphine(Math.max(0, parseFloat(e.target.value)))}
-                            className="bg-transparent text-4xl font-mono text-right w-24 border-b border-slate-600 focus:border-blue-500 outline-none"
+                            className="bg-transparent text-4xl font-mono text-right w-24 border-b border-[var(--background-modifier-border)] focus:border-[var(--interactive-accent)] outline-none text-[var(--text-normal)]"
                         />
-                        <span className="text-slate-400">mg</span>
+                        <span className="text-[var(--text-muted)]">mg</span>
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-medium text-slate-300">
+                    <div className="flex justify-between text-xs font-medium text-[var(--text-muted)]">
                         <span className="flex items-center gap-1"><Sliders className="w-3 h-3" /> Cross-Tolerance Reduction</span>
-                        <span className={reduction < 25 ? "text-rose-400" : "text-emerald-400"}>-{reduction}%</span>
+                        <span className={reduction < 25 ? "text-[var(--text-error)]" : "text-[var(--text-success)]"}>-{reduction}%</span>
                     </div>
                     <input
                         type="range"
@@ -321,9 +219,9 @@ const CalculatorView = () => {
                         max="75"
                         value={reduction}
                         onChange={(e) => setReduction(parseInt(e.target.value))}
-                        className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                        className="w-full h-1 bg-[var(--background-modifier-border)] rounded-lg appearance-none cursor-pointer accent-[var(--interactive-accent)]"
                     />
-                    <p className="text-[10px] text-slate-500">
+                    <p className="text-[10px] text-[var(--text-faint)]">
                         *Clinical Standard: Reduce calculated dose by 25-50% when rotating agents to account for incomplete cross-tolerance.
                     </p>
                 </div>
@@ -332,39 +230,39 @@ const CalculatorView = () => {
             {/* Results Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase ml-1">Parenteral (IV) Targets</h4>
+                    <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase ml-1">Parenteral (IV) Targets</h4>
                     <Card className="p-4">
                         <div className="flex justify-between items-baseline mb-1">
-                            <span className="font-bold text-slate-700">Hydromorphone IV</span>
-                            <span className="text-2xl font-bold text-blue-600">{convert(0.15).reduced} <span className="text-sm text-slate-400">mg</span></span>
+                            <span className="font-bold text-[var(--text-normal)]">Hydromorphone IV</span>
+                            <span className="text-2xl font-bold text-[var(--interactive-accent)]">{convert(0.15).reduced} <span className="text-sm text-[var(--text-faint)]">mg</span></span>
                         </div>
-                        <div className="text-xs text-slate-400">Raw calc: {convert(0.15).raw} mg (Ratio 1:6.7)</div>
+                        <div className="text-xs text-[var(--text-faint)]">Raw calc: {convert(0.15).raw} mg (Ratio 1:6.7)</div>
                     </Card>
                     <Card className="p-4">
                         <div className="flex justify-between items-baseline mb-1">
-                            <span className="font-bold text-slate-700">Fentanyl IV</span>
-                            <span className="text-2xl font-bold text-blue-600">{convert(10).reduced} <span className="text-sm text-slate-400">mcg</span></span>
+                            <span className="font-bold text-[var(--text-normal)]">Fentanyl IV</span>
+                            <span className="text-2xl font-bold text-[var(--interactive-accent)]">{convert(10).reduced} <span className="text-sm text-[var(--text-faint)]">mcg</span></span>
                         </div>
-                        <div className="text-xs text-slate-400">Raw calc: {convert(10).raw} mcg (Ratio 1:100)</div>
+                        <div className="text-xs text-[var(--text-faint)]">Raw calc: {convert(10).raw} mcg (Ratio 1:100)</div>
                     </Card>
                 </div>
 
                 <div className="space-y-3">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase ml-1">Enteral (PO) Targets</h4>
-                    <Card className="p-4 border-l-4 border-l-emerald-400">
+                    <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase ml-1">Enteral (PO) Targets</h4>
+                    <Card className="p-4 border-l-4 border-l-[var(--background-modifier-success)]">
                         <div className="flex justify-between items-baseline mb-1">
-                            <span className="font-bold text-slate-700">Oxycodone PO</span>
-                            <span className="text-2xl font-bold text-emerald-600">{convert(2.0).reduced} <span className="text-sm text-slate-400">mg</span></span>
+                            <span className="font-bold text-[var(--text-normal)]">Oxycodone PO</span>
+                            <span className="text-2xl font-bold text-[var(--text-success)]">{convert(2.0).reduced} <span className="text-sm text-[var(--text-faint)]">mg</span></span>
                         </div>
-                        <div className="text-xs text-slate-400">High Bioavailability. Ratio 1:2</div>
+                        <div className="text-xs text-[var(--text-faint)]">High Bioavailability. Ratio 1:2</div>
                     </Card>
-                    <Card className="p-4 border-l-4 border-l-amber-400">
+                    <Card className="p-4 border-l-4 border-l-[var(--background-modifier-warning)]">
                         <div className="flex justify-between items-baseline mb-1">
-                            <span className="font-bold text-slate-700">Hydromorphone PO</span>
-                            <span className="text-2xl font-bold text-amber-600">{convert(0.75).reduced} <span className="text-sm text-slate-400">mg</span></span>
+                            <span className="font-bold text-[var(--text-normal)]">Hydromorphone PO</span>
+                            <span className="text-2xl font-bold text-[var(--text-warning)]">{convert(0.75).reduced} <span className="text-sm text-[var(--text-faint)]">mg</span></span>
                         </div>
-                        <div className="text-xs text-slate-500 font-medium">Warning: Poor Bioavailability.</div>
-                        <div className="text-xs text-slate-400">Often underdosed if 1:1 conversion used.</div>
+                        <div className="text-xs text-[var(--text-muted)] font-medium">Warning: Poor Bioavailability.</div>
+                        <div className="text-xs text-[var(--text-faint)]">Often underdosed if 1:1 conversion used.</div>
                     </Card>
                 </div>
             </div>
@@ -473,23 +371,23 @@ const OpioidPrecisionApp = () => {
     const [activeTab, setActiveTab] = useState('decision');
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-100">
-            <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div className="min-h-full bg-[var(--background-primary)] text-[var(--text-normal)] font-sans selection:bg-[var(--text-selection)]">
+            <header className="sticky top-0 z-20 bg-[var(--background-primary-alt)] border-b border-[var(--background-modifier-border)]">
                 <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="bg-slate-900 text-white p-1.5 rounded-lg">
+                        <div className="bg-[var(--interactive-accent)] text-white p-1.5 rounded-lg">
                             <Activity className="w-4 h-4" />
                         </div>
                         <div>
-                            <h1 className="text-sm font-bold text-slate-900">Precision Analgesia</h1>
-                            <p className="text-[10px] text-slate-500 font-medium">Inpatient Guide 2025</p>
+                            <h1 className="text-sm font-bold text-[var(--text-normal)]">Precision Analgesia</h1>
+                            <p className="text-[10px] text-[var(--text-muted)] font-medium">Inpatient Guide 2025</p>
                         </div>
                     </div>
                 </div>
                 <div className="max-w-3xl mx-auto px-2 flex space-x-1">
-                    {[{ id: 'decision', icon: Database, l: 'Algo' }, { id: 'calc', icon: Calculator, l: 'Calc' }, { id: 'ref', icon: FileText, l: 'Data' }].map(t => (
+                    {[{ id: 'decision', icon: Database, l: 'Algo' }, { id: 'calc', icon: Calculator, l: 'Calc' }].map(t => (
                         <button key={t.id} onClick={() => setActiveTab(t.id)}
-                            className={`flex-1 py-2 text-xs font-medium border-b-2 transition-colors flex justify-center items-center gap-2 ${activeTab === t.id ? 'border-blue-600 text-blue-700 bg-blue-50/50' : 'border-transparent text-slate-500'}`}>
+                            className={`flex-1 py-2 text-xs font-medium border-b-2 transition-colors flex justify-center items-center gap-2 ${activeTab === t.id ? 'border-[var(--interactive-accent)] text-[var(--text-accent)] bg-[var(--background-modifier-hover)]' : 'border-transparent text-[var(--text-muted)]'}`}>
                             <t.icon className="w-3 h-3" /> {t.l}
                         </button>
                     ))}
@@ -499,7 +397,6 @@ const OpioidPrecisionApp = () => {
             <main className="max-w-3xl mx-auto px-4 py-6 pb-20">
                 {activeTab === 'decision' && <DecisionSupportView />}
                 {activeTab === 'calc' && <CalculatorView />}
-                {activeTab === 'ref' && <ReferenceView />}
             </main>
         </div>
     );
