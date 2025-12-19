@@ -35,10 +35,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Only upload the files needed for the web version
-          path: './'
-          # You might want to refine this to only include index.html, web-bundle.js, web-styles.css
-          # but for simplicity we upload root and we can use .gitignore or a specific folder if preferred.
+          path: 'web-dist'
 
       - name: Deploy to GitHub Pages
         id: deployment

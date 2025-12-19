@@ -11,7 +11,7 @@ const context = await esbuild.context({
     logLevel: "info",
     sourcemap: prod ? false : "inline",
     treeShaking: true,
-    outfile: "web-bundle.js",
+    outfile: "web-dist/web-bundle.js",
     define: {
         "process.env.NODE_ENV": prod ? '"production"' : '"development"',
     },
