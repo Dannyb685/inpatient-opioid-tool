@@ -1,0 +1,25 @@
+import esbuild from "esbuild";
+import process from "process";
+
+const prod = (process.argv[2] === "production");
+
+const context = await esbuild.context({
+    entryPoints: ["src/web.tsx"],
+    bundle: true,
+    format: "iife",
+    target: "es2018",
+    logLevel: "info",
+    sourcemap: prod ? false : "inline",
+    treeShaking: true,
+    outfile: "web-bundle.js",
+    define: {
+        "process.env.NODE_ENV": prod ? '"production"' : '"development"',
+    },
+});
+
+if (prod) {
+    await context.rebuild();
+    process.exit(0);
+} else {
+    await context.watch();
+}
