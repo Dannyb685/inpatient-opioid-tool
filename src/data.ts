@@ -7,7 +7,7 @@ export const DRUG_DATA = [
         iv_duration: '3-4 hrs',
         renal_safety: 'Unsafe',
         hepatic_safety: 'Caution',
-        clinical_nuance: 'M6G (analgesic) accumulates in renal failure = prolonged sedation. M3G (neuroexcitatory) accumulates = myoclonus/seizures. Histamine release is dose-dependent; avoid in hemodynamic instability.',
+        clinical_nuance: 'M6G (potent analgesic) accumulates in renal failure = prolonged sedation. M3G (neuroexcitatory) accumulation contributes to myoclonus/seizures. Histamine release is dose-dependent.',
         pharmacokinetics: 'Glucuronidation (UGT2B7). High first-pass metabolism (PO Bioavail ~30%).',
         tags: ['Standard', 'Histamine Release', 'Vasodilation'],
         bioavailability: 30
@@ -23,7 +23,7 @@ export const DRUG_DATA = [
         clinical_nuance: 'H3G metabolite is solely neuroexcitatory. In renal failure, accumulation causes allodynia and agitation (often mistaken for pain, leading to dangerous dose escalation). 5-7x potency of morphine.',
         pharmacokinetics: 'Glucuronidation. No CYP interactions. Cleaner than morphine but not risk-free.',
         tags: ['Potent', 'Low Volume', 'Neuroexcitation Risk'],
-        bioavailability: 40
+        bioavailability: 24
     },
     {
         id: 'fentanyl',
@@ -33,10 +33,10 @@ export const DRUG_DATA = [
         iv_duration: '30-60 min',
         renal_safety: 'Safe',
         hepatic_safety: 'Safe',
-        clinical_nuance: 'Context-Sensitive Half-Life: With continuous infusion >24h, lipid saturation occurs, prolonging elimination (t1/2 rises from 4h to >12h). Rigid chest wall syndrome possible with rapid high-dose push.',
+        clinical_nuance: 'Context-Sensitive Half-Life: Lipid saturation prolongs elimination (t1/2 ~3.6h terminal, but increases effectively with continuous infusion). Chest wall rigidity with rapid push.',
         pharmacokinetics: 'CYP3A4 substrate. Highly lipophilic. No active metabolites.',
         tags: ['Renal Safe', 'Cardio Stable', 'Lipid Storage'],
-        bioavailability: 0
+        bioavailability: 100
     },
     {
         id: 'oxycodone',
@@ -59,7 +59,7 @@ export const DRUG_DATA = [
         iv_duration: '6-8 hrs (Analgesia)',
         renal_safety: 'Safe',
         hepatic_safety: 'Caution',
-        clinical_nuance: 'The Dissociation Trap: Analgesia lasts 6-8h, but elimination t1/2 is 15-60h. "Stacking" toxicity typically occurs on Day 3-5. EKG mandatory (hERG blockade). NMDA antagonism reverses tolerance.',
+        clinical_nuance: 'Non-Linear Kinetics: Ratios vary from 2:1 (<30mg Mor) to 20:1 (>1000mg). "Stacking" toxicity on Day 3-5 due to long variable t1/2 (15-120h). Respiratory depression peaks later than analgesia.',
         pharmacokinetics: 'CYP3A4/2B6/2D6. Auto-induction occurs. Fecal excretion protects kidneys.',
         tags: ['Neuropathic', 'Stacking Risk', 'QT Prolongation'],
         bioavailability: 80
@@ -72,8 +72,8 @@ export const DRUG_DATA = [
         iv_duration: '6-8 hrs',
         renal_safety: 'Safe',
         hepatic_safety: 'Safe',
-        clinical_nuance: 'Binding Affinity (Ki ~0.22 nM) is stronger than Fentanyl (~1.35 nM). To treat acute pain, you must maintain baseline occupancy and use high-affinity full agonists to cover remaining receptors. Do not stop maintenance.',
-        pharmacokinetics: 'CYP3A4. Ceiling effect on respiratory depression, but NOT on sedation if combined with benzos.',
+        clinical_nuance: 'High Affinity (Ki ~0.22nM). Perioperative: Continue basal dose; do NOT taper (prevents destabilization). Add full agonist for acute pain. Ceiling effect on respiratory depression.',
+        pharmacokinetics: 'CYP3A4. Dissociates slowly from receptors (long duration).',
         tags: ['High Affinity', 'Split Dosing', 'Ceiling Effect'],
         bioavailability: 30
     },
@@ -88,7 +88,7 @@ export const DRUG_DATA = [
         clinical_nuance: 'Heat Sensitivity: Fever or heating pads increase absorption by 30%+, risking overdose. 12-24h "lag time" when starting/stopping. Do not use in opioid-naive patients. Requirement: >60mg OME baseline.',
         pharmacokinetics: 'Absorbed into skin depot. Steady state takes 3 patches to achieve fully.',
         tags: ['Chronic Pain Only', 'Heat Sensitive', 'Depot Effect'],
-        bioavailability: 92
+        bioavailability: 0
     },
     {
         id: 'butrans',
@@ -115,6 +115,110 @@ export const DRUG_DATA = [
         pharmacokinetics: 'Bypasses liver first-pass. Highly lipophilic.',
         tags: ['TIKOS', 'Breakthrough Only', 'Rapid Onset'],
         bioavailability: 50
+    },
+    {
+        id: 'hydrocodone',
+        name: 'Hydrocodone',
+        type: 'Full Agonist',
+        iv_onset: 'N/A',
+        iv_duration: '4-6 hrs',
+        renal_safety: 'Caution',
+        hepatic_safety: 'Caution',
+        clinical_nuance: 'Often combined with Acetaminophen. Watch daily APAP limit. Not primarily a prodrug (intrinsic activity), but CYP2D6 metabolizes it to Hydromorphone (minor pathway).',
+        pharmacokinetics: 'CYP3A4 -> Norhydrocodone (Major). CYP2D6 -> Hydromorphone (Minor).',
+        tags: ['Oral Only', 'APAP Combo', 'Prodrug'],
+        bioavailability: 70
+    },
+    {
+        id: 'codeine',
+        name: 'Codeine',
+        type: 'Weak Agonist',
+        iv_onset: '15-30 min (IM)',
+        iv_duration: '3-4 hrs',
+        renal_safety: 'Unsafe',
+        hepatic_safety: 'Caution',
+        clinical_nuance: 'Prodrug -> Morphine (CYP2D6). Genetic variability causes failure (poor metabolizers) or overdose (ultra-rapid). Avoid in children/BF/Renal Failure.',
+        pharmacokinetics: 'Hepatic metabolism. 10% converted to Morphine.',
+        tags: ['Prodrug', 'Genetic Variance', 'Weak'],
+        bioavailability: 90
+    },
+    {
+        id: 'tramadol',
+        name: 'Tramadol',
+        type: 'Weak Agonist / SNRI',
+        iv_onset: 'N/A',
+        iv_duration: '4-6 hrs',
+        renal_safety: 'Caution',
+        hepatic_safety: 'Caution',
+        clinical_nuance: 'Lowers seizure threshold. Risk of Serotonin Syndrome. Dual mechanism: Mu-agonist + SNRI. Adjustment required in CKD (Max 200mg).',
+        pharmacokinetics: 'CYP2D6/3A4. Active metabolite (O-desmethyltramadol) is more potent.',
+        tags: ['Seizure Risk', 'Serotonin Syndrome', 'Dual Action'],
+        bioavailability: 75
+    },
+    {
+        id: 'oxymorphone',
+        name: 'Oxymorphone',
+        type: 'Full Agonist',
+        iv_onset: '5-10 min',
+        iv_duration: '3-6 hrs',
+        renal_safety: 'Caution',
+        hepatic_safety: 'Unsafe',
+        clinical_nuance: 'Present as major drug form (Opana). As an Oxycodone metabolite, it is minor and clinically insignificant. High potency. Food significantly increases absorption (do not take with high fat meals).',
+        pharmacokinetics: 'Direct Glucuronidation. No CYP interactions (cleaner logic than Oxycodone).',
+        tags: ['Potent', 'Food Effect'],
+        bioavailability: 10
+    },
+    {
+        id: 'tapentadol',
+        name: 'Tapentadol',
+        type: 'Dual Action',
+        iv_onset: 'N/A',
+        iv_duration: '4-6 hrs',
+        renal_safety: 'Caution',
+        hepatic_safety: 'Caution',
+        clinical_nuance: 'Mu-agonist + NRI (Norepinephrine Reuptake Inhibitor). Less GI side effects than pure agonists. Limited data in severe renal impairment.',
+        pharmacokinetics: 'Glucuronidation. No active metabolites.',
+        tags: ['Dual Action', 'Less Constipation'],
+        bioavailability: 32
+    },
+    {
+        id: 'meperidine',
+        name: 'Meperidine (Pethidine)',
+        type: 'Phenylpiperidine',
+        iv_onset: '5 min',
+        iv_duration: '2-3 hrs',
+        renal_safety: 'Unsafe',
+        hepatic_safety: 'Caution',
+        clinical_nuance: 'CONTRAINDICATED in Renal Failure/Elderly. Toxic metabolite (Normeperidine) causes tremors/seizures. High interaction risk (MAOIs). Historic use only.',
+        pharmacokinetics: 'Hepatic -> Normeperidine (Neurotoxic, long T1/2).',
+        tags: ['Neurotoxic', 'Do Not Use', 'Seizure Risk'],
+        bioavailability: 50
+    },
+    {
+        id: 'sufentanil',
+        name: 'Sufentanil',
+        type: 'Phenylpiperidine',
+        iv_onset: '1-3 min',
+        iv_duration: '20-45 min',
+        renal_safety: 'Safe',
+        hepatic_safety: 'Safe',
+        clinical_nuance: 'ICU/Anesthesia Only. 5-10x potency of Fentanyl. Rapid equilibration.',
+        pharmacokinetics: 'High lipid solubility. High protein binding.',
+        tags: ['ICU Only', 'Ultra Potent'],
+        bioavailability: 100
+    },
+    {
+        id: 'alfentanil',
+        name: 'Alfentanil',
+        type: 'Phenylpiperidine',
+        iv_onset: '<1 min',
+        iv_duration: '10-15 min',
+        renal_safety: 'Safe',
+        hepatic_safety: 'Var',
+        clinical_nuance: 'Fastest onset (low pKa allows rapid BBB crossing). Very short duration. Context-sensitive half-life is favorable.',
+        pharmacokinetics: 'CYP3A4. Lower lipid solubility than Fentanyl = less distribution volume.',
+        tags: ['ICU Only', 'Rapid Onset'],
+        bioavailability: 100
     }
 ];
 
@@ -123,7 +227,7 @@ export const WARNING_DATA = [
         id: 'tramadol',
         name: 'Tramadol',
         risk: 'Serotonin Syndrome / Seizure',
-        desc: 'Low efficacy but high toxicity. Risk increases 5x with Linezolid (MAOI activity) or SSRIs. Hypoglycemia risk in elderly. 30% of analgesia is non-opioid (SNRI).'
+        desc: 'Low efficacy but high toxicity. Significant risk with Linezolid (MAOI activity) or SSRIs. Hypoglycemia risk in elderly. 30% of analgesia is non-opioid (SNRI).'
     },
     {
         id: 'combo',

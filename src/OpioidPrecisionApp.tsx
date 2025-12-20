@@ -70,13 +70,14 @@ const DecisionSupportView = () => {
     const [hemo, setHemo] = useState<string | null>(null);
     const [hepatic, setHepatic] = useState<string | null>(null);
     const [painType, setPainType] = useState<string | null>(null);
+    const [indication, setIndication] = useState<string | null>(null);
     const [route, setRoute] = useState<string | null>(null);
     const [gi, setGi] = useState<string | null>(null);
     const [recs, setRecs] = useState<any[]>([]);
     const [warnings, setWarnings] = useState<string[]>([]);
 
     useEffect(() => {
-        if (!renal || !hemo || !route || !gi || !hepatic || !painType) {
+        if (!renal || !hemo || !route || !gi || !hepatic || !painType || !indication) {
             setRecs([]);
             setWarnings([]);
             return;
@@ -159,9 +160,32 @@ const DecisionSupportView = () => {
             });
         }
 
+        // Clinical Indication Logic
+        if (indication === 'dyspnea') {
+            const hasMorphine = r.find(x => x.name === 'Morphine' || x.name === 'Morphine PO');
+            if (renal === 'normal' && !hasMorphine) {
+                r.unshift({
+                    name: route === 'po' ? 'Morphine PO' : 'Morphine',
+                    reason: 'Preferred for Dyspnea.',
+                    detail: route === 'po' ? 'Liquid (Roxanol) preferred for titration. Ideal for air hunger/anxiety.' : 'Gold standard for air hunger.',
+                    type: 'safe'
+                });
+            } else if (renal !== 'normal') {
+                w.push('Dyspnea Management: Morphine is preferred for air hunger but remains unsafe in renal failure. Consider Fentanyl or Hydromorphone with close monitoring.');
+            }
+        } else if (indication === 'cancer_pain') {
+            r = r.map(x => {
+                if (x.name.includes('Morphine') || x.name.includes('Hydromorphone')) {
+                    return { ...x, detail: x.detail + ' Preferred for initiation of severe cancer pain.' };
+                }
+                return x;
+            });
+            w.push('Cancer Pain: Utilize short-acting opioids for initiation per NCCN/ASCO guidelines.');
+        }
+
         setRecs(r);
         setWarnings(w);
-    }, [renal, hemo, route, gi, hepatic, painType]);
+    }, [renal, hemo, route, gi, hepatic, painType, indication]);
 
     const ParameterBtn = ({ active, onClick, label, sub }: { active: boolean, onClick: () => void, label: string, sub?: string }) => (
         <button
@@ -183,6 +207,15 @@ const DecisionSupportView = () => {
                 <div>
                     <h2 className="text-lg font-bold text-slate-800 mb-4 px-1">Case Parameters</h2>
                     <div className="space-y-5">
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-400 uppercase ml-1">Clinical Indication</label>
+                            <div className="space-y-1.5">
+                                <ParameterBtn active={indication === 'standard'} onClick={() => setIndication('standard')} label="Standard Pain" sub="Acute / Nociceptive" />
+                                <ParameterBtn active={indication === 'dyspnea'} onClick={() => setIndication('dyspnea')} label="Dyspnea / Air Hunger" sub="Comfort Care / Palliative" />
+                                <ParameterBtn active={indication === 'cancer_pain'} onClick={() => setIndication('cancer_pain')} label="Severe Cancer Pain" sub="NCCN / ASCO initiation" />
+                            </div>
+                        </div>
+
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-400 uppercase ml-1">Pain Pathophysiology</label>
                             <div className="space-y-1.5">
@@ -299,11 +332,25 @@ const DecisionSupportView = () => {
 const CalculatorView = () => {
     const [ivMorphine, setIvMorphine] = useState(10);
     const [reduction, setReduction] = useState(30);
+    const [showInfusion, setShowInfusion] = useState(false);
+    const [infusionRate, setInfusionRate] = useState(0);
 
     const convert = (factor: number) => {
         const raw = ivMorphine * factor;
         const reduced = raw * (1 - (reduction / 100));
-        return { raw: raw.toFixed(1), reduced: reduced.toFixed(1) };
+        // Breakthrough = 10-15% of REDUCED total daily dose. Using ~12.5% (1/8th) or range.
+        // NCCN suggests 10-20%. Let's display 10%.
+        const btd = reduced * 0.10;
+        return {
+            raw: raw.toFixed(1),
+            reduced: reduced.toFixed(1),
+            btd: btd.toFixed(1)
+        };
+    };
+
+    const handleInfusionCalc = (rate: number) => {
+        setInfusionRate(rate);
+        setIvMorphine(rate * 24);
     };
 
     return (
@@ -313,9 +360,10 @@ const CalculatorView = () => {
                     <Info className="w-5 h-5" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-bold text-blue-900 mb-1">When to use this Calculator?</h3>
+                    <h3 className="text-sm font-bold text-blue-900 mb-1">Safety First: 24-Hour Totals</h3>
                     <p className="text-sm text-blue-800 leading-relaxed">
-                        Use this tool to calculate a safe starting dose when <strong>switching</strong> a patient from one opioid to another (Opioid Rotation).
+                        Calculations must be based on the <strong>TOTAL 24-Hour Opioid Exposure</strong> (Scheduled + Breakthrough).
+                        Do not use single doses or hourly rates directly.
                         <span className="block mt-1.5 font-bold text-rose-600">
                             ⚠️ Do NOT use this for patients who are not currently taking opioids (opioid-naive).
                         </span>
@@ -325,10 +373,10 @@ const CalculatorView = () => {
             {/* Input Side */}
             <div className="space-y-6">
                 <ClinicalCard title="Input Dose">
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center justify-between mb-2">
                         <div>
-                            <span className="block text-2xl font-bold text-slate-900">Morphine IV</span>
-                            <span className="text-xs text-slate-500 font-medium uppercase tracking-wide">Reference Standard</span>
+                            <span className="block text-2xl font-bold text-slate-900">Total 24-Hour Dose</span>
+                            <span className="text-xs text-slate-500 font-medium uppercase tracking-wide">Morphine IV Equivalents</span>
                         </div>
                         <div className="flex items-baseline gap-1 relative">
                             <input
@@ -337,9 +385,40 @@ const CalculatorView = () => {
                                 onChange={(e) => setIvMorphine(Math.max(0, parseFloat(e.target.value)))}
                                 className="w-28 text-4xl font-bold text-right text-teal-600 border-b-2 border-slate-100 focus:border-teal-500 focus:outline-none bg-transparent pb-1"
                             />
-                            <span className="text-sm font-bold text-slate-400 absolute -right-6 bottom-2">mg</span>
+                            <span className="text-sm font-bold text-slate-400 absolute -right-6 bottom-2">mg/24h</span>
                         </div>
                     </div>
+
+                    <div className="mb-6 flex justify-between items-start">
+                        <p className="text-[10px] text-slate-400 italic max-w-[60%]">
+                            *Include all scheduled doses AND breakthrough doses administered in the last 24 hours.
+                        </p>
+                        <button
+                            onClick={() => setShowInfusion(!showInfusion)}
+                            className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-1 rounded border border-teal-100 hover:bg-teal-100 transition-colors"
+                        >
+                            {showInfusion ? 'Close Helper' : 'Infusion Helper'}
+                        </button>
+                    </div>
+
+                    {showInfusion && (
+                        <div className="mb-6 bg-slate-50 p-3 rounded-lg border border-slate-200 animate-in slide-in-from-top-2">
+                            <div className="flex items-center gap-4">
+                                <span className="text-xs font-bold text-slate-500 uppercase">Hourly Rate:</span>
+                                <div className="flex items-baseline gap-1">
+                                    <input
+                                        type="number"
+                                        value={infusionRate}
+                                        onChange={(e) => handleInfusionCalc(Math.max(0, parseFloat(e.target.value)))}
+                                        className="w-16 p-1 text-right font-bold text-slate-700 border-b border-slate-300 bg-transparent focus:outline-none focus:border-teal-500"
+                                    />
+                                    <span className="text-xs text-slate-400">mg/hr</span>
+                                </div>
+                                <span className="text-xs font-bold text-slate-400">× 24h =</span>
+                                <span className="text-sm font-bold text-teal-600">{infusionRate * 24} mg/day</span>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
                         <div className="flex justify-between items-center mb-3">
@@ -400,9 +479,9 @@ const CalculatorView = () => {
                                 {reduction === 50 && <strong>Conservative (50%):</strong>}
                                 {reduction !== 0 && reduction !== 30 && reduction !== 50 && <strong>Custom (-{reduction}%):</strong>}
                                 {' '}
-                                {reduction < 25 && "Use ONLY if pain is severe/uncontrolled OR switching route of same drug. High risk of incomplete cross-tolerance."}
+                                {reduction < 25 && "Use ONLY if pain is severely uncontrolled OR switching route of same drug (e.g. IV to PO)."}
                                 {(reduction >= 25 && reduction <= 40) && "Standard starting point. Balances pain control with safety margin."}
-                                {reduction > 40 && "Recommended for elderly, frail, or renal/hepatic impairment. Prioritizes safety."}
+                                {reduction > 40 && "Mandatory for elderly, frail, renal/hepatic impairment, or history of adverse effects. Prioritizes safety over efficacy."}
                             </span>
                         </div>
                     </div>
@@ -413,7 +492,38 @@ const CalculatorView = () => {
                     <p className="text-xs leading-relaxed">
                         <strong>Clinical Note:</strong> Calculator uses equianalgesic ratios from NCCN Guidelines.
                         Always use clinical judgment and start lower in elderly/frail patients.
+                        <strong> Methadone conversions are non-linear; consult Pain/Pall Care expert.</strong>
                     </p>
+                </div>
+
+
+                <div className="border border-slate-200 rounded-lg overflow-hidden">
+                    <details className="group">
+                        <summary className="flex items-center justify-between p-3 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Limitations & Evidence Gaps</span>
+                            <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" />
+                        </summary>
+                        <div className="p-4 bg-white text-[10px] leading-relaxed text-slate-500 space-y-3 border-t border-slate-200">
+                            <div>
+                                <strong className="block text-slate-700 mb-1">Evidence Gaps & Variation</strong>
+                                <p>Current equianalgesic tables lack national consensus. A 2022 study found only 37.5% of tools addressed cross-tolerance, and institutional Hydromorphone PO:IV ratios varied from 2.06 to 6.12. Individualized titration is mandatory.</p>
+                            </div>
+
+                            <div>
+                                <strong className="block text-slate-700 mb-1">Special Populations</strong>
+                                <ul className="list-disc list-inside space-y-1 pl-1">
+                                    <li><strong>Methadone:</strong> Non-linear conversion (2:1 to 20:1). Consult specialist if &gt;30mg/day. Accumulation risk days 3-5.</li>
+                                    <li><strong>Fentanyl Patch:</strong> Opioid-tolerant patients ONLY (≥60mg OME). Absorption increases with heat (fever/pads).</li>
+                                    <li><strong>Buprenorphine:</strong> Continue perioperatively without tapering. Add full agonist for breakthrough.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <strong className="block text-slate-700 mb-1">Monitoring & Safety</strong>
+                                <p>Monitor for "end-of-dose failure" and adverse effects (sedation/delirium). Provide breakthrough medication at 10-20% of TDD. Patients with history of high-dose fentanyl may require higher-than-calculated doses.</p>
+                            </div>
+                        </div>
+                    </details>
                 </div>
             </div>
 
@@ -428,41 +538,58 @@ const CalculatorView = () => {
                                 <div className="text-[10px] text-slate-400">Ratio 1:6.7</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-teal-600">{convert(0.15).reduced}<small className="text-xs text-slate-400 ml-1">mg</small></div>
-                                <div className="text-[10px] text-slate-400 strikethrough decoration-slate-300 opacity-60">{convert(0.15).raw} raw</div>
+                                <div className="text-2xl font-bold text-teal-600">{convert(0.15).reduced}<small className="text-xs text-slate-400 ml-1">mg/24h</small></div>
+                                <div className="text-[9px] font-medium text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded inline-block mt-1">
+                                    BT: {convert(0.15).btd} mg q2-4h
+                                </div>
+                                <div className="text-[10px] text-slate-400 strikethrough decoration-slate-300 opacity-60 mt-1">{convert(0.15).raw} raw</div>
                             </div>
                         </ClinicalCard>
                         <ClinicalCard className="flex justify-between items-center p-4">
                             <div>
                                 <div className="font-bold text-slate-800">Fentanyl IV</div>
-                                <div className="text-[10px] text-slate-400">Ratio 1:100 (mcg)</div>
+                                <div className="text-[10px] text-slate-400 font-medium">10mg Mor : 100mcg Fent</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-teal-600">{convert(10).reduced}<small className="text-xs text-slate-400 ml-1">mcg</small></div>
+                                <div className="text-2xl font-bold text-teal-600">{convert(10).reduced}<small className="text-xs text-slate-400 ml-1">mcg/24h</small></div>
+                                <div className="text-[9px] font-medium text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded inline-block mt-1">
+                                    BT: {convert(10).btd} mcg q1-2h
+                                </div>
                             </div>
                         </ClinicalCard>
                     </div>
                 </div>
 
                 <div>
-                    <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Enteral Targets (PO)</h3>
+                    <div className="flex justify-between items-end mb-3 ml-1">
+                        <h3 className="text-xs font-bold text-slate-400 uppercase">Enteral Targets (PO)</h3>
+                        <div className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                            PO Mor Equiv: {convert(3).reduced}mg
+                        </div>
+                    </div>
                     <div className="space-y-2">
                         <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-emerald-400">
                             <div>
                                 <div className="font-bold text-slate-800">Oxycodone PO</div>
-                                <div className="text-[10px] text-emerald-600 font-medium">High Bioavailability</div>
+                                <div className="text-[10px] text-emerald-600 font-medium">OME Ratio 1:1.5</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-slate-800">{convert(2.0).reduced}<small className="text-xs text-slate-400 ml-1">mg</small></div>
+                                <div className="text-2xl font-bold text-slate-800">{convert(2.0).reduced}<small className="text-xs text-slate-400 ml-1">mg/24h</small></div>
+                                <div className="text-[9px] font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded inline-block mt-1">
+                                    BT: {convert(2.0).btd} mg q3-4h
+                                </div>
                             </div>
                         </ClinicalCard>
                         <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-amber-400 bg-amber-50/30">
                             <div>
                                 <div className="font-bold text-slate-800">Hydromorphone PO</div>
-                                <div className="text-[10px] text-amber-600 font-medium">Erratic Absorption</div>
+                                <div className="text-[10px] text-amber-600 font-medium">OME Ratio 1:4</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-slate-800">{convert(0.75).reduced}<small className="text-xs text-slate-400 ml-1">mg</small></div>
+                                <div className="text-2xl font-bold text-slate-800">{convert(0.75).reduced}<small className="text-xs text-slate-400 ml-1">mg/24h</small></div>
+                                <div className="text-[9px] font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded inline-block mt-1">
+                                    BT: {convert(0.75).btd} mg q3-4h
+                                </div>
                             </div>
                         </ClinicalCard>
                     </div>
@@ -478,17 +605,17 @@ const CalculatorView = () => {
                             </div>
                             <div className="text-right">
                                 <div className="text-2xl font-bold text-purple-700">{convert(1.5).reduced}<small className="text-xs text-slate-400 ml-1">mcg/h</small></div>
-                                <div className="text-[9px] text-slate-400">Ratio 1:2 (OME)</div>
+                                <div className="text-[9px] text-slate-400">Consult Pkg Insert</div>
                             </div>
                         </ClinicalCard>
                         <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-indigo-400 bg-indigo-50/20">
                             <div>
                                 <div className="font-bold text-slate-800">Butrans Patch</div>
-                                <div className="text-[10px] text-indigo-600 font-medium">7-Day Partial Agonist</div>
+                                <div className="text-[10px] text-indigo-600 font-medium italic">Consult Specialist</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-indigo-700">{convert(1.5).reduced}<small className="text-xs text-slate-400 ml-1">mcg/h</small></div>
-                                <div className="text-[9px] text-slate-400">Max 20mcg/h</div>
+                                <div className="text-xs font-bold text-slate-400 uppercase">No Ratio</div>
+                                <div className="text-[9px] text-rose-500 font-bold">Withdrawal Risk</div>
                             </div>
                         </ClinicalCard>
                     </div>
@@ -503,17 +630,25 @@ const CalculatorView = () => {
                         <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-rose-400 bg-rose-50/10">
                             <div>
                                 <div className="font-bold text-slate-800">Fentanyl SL</div>
-                                <div className="text-[10px] text-rose-600 font-medium">Rapid Breakthrough</div>
+                                <div className="text-[10px] text-rose-600 font-medium italic">Titrate from lowest</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-rose-700">{convert(10).reduced}<small className="text-xs text-slate-400 ml-1">mcg</small></div>
+                                <div className="text-xs font-bold text-slate-400 uppercase">Independent</div>
                                 <div className="text-[9px] text-slate-400">Not for Naive</div>
                             </div>
                         </ClinicalCard>
                     </div>
                 </div>
+
+                <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100 flex gap-2 text-emerald-900 mt-2">
+                    <Activity className="w-4 h-4 flex-none text-emerald-600 mt-0.5" />
+                    <p className="text-[10px] leading-relaxed font-medium">
+                        <strong>Monitoring:</strong> Assess efficacy & safety q2-4h (first 24h). Re-calculate TDD after 24-72h.
+                        Breakthrough (BT) calculated at ~10% of TDD.
+                    </p>
+                </div>
             </div>
-        </div>
+        </div >
     );
 };
 
@@ -571,7 +706,7 @@ const ReferenceView = () => {
                                             <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                                 <div className="h-full bg-teal-500" style={{ width: `${drug.bioavailability}%` }}></div>
                                             </div>
-                                            <span className="text-xs font-bold text-slate-600 w-8">{drug.bioavailability > 0 ? `${drug.bioavailability}%` : '-'}</span>
+                                            <span className="text-xs font-bold text-slate-600 w-8">{drug.bioavailability > 0 ? `${drug.bioavailability}%` : 'N/A'}</span>
                                         </div>
                                     </div>
                                 </div>
