@@ -43,12 +43,12 @@ export const Badge = ({ type, text }: { type?: string, text: string }) => {
 export const ParameterBtn = ({ active, onClick, label, sub }: { active: boolean, onClick: () => void, label: string, sub?: string }) => (
     <button
         onClick={onClick}
-        className={`w-full text-left p-3 rounded-md border text-sm transition-all ${active
+        className={`w-full text-left p-2 rounded-md border text-xs transition-all ${active
             ? 'bg-teal-50 border-teal-600 text-teal-900 ring-1 ring-teal-600'
             : 'bg-white border-slate-200 text-slate-600 hover:border-teal-400 hover:bg-slate-50'
             }`}
     >
-        <div className="font-medium">{label}</div>
-        {sub && <div className="text-[10px] opacity-70 mt-0.5">{sub}</div>}
+        <div className="font-bold">{label}</div>
+        {sub && <div className="text-[9px] opacity-70 mt-0.5 font-medium">{sub}</div>}
     </button>
 );

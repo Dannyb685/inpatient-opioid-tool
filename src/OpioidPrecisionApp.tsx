@@ -34,9 +34,9 @@ const OpioidPrecisionApp = () => {
     const [activeTab, setActiveTab] = useState('decision');
 
     return (
-        <div className="flex h-screen bg-white text-slate-900 font-sans overflow-hidden">
-            {/* Sidebar Navigation */}
-            <nav className="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-6 z-20 flex-none">
+        <div className="flex flex-col md:flex-row h-screen bg-white text-slate-900 font-sans overflow-hidden">
+            {/* Sidebar Navigation (Desktop) */}
+            <nav className="hidden md:flex w-20 bg-white border-r border-slate-200 flex-col items-center py-6 z-20 flex-none">
                 <div className="mb-8">
                     <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center text-white shadow-teal-200 shadow-lg">
                         <Activity className="w-6 h-6" />
@@ -62,26 +62,53 @@ const OpioidPrecisionApp = () => {
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col h-full bg-white overflow-hidden relative">
                 {/* Top Bar */}
-                <header className="h-16 border-b border-slate-100 flex items-center justify-between px-8 bg-white/80 backdrop-blur-sm z-10 flex-none">
+                <header className="h-14 md:h-16 border-b border-slate-100 flex items-center justify-between px-4 md:px-8 bg-white/80 backdrop-blur-sm z-10 flex-none">
                     <div>
-                        <h1 className="text-xl font-bold text-slate-800">
+                        <h1 className="text-lg md:text-xl font-bold text-slate-800">
                             {activeTab === 'decision' && 'Patient Assessment'}
                             {activeTab === 'moud' && 'Assessment Toolkit'}
                             {activeTab === 'proto' && 'Clinical Protocols'}
                             {activeTab === 'calc' && 'Conversion Calculator'}
                             {activeTab === 'ref' && 'Pharmacology Reference'}
                         </h1>
-                        <p className="text-xs text-slate-400 font-medium">Inpatient Opioid Management Tool</p>
+                        <p className="text-[10px] md:text-xs text-slate-400 font-medium line-clamp-1">Inpatient Opioid Management Tool</p>
+                    </div>
+                    <div className="md:hidden w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-bold">
+                        DB
                     </div>
                 </header>
 
-                <main className={`flex-1 relative ${activeTab === 'decision' ? 'overflow-hidden' : 'overflow-y-auto p-6'}`}>
+                <main className={`flex-1 relative ${activeTab === 'decision' ? 'overflow-hidden' : 'overflow-y-auto p-4 md:p-6'} pb-20 md:pb-0`}>
                     {activeTab === 'decision' && <AssessmentView />}
                     {activeTab === 'moud' && <ToolkitView />}
                     {activeTab === 'proto' && <ProtocolsView />}
                     {activeTab === 'calc' && <CalculatorView />}
                     {activeTab === 'ref' && <ReferenceView />}
                 </main>
+
+                {/* Bottom Navigation (Mobile) */}
+                <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around p-2 z-30 safe-area-bottom">
+                    <button onClick={() => setActiveTab('decision')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'decision' ? 'text-teal-600 bg-teal-50' : 'text-slate-400'}`}>
+                        <Home className="w-5 h-5" />
+                        <span className="text-[9px] font-bold mt-1">Risk</span>
+                    </button>
+                    <button onClick={() => setActiveTab('moud')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'moud' ? 'text-teal-600 bg-teal-50' : 'text-slate-400'}`}>
+                        <Stethoscope className="w-5 h-5" />
+                        <span className="text-[9px] font-bold mt-1">Tools</span>
+                    </button>
+                    <button onClick={() => setActiveTab('proto')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'proto' ? 'text-teal-600 bg-teal-50' : 'text-slate-400'}`}>
+                        <BookOpen className="w-5 h-5" />
+                        <span className="text-[9px] font-bold mt-1">Proto</span>
+                    </button>
+                    <button onClick={() => setActiveTab('calc')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'calc' ? 'text-teal-600 bg-teal-50' : 'text-slate-400'}`}>
+                        <Calculator className="w-5 h-5" />
+                        <span className="text-[9px] font-bold mt-1">Dose</span>
+                    </button>
+                    <button onClick={() => setActiveTab('ref')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'ref' ? 'text-teal-600 bg-teal-50' : 'text-slate-400'}`}>
+                        <Database className="w-5 h-5" />
+                        <span className="text-[9px] font-bold mt-1">Drug</span>
+                    </button>
+                </div>
             </div>
         </div>
     );

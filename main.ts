@@ -1,14 +1,9 @@
 import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, ItemView, Notice, TFile } from 'obsidian';
-import * as React from 'react';
-import { createRoot, Root } from 'react-dom/client';
-import OpioidPrecisionApp from './src/OpioidPrecisionApp';
-import { DRUG_DATA, WARNING_DATA } from './src/data';
+import { DRUG_DATA } from './src/data';
 
 const VIEW_TYPE_OPIOID = "opioid-precision-tool-view";
 
 class OpioidView extends ItemView {
-    root: Root | null = null;
-
     constructor(leaf: WorkspaceLeaf) {
         super(leaf);
     }
@@ -23,20 +18,20 @@ class OpioidView extends ItemView {
 
     async onOpen() {
         const container = this.contentEl;
+        container.empty();
         container.addClass('opioid-tool-container');
 
-        this.root = createRoot(container);
-        this.root.render(
-            React.createElement(React.StrictMode, null,
-                React.createElement(OpioidPrecisionApp, null)
-            )
-        );
+        const iframe = container.createEl('iframe', {
+            attr: {
+                src: 'https://inpatient-opioid-tool.vercel.app',
+                style: 'width: 100%; height: 100%; border: none;',
+                sandbox: 'allow-scripts allow-forms allow-popups allow-same-origin'
+            }
+        });
     }
 
     async onClose() {
-        if (this.root) {
-            this.root.unmount();
-        }
+        // Nothing to unmount for iframe
     }
 }
 
