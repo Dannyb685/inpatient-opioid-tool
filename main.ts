@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, ItemView, Notice, TFolder } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, ItemView, Notice, TFile } from 'obsidian';
 import * as React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import OpioidPrecisionApp from './src/OpioidPrecisionApp';
@@ -102,7 +102,7 @@ ${drug.pharmacokinetics}
 
             const existingFile = this.app.vault.getAbstractFileByPath(fileName);
             if (existingFile) {
-                await this.app.vault.modify(existingFile as any, content);
+                await this.app.vault.modify(existingFile as TFile, content);
             } else {
                 await this.app.vault.create(fileName, content);
             }
@@ -117,7 +117,7 @@ ${drug.pharmacokinetics}
     async activateView() {
         const { workspace } = this.app;
 
-        let leaf: WorkspaceLeaf | null = null;
+        let leaf: WorkspaceLeaf;
         const leaves = workspace.getLeavesOfType(VIEW_TYPE_OPIOID);
 
         if (leaves.length > 0) {
