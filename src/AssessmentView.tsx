@@ -326,7 +326,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                 <div className="space-y-3">
 
                     {/* Demographics & PRODIGY */}
-                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
+                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
                         <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
                             <Users className="w-4 h-4" /> Patient Demographics
                         </h3>
@@ -339,12 +339,12 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                                     placeholder="Yrs"
                                     value={age}
                                     onChange={(e) => setAge(e.target.value)}
-                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 outline-none focus:border-teal-500"
+                                    className="w-full px-3 py-1.5 rounded-sm border border-slate-200 text-sm font-bold text-slate-700 outline-none focus:border-teal-500"
                                 />
                             </div>
                             <div className="flex-1">
                                 <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Sex</label>
-                                <div className="flex bg-white rounded-lg border border-slate-200 overflow-hidden">
+                                <div className="flex bg-white rounded-sm border border-slate-200 overflow-hidden">
                                     <button onClick={() => setSex('male')} className={`flex-1 py-1.5 text-xs font-bold ${sex === 'male' ? 'bg-teal-50 text-teal-700' : 'text-slate-400 hover:bg-slate-50'}`}>M</button>
                                     <div className="w-px bg-slate-200"></div>
                                     <button onClick={() => setSex('female')} className={`flex-1 py-1.5 text-xs font-bold ${sex === 'female' ? 'bg-teal-50 text-teal-700' : 'text-slate-400 hover:bg-slate-50'}`}>F</button>
@@ -352,7 +352,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                             </div>
                         </div>
 
-                        <label className={`flex items-center justify-between p-2 rounded-lg border cursor-pointer transition-colors ${naive ? 'bg-teal-50 border-teal-200' : 'bg-white border-slate-200'}`}>
+                        <label className={`flex items-center justify-between p-2 rounded-sm border cursor-pointer transition-colors ${naive ? 'bg-teal-50 border-teal-200' : 'bg-white border-slate-200'}`}>
                             <div>
                                 <span className="text-xs font-bold text-slate-700 block">Opioid Naive</span>
                                 <span className="text-[10px] text-slate-400 font-medium">No exposure last 7 days</span>
@@ -362,7 +362,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                     </div>
 
                     {/* Risk Factors Section */}
-                    <div className="bg-rose-50/50 p-3 rounded-xl border border-rose-100 space-y-2">
+                    <div className="bg-rose-50/50 p-3 rounded-lg border border-rose-100 space-y-2">
                         <h3 className="text-xs font-bold text-rose-500 uppercase tracking-wider flex items-center gap-2">
                             <ShieldAlert className="w-4 h-4" /> PRODIGY & Safety
                         </h3>
@@ -461,12 +461,12 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                 </div>
             </div>
             {/* Right Pane: Guidance */}
-            <div className="lg:flex-1 h-full min-h-[400px] bg-slate-50 rounded-xl border border-slate-200 p-4 flex flex-col">
+            <div className="lg:flex-1 h-full min-h-[400px] bg-slate-50 rounded-lg border border-slate-200 p-4 flex flex-col">
                 {recs.length > 0 ? (
                     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 flex-1 flex flex-col h-full overflow-hidden">
 
                         {/* Static Advisory - Always Visible */}
-                        <div className="bg-blue-50/50 border border-blue-100 p-2.5 rounded-lg flex items-start gap-3 shrink-0">
+                        <div className="bg-blue-50/50 border border-blue-100 p-2.5 rounded-sm flex items-start gap-3 shrink-0">
                             <Activity className="w-4 h-4 text-blue-500 mt-0.5" />
                             <div className="text-xs text-blue-900 leading-relaxed font-medium">
                                 <strong>Non-Opioid Strategy:</strong>
@@ -483,7 +483,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                         <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4">
 
                             {/* PRODIGY Header */}
-                            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden mb-2">
+                            <div className="bg-white rounded-sm border border-slate-200 shadow-sm overflow-hidden mb-2">
                                 <div className="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                                     <div className="flex items-center gap-2">
                                         <Activity className="w-5 h-5 text-indigo-600" />
@@ -544,7 +544,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
 
                             <div className="space-y-3 overflow-y-auto custom-scrollbar flex-1 pr-1">
                                 {recs.map((rec, i) => (
-                                    <div key={i} className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                                    <div key={i} className="bg-white p-3 rounded-sm shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
                                         <div className="flex justify-between items-start mb-1.5">
                                             <div className="flex items-center gap-2">
                                                 {rec.type === 'safe'
@@ -566,7 +566,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                                             <CheckCircle2 className="w-4 h-4" /> Suggested Adjuvants
                                         </h3>
                                         {adjuvants.map((adj, i) => (
-                                            <div key={i} className="bg-teal-50/50 p-2.5 rounded-lg border border-teal-100 text-xs text-teal-900 leading-relaxed font-medium">
+                                            <div key={i} className="bg-teal-50/50 p-2.5 rounded-sm border border-teal-100 text-xs text-teal-900 leading-relaxed font-medium">
                                                 {adj}
                                             </div>
                                         ))}
@@ -582,7 +582,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                                 <h3 className="text-xs font-bold text-rose-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                                     <ShieldAlert className="w-4 h-4" /> Contraindications
                                 </h3>
-                                <div className="bg-rose-50 border border-rose-100 rounded-lg p-3">
+                                <div className="bg-rose-50 border border-rose-100 rounded-sm p-3">
                                     <ul className="space-y-1.5">
                                         {warnings.map((w, i) => (
                                             <li key={i} className="flex items-start gap-2 text-xs text-rose-800 font-medium">
