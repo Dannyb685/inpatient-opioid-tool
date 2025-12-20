@@ -12,26 +12,40 @@ import {
     ShieldAlert,
     Microscope,
     Sliders,
-    Zap
+    Zap,
+    Home,
+    Menu,
+    X,
+    User,
+    Settings,
+    Beaker
 } from 'lucide-react';
 
 import { DRUG_DATA, WARNING_DATA } from './data';
 
 // --- Components ---
 
-const Card = ({ children, className = "", onClick }: { children: React.ReactNode, className?: string, onClick?: () => void }) => (
-    <div onClick={onClick} className={`bg-[var(--background-secondary)] rounded-xl shadow-sm border border-[var(--background-modifier-border)] overflow-hidden ${className} ${onClick ? 'cursor-pointer hover:border-[var(--interactive-accent)] transition-colors' : ''}`}>
-        {children}
+const ClinicalCard = ({ children, className = "", title, action }: { children: React.ReactNode, className?: string, title?: string, action?: React.ReactNode }) => (
+    <div className={`bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden ${className}`}>
+        {title && (
+            <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">{title}</h3>
+                {action}
+            </div>
+        )}
+        <div className="p-4">
+            {children}
+        </div>
     </div>
 );
 
 const Badge = ({ type, text }: { type?: string, text: string }) => {
     const styles: { [key: string]: string } = {
-        safe: "bg-[var(--background-modifier-success)] text-white border-transparent",
-        caution: "bg-[var(--background-modifier-warning)] text-black border-transparent",
-        unsafe: "bg-[var(--status-error)] text-white border-transparent",
-        neutral: "bg-[var(--background-modifier-border)] text-[var(--text-muted)] border-transparent",
-        purple: "bg-[var(--interactive-accent)] text-white border-transparent"
+        safe: "bg-emerald-100 text-emerald-700 border-emerald-200",
+        caution: "bg-amber-100 text-amber-700 border-amber-200",
+        unsafe: "bg-rose-100 text-rose-700 border-rose-200",
+        neutral: "bg-slate-100 text-slate-600 border-slate-200",
+        purple: "bg-purple-100 text-purple-700 border-purple-200"
     };
 
     let styleKey = type || 'neutral';
@@ -61,6 +75,7 @@ const DecisionSupportView = () => {
     useEffect(() => {
         if (!renal || !hemo || !route) {
             setRecs([]);
+            setWarnings([]);
             return;
         }
 
@@ -100,77 +115,106 @@ const DecisionSupportView = () => {
         setWarnings(w);
     }, [renal, hemo, route]);
 
+    const ParameterBtn = ({ active, onClick, label, sub }: { active: boolean, onClick: () => void, label: string, sub?: string }) => (
+        <button
+            onClick={onClick}
+            className={`w-full text-left p-3 rounded-md border text-sm transition-all ${active
+                ? 'bg-teal-50 border-teal-600 text-teal-900 ring-1 ring-teal-600'
+                : 'bg-white border-slate-200 text-slate-600 hover:border-teal-400 hover:bg-slate-50'
+                }`}
+        >
+            <div className="font-medium">{label}</div>
+            {sub && <div className="text-[10px] opacity-70 mt-0.5">{sub}</div>}
+        </button>
+    );
+
     return (
-        <div className="space-y-6">
-            {/* Input Matrix */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-[var(--text-muted)] uppercase">Renal Status</label>
-                    <div className="flex flex-col gap-1">
-                        {[{ id: 'normal', l: 'GFR > 60' }, { id: 'impaired', l: 'GFR < 30' }, { id: 'dialysis', l: 'Dialysis' }].map(o => (
-                            <button key={o.id} onClick={() => setRenal(o.id)}
-                                className={`px-3 py-2 text-sm rounded-lg border text-left ${renal === o.id ? 'bg-[var(--interactive-accent)] text-[var(--text-on-accent)] border-[var(--interactive-accent)]' : 'bg-[var(--background-primary)] text-[var(--text-normal)] border-[var(--background-modifier-border)] hover:bg-[var(--background-modifier-hover)]'}`}>
-                                {o.l}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-[var(--text-muted)] uppercase">Hemodynamics</label>
-                    <div className="flex flex-col gap-1">
-                        {[{ id: 'stable', l: 'Stable BP' }, { id: 'unstable', l: 'Shock / Hypotensive' }].map(o => (
-                            <button key={o.id} onClick={() => setHemo(o.id)}
-                                className={`px-3 py-2 text-sm rounded-lg border text-left ${hemo === o.id ? 'bg-[var(--interactive-accent)] text-[var(--text-on-accent)] border-[var(--interactive-accent)]' : 'bg-[var(--background-primary)] text-[var(--text-normal)] border-[var(--background-modifier-border)] hover:bg-[var(--background-modifier-hover)]'}`}>
-                                {o.l}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-[var(--text-muted)] uppercase">Route</label>
-                    <div className="flex flex-col gap-1">
-                        {[{ id: 'iv', l: 'Intravenous' }, { id: 'po', l: 'Oral' }].map(o => (
-                            <button key={o.id} onClick={() => setRoute(o.id)}
-                                className={`px-3 py-2 text-sm rounded-lg border text-left ${route === o.id ? 'bg-[var(--interactive-accent)] text-[var(--text-on-accent)] border-[var(--interactive-accent)]' : 'bg-[var(--background-primary)] text-[var(--text-normal)] border-[var(--background-modifier-border)] hover:bg-[var(--background-modifier-hover)]'}`}>
-                                {o.l}
-                            </button>
-                        ))}
+        <div className="flex flex-col lg:flex-row gap-6 h-full">
+            {/* Left Pane: Patient Profile */}
+            <div className="lg:w-1/3 flex-none space-y-6">
+                <div>
+                    <h2 className="text-lg font-bold text-slate-800 mb-4 px-1">Case Parameters</h2>
+                    <div className="space-y-5">
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-400 uppercase ml-1">Renal Function</label>
+                            <div className="space-y-1.5">
+                                <ParameterBtn active={renal === 'normal'} onClick={() => setRenal('normal')} label="Normal Function" sub="eGFR > 60" />
+                                <ParameterBtn active={renal === 'impaired'} onClick={() => setRenal('impaired')} label="Impaired / CKD" sub="eGFR < 30" />
+                                <ParameterBtn active={renal === 'dialysis'} onClick={() => setRenal('dialysis')} label="Dialysis Dependent" sub="HD / PD / CRRT" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-400 uppercase ml-1">Hemodynamics</label>
+                            <div className="space-y-1.5">
+                                <ParameterBtn active={hemo === 'stable'} onClick={() => setHemo('stable')} label="Hemodynamically Stable" />
+                                <ParameterBtn active={hemo === 'unstable'} onClick={() => setHemo('unstable')} label="Shock / Hypotensive" sub="MAP < 65 or Pressors" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-400 uppercase ml-1">Route of Admin</label>
+                            <div className="grid grid-cols-2 gap-2">
+                                <ParameterBtn active={route === 'iv'} onClick={() => setRoute('iv')} label="IV / SQ" />
+                                <ParameterBtn active={route === 'po'} onClick={() => setRoute('po')} label="Oral (PO)" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Output Stream */}
-            <div className="min-h-[200px]">
+            {/* Right Pane: Guidance */}
+            <div className="lg:flex-1 h-full min-h-[400px] bg-slate-50 rounded-xl border border-slate-200 p-6">
                 {recs.length > 0 ? (
-                    <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2">
-                        <h3 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
-                            <Microscope className="w-4 h-4" /> Clinical Recommendations
-                        </h3>
-                        {recs.map((rec, i) => (
-                            <Card key={i} className={`p-4 border-l-4 ${rec.type === 'safe' ? 'border-l-[var(--background-modifier-success)]' : 'border-l-[var(--background-modifier-warning)]'}`}>
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="font-bold text-[var(--text-normal)]">{rec.name}</span>
-                                    <Badge type={rec.type} text={rec.type === 'safe' ? 'Preferred' : 'Proceed with Caution'} />
+                    <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                <Beaker className="w-4 h-4" /> Recommended Agents
+                            </h3>
+                            <span className="text-xs font-medium text-slate-400">{recs.length} options found</span>
+                        </div>
+
+                        <div className="space-y-3">
+                            {recs.map((rec, i) => (
+                                <div key={i} className="bg-white p-4 rounded-lg shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="flex items-center gap-2">
+                                            {rec.type === 'safe'
+                                                ? <div className="p-1 rounded-full bg-emerald-100 text-emerald-600"><Activity className="w-4 h-4" /></div>
+                                                : <div className="p-1 rounded-full bg-amber-100 text-amber-600"><AlertTriangle className="w-4 h-4" /></div>
+                                            }
+                                            <span className="font-bold text-slate-800 text-lg">{rec.name}</span>
+                                        </div>
+                                        <Badge type={rec.type} text={rec.type === 'safe' ? 'Preferred' : 'Monitor'} />
+                                    </div>
+                                    <p className="text-slate-600 text-sm font-medium mb-1">{rec.reason}</p>
+                                    <p className="text-xs text-slate-400 bg-slate-50 p-2 rounded border border-slate-100 inline-block">{rec.detail}</p>
                                 </div>
-                                <div className="text-sm text-[var(--text-muted)] font-medium">{rec.reason}</div>
-                                <div className="text-xs text-[var(--text-faint)] mt-1 italic border-t pt-1 border-[var(--background-modifier-border)]">{rec.detail}</div>
-                            </Card>
-                        ))}
+                            ))}
+                        </div>
+
                         {warnings.length > 0 && (
-                            <div className="bg-[var(--background-modifier-error)] p-4 rounded-xl border border-[var(--background-modifier-border)]">
-                                <div className="flex items-center gap-2 text-white font-bold text-sm mb-2">
+                            <div className="mt-6">
+                                <h3 className="text-xs font-bold text-rose-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                                     <ShieldAlert className="w-4 h-4" /> Contraindications
+                                </h3>
+                                <div className="bg-rose-50 border border-rose-100 rounded-lg p-4">
+                                    <ul className="space-y-2">
+                                        {warnings.map((w, i) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-rose-800">
+                                                <span className="block w-1.5 h-1.5 mt-1.5 rounded-full bg-rose-400 flex-none" />
+                                                {w}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
-                                <ul className="text-xs text-white/90 space-y-1 list-disc pl-4">
-                                    {warnings.map((w, i) => <li key={i}>{w}</li>)}
-                                </ul>
                             </div>
                         )}
                     </div>
                 ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-[var(--text-faint)] border-2 border-dashed border-[var(--background-modifier-border)] rounded-xl p-8">
-                        <Activity className="w-8 h-8 mb-2" />
-                        <span className="text-sm">Awaiting Clinical Parameters</span>
+                    <div className="h-full flex flex-col items-center justify-center text-slate-300">
+                        <Microscope className="w-12 h-12 mb-4 opacity-50" />
+                        <span className="text-sm font-medium">Select parameters to view guidance</span>
                     </div>
                 )}
             </div>
@@ -180,7 +224,7 @@ const DecisionSupportView = () => {
 
 const CalculatorView = () => {
     const [ivMorphine, setIvMorphine] = useState(10);
-    const [reduction, setReduction] = useState(30); // Default 30% reduction
+    const [reduction, setReduction] = useState(30);
 
     const convert = (factor: number) => {
         const raw = ivMorphine * factor;
@@ -189,81 +233,104 @@ const CalculatorView = () => {
     };
 
     return (
-        <div className="space-y-6 max-w-2xl mx-auto">
-            {/* Input */}
-            <div className="bg-[var(--background-secondary-alt)] text-[var(--text-normal)] p-6 rounded-2xl shadow-lg border border-[var(--background-modifier-border)]">
-                <div className="flex justify-between items-start mb-6">
-                    <div>
-                        <label className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Input Dose</label>
-                        <div className="text-2xl font-bold">IV Morphine Equivalent</div>
+        <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Input Side */}
+            <div className="space-y-6">
+                <ClinicalCard title="Input Dose">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <span className="block text-2xl font-bold text-slate-900">Morphine IV</span>
+                            <span className="text-xs text-slate-500 font-medium uppercase tracking-wide">Reference Standard</span>
+                        </div>
+                        <div className="flex items-baseline gap-1 relative">
+                            <input
+                                type="number"
+                                value={ivMorphine}
+                                onChange={(e) => setIvMorphine(Math.max(0, parseFloat(e.target.value)))}
+                                className="w-28 text-4xl font-bold text-right text-teal-600 border-b-2 border-slate-100 focus:border-teal-500 focus:outline-none bg-transparent pb-1"
+                            />
+                            <span className="text-sm font-bold text-slate-400 absolute -right-6 bottom-2">mg</span>
+                        </div>
                     </div>
-                    <div className="flex items-baseline gap-2">
-                        <input
-                            type="number"
-                            value={ivMorphine}
-                            onChange={(e) => setIvMorphine(Math.max(0, parseFloat(e.target.value)))}
-                            className="bg-transparent text-4xl font-mono text-right w-24 border-b border-[var(--background-modifier-border)] focus:border-[var(--interactive-accent)] outline-none text-[var(--text-normal)]"
-                        />
-                        <span className="text-[var(--text-muted)]">mg</span>
-                    </div>
-                </div>
 
-                <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-medium text-[var(--text-muted)]">
-                        <span className="flex items-center gap-1"><Sliders className="w-3 h-3" /> Cross-Tolerance Reduction</span>
-                        <span className={reduction < 25 ? "text-[var(--text-error)]" : "text-[var(--text-success)]"}>-{reduction}%</span>
+                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                        <div className="flex justify-between text-xs font-bold text-slate-500 uppercase mb-4">
+                            <span>Cross-Tolerance Reduction</span>
+                            <span className={reduction < 25 ? "text-rose-500" : "text-emerald-600"}>-{reduction}%</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="0"
+                            max="75"
+                            value={reduction}
+                            onChange={(e) => setReduction(parseInt(e.target.value))}
+                            className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600 mb-2"
+                        />
+                        <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                            <span>0% (Aggressive)</span>
+                            <span>50% (Conservative)</span>
+                        </div>
                     </div>
-                    <input
-                        type="range"
-                        min="0"
-                        max="75"
-                        value={reduction}
-                        onChange={(e) => setReduction(parseInt(e.target.value))}
-                        className="w-full h-1 bg-[var(--background-modifier-border)] rounded-lg appearance-none cursor-pointer accent-[var(--interactive-accent)]"
-                    />
-                    <p className="text-[10px] text-[var(--text-faint)]">
-                        *Clinical Standard: Reduce calculated dose by 25-50% when rotating agents to account for incomplete cross-tolerance.
+                </ClinicalCard>
+
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 flex gap-3 text-blue-900">
+                    <Info className="w-5 h-5 flex-none text-blue-500" />
+                    <p className="text-xs leading-relaxed">
+                        <strong>Clinical Note:</strong> Calculator uses equianalgesic ratios from NCCN Guidelines.
+                        Always use clinical judgment and start lower in elderly/frail patients.
                     </p>
                 </div>
             </div>
 
-            {/* Results Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                    <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase ml-1">Parenteral (IV) Targets</h4>
-                    <Card className="p-4">
-                        <div className="flex justify-between items-baseline mb-1">
-                            <span className="font-bold text-[var(--text-normal)]">Hydromorphone IV</span>
-                            <span className="text-2xl font-bold text-[var(--interactive-accent)]">{convert(0.15).reduced} <span className="text-sm text-[var(--text-faint)]">mg</span></span>
-                        </div>
-                        <div className="text-xs text-[var(--text-faint)]">Raw calc: {convert(0.15).raw} mg (Ratio 1:6.7)</div>
-                    </Card>
-                    <Card className="p-4">
-                        <div className="flex justify-between items-baseline mb-1">
-                            <span className="font-bold text-[var(--text-normal)]">Fentanyl IV</span>
-                            <span className="text-2xl font-bold text-[var(--interactive-accent)]">{convert(10).reduced} <span className="text-sm text-[var(--text-faint)]">mcg</span></span>
-                        </div>
-                        <div className="text-xs text-[var(--text-faint)]">Raw calc: {convert(10).raw} mcg (Ratio 1:100)</div>
-                    </Card>
+            {/* Output Side */}
+            <div className="space-y-6">
+                <div>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Parenteral Targets (IV/SQ)</h3>
+                    <div className="space-y-2">
+                        <ClinicalCard className="flex justify-between items-center p-4">
+                            <div>
+                                <div className="font-bold text-slate-800">Hydromorphone IV</div>
+                                <div className="text-[10px] text-slate-400">Ratio 1:6.7</div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-teal-600">{convert(0.15).reduced}<small className="text-xs text-slate-400 ml-1">mg</small></div>
+                                <div className="text-[10px] text-slate-400 strikethrough decoration-slate-300 opacity-60">{convert(0.15).raw} raw</div>
+                            </div>
+                        </ClinicalCard>
+                        <ClinicalCard className="flex justify-between items-center p-4">
+                            <div>
+                                <div className="font-bold text-slate-800">Fentanyl IV</div>
+                                <div className="text-[10px] text-slate-400">Ratio 1:100 (mcg)</div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-teal-600">{convert(10).reduced}<small className="text-xs text-slate-400 ml-1">mcg</small></div>
+                            </div>
+                        </ClinicalCard>
+                    </div>
                 </div>
 
-                <div className="space-y-3">
-                    <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase ml-1">Enteral (PO) Targets</h4>
-                    <Card className="p-4 border-l-4 border-l-[var(--background-modifier-success)]">
-                        <div className="flex justify-between items-baseline mb-1">
-                            <span className="font-bold text-[var(--text-normal)]">Oxycodone PO</span>
-                            <span className="text-2xl font-bold text-[var(--text-success)]">{convert(2.0).reduced} <span className="text-sm text-[var(--text-faint)]">mg</span></span>
-                        </div>
-                        <div className="text-xs text-[var(--text-faint)]">High Bioavailability. Ratio 1:2</div>
-                    </Card>
-                    <Card className="p-4 border-l-4 border-l-[var(--background-modifier-warning)]">
-                        <div className="flex justify-between items-baseline mb-1">
-                            <span className="font-bold text-[var(--text-normal)]">Hydromorphone PO</span>
-                            <span className="text-2xl font-bold text-[var(--text-warning)]">{convert(0.75).reduced} <span className="text-sm text-[var(--text-faint)]">mg</span></span>
-                        </div>
-                        <div className="text-xs text-[var(--text-muted)] font-medium">Warning: Poor Bioavailability.</div>
-                        <div className="text-xs text-[var(--text-faint)]">Often underdosed if 1:1 conversion used.</div>
-                    </Card>
+                <div>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Enteral Targets (PO)</h3>
+                    <div className="space-y-2">
+                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-emerald-400">
+                            <div>
+                                <div className="font-bold text-slate-800">Oxycodone PO</div>
+                                <div className="text-[10px] text-emerald-600 font-medium">High Bioavailability</div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-slate-800">{convert(2.0).reduced}<small className="text-xs text-slate-400 ml-1">mg</small></div>
+                            </div>
+                        </ClinicalCard>
+                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-amber-400 bg-amber-50/30">
+                            <div>
+                                <div className="font-bold text-slate-800">Hydromorphone PO</div>
+                                <div className="text-[10px] text-amber-600 font-medium">Erratic Absorption</div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-slate-800">{convert(0.75).reduced}<small className="text-xs text-slate-400 ml-1">mg</small></div>
+                            </div>
+                        </ClinicalCard>
+                    </div>
                 </div>
             </div>
         </div>
@@ -280,13 +347,13 @@ const ReferenceView = () => {
     );
 
     return (
-        <div className="space-y-4">
+        <div className="max-w-4xl mx-auto space-y-6">
             <div className="relative">
                 <Search className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
                 <input
                     type="text"
                     placeholder="Search by drug, metabolite, or mechanism..."
-                    className="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none text-sm"
+                    className="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 text-sm shadow-sm"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -294,51 +361,55 @@ const ReferenceView = () => {
 
             <div className="space-y-3">
                 {filtered.map(drug => (
-                    <div key={drug.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div key={drug.id} className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all">
                         <div
                             onClick={() => setExpanded(expanded === drug.id ? null : drug.id)}
-                            className="p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center"
+                            className="p-4 cursor-pointer flex justify-between items-center group"
                         >
                             <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="font-bold text-slate-900">{drug.name}</h3>
+                                <div className="flex items-center gap-3">
+                                    <h3 className="font-bold text-slate-800">{drug.name}</h3>
                                     <Badge type={drug.type} text={drug.renal_safety === 'Safe' ? 'Renal Safe' : 'Renal Caution'} />
                                 </div>
-                                <div className="text-xs text-slate-500">{drug.type}</div>
+                                <div className="text-xs text-slate-500 mt-1">{drug.type}</div>
                             </div>
-                            {expanded === drug.id ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+                            <div className={`p-1 rounded-full transition-colors ${expanded === drug.id ? 'bg-slate-100 text-slate-600' : 'text-slate-300 group-hover:text-slate-500'}`}>
+                                {expanded === drug.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                            </div>
                         </div>
 
                         {expanded === drug.id && (
-                            <div className="bg-slate-50 px-4 pb-4 pt-2 border-t border-slate-100 text-sm">
-                                <div className="grid grid-cols-2 gap-4 mb-3">
-                                    <div className="bg-white p-2 rounded border border-slate-200">
-                                        <span className="block text-[10px] font-bold text-slate-400 uppercase">IV Onset/Duration</span>
-                                        <span className="text-slate-700">{drug.iv_onset} / {drug.iv_duration}</span>
+                            <div className="bg-slate-50 px-4 pb-4 pt-4 border-t border-slate-100 text-sm">
+                                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                                    <div className="bg-white p-3 rounded border border-slate-200">
+                                        <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">IV Profile</span>
+                                        <span className="text-slate-700 font-medium">{drug.iv_onset} onset / {drug.iv_duration} duration</span>
                                     </div>
-                                    <div className="bg-white p-2 rounded border border-slate-200">
-                                        <span className="block text-[10px] font-bold text-slate-400 uppercase">Bioavailability</span>
+                                    <div className="bg-white p-3 rounded border border-slate-200">
+                                        <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Bioavailability</span>
                                         <div className="flex items-center gap-2">
-                                            <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
-                                                <div className="h-full bg-blue-500" style={{ width: `${drug.bioavailability}%` }}></div>
+                                            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                                <div className="h-full bg-teal-500" style={{ width: `${drug.bioavailability}%` }}></div>
                                             </div>
-                                            <span className="text-slate-700">{drug.bioavailability > 0 ? `${drug.bioavailability}%` : 'N/A'}</span>
+                                            <span className="text-xs font-bold text-slate-600 w-8">{drug.bioavailability > 0 ? `${drug.bioavailability}%` : '-'}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <div>
-                                        <span className="flex items-center gap-1 text-xs font-bold text-purple-700 uppercase mb-1">
-                                            <Zap className="w-3 h-3" /> Clinical Context
-                                        </span>
-                                        <p className="text-slate-700 leading-relaxed">{drug.clinical_nuance}</p>
+                                <div className="space-y-3">
+                                    <div className="flex gap-3">
+                                        <Zap className="w-4 h-4 text-purple-500 flex-none mt-0.5" />
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-900 uppercase mb-1">Clinical Nuance</h4>
+                                            <p className="text-slate-600 leading-relaxed">{drug.clinical_nuance}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <span className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase mb-1">
-                                            <Activity className="w-3 h-3" /> Pharmacokinetics
-                                        </span>
-                                        <p className="text-slate-600">{drug.pharmacokinetics}</p>
+                                    <div className="flex gap-3">
+                                        <Activity className="w-4 h-4 text-slate-400 flex-none mt-0.5" />
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-900 uppercase mb-1">Pharmacokinetics</h4>
+                                            <p className="text-slate-500 leading-relaxed text-xs">{drug.pharmacokinetics}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -346,58 +417,79 @@ const ReferenceView = () => {
                     </div>
                 ))}
             </div>
-
-            <div className="mt-8 pt-6 border-t border-dashed border-slate-300">
-                <h3 className="text-xs font-bold text-rose-500 uppercase mb-3 flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4" /> High-Risk Agents
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {WARNING_DATA.map(w => (
-                        <div key={w.id} className="bg-rose-50 p-3 rounded-lg border border-rose-100">
-                            <div className="font-bold text-rose-900 text-sm mb-1">{w.name}</div>
-                            <div className="text-[10px] font-bold text-rose-800 uppercase mb-1">{w.risk}</div>
-                            <p className="text-xs text-rose-800/80 leading-relaxed">{w.desc}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
         </div>
     );
 };
 
 // --- Shell ---
 
+const SidebarItem = ({ active, icon: Icon, label, onClick }: { active: boolean, icon: any, label: string, onClick: () => void }) => (
+    <button
+        onClick={onClick}
+        className={`w-full flex flex-col items-center justify-center p-3 rounded-xl transition-all mb-2 ${active
+            ? 'bg-teal-50 text-teal-700 shadow-sm'
+            : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+            }`}
+    >
+        <Icon className={`w-6 h-6 mb-1 ${active ? 'stroke-2' : 'stroke-1.5'}`} />
+        <span className="text-[10px] font-bold tracking-wide">{label}</span>
+    </button>
+);
+
 const OpioidPrecisionApp = () => {
     const [activeTab, setActiveTab] = useState('decision');
 
     return (
-        <div className="min-h-full bg-[var(--background-primary)] text-[var(--text-normal)] font-sans selection:bg-[var(--text-selection)]">
-            <header className="sticky top-0 z-20 bg-[var(--background-primary-alt)] border-b border-[var(--background-modifier-border)]">
-                <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="bg-[var(--interactive-accent)] text-white p-1.5 rounded-lg">
-                            <Activity className="w-4 h-4" />
-                        </div>
-                        <div>
-                            <h1 className="text-sm font-bold text-[var(--text-normal)]">Precision Analgesia</h1>
-                            <p className="text-[10px] text-[var(--text-muted)] font-medium">Inpatient Guide 2025</p>
-                        </div>
+        <div className="flex h-screen bg-white text-slate-900 font-sans overflow-hidden">
+            {/* Sidebar Navigation */}
+            <nav className="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-6 z-20 flex-none">
+                <div className="mb-8">
+                    <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center text-white shadow-teal-200 shadow-lg">
+                        <Activity className="w-6 h-6" />
                     </div>
                 </div>
-                <div className="max-w-3xl mx-auto px-2 flex space-x-1">
-                    {[{ id: 'decision', icon: Database, l: 'Algo' }, { id: 'calc', icon: Calculator, l: 'Calc' }].map(t => (
-                        <button key={t.id} onClick={() => setActiveTab(t.id)}
-                            className={`flex-1 py-2 text-xs font-medium border-b-2 transition-colors flex justify-center items-center gap-2 ${activeTab === t.id ? 'border-[var(--interactive-accent)] text-[var(--text-accent)] bg-[var(--background-modifier-hover)]' : 'border-transparent text-[var(--text-muted)]'}`}>
-                            <t.icon className="w-3 h-3" /> {t.l}
-                        </button>
-                    ))}
-                </div>
-            </header>
 
-            <main className="max-w-3xl mx-auto px-4 py-6 pb-20">
-                {activeTab === 'decision' && <DecisionSupportView />}
-                {activeTab === 'calc' && <CalculatorView />}
-            </main>
+                <div className="flex-1 w-full px-2">
+                    <SidebarItem active={activeTab === 'decision'} onClick={() => setActiveTab('decision')} icon={Home} label="Guide" />
+                    <SidebarItem active={activeTab === 'calc'} onClick={() => setActiveTab('calc')} icon={Calculator} label="Dose" />
+                    <SidebarItem active={activeTab === 'ref'} onClick={() => setActiveTab('ref')} icon={Database} label="Drugs" />
+                </div>
+
+                <div className="mt-auto px-2 space-y-2">
+                    <button className="w-full text-slate-300 hover:text-slate-500 p-2"><Settings className="w-5 h-5 mx-auto" /></button>
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-bold mx-auto">
+                        DB
+                    </div>
+                </div>
+            </nav>
+
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col h-full bg-white overflow-hidden relative">
+                {/* Top Bar */}
+                <header className="h-16 border-b border-slate-100 flex items-center justify-between px-8 bg-white/80 backdrop-blur-sm z-10 flex-none">
+                    <div>
+                        <h1 className="text-xl font-bold text-slate-800">
+                            {activeTab === 'decision' && 'Clinical Decision Support'}
+                            {activeTab === 'calc' && 'Conversion Calculator'}
+                            {activeTab === 'ref' && 'Pharmacology Reference'}
+                        </h1>
+                        <p className="text-xs text-slate-400 font-medium">Inpatient Opioid Management Tool</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg text-xs font-medium text-slate-500 border border-slate-100">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            System Active
+                        </div>
+                    </div>
+                </header>
+
+                {/* View Container */}
+                <main className="flex-1 overflow-y-auto p-8 relative">
+                    {activeTab === 'decision' && <DecisionSupportView />}
+                    {activeTab === 'calc' && <CalculatorView />}
+                    {activeTab === 'ref' && <ReferenceView />}
+                </main>
+            </div>
         </div>
     );
 };
