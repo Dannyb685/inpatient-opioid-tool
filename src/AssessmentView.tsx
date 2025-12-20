@@ -257,9 +257,6 @@ export const AssessmentView = () => {
 
         // 1. General / Acute Pain Guidelines (CDC / ACEP)
         if (indication === 'standard') {
-            // First-Line: Non-Opioids
-            r.unshift({ name: 'Acetaminophen / NSAIDs', reason: 'First-Line Strategy.', detail: 'Maximize non-opioids before escalating to opioids (CDC 2022).', type: 'safe' });
-
             // Opioid Context
             r = r.map(x => {
                 if (['Morphine', 'Oxycodone', 'Hydromorphone'].some(d => x.name.includes(d))) {
@@ -491,98 +488,113 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
             {/* Right Pane: Guidance */}
             <div className="lg:flex-1 h-full min-h-[400px] bg-slate-50 rounded-xl border border-slate-200 p-6 flex flex-col">
                 {recs.length > 0 ? (
-                    <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 flex-1 flex flex-col">
+                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 flex-1 flex flex-col h-full overflow-hidden">
 
-                        {/* PRODIGY Header */}
-                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden mb-2">
-                            <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                                <div className="flex items-center gap-2">
-                                    <Activity className="w-5 h-5 text-indigo-600" />
-                                    <div>
-                                        <h3 className="text-xs font-bold text-indigo-900 uppercase tracking-wide">PRODIGY Risk Score</h3>
-                                        <p className="text-[10px] text-slate-500 font-medium">Respiratory Depression Prediction</p>
+                        {/* Static Advisory - Always Visible */}
+                        <div className="bg-blue-50/50 border border-blue-100 p-3 rounded-lg flex items-start gap-3 shrink-0">
+                            <Activity className="w-4 h-4 text-blue-500 mt-0.5" />
+                            <p className="text-xs text-blue-900 leading-relaxed font-medium">
+                                <strong>Non-Opioid Strategy:</strong> Avoid Tylenol {'>'} 4g daily (2g if liver failure).
+                                Avoid NSAIDs in HTN/CAD, GI Bleed, Renal Disease.
+                            </p>
+                        </div>
+
+                        {/* Scrollable Content Container */}
+                        <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4">
+
+                            {/* PRODIGY Header */}
+                            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden mb-2">
+                                <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                    <div className="flex items-center gap-2">
+                                        <Activity className="w-5 h-5 text-indigo-600" />
+                                        <div>
+                                            <h3 className="text-xs font-bold text-indigo-900 uppercase tracking-wide">PRODIGY Risk Score</h3>
+                                            <p className="text-[10px] text-slate-500 font-medium">Respiratory Depression Prediction</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-2xl font-black text-indigo-600 leading-none">{prodigyScore}</div>
+                                        <div className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${prodigyRisk === 'High' ? 'bg-rose-100 text-rose-700' :
+                                            prodigyRisk === 'Intermediate' ? 'bg-amber-100 text-amber-700' :
+                                                'bg-emerald-100 text-emerald-700'
+                                            }`}>{prodigyRisk} Risk</div>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <div className="text-2xl font-black text-indigo-600 leading-none">{prodigyScore}</div>
-                                    <div className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${prodigyRisk === 'High' ? 'bg-rose-100 text-rose-700' :
-                                        prodigyRisk === 'Intermediate' ? 'bg-amber-100 text-amber-700' :
-                                            'bg-emerald-100 text-emerald-700'
-                                        }`}>{prodigyRisk} Risk</div>
+
+                                {/* Monitoring Plan */}
+                                <div className={`p-4 ${prodigyRisk === 'High' ? 'bg-rose-50' : prodigyRisk === 'Intermediate' ? 'bg-amber-50' : 'bg-slate-50'}`}>
+                                    <h4 className={`text-xs font-bold uppercase mb-2 flex items-center gap-2 ${prodigyRisk === 'High' ? 'text-rose-700' :
+                                        prodigyRisk === 'Intermediate' ? 'text-amber-700' :
+                                            'text-slate-500'
+                                        }`}>
+                                        <HeartPulse className="w-4 h-4" /> Monitoring Strategy
+                                    </h4>
+                                    <ul className="space-y-1 mb-3">
+                                        {monitoringRecs.map((m, i) => (
+                                            <li key={i} className="text-xs font-medium text-slate-700 flex items-start gap-2">
+                                                <span className="mt-1 w-1 h-1 rounded-full bg-slate-400 flex-none" />
+                                                {m}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    {/* Temporal Alert */}
+                                    <div className="bg-white/60 rounded border border-black/5 p-2 flex gap-3 items-center">
+                                        <Timer className="w-4 h-4 text-slate-400 flex-none" />
+                                        <div className="text-[10px] text-slate-600 leading-tight">
+                                            <strong>Peak Risk:</strong> 14:00-20:00 (Day 0) & 02:00-06:00 (Night).
+                                            Median onset 8.8h post-op. 46% of PRODIGY patients had an event.
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Monitoring Plan */}
-                            <div className={`p-4 ${prodigyRisk === 'High' ? 'bg-rose-50' : prodigyRisk === 'Intermediate' ? 'bg-amber-50' : 'bg-slate-50'}`}>
-                                <h4 className={`text-xs font-bold uppercase mb-2 flex items-center gap-2 ${prodigyRisk === 'High' ? 'text-rose-700' :
-                                    prodigyRisk === 'Intermediate' ? 'text-amber-700' :
-                                        'text-slate-500'
-                                    }`}>
-                                    <HeartPulse className="w-4 h-4" /> Monitoring Strategy
-                                </h4>
-                                <ul className="space-y-1 mb-3">
-                                    {monitoringRecs.map((m, i) => (
-                                        <li key={i} className="text-xs font-medium text-slate-700 flex items-start gap-2">
-                                            <span className="mt-1 w-1 h-1 rounded-full bg-slate-400 flex-none" />
-                                            {m}
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                {/* Temporal Alert */}
-                                <div className="bg-white/60 rounded border border-black/5 p-2 flex gap-3 items-center">
-                                    <Timer className="w-4 h-4 text-slate-400 flex-none" />
-                                    <div className="text-[10px] text-slate-600 leading-tight">
-                                        <strong>Peak Risk:</strong> 14:00-20:00 (Day 0) & 02:00-06:00 (Night).
-                                        Median onset 8.8h post-op. 46% of PRODIGY patients had an event.
-                                    </div>
-                                </div>
+                            <div className="flex items-center justify-between mt-2">
+                                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                    <Beaker className="w-4 h-4" /> Clinical Recommendations
+                                </h3>
+                                <button
+                                    onClick={handleCopy}
+                                    className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md transition-colors text-[10px] font-bold"
+                                >
+                                    <Copy className="w-3 h-3" />
+                                    Smart Copy
+                                </button>
                             </div>
-                        </div>
 
-                        <div className="flex items-center justify-between mt-2">
-                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                                <Beaker className="w-4 h-4" /> Clinical Recommendations
-                            </h3>
-                            <button
-                                onClick={handleCopy}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md transition-colors text-[10px] font-bold"
-                            >
-                                <Copy className="w-3 h-3" />
-                                Smart Copy
-                            </button>
-                        </div>
-
-                        <div className="space-y-3 overflow-y-auto custom-scrollbar flex-1 pr-1">
-                            {recs.map((rec, i) => (
-                                <div key={i} className="bg-white p-4 rounded-lg shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="flex items-center gap-2">
-                                            {rec.type === 'safe'
-                                                ? <div className="p-1 rounded-full bg-emerald-100 text-emerald-600"><Activity className="w-4 h-4" /></div>
-                                                : <div className="p-1 rounded-full bg-amber-100 text-amber-600"><AlertTriangle className="w-4 h-4" /></div>
-                                            }
-                                            <span className="font-bold text-slate-800 text-lg">{rec.name}</span>
+                            <div className="space-y-3 overflow-y-auto custom-scrollbar flex-1 pr-1">
+                                {recs.map((rec, i) => (
+                                    <div key={i} className="bg-white p-4 rounded-lg shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="flex items-center gap-2">
+                                                {rec.type === 'safe'
+                                                    ? <div className="p-1 rounded-full bg-emerald-100 text-emerald-600"><Activity className="w-4 h-4" /></div>
+                                                    : <div className="p-1 rounded-full bg-amber-100 text-amber-600"><AlertTriangle className="w-4 h-4" /></div>
+                                                }
+                                                <span className="font-bold text-slate-800 text-lg">{rec.name}</span>
+                                            </div>
+                                            <Badge type={rec.type} text={rec.type === 'safe' ? 'Preferred' : 'Monitor'} />
                                         </div>
-                                        <Badge type={rec.type} text={rec.type === 'safe' ? 'Preferred' : 'Monitor'} />
+                                        <p className="text-slate-600 text-sm font-medium mb-1">{rec.reason}</p>
+                                        <p className="text-xs text-slate-400 bg-slate-50 p-2 rounded border border-slate-100 inline-block">{rec.detail}</p>
                                     </div>
-                                    <p className="text-slate-600 text-sm font-medium mb-1">{rec.reason}</p>
-                                    <p className="text-xs text-slate-400 bg-slate-50 p-2 rounded border border-slate-100 inline-block">{rec.detail}</p>
-                                </div>
-                            ))}
+                                ))}
 
-                            {adjuvants.length > 0 && (
-                                <div className="mt-4 space-y-3">
-                                    <h3 className="text-sm font-bold text-teal-600 uppercase tracking-wider flex items-center gap-2">
-                                        <CheckCircle2 className="w-4 h-4" /> Suggested Adjuvants
-                                    </h3>
-                                    {adjuvants.map((adj, i) => (
-                                        <div key={i} className="bg-teal-50/50 p-3 rounded-lg border border-teal-100 text-sm text-teal-900 leading-relaxed">
-                                            {adj}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                                {adjuvants.length > 0 && (
+                                    <div className="mt-4 space-y-3">
+                                        <h3 className="text-sm font-bold text-teal-600 uppercase tracking-wider flex items-center gap-2">
+                                            <CheckCircle2 className="w-4 h-4" /> Suggested Adjuvants
+                                        </h3>
+                                        {adjuvants.map((adj, i) => (
+                                            <div key={i} className="bg-teal-50/50 p-3 rounded-lg border border-teal-100 text-sm text-teal-900 leading-relaxed">
+                                                {adj}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Close Scrollable Container */}
                         </div>
 
                         {warnings.length > 0 && (

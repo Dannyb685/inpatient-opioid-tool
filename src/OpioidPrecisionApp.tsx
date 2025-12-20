@@ -75,7 +75,7 @@ const OpioidPrecisionApp = () => {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-y-auto p-6 relative">
+                <main className={`flex-1 relative ${activeTab === 'decision' ? 'overflow-hidden' : 'overflow-y-auto p-6'}`}>
                     {activeTab === 'decision' && <AssessmentView />}
                     {activeTab === 'moud' && <ToolkitView />}
                     {activeTab === 'proto' && <ProtocolsView />}
