@@ -68,12 +68,15 @@ const Badge = ({ type, text }: { type?: string, text: string }) => {
 const DecisionSupportView = () => {
     const [renal, setRenal] = useState<string | null>(null);
     const [hemo, setHemo] = useState<string | null>(null);
+    const [hepatic, setHepatic] = useState<string | null>(null);
+    const [painType, setPainType] = useState<string | null>(null);
     const [route, setRoute] = useState<string | null>(null);
+    const [gi, setGi] = useState<string | null>(null);
     const [recs, setRecs] = useState<any[]>([]);
     const [warnings, setWarnings] = useState<string[]>([]);
 
     useEffect(() => {
-        if (!renal || !hemo || !route) {
+        if (!renal || !hemo || !route || !gi || !hepatic || !painType) {
             setRecs([]);
             setWarnings([]);
             return;
@@ -111,9 +114,54 @@ const DecisionSupportView = () => {
             w.push('Morphine: Histamine release precipitates vasodilation/hypotension.');
         }
 
+        // GI / Swallowing Logic
+        if (gi === 'npo') {
+            if (route === 'po') {
+                r = [];
+                w.push('PO Contraindicated: Patient is NPO / Malabsorption. Switch to IV or Patch.');
+            }
+        } else if (gi === 'tube') {
+            if (route === 'po') {
+                w.push('DO NOT CRUSH Extended Release (ER/LA) formulations (OxyContin, MS Contin). Fatal dose dumping risk.');
+                r = r.map(x => ({ ...x, detail: x.detail + ' Use liquid formulation.' }));
+            }
+        }
+
+        // Hepatic Logic
+        if (hepatic === 'impaired' || hepatic === 'failure') {
+            r = r.map(x => ({ ...x, detail: x.detail + ' Reduce initial dose 50% and extend interval.' }));
+
+            if (hepatic === 'failure') {
+                w.push('Liver Failure (Child-Pugh C): Avoid Methadone (accumulation) and Morphine/Codeine (prodrug failure / precipitous coma).');
+                r = r.filter(x => x.name !== 'Methadone');
+                if (!r.find(x => x.name === 'Fentanyl')) {
+                    r.unshift({ name: 'Fentanyl', reason: 'Preferred.', detail: 'Safest option in failures (no active metabolites), but clearance is still reduced.', type: 'safe' });
+                }
+            }
+        }
+
+        // Pain Pathophysiology Logic
+        if (painType === 'neuropathic') {
+            // If Methadone is present (and safe), upgrade it to Preferred
+            const methadone = r.find(x => x.name === 'Methadone');
+            if (methadone) {
+                // Move Methadone to top and mark preferred
+                r = r.filter(x => x.name !== 'Methadone');
+                r.unshift({ ...methadone, type: 'safe', reason: 'Preferred.', detail: 'NMDA antagonism treats neuropathic component. Monitor QTc.' });
+            }
+
+            // Warn about others
+            r = r.map(x => {
+                if (x.name !== 'Methadone') {
+                    return { ...x, detail: x.detail + ' Less effective for nerve pain. Consider adjuvants.' };
+                }
+                return x;
+            });
+        }
+
         setRecs(r);
         setWarnings(w);
-    }, [renal, hemo, route]);
+    }, [renal, hemo, route, gi, hepatic, painType]);
 
     const ParameterBtn = ({ active, onClick, label, sub }: { active: boolean, onClick: () => void, label: string, sub?: string }) => (
         <button
@@ -136,6 +184,14 @@ const DecisionSupportView = () => {
                     <h2 className="text-lg font-bold text-slate-800 mb-4 px-1">Case Parameters</h2>
                     <div className="space-y-5">
                         <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-400 uppercase ml-1">Pain Pathophysiology</label>
+                            <div className="space-y-1.5">
+                                <ParameterBtn active={painType === 'nociceptive'} onClick={() => setPainType('nociceptive')} label="Nociceptive" sub="Somatic / Visceral" />
+                                <ParameterBtn active={painType === 'neuropathic'} onClick={() => setPainType('neuropathic')} label="Neuropathic" sub="Nerve Injury / Radiculopathy" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-400 uppercase ml-1">Renal Function</label>
                             <div className="space-y-1.5">
                                 <ParameterBtn active={renal === 'normal'} onClick={() => setRenal('normal')} label="Normal Function" sub="eGFR > 60" />
@@ -149,6 +205,24 @@ const DecisionSupportView = () => {
                             <div className="space-y-1.5">
                                 <ParameterBtn active={hemo === 'stable'} onClick={() => setHemo('stable')} label="Hemodynamically Stable" />
                                 <ParameterBtn active={hemo === 'unstable'} onClick={() => setHemo('unstable')} label="Shock / Hypotensive" sub="MAP < 65 or Pressors" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-400 uppercase ml-1">Hepatic Function</label>
+                            <div className="space-y-1.5">
+                                <ParameterBtn active={hepatic === 'normal'} onClick={() => setHepatic('normal')} label="Normal Function" />
+                                <ParameterBtn active={hepatic === 'impaired'} onClick={() => setHepatic('impaired')} label="Impaired / Cirrhosis" sub="Child-Pugh A/B" />
+                                <ParameterBtn active={hepatic === 'failure'} onClick={() => setHepatic('failure')} label="Liver Failure" sub="Child-Pugh C" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-400 uppercase ml-1">GI / Swallowing</label>
+                            <div className="space-y-1.5">
+                                <ParameterBtn active={gi === 'intact'} onClick={() => setGi('intact')} label="Intact / Swallow" />
+                                <ParameterBtn active={gi === 'tube'} onClick={() => setGi('tube')} label="Tube / Dysphagia" sub="NGT / OGT / PEG" />
+                                <ParameterBtn active={gi === 'npo'} onClick={() => setGi('npo')} label="NPO / GI Failure" sub="Ileus / Obstruction" />
                             </div>
                         </div>
 
@@ -234,6 +308,20 @@ const CalculatorView = () => {
 
     return (
         <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="lg:col-span-2 bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-4 items-start shadow-sm">
+                <div className="p-2 bg-blue-100 text-blue-600 rounded-lg flex-none">
+                    <Info className="w-5 h-5" />
+                </div>
+                <div>
+                    <h3 className="text-sm font-bold text-blue-900 mb-1">When to use this Calculator?</h3>
+                    <p className="text-sm text-blue-800 leading-relaxed">
+                        Use this tool to calculate a safe starting dose when <strong>switching</strong> a patient from one opioid to another (Opioid Rotation).
+                        <span className="block mt-1.5 font-bold text-rose-600">
+                            ⚠️ Do NOT use this for patients who are not currently taking opioids (opioid-naive).
+                        </span>
+                    </p>
+                </div>
+            </div>
             {/* Input Side */}
             <div className="space-y-6">
                 <ClinicalCard title="Input Dose">
@@ -254,21 +342,68 @@ const CalculatorView = () => {
                     </div>
 
                     <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                        <div className="flex justify-between text-xs font-bold text-slate-500 uppercase mb-4">
-                            <span>Cross-Tolerance Reduction</span>
-                            <span className={reduction < 25 ? "text-rose-500" : "text-emerald-600"}>-{reduction}%</span>
+                        <div className="flex justify-between items-center mb-3">
+                            <span className="text-xs font-bold text-slate-500 uppercase">Cross-Tolerance Reduction</span>
+                            <div className="min-w-[3.5rem] text-center px-2 py-0.5 rounded bg-white border border-slate-200 shadow-sm">
+                                <span className={`text-xs font-extrabold ${reduction < 30 ? 'text-rose-500' : reduction > 40 ? 'text-blue-600' : 'text-teal-600'}`}>
+                                    -{reduction}%
+                                </span>
+                            </div>
                         </div>
-                        <input
-                            type="range"
-                            min="0"
-                            max="75"
-                            value={reduction}
-                            onChange={(e) => setReduction(parseInt(e.target.value))}
-                            className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600 mb-2"
-                        />
-                        <div className="flex justify-between text-[10px] text-slate-400 font-medium">
-                            <span>0% (Aggressive)</span>
-                            <span>50% (Conservative)</span>
+
+                        {/* Presets */}
+                        <div className="flex justify-between gap-2 mb-3">
+                            {[
+                                { val: 0, label: '0%', color: 'rose' },
+                                { val: 30, label: '30%', color: 'teal' },
+                                { val: 50, label: '50%', color: 'blue' }
+                            ].map((opt) => (
+                                <button
+                                    key={opt.val}
+                                    onClick={() => setReduction(opt.val)}
+                                    className={`flex-1 py-1.5 px-2 rounded text-[10px] font-bold uppercase tracking-wider border transition-all ${reduction === opt.val
+                                        ? `bg-white border-${opt.color}-500 text-${opt.color}-600 shadow-sm ring-1 ring-${opt.color}-500`
+                                        : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-white hover:border-slate-300'
+                                        }`}
+                                >
+                                    {opt.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Range Slider */}
+                        <div className="mb-4 px-1">
+                            <input
+                                type="range"
+                                min="0"
+                                max="75"
+                                step="5"
+                                value={reduction}
+                                onChange={(e) => setReduction(parseInt(e.target.value))}
+                                className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
+                            />
+                            <div className="flex justify-between mt-1 text-[9px] font-bold text-slate-400 uppercase tracking-wide">
+                                <span>Aggressive</span>
+                                <span>Conservative</span>
+                            </div>
+                        </div>
+
+                        <div className="text-[11px] leading-relaxed text-slate-500 bg-white p-3 rounded border border-slate-200 flex gap-2">
+                            <div className="mt-0.5 min-w-[14px]">
+                                {reduction < 25 ? <Zap className="w-3.5 h-3.5 text-rose-500" /> :
+                                    reduction > 40 ? <ShieldAlert className="w-3.5 h-3.5 text-blue-500" /> :
+                                        <Activity className="w-3.5 h-3.5 text-teal-500" />}
+                            </div>
+                            <span>
+                                {reduction === 0 && <strong>Aggressive (0%):</strong>}
+                                {reduction === 30 && <strong>Standard (30%):</strong>}
+                                {reduction === 50 && <strong>Conservative (50%):</strong>}
+                                {reduction !== 0 && reduction !== 30 && reduction !== 50 && <strong>Custom (-{reduction}%):</strong>}
+                                {' '}
+                                {reduction < 25 && "Use ONLY if pain is severe/uncontrolled OR switching route of same drug. High risk of incomplete cross-tolerance."}
+                                {(reduction >= 25 && reduction <= 40) && "Standard starting point. Balances pain control with safety margin."}
+                                {reduction > 40 && "Recommended for elderly, frail, or renal/hepatic impairment. Prioritizes safety."}
+                            </span>
                         </div>
                     </div>
                 </ClinicalCard>
@@ -328,6 +463,51 @@ const CalculatorView = () => {
                             </div>
                             <div className="text-right">
                                 <div className="text-2xl font-bold text-slate-800">{convert(0.75).reduced}<small className="text-xs text-slate-400 ml-1">mg</small></div>
+                            </div>
+                        </ClinicalCard>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Transdermal Targets (Patches)</h3>
+                    <div className="space-y-2">
+                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-purple-400 bg-purple-50/20">
+                            <div>
+                                <div className="font-bold text-slate-800">Fentanyl Patch</div>
+                                <div className="text-[10px] text-purple-600 font-medium">72hr Delivery</div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-purple-700">{convert(1.5).reduced}<small className="text-xs text-slate-400 ml-1">mcg/h</small></div>
+                                <div className="text-[9px] text-slate-400">Ratio 1:2 (OME)</div>
+                            </div>
+                        </ClinicalCard>
+                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-indigo-400 bg-indigo-50/20">
+                            <div>
+                                <div className="font-bold text-slate-800">Butrans Patch</div>
+                                <div className="text-[10px] text-indigo-600 font-medium">7-Day Partial Agonist</div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-indigo-700">{convert(1.5).reduced}<small className="text-xs text-slate-400 ml-1">mcg/h</small></div>
+                                <div className="text-[9px] text-slate-400">Max 20mcg/h</div>
+                            </div>
+                        </ClinicalCard>
+                    </div>
+                    <div className="mt-2 p-2 bg-purple-50 rounded border border-purple-100 text-[10px] text-purple-700 italic leading-tight">
+                        Note: Patches take 12-24h for initial effect. Maintain bridge dose if transitioning from short-acting opioids.
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Transmucosal Targets (SL/Buccal)</h3>
+                    <div className="space-y-2">
+                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-rose-400 bg-rose-50/10">
+                            <div>
+                                <div className="font-bold text-slate-800">Fentanyl SL</div>
+                                <div className="text-[10px] text-rose-600 font-medium">Rapid Breakthrough</div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-rose-700">{convert(10).reduced}<small className="text-xs text-slate-400 ml-1">mcg</small></div>
+                                <div className="text-[9px] text-slate-400">Not for Naive</div>
                             </div>
                         </ClinicalCard>
                     </div>

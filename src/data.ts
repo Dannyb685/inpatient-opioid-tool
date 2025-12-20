@@ -76,6 +76,45 @@ export const DRUG_DATA = [
         pharmacokinetics: 'CYP3A4. Ceiling effect on respiratory depression, but NOT on sedation if combined with benzos.',
         tags: ['High Affinity', 'Split Dosing', 'Ceiling Effect'],
         bioavailability: 30
+    },
+    {
+        id: 'fentanyl_patch',
+        name: 'Fentanyl (Transdermal)',
+        type: 'Phenylpiperidine',
+        iv_onset: '12-24 hrs (Steady State)',
+        iv_duration: '72 hrs',
+        renal_safety: 'Safe',
+        hepatic_safety: 'Safe',
+        clinical_nuance: 'Heat Sensitivity: Fever or heating pads increase absorption by 30%+, risking overdose. 12-24h "lag time" when starting/stopping. Do not use in opioid-naive patients. Requirement: >60mg OME baseline.',
+        pharmacokinetics: 'Absorbed into skin depot. Steady state takes 3 patches to achieve fully.',
+        tags: ['Chronic Pain Only', 'Heat Sensitive', 'Depot Effect'],
+        bioavailability: 92
+    },
+    {
+        id: 'butrans',
+        name: 'Buprenorphine (Butrans)',
+        type: 'Partial Agonist',
+        iv_onset: '24-48 hrs',
+        iv_duration: '7 days',
+        renal_safety: 'Safe',
+        hepatic_safety: 'Safe',
+        clinical_nuance: '7-Day Patch. Ceiling effect on respiratory depression. Stronger binding affinity than full agonists; can precipitate withdrawal if started too soon after high-dose full agonists.',
+        pharmacokinetics: 'Transdermal. Long half-life (~26h after removal).',
+        tags: ['7-Day Patch', 'Partial Agonist', 'Ceiling Effect'],
+        bioavailability: 15
+    },
+    {
+        id: 'sublingual_fentanyl',
+        name: 'Fentanyl (Sublingual/Buccal)',
+        type: 'Phenylpiperidine',
+        iv_onset: '5-15 min',
+        iv_duration: '2-3 hrs',
+        renal_safety: 'Safe',
+        hepatic_safety: 'Safe',
+        clinical_nuance: 'TIKOS (TIRF) Drugs. High potency for breakthrough pain. Dose is NOT directly proportional to oral/IV counterparts due to transmucosal bypass of first-pass metabolism.',
+        pharmacokinetics: 'Bypasses liver first-pass. Highly lipophilic.',
+        tags: ['TIKOS', 'Breakthrough Only', 'Rapid Onset'],
+        bioavailability: 50
     }
 ];
 
