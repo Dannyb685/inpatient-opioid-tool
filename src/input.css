@@ -7,3 +7,9 @@ body {
     width: 100vw;
     overflow: hidden;
 }
+
+@layer utilities {
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+}

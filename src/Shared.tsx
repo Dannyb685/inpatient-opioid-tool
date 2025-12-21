@@ -3,10 +3,10 @@ import React from 'react';
 // --- Shared Components ---
 
 export const ClinicalCard = ({ children, className = "", title, action }: { children: React.ReactNode, className?: string, title?: string, action?: React.ReactNode }) => (
-    <div className={`bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden ${className}`}>
+    <div className={`bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden ${className}`}>
         {title && (
-            <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">{title}</h3>
+            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{title}</h3>
                 {action}
             </div>
         )}

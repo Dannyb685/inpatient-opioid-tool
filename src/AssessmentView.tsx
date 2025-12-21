@@ -322,12 +322,12 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
         <div className="flex flex-col lg:flex-row gap-4 h-full">
             {/* Left Pane: Patient Profile */}
             <div className="lg:w-1/3 flex-none space-y-3 overflow-y-auto pr-2 custom-scrollbar">
-                <h2 className="text-lg font-bold text-slate-800 mb-2 px-1">Case Parameters</h2>
+                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-2 px-1">Case Parameters</h2>
                 <div className="space-y-3">
 
                     {/* Demographics & PRODIGY */}
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
-                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                    <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700/50 space-y-3 shadow-sm">
+                        <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <Users className="w-4 h-4" /> Patient Demographics
                         </h3>
 
@@ -339,54 +339,54 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                                     placeholder="Yrs"
                                     value={age}
                                     onChange={(e) => setAge(e.target.value)}
-                                    className="w-full px-3 py-1.5 rounded-sm border border-slate-200 text-sm font-bold text-slate-700 outline-none focus:border-teal-500"
+                                    className="w-full px-3 py-1.5 rounded-sm border border-slate-200 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-300 text-sm font-bold text-slate-700 outline-none focus:border-teal-500 transition-colors"
                                 />
                             </div>
                             <div className="flex-1">
                                 <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Sex</label>
-                                <div className="flex bg-white rounded-sm border border-slate-200 overflow-hidden">
-                                    <button onClick={() => setSex('male')} className={`flex-1 py-1.5 text-xs font-bold ${sex === 'male' ? 'bg-teal-50 text-teal-700' : 'text-slate-400 hover:bg-slate-50'}`}>M</button>
-                                    <div className="w-px bg-slate-200"></div>
-                                    <button onClick={() => setSex('female')} className={`flex-1 py-1.5 text-xs font-bold ${sex === 'female' ? 'bg-teal-50 text-teal-700' : 'text-slate-400 hover:bg-slate-50'}`}>F</button>
+                                <div className="flex bg-white dark:bg-slate-950/50 rounded-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                                    <button onClick={() => setSex('male')} className={`flex-1 py-1.5 text-xs font-bold transition-colors ${sex === 'male' ? 'bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>M</button>
+                                    <div className="w-px bg-slate-200 dark:bg-slate-700"></div>
+                                    <button onClick={() => setSex('female')} className={`flex-1 py-1.5 text-xs font-bold transition-colors ${sex === 'female' ? 'bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>F</button>
                                 </div>
                             </div>
                         </div>
 
-                        <label className={`flex items-center justify-between p-2 rounded-sm border cursor-pointer transition-colors ${naive ? 'bg-teal-50 border-teal-200' : 'bg-white border-slate-200'}`}>
+                        <label className={`flex items-center justify-between p-2 rounded-sm border cursor-pointer transition-colors ${naive ? 'bg-teal-50 dark:bg-teal-900/40 border-teal-200 dark:border-teal-800/50' : 'bg-white dark:bg-slate-950/50 border-slate-200 dark:border-slate-700'}`}>
                             <div>
-                                <span className="text-xs font-bold text-slate-700 block">Opioid Naive</span>
-                                <span className="text-[10px] text-slate-400 font-medium">No exposure last 7 days</span>
+                                <span className={`text-xs font-bold block ${naive ? 'text-teal-900 dark:text-teal-400' : 'text-slate-700 dark:text-slate-400'}`}>Opioid Naive</span>
+                                <span className={`text-[10px] font-medium ${naive ? 'text-teal-600 dark:text-teal-500/80' : 'text-slate-400 dark:text-slate-500'}`}>No exposure last 7 days</span>
                             </div>
                             <input type="checkbox" checked={naive} onChange={e => setNaive(e.target.checked)} className="w-4 h-4 accent-teal-600 rounded" />
                         </label>
                     </div>
 
                     {/* Risk Factors Section */}
-                    <div className="bg-rose-50/50 p-3 rounded-lg border border-rose-100 space-y-2">
-                        <h3 className="text-xs font-bold text-rose-500 uppercase tracking-wider flex items-center gap-2">
+                    <div className="bg-rose-50/50 dark:bg-rose-900/10 p-3 rounded-lg border border-rose-100 dark:border-rose-900/30 space-y-2">
+                        <h3 className="text-xs font-bold text-rose-500 dark:text-rose-400 uppercase tracking-wider flex items-center gap-2">
                             <ShieldAlert className="w-4 h-4" /> PRODIGY & Safety
                         </h3>
 
                         <div className="grid grid-cols-1 gap-1.5">
-                            <label className="flex items-center gap-2 p-1.5 bg-white rounded border border-slate-200 cursor-pointer">
+                            <label className="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-900/60 rounded border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-rose-200 dark:hover:border-rose-800 transition-colors">
                                 <input type="checkbox" checked={sleepApnea} onChange={e => setSleepApnea(e.target.checked)} className="w-3.5 h-3.5 accent-rose-500" />
-                                <span className="text-[11px] font-bold text-slate-600">Sleep Apnea (OSA/CSA)</span>
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Sleep Apnea (OSA/CSA)</span>
                             </label>
-                            <label className="flex items-center gap-2 p-1.5 bg-white rounded border border-slate-200 cursor-pointer">
+                            <label className="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-900/60 rounded border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-rose-200 dark:hover:border-rose-800 transition-colors">
                                 <input type="checkbox" checked={chf} onChange={e => setChf(e.target.checked)} className="w-3.5 h-3.5 accent-rose-500" />
-                                <span className="text-[11px] font-bold text-slate-600">Chronic Heart Failure</span>
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Chronic Heart Failure</span>
                             </label>
-                            <label className="flex items-center gap-2 p-1.5 bg-white rounded border border-slate-200 cursor-pointer">
+                            <label className="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-900/60 rounded border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-rose-200 dark:hover:border-rose-800 transition-colors">
                                 <input type="checkbox" checked={benzos} onChange={e => setBenzos(e.target.checked)} className="w-3.5 h-3.5 accent-rose-500" />
-                                <span className="text-[11px] font-bold text-slate-600">Benzos / Sedatives</span>
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Benzos / Sedatives</span>
                             </label>
-                            <label className="flex items-center gap-2 p-1.5 bg-white rounded border border-slate-200 cursor-pointer">
+                            <label className="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-900/60 rounded border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-rose-200 dark:hover:border-rose-800 transition-colors">
                                 <input type="checkbox" checked={copd} onChange={e => setCopd(e.target.checked)} className="w-3.5 h-3.5 accent-rose-500" />
-                                <span className="text-[11px] font-bold text-slate-600">COPD / Lung Disease</span>
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">COPD / Lung Disease</span>
                             </label>
-                            <label className="flex items-center gap-2 p-1.5 bg-white rounded border border-slate-200 cursor-pointer">
+                            <label className="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-900/60 rounded border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-rose-200 dark:hover:border-rose-800 transition-colors">
                                 <input type="checkbox" checked={psychHistory} onChange={e => setPsychHistory(e.target.checked)} className="w-3.5 h-3.5 accent-rose-500" />
-                                <span className="text-[11px] font-bold text-slate-600">Substance / Psych Hx</span>
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Substance / Psych Hx</span>
                             </label>
                         </div>
                     </div>
@@ -461,14 +461,14 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                 </div>
             </div>
             {/* Right Pane: Guidance */}
-            <div className="lg:flex-1 h-full min-h-[400px] bg-slate-50 rounded-lg border border-slate-200 p-4 flex flex-col">
+            <div className="lg:flex-1 h-full min-h-[400px] bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700/50 p-4 flex flex-col shadow-sm">
                 {recs.length > 0 ? (
                     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 flex-1 flex flex-col h-full overflow-hidden">
 
                         {/* Static Advisory - Always Visible */}
-                        <div className="bg-blue-50/50 border border-blue-100 p-2.5 rounded-sm flex items-start gap-3 shrink-0">
-                            <Activity className="w-4 h-4 text-blue-500 mt-0.5" />
-                            <div className="text-xs text-blue-900 leading-relaxed font-medium">
+                        <div className="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 p-2.5 rounded-sm flex items-start gap-3 shrink-0">
+                            <Activity className="w-4 h-4 text-blue-500 dark:text-blue-400 mt-0.5" />
+                            <div className="text-xs text-blue-900 dark:text-blue-100 leading-relaxed font-medium">
                                 <strong>Non-Opioid Strategy:</strong>
                                 {(hepatic === 'impaired' || hepatic === 'failure' || (hepatic === 'normal' && renal === 'normal')) && (
                                     <p className="mt-0.5">• Avoid Tylenol {'>'} 4g daily (2g if liver failure).</p>
@@ -483,29 +483,29 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                         <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4">
 
                             {/* PRODIGY Header */}
-                            <div className="bg-white rounded-sm border border-slate-200 shadow-sm overflow-hidden mb-2">
-                                <div className="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <div className="bg-white dark:bg-slate-900 rounded-sm border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-2">
+                                <div className="p-3 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
                                     <div className="flex items-center gap-2">
-                                        <Activity className="w-5 h-5 text-indigo-600" />
+                                        <Activity className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                         <div>
-                                            <h3 className="text-xs font-bold text-indigo-900 uppercase tracking-wide">PRODIGY Risk Score</h3>
-                                            <p className="text-[10px] text-slate-500 font-medium">Respiratory Depression Prediction</p>
+                                            <h3 className="text-xs font-bold text-indigo-900 dark:text-indigo-200 uppercase tracking-wide">PRODIGY Risk Score</h3>
+                                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Respiratory Depression Prediction</p>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-2xl font-black text-indigo-600 leading-none">{prodigyScore}</div>
-                                        <div className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${prodigyRisk === 'High' ? 'bg-rose-100 text-rose-700' :
-                                            prodigyRisk === 'Intermediate' ? 'bg-amber-100 text-amber-700' :
-                                                'bg-emerald-100 text-emerald-700'
+                                        <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 leading-none">{prodigyScore}</div>
+                                        <div className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${prodigyRisk === 'High' ? 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300' :
+                                            prodigyRisk === 'Intermediate' ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300' :
+                                                'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300'
                                             }`}>{prodigyRisk} Risk</div>
                                     </div>
                                 </div>
 
                                 {/* Monitoring Plan */}
-                                <div className={`p-3 ${prodigyRisk === 'High' ? 'bg-rose-50' : prodigyRisk === 'Intermediate' ? 'bg-amber-50' : 'bg-slate-50'}`}>
-                                    <h4 className={`text-xs font-bold uppercase mb-2 flex items-center gap-2 ${prodigyRisk === 'High' ? 'text-rose-700' :
-                                        prodigyRisk === 'Intermediate' ? 'text-amber-700' :
-                                            'text-slate-500'
+                                <div className={`p-3 ${prodigyRisk === 'High' ? 'bg-rose-50 dark:bg-rose-950/20' : prodigyRisk === 'Intermediate' ? 'bg-amber-50 dark:bg-amber-950/20' : 'bg-slate-50 dark:bg-slate-900/50'}`}>
+                                    <h4 className={`text-xs font-bold uppercase mb-2 flex items-center gap-2 ${prodigyRisk === 'High' ? 'text-rose-700 dark:text-rose-400' :
+                                        prodigyRisk === 'Intermediate' ? 'text-amber-700 dark:text-amber-400' :
+                                            'text-slate-500 dark:text-slate-400'
                                         }`}>
                                         <HeartPulse className="w-4 h-4" /> Monitoring Strategy
                                     </h4>
@@ -519,9 +519,9 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                                     </ul>
 
                                     {/* Temporal Alert */}
-                                    <div className="bg-white/60 rounded border border-black/5 p-2 flex gap-3 items-center">
-                                        <Timer className="w-4 h-4 text-slate-400 flex-none" />
-                                        <div className="text-[10px] text-slate-600 leading-tight">
+                                    <div className="bg-white/60 dark:bg-slate-800/50 rounded border border-black/5 dark:border-white/5 p-2 flex gap-3 items-center">
+                                        <Timer className="w-4 h-4 text-slate-400 dark:text-slate-500 flex-none" />
+                                        <div className="text-[10px] text-slate-600 dark:text-slate-400 leading-tight">
                                             <strong>Peak Risk:</strong> 14:00-20:00 (Day 0) & 02:00-06:00 (Night).
                                             Median onset 8.8h post-op. 46% of PRODIGY patients had an event.
                                         </div>
@@ -530,12 +530,12 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                             </div>
 
                             <div className="flex items-center justify-between mt-2">
-                                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
                                     <Beaker className="w-4 h-4" /> Clinical Recommendations
                                 </h3>
                                 <button
                                     onClick={handleCopy}
-                                    className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md transition-colors text-[10px] font-bold"
+                                    className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 rounded-md transition-colors text-[10px] font-bold"
                                 >
                                     <Copy className="w-3 h-3" />
                                     Smart Copy
@@ -544,29 +544,29 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
 
                             <div className="space-y-3 overflow-y-auto custom-scrollbar flex-1 pr-1">
                                 {recs.map((rec, i) => (
-                                    <div key={i} className="bg-white p-3 rounded-sm shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                                    <div key={i} className="bg-white dark:bg-slate-900 p-3 rounded-sm shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all">
                                         <div className="flex justify-between items-start mb-1.5">
                                             <div className="flex items-center gap-2">
                                                 {rec.type === 'safe'
-                                                    ? <div className="p-1 rounded-full bg-emerald-100 text-emerald-600"><Activity className="w-4 h-4" /></div>
-                                                    : <div className="p-1 rounded-full bg-amber-100 text-amber-600"><AlertTriangle className="w-4 h-4" /></div>
+                                                    ? <div className="p-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"><Activity className="w-4 h-4" /></div>
+                                                    : <div className="p-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"><AlertTriangle className="w-4 h-4" /></div>
                                                 }
-                                                <span className="font-bold text-slate-800 text-base">{rec.name}</span>
+                                                <span className="font-bold text-slate-800 dark:text-slate-200 text-base">{rec.name}</span>
                                             </div>
                                             <Badge type={rec.type} text={rec.type === 'safe' ? 'Preferred' : 'Monitor'} />
                                         </div>
-                                        <p className="text-slate-600 text-xs font-medium mb-1">{rec.reason}</p>
-                                        <p className="text-[10px] text-slate-500 bg-slate-50 p-1.5 rounded border border-slate-100 inline-block leading-relaxed">{rec.detail}</p>
+                                        <p className="text-slate-600 dark:text-slate-400 text-xs font-medium mb-1">{rec.reason}</p>
+                                        <p className="text-[10px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-black/20 p-1.5 rounded border border-slate-100 dark:border-slate-800 inline-block leading-relaxed">{rec.detail}</p>
                                     </div>
                                 ))}
 
                                 {adjuvants.length > 0 && (
                                     <div className="mt-4 space-y-2">
-                                        <h3 className="text-xs font-bold text-teal-600 uppercase tracking-wider flex items-center gap-2">
+                                        <h3 className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider flex items-center gap-2">
                                             <CheckCircle2 className="w-4 h-4" /> Suggested Adjuvants
                                         </h3>
                                         {adjuvants.map((adj, i) => (
-                                            <div key={i} className="bg-teal-50/50 p-2.5 rounded-sm border border-teal-100 text-xs text-teal-900 leading-relaxed font-medium">
+                                            <div key={i} className="bg-teal-50/50 dark:bg-teal-900/20 p-2.5 rounded-sm border border-teal-100 dark:border-teal-900/30 text-xs text-teal-900 dark:text-teal-200 leading-relaxed font-medium">
                                                 {adj}
                                             </div>
                                         ))}
@@ -579,14 +579,14 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
 
                         {warnings.length > 0 && (
                             <div className="mt-auto">
-                                <h3 className="text-xs font-bold text-rose-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <h3 className="text-xs font-bold text-rose-500 dark:text-rose-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                                     <ShieldAlert className="w-4 h-4" /> Contraindications
                                 </h3>
-                                <div className="bg-rose-50 border border-rose-100 rounded-sm p-3">
+                                <div className="bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-900/30 rounded-sm p-3">
                                     <ul className="space-y-1.5">
                                         {warnings.map((w, i) => (
-                                            <li key={i} className="flex items-start gap-2 text-xs text-rose-800 font-medium">
-                                                <span className="block w-1.5 h-1.5 mt-1 rounded-full bg-rose-400 flex-none" />
+                                            <li key={i} className="flex items-start gap-2 text-xs text-rose-800 dark:text-rose-200 font-medium">
+                                                <span className="block w-1.5 h-1.5 mt-1 rounded-full bg-rose-400 dark:bg-rose-500 flex-none" />
                                                 {w}
                                             </li>
                                         ))}
@@ -596,7 +596,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                         )}
                     </div>
                 ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-slate-300">
+                    <div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600">
                         <Microscope className="w-12 h-12 mb-4 opacity-50" />
                         <span className="text-sm font-medium">Select parameters to view guidance</span>
                     </div>
