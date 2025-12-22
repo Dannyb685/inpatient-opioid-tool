@@ -322,71 +322,71 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
         <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-full p-4 md:p-0">
             {/* Left Pane: Patient Profile */}
             <div className="lg:w-1/3 flex-none space-y-3 lg:overflow-y-auto pr-2 custom-scrollbar">
-                <h2 className="text-lg font-bold text-slate-800 mb-2 px-1">Case Parameters</h2>
+                <h2 className="text-lg font-bold text-text-primary mb-2 px-1">Case Parameters</h2>
                 <div className="space-y-3">
 
                     {/* Demographics & PRODIGY */}
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
-                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                    <div className="bg-surface-highlight p-3 rounded-lg border border-border space-y-3">
+                        <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2">
                             <Users className="w-4 h-4" /> Patient Demographics
                         </h3>
 
                         <div className="flex gap-3">
                             <div className="flex-1">
-                                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Age</label>
+                                <label className="block text-xs font-bold text-text-tertiary uppercase mb-1">Age</label>
                                 <input
                                     type="number"
                                     placeholder="Yrs"
                                     value={age}
                                     onChange={(e) => setAge(e.target.value)}
-                                    className="w-full px-3 py-1.5 rounded-sm border border-slate-200 text-sm font-bold text-slate-700 outline-none focus:border-teal-500"
+                                    className="w-full px-3 py-1.5 rounded-sm border border-border text-sm font-bold text-text-primary outline-none focus:border-action bg-surface-card"
                                 />
                             </div>
                             <div className="flex-1">
-                                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Sex</label>
-                                <div className="flex bg-white rounded-sm border border-slate-200 overflow-hidden">
-                                    <button onClick={() => setSex('male')} className={`flex-1 py-1.5 text-xs font-bold ${sex === 'male' ? 'bg-teal-50 text-teal-700' : 'text-slate-400 hover:bg-slate-50'}`}>M</button>
-                                    <div className="w-px bg-slate-200"></div>
-                                    <button onClick={() => setSex('female')} className={`flex-1 py-1.5 text-xs font-bold ${sex === 'female' ? 'bg-teal-50 text-teal-700' : 'text-slate-400 hover:bg-slate-50'}`}>F</button>
+                                <label className="block text-xs font-bold text-text-tertiary uppercase mb-1">Sex</label>
+                                <div className="flex bg-surface-card rounded-sm border border-border overflow-hidden">
+                                    <button onClick={() => setSex('male')} className={`flex-1 py-1.5 text-xs font-bold ${sex === 'male' ? 'bg-action-bg text-action' : 'text-text-tertiary hover:bg-surface-highlight'}`}>M</button>
+                                    <div className="w-px bg-border"></div>
+                                    <button onClick={() => setSex('female')} className={`flex-1 py-1.5 text-xs font-bold ${sex === 'female' ? 'bg-action-bg text-action' : 'text-text-tertiary hover:bg-surface-highlight'}`}>F</button>
                                 </div>
                             </div>
                         </div>
 
-                        <label className={`flex items-center justify-between p-2 rounded-sm border cursor-pointer transition-colors ${naive ? 'bg-teal-50 border-teal-200' : 'bg-white border-slate-200'}`}>
+                        <label className={`flex items-center justify-between p-2 rounded-sm border cursor-pointer transition-colors ${naive ? 'bg-action-bg border-action-border/30' : 'bg-surface-card border-border'}`}>
                             <div>
-                                <span className="text-xs font-bold text-slate-700 block">Opioid Naive</span>
-                                <span className="text-[10px] text-slate-400 font-medium">No exposure last 7 days</span>
+                                <span className="text-xs font-bold text-text-primary block">Opioid Naive</span>
+                                <span className="text-[10px] text-text-tertiary font-medium">No exposure last 7 days</span>
                             </div>
-                            <input type="checkbox" checked={naive} onChange={e => setNaive(e.target.checked)} className="w-4 h-4 accent-teal-600 rounded" />
+                            <input type="checkbox" checked={naive} onChange={e => setNaive(e.target.checked)} className="w-4 h-4 accent-action rounded" />
                         </label>
                     </div>
 
                     {/* Risk Factors Section */}
-                    <div className="bg-rose-50/50 p-3 rounded-lg border border-rose-100 space-y-2">
-                        <h3 className="text-xs font-bold text-rose-500 uppercase tracking-wider flex items-center gap-2">
+                    <div className="bg-danger-bg/50 p-3 rounded-lg border border-danger/20 space-y-2">
+                        <h3 className="text-xs font-bold text-danger uppercase tracking-wider flex items-center gap-2">
                             <ShieldAlert className="w-4 h-4" /> PRODIGY & Safety
                         </h3>
 
                         <div className="grid grid-cols-1 gap-1.5">
-                            <label className="flex items-center gap-2 p-1.5 bg-white rounded border border-slate-200 cursor-pointer">
-                                <input type="checkbox" checked={sleepApnea} onChange={e => setSleepApnea(e.target.checked)} className="w-3.5 h-3.5 accent-rose-500" />
-                                <span className="text-[11px] font-bold text-slate-600">Sleep Apnea (OSA/CSA)</span>
+                            <label className="flex items-center gap-2 p-1.5 bg-surface-card rounded border border-border cursor-pointer">
+                                <input type="checkbox" checked={sleepApnea} onChange={e => setSleepApnea(e.target.checked)} className="w-3.5 h-3.5 accent-danger" />
+                                <span className="text-[11px] font-bold text-text-secondary">Sleep Apnea (OSA/CSA)</span>
                             </label>
-                            <label className="flex items-center gap-2 p-1.5 bg-white rounded border border-slate-200 cursor-pointer">
-                                <input type="checkbox" checked={chf} onChange={e => setChf(e.target.checked)} className="w-3.5 h-3.5 accent-rose-500" />
-                                <span className="text-[11px] font-bold text-slate-600">Chronic Heart Failure</span>
+                            <label className="flex items-center gap-2 p-1.5 bg-surface-card rounded border border-border cursor-pointer">
+                                <input type="checkbox" checked={chf} onChange={e => setChf(e.target.checked)} className="w-3.5 h-3.5 accent-danger" />
+                                <span className="text-[11px] font-bold text-text-secondary">Chronic Heart Failure</span>
                             </label>
-                            <label className="flex items-center gap-2 p-1.5 bg-white rounded border border-slate-200 cursor-pointer">
-                                <input type="checkbox" checked={benzos} onChange={e => setBenzos(e.target.checked)} className="w-3.5 h-3.5 accent-rose-500" />
-                                <span className="text-[11px] font-bold text-slate-600">Benzos / Sedatives</span>
+                            <label className="flex items-center gap-2 p-1.5 bg-surface-card rounded border border-border cursor-pointer">
+                                <input type="checkbox" checked={benzos} onChange={e => setBenzos(e.target.checked)} className="w-3.5 h-3.5 accent-danger" />
+                                <span className="text-[11px] font-bold text-text-secondary">Benzos / Sedatives</span>
                             </label>
-                            <label className="flex items-center gap-2 p-1.5 bg-white rounded border border-slate-200 cursor-pointer">
-                                <input type="checkbox" checked={copd} onChange={e => setCopd(e.target.checked)} className="w-3.5 h-3.5 accent-rose-500" />
-                                <span className="text-[11px] font-bold text-slate-600">COPD / Lung Disease</span>
+                            <label className="flex items-center gap-2 p-1.5 bg-surface-card rounded border border-border cursor-pointer">
+                                <input type="checkbox" checked={copd} onChange={e => setCopd(e.target.checked)} className="w-3.5 h-3.5 accent-danger" />
+                                <span className="text-[11px] font-bold text-text-secondary">COPD / Lung Disease</span>
                             </label>
-                            <label className="flex items-center gap-2 p-1.5 bg-white rounded border border-slate-200 cursor-pointer">
-                                <input type="checkbox" checked={psychHistory} onChange={e => setPsychHistory(e.target.checked)} className="w-3.5 h-3.5 accent-rose-500" />
-                                <span className="text-[11px] font-bold text-slate-600">Substance / Psych Hx</span>
+                            <label className="flex items-center gap-2 p-1.5 bg-surface-card rounded border border-border cursor-pointer">
+                                <input type="checkbox" checked={psychHistory} onChange={e => setPsychHistory(e.target.checked)} className="w-3.5 h-3.5 accent-danger" />
+                                <span className="text-[11px] font-bold text-text-secondary">Substance / Psych Hx</span>
                             </label>
                         </div>
                     </div>
@@ -461,7 +461,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                 </div>
             </div>
             {/* Right Pane: Guidance */}
-            <div className="lg:flex-1 h-auto lg:h-full min-h-[400px] bg-slate-50 rounded-lg border border-slate-200 p-4 flex flex-col">
+            <div className="lg:flex-1 h-auto lg:h-full min-h-[400px] bg-surface-highlight rounded-lg border border-border p-4 flex flex-col">
                 {recs.length > 0 ? (
                     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 flex-1 flex flex-col h-auto lg:h-full lg:overflow-hidden">
 
@@ -493,10 +493,10 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-2xl font-black text-indigo-600 leading-none">{prodigyScore}</div>
-                                        <div className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${prodigyRisk === 'High' ? 'bg-rose-100 text-rose-700' :
-                                            prodigyRisk === 'Intermediate' ? 'bg-amber-100 text-amber-700' :
-                                                'bg-emerald-100 text-emerald-700'
+                                        <div className="text-2xl font-black text-action leading-none">{prodigyScore}</div>
+                                        <div className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${prodigyRisk === 'High' ? 'bg-danger-bg text-danger' :
+                                            prodigyRisk === 'Intermediate' ? 'bg-warning-bg text-warning' :
+                                                'bg-action-bg text-action'
                                             }`}>{prodigyRisk} Risk</div>
                                     </div>
                                 </div>
@@ -511,8 +511,8 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                                     </h4>
                                     <ul className="space-y-1 mb-2">
                                         {monitoringRecs.map((m, i) => (
-                                            <li key={i} className="text-xs font-medium text-slate-700 flex items-start gap-2">
-                                                <span className="mt-1 w-1 h-1 rounded-full bg-slate-400 flex-none" />
+                                            <li key={i} className="text-xs font-medium text-text-secondary flex items-start gap-2">
+                                                <span className="mt-1 w-1 h-1 rounded-full bg-text-tertiary flex-none" />
                                                 {m}
                                             </li>
                                         ))}
@@ -596,7 +596,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                         )}
                     </div>
                 ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-slate-300">
+                    <div className="h-full flex flex-col items-center justify-center text-text-tertiary">
                         <Microscope className="w-12 h-12 mb-4 opacity-50" />
                         <span className="text-sm font-medium">Select parameters to view guidance</span>
                     </div>

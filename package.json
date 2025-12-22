@@ -7,12 +7,16 @@
         "dev": "concurrently \"node esbuild.config.mjs\" \"npm run build:css -- --watch\"",
         "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production && npm run build:web",
         "build:web": "mkdir -p web-dist && cp index.html web-dist/index.html && node esbuild.web.mjs production && npm run build:web:css",
-        "build:web:css": "tailwindcss -i ./src/input.css -o ./web-dist/web-styles.css"
+        "build:web:css": "tailwindcss -i ./src/input.css -o ./web-dist/web-styles.css",
+        "cap:sync": "npx cap sync",
+        "cap:open": "npx cap open ios",
+        "ios:build": "npm run build:web && npx cap sync"
     },
     "keywords": [],
     "author": "Daniel Bergholz",
     "license": "MIT",
     "devDependencies": {
+        "@capacitor/assets": "^3.0.5",
         "@types/node": "^16.11.6",
         "@types/react": "^18.2.0",
         "@types/react-dom": "^18.2.0",
@@ -29,6 +33,9 @@
         "typescript": "4.7.4"
     },
     "dependencies": {
+        "@capacitor/cli": "^8.0.0",
+        "@capacitor/core": "^8.0.0",
+        "@capacitor/ios": "^8.0.0",
         "lucide-react": "^0.263.1",
         "posthog-js": "^1.116.6",
         "react": "^18.2.0",

@@ -1,9 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
+
 @tailwind components;
 @tailwind utilities;
 
-/* Standard Web App Resets - No Scoping Needed (Iframe Isolated) */
-body {
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+@layer base {
+    :root {
+        /* Light Mode (Default) */
+        --color-surface-base: 248 250 252;
+        /* Slate 50 */
+        --color-surface-card: 255 255 255;
+        /* White */
+        --color-surface-highlight: 241 245 249;
+        /* Slate 100 */
+
+        --color-text-primary: 15 23 42;
+        /* Slate 900 */
+        --color-text-secondary: 100 116 139;
+        /* Slate 500 */
+        --color-text-tertiary: 148 163 184;
+        /* Slate 400 */
+
+        --color-action: 15 118 110;
+        /* Teal 700 */
+        --color-action-bg: 240 253 250;
+        /* Teal 50 */
+        --color-action-border: 20 184 166;
+        /* Teal 500 */
+
+        --color-danger: 190 18 60;
+        /* Rose 700 */
+        --color-danger-bg: 255 241 242;
+        /* Rose 50 */
+
+        --color-warning: 180 83 9;
+        /* Amber 700 */
+        --color-warning-bg: 255 251 235;
+        /* Amber 50 */
+
+        --color-border: 226 232 240;
+        /* Slate 200 */
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            /* Dark Mode */
+            --color-surface-base: 15 23 42;
+            /* Slate 900 */
+            --color-surface-card: 30 41 59;
+            /* Slate 800 */
+            --color-surface-highlight: 51 65 85;
+            /* Slate 700 */
+
+            --color-text-primary: 241 245 249;
+            /* Slate 100 */
+            --color-text-secondary: 203 213 225;
+            /* Slate 300 */
+            --color-text-tertiary: 148 163 184;
+            /* Slate 400 */
+
+            --color-action: 45 212 191;
+            /* Teal 400 */
+            --color-action-bg: 17 94 89;
+            /* Teal 900 */
+            --color-action-border: 20 184 166;
+            /* Teal 500 */
+
+            --color-danger: 251 113 133;
+            /* Rose 400 */
+            --color-danger-bg: 136 19 55;
+            /* Rose 900 */
+
+            --color-warning: 251 191 36;
+            /* Amber 400 */
+            --color-warning-bg: 120 53 15;
+            /* Amber 900 */
+
+            --color-border: 51 65 85;
+            /* Slate 700 */
+        }
+    }
+
+    body {
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+        @apply bg-surface-base text-text-primary font-sans;
+    }
+}
+
+@layer utilities {
+    .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .h-safe {
+        height: env(safe-area-inset-bottom, 0px);
+    }
 }
