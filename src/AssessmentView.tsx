@@ -319,9 +319,9 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
     };
 
     return (
-        <div className="flex flex-col lg:flex-row gap-4 h-full">
+        <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-full p-4 md:p-0">
             {/* Left Pane: Patient Profile */}
-            <div className="lg:w-1/3 flex-none space-y-3 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="lg:w-1/3 flex-none space-y-3 lg:overflow-y-auto pr-2 custom-scrollbar">
                 <h2 className="text-lg font-bold text-slate-800 mb-2 px-1">Case Parameters</h2>
                 <div className="space-y-3">
 
@@ -461,9 +461,9 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                 </div>
             </div>
             {/* Right Pane: Guidance */}
-            <div className="lg:flex-1 h-full min-h-[400px] bg-slate-50 rounded-lg border border-slate-200 p-4 flex flex-col">
+            <div className="lg:flex-1 h-auto lg:h-full min-h-[400px] bg-slate-50 rounded-lg border border-slate-200 p-4 flex flex-col">
                 {recs.length > 0 ? (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 flex-1 flex flex-col h-full overflow-hidden">
+                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 flex-1 flex flex-col h-auto lg:h-full lg:overflow-hidden">
 
                         {/* Static Advisory - Always Visible */}
                         <div className="bg-blue-50/50 border border-blue-100 p-2.5 rounded-sm flex items-start gap-3 shrink-0">
@@ -480,7 +480,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                         </div>
 
                         {/* Scrollable Content Container */}
-                        <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4">
+                        <div className="lg:overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4">
 
                             {/* PRODIGY Header */}
                             <div className="bg-white rounded-sm border border-slate-200 shadow-sm overflow-hidden mb-2">
@@ -542,7 +542,7 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                                 </button>
                             </div>
 
-                            <div className="space-y-3 overflow-y-auto custom-scrollbar flex-1 pr-1">
+                            <div className="space-y-3 lg:overflow-y-auto custom-scrollbar flex-1 pr-1">
                                 {recs.map((rec, i) => (
                                     <div key={i} className="bg-white p-3 rounded-sm shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
                                         <div className="flex justify-between items-start mb-1.5">

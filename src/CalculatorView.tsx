@@ -9,13 +9,14 @@ import {
 import { ClinicalCard } from './Shared';
 
 export const CalculatorView = () => {
-    const [ivMorphine, setIvMorphine] = useState(10);
+    const [ivMorphine, setIvMorphine] = useState<string | number>(10);
     const [reduction, setReduction] = useState(30);
     const [showInfusion, setShowInfusion] = useState(false);
-    const [infusionRate, setInfusionRate] = useState(0);
+    const [infusionRate, setInfusionRate] = useState<string | number>(0);
 
     const convert = (factor: number) => {
-        const raw = ivMorphine * factor;
+        const val = typeof ivMorphine === 'string' ? parseFloat(ivMorphine) || 0 : ivMorphine;
+        const raw = val * factor;
         const reduced = raw * (1 - (reduction / 100));
         // Breakthrough = 10-15% of REDUCED total daily dose. Using ~12.5% (1/8th) or range.
         // NCCN suggests 10-20%. Let's display 10%.
@@ -27,10 +28,23 @@ export const CalculatorView = () => {
         };
     };
 
-    const handleInfusionCalc = (rate: number) => {
-        setInfusionRate(rate);
+    const handleInfusionCalc = (val: string) => {
+        setInfusionRate(val);
+        const rate = parseFloat(val) || 0;
         setIvMorphine(rate * 24);
     };
+
+    React.useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            const { trackEvent } = require('./analytics');
+            trackEvent('calculation_updated', {
+                iv_morphine_dose: ivMorphine,
+                reduction_percentage: reduction
+            });
+        }, 1000); // Debounce for 1 second
+
+        return () => clearTimeout(timeoutId);
+    }, [ivMorphine, reduction]);
 
     return (
         <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -61,7 +75,7 @@ export const CalculatorView = () => {
                             <input
                                 type="number"
                                 value={ivMorphine}
-                                onChange={(e) => setIvMorphine(Math.max(0, parseFloat(e.target.value)))}
+                                onChange={(e) => setIvMorphine(e.target.value)}
                                 className="w-28 text-4xl font-bold text-right text-teal-600 border-b-2 border-slate-100 focus:border-teal-500 focus:outline-none bg-transparent pb-1"
                             />
                             <span className="text-sm font-bold text-slate-400 absolute -right-6 bottom-2">mg/24h</span>
@@ -88,13 +102,13 @@ export const CalculatorView = () => {
                                     <input
                                         type="number"
                                         value={infusionRate}
-                                        onChange={(e) => handleInfusionCalc(Math.max(0, parseFloat(e.target.value)))}
+                                        onChange={(e) => handleInfusionCalc(e.target.value)}
                                         className="w-16 p-1 text-right font-bold text-slate-700 border-b border-slate-300 bg-transparent focus:outline-none focus:border-teal-500"
                                     />
                                     <span className="text-xs text-slate-400">mg/hr</span>
                                 </div>
                                 <span className="text-xs font-bold text-slate-400">× 24h =</span>
-                                <span className="text-sm font-bold text-teal-600">{infusionRate * 24} mg/day</span>
+                                <span className="text-sm font-bold text-teal-600">{(parseFloat(infusionRate as string) || 0) * 24} mg/day</span>
                             </div>
                         </div>
                     )}

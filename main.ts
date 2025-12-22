@@ -44,6 +44,7 @@ export default class OpioidPlugin extends Plugin {
 
         this.addRibbonIcon('activity', 'Open Inpatient Opioid Tool', (evt: MouseEvent) => {
             this.activateView();
+            this.trackPluginEvent('plugin_ribbon_open');
         });
 
         this.addCommand({
@@ -51,6 +52,7 @@ export default class OpioidPlugin extends Plugin {
             name: 'Open Opioid Precision Tool',
             callback: () => {
                 this.activateView();
+                this.trackPluginEvent('plugin_command_open');
             }
         });
 
@@ -59,8 +61,35 @@ export default class OpioidPlugin extends Plugin {
             name: 'Sync Medical Reference Notes',
             callback: async () => {
                 await this.syncMedicalReference();
+                this.trackPluginEvent('plugin_command_sync');
             }
         });
+    }
+
+    // Simple fire-and-forget tracking for the plugin side
+    // We don't want to bundle the full PostHog node client here to keep it lightweight
+    async trackPluginEvent(event: string) {
+        // TODO: Replace with your actual Project API Key
+        const POSTHOG_KEY = 'phc_INSERT_KEY_HERE';
+        const POSTHOG_HOST = 'https://us.i.posthog.com';
+
+        try {
+            await fetch(`${POSTHOG_HOST}/capture/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    api_key: POSTHOG_KEY,
+                    event: event,
+                    properties: {
+                        distinct_id: 'plugin_user', // Anonymous user for plugin side
+                        $lib: 'obsidian-plugin',
+                        source: 'obsidian'
+                    }
+                })
+            });
+        } catch (e) {
+            console.error("Failed to track plugin event", e);
+        }
     }
 
     async syncMedicalReference() {

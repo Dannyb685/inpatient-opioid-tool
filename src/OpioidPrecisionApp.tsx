@@ -33,6 +33,11 @@ const SidebarItem = ({ active, icon: Icon, label, onClick }: { active: boolean, 
 const OpioidPrecisionApp = () => {
     const [activeTab, setActiveTab] = useState('decision');
 
+    React.useEffect(() => {
+        const { trackPageView } = require('./analytics');
+        trackPageView(activeTab);
+    }, [activeTab]);
+
     return (
         <div className="flex flex-col md:flex-row h-screen bg-white text-slate-900 font-sans overflow-hidden">
             {/* Sidebar Navigation (Desktop) */}
@@ -78,7 +83,7 @@ const OpioidPrecisionApp = () => {
                     </div>
                 </header>
 
-                <main className={`flex-1 relative ${activeTab === 'decision' ? 'overflow-hidden' : 'overflow-y-auto p-4 md:p-6'} pb-20 md:pb-0`}>
+                <main className={`flex-1 relative ${activeTab === 'decision' ? 'overflow-y-auto lg:overflow-hidden' : 'overflow-y-auto p-4 md:p-6'} pb-20 md:pb-0`}>
                     {activeTab === 'decision' && <AssessmentView />}
                     {activeTab === 'moud' && <ToolkitView />}
                     {activeTab === 'proto' && <ProtocolsView />}
