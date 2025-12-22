@@ -1,0 +1,8 @@
+{
+    "appId": "com.danbergholz.inpatientopioidtool",
+    "appName": "Inpatient Opioid Tool",
+    "webDir": "web-dist",
+    "server": {
+        "androidScheme": "https"
+    }
+}
