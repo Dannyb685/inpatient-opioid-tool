@@ -14,6 +14,7 @@ import { CalculatorView } from './CalculatorView';
 import { ReferenceView } from './ReferenceView';
 import { ToolkitView } from './ToolkitView';
 import { ProtocolsView } from './ProtocolsView';
+import { trackPageView } from './analytics';
 
 // --- Shell ---
 
@@ -34,7 +35,6 @@ const OpioidPrecisionApp = () => {
     const [activeTab, setActiveTab] = useState('decision');
 
     React.useEffect(() => {
-        const { trackPageView } = require('./analytics');
         trackPageView(activeTab);
     }, [activeTab]);
 
