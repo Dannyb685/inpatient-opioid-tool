@@ -1,6 +1,6 @@
 {
     "name": "inpatient-opioid-tool",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "A clinical decision support tool for inpatient opioid management.",
     "main": "main.js",
     "scripts": {
