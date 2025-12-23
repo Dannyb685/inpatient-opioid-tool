@@ -9,13 +9,15 @@ import {
 import { ClinicalCard } from './Shared';
 
 export const CalculatorView = () => {
-    const [ivMorphine, setIvMorphine] = useState(10);
+    const [ivMorphine, setIvMorphine] = useState<string | number>(10);
     const [reduction, setReduction] = useState(30);
     const [showInfusion, setShowInfusion] = useState(false);
-    const [infusionRate, setInfusionRate] = useState(0);
+    const [infusionRate, setInfusionRate] = useState<string | number>(0);
+    const [showSafetyCheck, setShowSafetyCheck] = useState(false);
 
     const convert = (factor: number) => {
-        const raw = ivMorphine * factor;
+        const val = typeof ivMorphine === 'string' ? parseFloat(ivMorphine) || 0 : ivMorphine;
+        const raw = val * factor;
         const reduced = raw * (1 - (reduction / 100));
         // Breakthrough = 10-15% of REDUCED total daily dose. Using ~12.5% (1/8th) or range.
         // NCCN suggests 10-20%. Let's display 10%.
@@ -27,38 +29,59 @@ export const CalculatorView = () => {
         };
     };
 
-    const handleInfusionCalc = (rate: number) => {
-        setInfusionRate(rate);
+    const handleInfusionCalc = (val: string) => {
+        setInfusionRate(val);
+        const rate = parseFloat(val) || 0;
         setIvMorphine(rate * 24);
     };
 
+    React.useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            // Analytics integration from origin/main
+            try {
+                const analytics = (window as any).posthog;
+                if (analytics) {
+                    analytics.capture('calculation_updated', {
+                        iv_morphine_dose: ivMorphine,
+                        reduction_percentage: reduction
+                    });
+                }
+            } catch (e) {
+                console.error('Analytics failed', e);
+            }
+        }, 1000); // Debounce for 1 second
+
+        return () => clearTimeout(timeoutId);
+    }, [ivMorphine, reduction]);
+
     return (
-        <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="lg:col-span-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-xl p-4 flex gap-4 items-start shadow-sm">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg flex-none">
+        <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto p-4 md:p-0">
+            <div className="lg:col-span-2 bg-surface-highlight border border-border rounded-2xl p-4 flex gap-4 items-start shadow-sm">
+                <div className="p-2 bg-surface-card text-action rounded-xl flex-none border border-border/50">
                     <Info className="w-5 h-5" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-bold text-blue-900 dark:text-blue-300 mb-1">Safety First: 24-Hour Totals</h3>
-                    <p className="text-sm text-blue-800 dark:text-blue-400 leading-relaxed">
+                    <h3 className="text-sm font-bold text-text-primary mb-1">Safety First: 24-Hour Totals</h3>
+                    <p className="text-sm text-text-secondary leading-relaxed">
                         Calculations must be based on the <strong>TOTAL 24-Hour Opioid Exposure</strong> (Scheduled + Breakthrough).
                         Do not use single doses or hourly rates directly.
-                        <span className="block mt-1.5 font-bold text-rose-600 dark:text-rose-400">
+                        <span className="block mt-1.5 font-bold text-danger">
                             ⚠️ Do NOT use this for patients who are not currently taking opioids (opioid-naive).
                         </span>
                     </p>
                 </div>
             </div>
+
             {/* Input Side */}
             <div className="space-y-6">
                 <ClinicalCard title="Input Dose">
-                    <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-inner mb-4">
+                    <div className="bg-surface-highlight p-4 rounded-2xl border border-border shadow-inner mb-4">
                         <div className="flex items-center justify-between mb-2">
                             <div>
-                                <span className="block text-2xl font-black text-slate-900 dark:text-slate-100 italic tracking-tight">Total 24-Hour Dose</span>
+                                <span className="block text-2xl font-black text-text-primary italic tracking-tight">Total 24-Hour Dose</span>
                                 <div className="flex items-center gap-1.5">
-                                    <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
-                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-extrabold uppercase tracking-widest">Morphine IV Equivalents</span>
+                                    <div className="w-2 h-2 rounded-full bg-danger animate-pulse"></div>
+                                    <span className="text-[10px] text-text-tertiary font-extrabold uppercase tracking-widest">Morphine IV Equivalents</span>
                                 </div>
                             </div>
                             <div className="flex items-baseline gap-2 relative">
@@ -66,49 +89,49 @@ export const CalculatorView = () => {
                                     type="number"
                                     value={ivMorphine}
                                     onChange={(e) => setIvMorphine(Math.max(0, parseFloat(e.target.value)))}
-                                    className="w-32 text-4xl font-black text-right text-teal-600 dark:text-teal-400 border-b-2 border-teal-500/30 focus:border-teal-500 focus:outline-none bg-transparent pb-1 transition-all"
+                                    className="w-32 text-4xl font-black text-right text-action border-b-2 border-action/30 focus:border-action outline-none bg-transparent pb-1 transition-all"
                                 />
-                                <span className="text-sm font-black text-slate-400 dark:text-slate-500 italic">mg/24h</span>
+                                <span className="text-sm font-black text-text-tertiary italic">mg/24h</span>
                             </div>
                         </div>
                     </div>
 
                     <div className="mb-6 flex justify-between items-start">
-                        <p className="text-[10px] text-slate-400 dark:text-slate-500 italic max-w-[60%]">
+                        <p className="text-[10px] text-text-tertiary italic max-w-[60%]">
                             *Include all scheduled doses AND breakthrough doses administered in the last 24 hours.
                         </p>
                         <button
                             onClick={() => setShowInfusion(!showInfusion)}
-                            className="text-[10px] font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 px-2 py-1 rounded border border-teal-100 dark:border-teal-800/50 hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors"
+                            className="text-[10px] font-bold text-action bg-action-bg px-2 py-1 rounded-xl border border-action-border/30 hover:bg-action-bg/80 transition-colors"
                         >
                             {showInfusion ? 'Close Helper' : 'Infusion Helper'}
                         </button>
                     </div>
 
                     {showInfusion && (
-                        <div className="mb-6 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700 animate-in slide-in-from-top-2">
+                        <div className="mb-6 bg-surface-card p-3 rounded-2xl border border-border animate-fade-in">
                             <div className="flex items-center gap-4">
-                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Hourly Rate:</span>
+                                <span className="text-xs font-bold text-text-secondary uppercase">Hourly Rate:</span>
                                 <div className="flex items-baseline gap-1">
                                     <input
                                         type="number"
                                         value={infusionRate}
-                                        onChange={(e) => handleInfusionCalc(Math.max(0, parseFloat(e.target.value)))}
-                                        className="w-16 p-1 text-right font-bold text-slate-700 dark:text-slate-200 border-b border-slate-300 dark:border-slate-600 bg-transparent focus:outline-none focus:border-teal-500"
+                                        onChange={(e) => handleInfusionCalc(e.target.value)}
+                                        className="w-16 p-1 text-right font-bold text-text-primary border-b border-border bg-transparent focus:outline-none focus:border-action"
                                     />
-                                    <span className="text-xs text-slate-400">mg/hr</span>
+                                    <span className="text-xs text-text-tertiary">mg/hr</span>
                                 </div>
-                                <span className="text-xs font-bold text-slate-400">× 24h =</span>
-                                <span className="text-sm font-bold text-teal-600 dark:text-teal-400">{infusionRate * 24} mg/day</span>
+                                <span className="text-xs font-bold text-text-secondary">× 24h =</span>
+                                <span className="text-sm font-bold text-action">{(parseFloat(infusionRate as string) || 0) * 24} mg/day</span>
                             </div>
                         </div>
                     )}
 
-                    <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-100 dark:border-slate-700/50">
+                    <div className="bg-surface-highlight p-4 rounded-xl border border-border">
                         <div className="flex justify-between items-center mb-3">
-                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Cross-Tolerance Reduction</span>
-                            <div className="min-w-[3.5rem] text-center px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                                <span className={`text-xs font-extrabold ${reduction < 30 ? 'text-rose-500 dark:text-rose-400' : reduction > 40 ? 'text-blue-600 dark:text-blue-400' : 'text-teal-600 dark:text-teal-400'}`}>
+                            <span className="text-xs font-bold text-text-secondary uppercase">Cross-Tolerance Reduction</span>
+                            <div className="min-w-[3.5rem] text-center px-2 py-0.5 rounded-xl bg-surface-card border border-border shadow-sm">
+                                <span className={`text-xs font-extrabold ${reduction < 30 ? 'text-danger' : reduction > 40 ? 'text-warning' : 'text-action'}`}>
                                     -{reduction}%
                                 </span>
                             </div>
@@ -125,9 +148,9 @@ export const CalculatorView = () => {
                                     <button
                                         key={opt.val}
                                         onClick={() => setReduction(opt.val)}
-                                        className={`flex-1 py-2 px-1 rounded-lg border transition-all flex flex-col items-center justify-center ${reduction === opt.val
-                                            ? 'bg-teal-50 dark:bg-teal-900/30 border-teal-500 text-teal-700 dark:text-teal-400 ring-1 ring-teal-500'
-                                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                                        className={`flex-1 py-2 px-1 rounded-xl border transition-all flex flex-col items-center justify-center ${reduction === opt.val
+                                            ? 'bg-action-bg border-action-border text-action ring-1 ring-action-border'
+                                            : 'bg-surface-card border-border text-text-tertiary hover:border-text-tertiary/50 hover:bg-surface-highlight'
                                             }`}
                                     >
                                         <span className="text-sm font-bold">{opt.label}</span>
@@ -144,23 +167,23 @@ export const CalculatorView = () => {
                                     step="5"
                                     value={reduction}
                                     onChange={(e) => setReduction(parseInt(e.target.value))}
-                                    className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-teal-600"
+                                    className="w-full h-2 bg-surface-base rounded-2xl appearance-none cursor-pointer accent-action"
                                 />
-                                <div className="flex justify-between mt-2 text-[10px] font-medium text-slate-400">
+                                <div className="flex justify-between mt-2 text-[10px] font-medium text-text-tertiary">
                                     <span>Custom: -{reduction}%</span>
                                     <span>(Range: 0-75%)</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="text-[11px] leading-relaxed text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700 flex gap-3">
+                        <div className="text-[11px] leading-relaxed text-text-secondary bg-surface-card p-3 rounded-xl border border-border flex gap-3">
                             <div className="mt-0.5 min-w-[16px]">
-                                {reduction < 25 ? <Zap className="w-4 h-4 text-rose-500 dark:text-rose-400" /> :
-                                    reduction > 40 ? <ShieldAlert className="w-4 h-4 text-blue-600 dark:text-blue-400" /> :
-                                        <Activity className="w-4 h-4 text-teal-600 dark:text-teal-400" />}
+                                {reduction < 25 ? <Zap className="w-4 h-4 text-danger" /> :
+                                    reduction > 40 ? <ShieldAlert className="w-4 h-4 text-warning" /> :
+                                        <Activity className="w-4 h-4 text-action" />}
                             </div>
                             <div>
-                                <strong className="block text-slate-900 dark:text-slate-200 mb-1">
+                                <strong className="block text-text-primary mb-1">
                                     {reduction < 25 && "Inadequate Analgesia (10-25%)"}
                                     {reduction >= 25 && reduction <= 40 && "Standard / Reason for Rotation (25-40%)"}
                                     {reduction > 40 && "Severe Adverse Effects (>40%)"}
@@ -175,47 +198,46 @@ export const CalculatorView = () => {
                     </div>
                 </ClinicalCard>
 
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800/50 flex gap-3 text-blue-900 dark:text-blue-300">
-                    <Info className="w-5 h-5 flex-none text-blue-500 dark:text-blue-400" />
+                <div className="bg-action-bg p-4 rounded-xl border border-action-border/30 flex gap-3 text-action">
+                    <Info className="w-5 h-5 flex-none" />
                     <p className="text-xs leading-relaxed">
                         <strong>Clinical Note:</strong> Calculator uses equianalgesic ratios from NCCN Guidelines.
                         Always use clinical judgment and start lower in elderly/frail patients.
                         <strong> Methadone conversions are non-linear; consult Pain/Pall Care expert.</strong>
                     </p>
                 </div>
-
             </div>
 
             {/* Output Side */}
             <div className="space-y-6">
                 <div>
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-                        <Calculator className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                    <h3 className="text-sm font-bold text-text-primary mb-4 flex items-center gap-2">
+                        <Calculator className="w-4 h-4 text-action" />
                         Estimated 24-Hour Target Doses
                     </h3>
-                    <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Parenteral Targets (IV/SQ)</h3>
+                    <h3 className="text-xs font-bold text-text-tertiary uppercase mb-3 ml-1">Parenteral Targets (IV/SQ)</h3>
                     <div className="space-y-2">
                         <ClinicalCard className="flex justify-between items-center p-4">
                             <div>
-                                <div className="font-bold text-slate-800 dark:text-slate-200">Hydromorphone IV</div>
-                                <div className="text-[10px] text-slate-400">Ratio 1:6.7</div>
+                                <div className="font-bold text-text-primary">Hydromorphone IV</div>
+                                <div className="text-[10px] text-text-tertiary">Ratio 1:6.7</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-teal-600 dark:text-teal-400">{convert(0.15).reduced}<small className="text-xs text-slate-400 ml-1">mg/24h</small></div>
-                                <div className="text-[9px] font-medium text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 px-1.5 py-0.5 rounded inline-block mt-1">
+                                <div className="text-2xl font-bold text-action">{convert(0.15).reduced}<small className="text-xs text-text-tertiary ml-1">mg/24h</small></div>
+                                <div className="text-[9px] font-medium text-action bg-action-bg px-1.5 py-0.5 rounded inline-block mt-1">
                                     BT: {convert(0.15).btd} mg q2-4h
                                 </div>
-                                <div className="text-[10px] text-slate-400 strikethrough decoration-slate-300 opacity-60 mt-1">{convert(0.15).raw} raw</div>
+                                <div className="text-[10px] text-text-tertiary line-through opacity-60 mt-1 block">{convert(0.15).raw} raw</div>
                             </div>
                         </ClinicalCard>
                         <ClinicalCard className="flex justify-between items-center p-4">
                             <div>
-                                <div className="font-bold text-slate-800 dark:text-slate-200">Fentanyl IV</div>
-                                <div className="text-[10px] text-slate-400 font-medium">10mg Mor : 100mcg Fent</div>
+                                <div className="font-bold text-text-primary">Fentanyl IV</div>
+                                <div className="text-[10px] text-text-tertiary font-medium">10mg Mor : 100mcg Fent</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-teal-600 dark:text-teal-400">{convert(10).reduced}<small className="text-xs text-slate-400 ml-1">mcg/24h</small></div>
-                                <div className="text-[9px] font-medium text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 px-1.5 py-0.5 rounded inline-block mt-1">
+                                <div className="text-2xl font-bold text-action">{convert(10).reduced}<small className="text-xs text-text-tertiary ml-1">mcg/24h</small></div>
+                                <div className="text-[9px] font-medium text-action bg-action-bg px-1.5 py-0.5 rounded inline-block mt-1">
                                     BT: {convert(10).btd} mcg q1-2h
                                 </div>
                             </div>
@@ -225,32 +247,32 @@ export const CalculatorView = () => {
 
                 <div>
                     <div className="flex justify-between items-end mb-3 ml-1">
-                        <h3 className="text-xs font-bold text-slate-400 uppercase">Enteral Targets (PO)</h3>
-                        <div className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                        <h3 className="text-xs font-bold text-text-tertiary uppercase">Enteral Targets (PO)</h3>
+                        <div className="text-[10px] font-bold text-text-secondary bg-surface-highlight px-2 py-0.5 rounded border border-border">
                             PO Mor Equiv: {convert(3).reduced}mg
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-emerald-400 dark:border-l-emerald-500">
+                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-action">
                             <div>
-                                <div className="font-bold text-slate-800 dark:text-slate-200">Oxycodone PO</div>
-                                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">OME Ratio 1:1.5</div>
+                                <div className="font-bold text-text-primary">Oxycodone PO</div>
+                                <div className="text-[10px] text-action font-medium">OME Ratio 1:1.5</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{convert(2.0).reduced}<small className="text-xs text-slate-400 ml-1">mg/24h</small></div>
-                                <div className="text-[9px] font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/50 px-1.5 py-0.5 rounded inline-block mt-1">
+                                <div className="text-2xl font-bold text-text-primary">{convert(2.0).reduced}<small className="text-xs text-text-tertiary ml-1">mg/24h</small></div>
+                                <div className="text-[9px] font-medium text-text-secondary bg-surface-highlight px-1.5 py-0.5 rounded inline-block mt-1">
                                     BT: {convert(2.0).btd} mg q3-4h
                                 </div>
                             </div>
                         </ClinicalCard>
-                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-amber-400 dark:border-l-amber-500 bg-amber-50/30 dark:bg-amber-900/10">
+                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-warning bg-warning-bg/10">
                             <div>
-                                <div className="font-bold text-slate-800 dark:text-slate-200">Hydromorphone PO</div>
-                                <div className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">OME Ratio 1:4</div>
+                                <div className="font-bold text-text-primary">Hydromorphone PO</div>
+                                <div className="text-[10px] text-warning font-medium">OME Ratio 1:4</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{convert(0.75).reduced}<small className="text-xs text-slate-400 ml-1">mg/24h</small></div>
-                                <div className="text-[9px] font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/50 px-1.5 py-0.5 rounded inline-block mt-1">
+                                <div className="text-2xl font-bold text-text-primary">{convert(0.75).reduced}<small className="text-xs text-text-tertiary ml-1">mg/24h</small></div>
+                                <div className="text-[9px] font-medium text-text-secondary bg-surface-highlight px-1.5 py-0.5 rounded inline-block mt-1">
                                     BT: {convert(0.75).btd} mg q3-4h
                                 </div>
                             </div>
@@ -259,52 +281,67 @@ export const CalculatorView = () => {
                 </div>
 
                 <div>
-                    <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Transdermal Targets (Patches)</h3>
-                    <div className="space-y-2">
-                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-purple-400 dark:border-l-purple-500 bg-purple-50/20 dark:bg-purple-900/10">
-                            <div>
-                                <div className="font-bold text-slate-800 dark:text-slate-200">Fentanyl Patch</div>
-                                <div className="text-[10px] text-purple-600 dark:text-purple-400 font-medium">72hr Delivery</div>
+                    <h3 className="text-xs font-bold text-text-tertiary uppercase mb-3 ml-1">Transdermal / Transmucosal</h3>
+
+                    {/* Safety Interstitial */}
+                    <div className="bg-surface-card rounded-2xl border border-warning/30 overflow-hidden shadow-sm">
+                        <div className="bg-warning-bg p-3 border-b border-warning/20 flex justify-between items-center">
+                            <div className="flex items-center gap-2 text-warning font-bold text-xs uppercase tracking-wide">
+                                <ShieldAlert className="w-4 h-4" /> Complex Conversions
                             </div>
-                            <div className="text-right">
-                                <div className="text-2xl font-bold text-purple-700 dark:text-purple-400">{convert(1.5).reduced}<small className="text-xs text-slate-400 ml-1">mcg/h</small></div>
-                                <div className="text-[9px] text-slate-400">Consult Pkg Insert</div>
+                            {!showSafetyCheck && (
+                                <button
+                                    onClick={() => setShowSafetyCheck(true)}
+                                    className="text-[10px] bg-surface-card border border-warning/30 px-2 py-1 rounded-xl text-warning hover:bg-warning-bg transition-colors font-bold"
+                                >
+                                    Show Estimates
+                                </button>
+                            )}
+                        </div>
+
+                        {showSafetyCheck ? (
+                            <div className="p-4 space-y-4 animate-fade-in">
+                                {/* Fentanyl Patch */}
+                                <div className="flex flex-col gap-2 pb-4 border-b border-border">
+                                    <div className="flex justify-between">
+                                        <h3 className="font-bold text-text-primary">Fentanyl Patch</h3>
+                                        <div className="text-right">
+                                            <div className="text-xl font-bold text-text-primary">{convert(1.5).reduced} <span className="text-xs font-medium text-text-tertiary">mcg/hr</span></div>
+                                            <div className="text-[10px] text-warning mt-1 font-medium">Use closest LOWER patch size</div>
+                                        </div>
+                                    </div>
+                                    <div className="text-[10px] bg-warning-bg text-warning p-2 rounded-xl border border-warning/20 leading-relaxed">
+                                        <strong>WARNING:</strong> Patches take 12-24h to onset. Cover with short-acting. Package insert recommends stricter conversion than standard equianalgesic tables.
+                                    </div>
+                                </div>
+
+                                {/* Methadone (No calc provided) */}
+                                <div className="flex flex-col gap-2">
+                                    <div className="flex justify-between">
+                                        <h3 className="font-bold text-text-primary">Methadone</h3>
+                                        <div className="text-right">
+                                            <div className="text-xl font-bold text-text-primary">Consult Pain Svc</div>
+                                            <div className="text-[10px] text-text-tertiary mt-1">Non-linear kinetics</div>
+                                        </div>
+                                    </div>
+                                    <div className="text-[10px] bg-danger-bg text-danger p-2 rounded-xl border border-danger/20 leading-relaxed">
+                                        <strong>DO NOT ESTIMATE:</strong> Methadone conversion varies by total MME (4:1 to 20:1). Accumulates over 5 days (t1/2 8-59h). Risk of QTc prolongation and overdose.
+                                    </div>
+                                </div>
+
+                                <button onClick={() => setShowSafetyCheck(false)} className="w-full py-2 text-xs font-bold text-text-tertiary hover:text-text-secondary transition-all">Hide Complex Conversions</button>
                             </div>
-                        </ClinicalCard>
-                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-indigo-400 dark:border-l-indigo-500 bg-indigo-50/20 dark:bg-indigo-900/10">
-                            <div>
-                                <div className="font-bold text-slate-800 dark:text-slate-200">Butrans Patch</div>
-                                <div className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium italic">Consult Specialist</div>
+                        ) : (
+                            <div className="p-6 text-center text-text-tertiary text-xs">
+                                <ShieldAlert className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                <p>High-risk conversions (Patch/Methadone) hidden for safety.</p>
                             </div>
-                            <div className="text-right">
-                                <div className="text-xs font-bold text-slate-400 uppercase">No Ratio</div>
-                                <div className="text-[9px] text-rose-500 dark:text-rose-400 font-bold">Withdrawal Risk</div>
-                            </div>
-                        </ClinicalCard>
-                    </div>
-                    <div className="mt-2 p-2 bg-purple-50 dark:bg-purple-900/20 rounded border border-purple-100 dark:border-purple-800/50 text-[10px] text-purple-700 dark:text-purple-300 italic leading-tight">
-                        Note: Patches take 12-24h for initial effect. Maintain bridge dose if transitioning from short-acting opioids.
+                        )}
                     </div>
                 </div>
 
-                <div>
-                    <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Transmucosal Targets (SL/Buccal)</h3>
-                    <div className="space-y-2">
-                        <ClinicalCard className="flex justify-between items-center p-4 border-l-4 border-l-rose-400 dark:border-l-rose-500 bg-rose-50/10 dark:bg-rose-900/10">
-                            <div>
-                                <div className="font-bold text-slate-800 dark:text-slate-200">Fentanyl SL</div>
-                                <div className="text-[10px] text-rose-600 dark:text-rose-400 font-medium italic">Titrate from lowest</div>
-                            </div>
-                            <div className="text-right">
-                                <div className="text-xs font-bold text-slate-400 uppercase">Independent</div>
-                                <div className="text-[9px] text-slate-400">Not for Naive</div>
-                            </div>
-                        </ClinicalCard>
-                    </div>
-                </div>
-
-                <div className="bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-lg border border-emerald-100 dark:border-emerald-800/50 flex gap-2 text-emerald-900 dark:text-emerald-300 mt-2">
-                    <Activity className="w-4 h-4 flex-none text-emerald-600 dark:text-emerald-400 mt-0.5" />
+                <div className="bg-action-bg p-3 rounded-xl border border-action-border/30 flex gap-2 text-action mt-2">
+                    <Activity className="w-4 h-4 flex-none mt-0.5" />
                     <p className="text-[10px] leading-relaxed font-medium">
                         <strong>Monitoring:</strong> Assess efficacy & safety q2-4h (first 24h). Re-calculate TDD after 24-72h.
                         Breakthrough (BT) calculated at ~10% of TDD.

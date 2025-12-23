@@ -3,10 +3,10 @@ import React from 'react';
 // --- Shared Components ---
 
 export const ClinicalCard = ({ children, className = "", title, action }: { children: React.ReactNode, className?: string, title?: string, action?: React.ReactNode }) => (
-    <div className={`bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden ${className}`}>
+    <div className={`bg-surface-card rounded-2xl border border-border/60 shadow-sm overflow-hidden ${className}`}>
         {title && (
-            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
-                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{title}</h3>
+            <div className="px-4 py-3 border-b border-border flex justify-between items-center bg-surface-highlight/50">
+                <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider">{title}</h3>
                 {action}
             </div>
         )}
@@ -18,11 +18,11 @@ export const ClinicalCard = ({ children, className = "", title, action }: { chil
 
 export const Badge = ({ type, text }: { type?: string, text: string }) => {
     const styles: { [key: string]: string } = {
-        safe: "bg-emerald-100 text-emerald-700 border-emerald-200",
-        caution: "bg-amber-100 text-amber-700 border-amber-200",
-        unsafe: "bg-rose-100 text-rose-700 border-rose-200",
-        neutral: "bg-slate-100 text-slate-600 border-slate-200",
-        purple: "bg-purple-100 text-purple-700 border-purple-200"
+        safe: "bg-surface-highlight text-action border-action-border/30",
+        caution: "bg-warning-bg text-warning border-warning/30",
+        unsafe: "bg-danger-bg text-danger border-danger/30",
+        neutral: "bg-surface-highlight text-text-secondary border-border/50",
+        purple: "bg-surface-highlight text-text-primary border-border/50"
     };
 
     let styleKey = type || 'neutral';
@@ -43,9 +43,9 @@ export const Badge = ({ type, text }: { type?: string, text: string }) => {
 export const ParameterBtn = ({ active, onClick, label, sub }: { active: boolean, onClick: () => void, label: string, sub?: string }) => (
     <button
         onClick={onClick}
-        className={`w-full text-left p-2 rounded-md border text-xs transition-all ${active
-            ? 'bg-teal-50 border-teal-600 text-teal-900 ring-1 ring-teal-600'
-            : 'bg-white border-slate-200 text-slate-600 hover:border-teal-400 hover:bg-slate-50'
+        className={`w-full text-left p-3 rounded-xl border text-xs transition-all ${active
+            ? 'bg-action-bg border-action-border text-action ring-1 ring-action-border'
+            : 'bg-surface-card border-border text-text-secondary hover:border-action-border hover:bg-surface-highlight'
             }`}
     >
         <div className="font-bold">{label}</div>

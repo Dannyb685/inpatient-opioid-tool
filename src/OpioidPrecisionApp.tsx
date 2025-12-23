@@ -18,6 +18,7 @@ import { ReferenceView } from './ReferenceView';
 import { ToolkitView } from './ToolkitView';
 import { ProtocolsView } from './ProtocolsView';
 import { SBIRTView } from './SBIRTView';
+import { trackPageView } from './analytics';
 
 // --- Shell ---
 
@@ -25,8 +26,8 @@ const SidebarItem = ({ active, icon: Icon, label, onClick }: { active: boolean, 
     <button
         onClick={onClick}
         className={`w-full flex flex-col items-center justify-center p-3 rounded-xl transition-all mb-2 ${active
-            ? 'bg-teal-50 dark:bg-teal-900/10 text-teal-700 dark:text-teal-300 shadow-sm'
-            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+            ? 'bg-action-bg text-action shadow-sm'
+            : 'text-text-tertiary hover:text-text-secondary hover:bg-surface-highlight'
             }`}
     >
         <Icon className={`w-6 h-6 mb-1 ${active ? 'stroke-2' : 'stroke-1.5'}`} />
@@ -54,12 +55,16 @@ const OpioidPrecisionApp = () => {
         }
     }, [isDarkMode]);
 
+    React.useEffect(() => {
+        trackPageView(activeTab);
+    }, [activeTab]);
+
     return (
-        <div className="flex flex-col md:flex-row h-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 font-sans overflow-hidden transition-colors duration-300">
+        <div className="flex flex-col md:flex-row h-screen bg-surface-base text-text-primary font-sans overflow-hidden transition-colors duration-300">
             {/* Sidebar Navigation (Desktop) */}
-            <nav className="hidden md:flex w-20 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col items-center py-6 z-20 flex-none bg-opacity-80 backdrop-blur-md">
+            <nav className="hidden md:flex w-20 bg-surface-card border-r border-border flex-col items-center py-6 z-20 flex-none bg-opacity-80 backdrop-blur-md">
                 <div className="mb-8">
-                    <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center text-white shadow-teal-200 dark:shadow-teal-900/20 shadow-lg">
+                    <div className="w-10 h-10 bg-action rounded-xl flex items-center justify-center text-white shadow-lg">
                         <Activity className="w-6 h-6" />
                     </div>
                 </div>
@@ -76,24 +81,24 @@ const OpioidPrecisionApp = () => {
                 <div className="mt-auto px-2 space-y-4 flex-none">
                     <button
                         onClick={() => setIsDarkMode(!isDarkMode)}
-                        className="w-full text-slate-300 hover:text-teal-500 dark:text-slate-600 dark:hover:text-teal-400 p-2 transition-colors"
+                        className="w-full text-text-tertiary hover:text-action p-2 transition-colors"
                         title="Toggle Theme"
                     >
                         {isDarkMode ? <Sun className="w-5 h-5 mx-auto" /> : <Moon className="w-5 h-5 mx-auto" />}
                     </button>
-                    {/* <button className="w-full text-slate-300 hover:text-slate-500 p-2"><Settings className="w-5 h-5 mx-auto" /></button> */}
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 text-xs font-bold mx-auto border border-white dark:border-slate-700 shadow-sm">
+                    <button className="w-full text-text-tertiary hover:text-text-secondary p-2"><Settings className="w-5 h-5 mx-auto" /></button>
+                    <div className="w-8 h-8 rounded-full bg-surface-highlight flex items-center justify-center text-text-tertiary text-xs font-bold mx-auto border border-border shadow-sm">
                         DB
                     </div>
                 </div>
             </nav>
 
             {/* Main Content Area */}
-            <div className={`flex-1 flex flex-col h-full bg-slate-50/50 dark:bg-slate-900 overflow-hidden relative transition-colors duration-300`}>
+            <div className="flex-1 flex flex-col h-full bg-surface-base overflow-hidden relative transition-colors duration-300">
                 {/* Top Bar */}
-                <header className="h-14 md:h-16 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 bg-white/80 dark:bg-slate-900/90 backdrop-blur-md z-10 flex-none">
+                <header className="h-14 md:h-16 pt-safe md:pt-0 border-b border-border flex items-center justify-between px-4 md:px-8 bg-surface-base/80 backdrop-blur-md z-10 flex-none">
                     <div>
-                        <h1 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-200">
+                        <h1 className="text-lg md:text-xl font-bold text-text-primary">
                             {activeTab === 'decision' && 'Selection & Risk'}
                             {activeTab === 'sbirt' && 'SBIRT Assessment'}
                             {activeTab === 'moud' && 'Assessment Toolkit'}
@@ -101,14 +106,14 @@ const OpioidPrecisionApp = () => {
                             {activeTab === 'calc' && 'Conversion Calculator'}
                             {activeTab === 'ref' && 'Pharmacology Reference'}
                         </h1>
-                        <p className="text-[10px] md:text-xs text-slate-400 font-medium line-clamp-1">Inpatient Opioid Management Tool</p>
+                        <p className="text-[10px] md:text-xs text-text-tertiary font-medium line-clamp-1">Inpatient Opioid Management Tool</p>
                     </div>
-                    <div className="md:hidden w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-bold">
+                    <div className="md:hidden w-8 h-8 rounded-full bg-surface-highlight flex items-center justify-center text-text-tertiary text-xs font-bold">
                         DB
                     </div>
                 </header>
 
-                <main className={`flex-1 relative ${activeTab === 'decision' ? 'overflow-hidden' : 'overflow-y-auto p-4 md:p-6'} pb-20 md:pb-0`}>
+                <main className={`flex-1 relative ${activeTab === 'decision' ? 'overflow-hidden' : 'overflow-y-auto p-4 md:p-6'} pb-24 md:pb-0`}>
                     <div key={activeTab} className="h-full animate-fade-in">
                         {activeTab === 'decision' && <AssessmentView />}
                         {activeTab === 'sbirt' && <SBIRTView />}
@@ -120,28 +125,28 @@ const OpioidPrecisionApp = () => {
                 </main>
 
                 {/* Bottom Navigation (Mobile) */}
-                <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around p-2 z-30 safe-area-bottom backdrop-blur-lg bg-opacity-90">
-                    <button onClick={() => setActiveTab('decision')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'decision' ? 'text-teal-600 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/10' : 'text-slate-400 dark:text-slate-500'}`}>
+                <div className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-card/80 backdrop-blur-lg border-t border-border flex justify-around p-2 pb-safe z-30">
+                    <button onClick={() => setActiveTab('decision')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'decision' ? 'text-action bg-action-bg' : 'text-text-tertiary'}`}>
                         <Home className="w-5 h-5" />
                         <span className="text-[9px] font-bold mt-1">Risk</span>
                     </button>
-                    <button onClick={() => setActiveTab('sbirt')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'sbirt' ? 'text-teal-600 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/10' : 'text-slate-400 dark:text-slate-500'}`}>
+                    <button onClick={() => setActiveTab('sbirt')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'sbirt' ? 'text-action bg-action-bg' : 'text-text-tertiary'}`}>
                         <ClipboardCheck className="w-5 h-5" />
                         <span className="text-[9px] font-bold mt-1">SBIRT</span>
                     </button>
-                    <button onClick={() => setActiveTab('moud')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'moud' ? 'text-teal-600 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/10' : 'text-slate-400 dark:text-slate-500'}`}>
+                    <button onClick={() => setActiveTab('moud')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'moud' ? 'text-action bg-action-bg' : 'text-text-tertiary'}`}>
                         <Stethoscope className="w-5 h-5" />
                         <span className="text-[9px] font-bold mt-1">Tools</span>
                     </button>
-                    <button onClick={() => setActiveTab('proto')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'proto' ? 'text-teal-600 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/10' : 'text-slate-400 dark:text-slate-500'}`}>
+                    <button onClick={() => setActiveTab('proto')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'proto' ? 'text-action bg-action-bg' : 'text-text-tertiary'}`}>
                         <BookOpen className="w-5 h-5" />
                         <span className="text-[9px] font-bold mt-1">Proto</span>
                     </button>
-                    <button onClick={() => setActiveTab('calc')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'calc' ? 'text-teal-600 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/10' : 'text-slate-400 dark:text-slate-500'}`}>
+                    <button onClick={() => setActiveTab('calc')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'calc' ? 'text-action bg-action-bg' : 'text-text-tertiary'}`}>
                         <Calculator className="w-5 h-5" />
                         <span className="text-[9px] font-bold mt-1">Dose</span>
                     </button>
-                    <button onClick={() => setActiveTab('ref')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'ref' ? 'text-teal-600 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/10' : 'text-slate-400 dark:text-slate-500'}`}>
+                    <button onClick={() => setActiveTab('ref')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'ref' ? 'text-action bg-action-bg' : 'text-text-tertiary'}`}>
                         <Database className="w-5 h-5" />
                         <span className="text-[9px] font-bold mt-1">Drug</span>
                     </button>
