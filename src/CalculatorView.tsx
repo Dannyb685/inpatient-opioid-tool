@@ -52,19 +52,24 @@ export const CalculatorView = () => {
             {/* Input Side */}
             <div className="space-y-6">
                 <ClinicalCard title="Input Dose">
-                    <div className="flex items-center justify-between mb-2">
-                        <div>
-                            <span className="block text-2xl font-bold text-slate-900 dark:text-slate-100">Total 24-Hour Dose</span>
-                            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">Morphine IV Equivalents</span>
-                        </div>
-                        <div className="flex items-baseline gap-2 relative">
-                            <input
-                                type="number"
-                                value={ivMorphine}
-                                onChange={(e) => setIvMorphine(Math.max(0, parseFloat(e.target.value)))}
-                                className="w-32 text-4xl font-bold text-right text-teal-600 dark:text-teal-400 border-b-2 border-slate-100 dark:border-slate-700 focus:border-teal-500 focus:outline-none bg-transparent pb-1"
-                            />
-                            <span className="text-sm font-bold text-slate-400 dark:text-slate-500">mg/24h</span>
+                    <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-inner mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                            <div>
+                                <span className="block text-2xl font-black text-slate-900 dark:text-slate-100 italic tracking-tight">Total 24-Hour Dose</span>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-extrabold uppercase tracking-widest">Morphine IV Equivalents</span>
+                                </div>
+                            </div>
+                            <div className="flex items-baseline gap-2 relative">
+                                <input
+                                    type="number"
+                                    value={ivMorphine}
+                                    onChange={(e) => setIvMorphine(Math.max(0, parseFloat(e.target.value)))}
+                                    className="w-32 text-4xl font-black text-right text-teal-600 dark:text-teal-400 border-b-2 border-teal-500/30 focus:border-teal-500 focus:outline-none bg-transparent pb-1 transition-all"
+                                />
+                                <span className="text-sm font-black text-slate-400 dark:text-slate-500 italic">mg/24h</span>
+                            </div>
                         </div>
                     </div>
 

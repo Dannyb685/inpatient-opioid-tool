@@ -1,0 +1,10 @@
+{
+	"id": "inpatient-opioid-tool",
+	"name": "Inpatient Opioid Tool",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "A clinical decision support tool for inpatient opioid management.",
+	"author": "Daniel Bergholz",
+	"authorUrl": "https://github.com/Dannyb685",
+	"isDesktopOnly": false
+}

@@ -322,8 +322,16 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
         <div className="flex flex-col lg:flex-row gap-4 h-full">
             {/* Left Pane: Patient Profile */}
             <div className="lg:w-1/3 flex-none space-y-3 overflow-y-auto pr-2 custom-scrollbar">
-                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-2 px-1">Case Parameters</h2>
+                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-2 px-1">Selection & Risk</h2>
                 <div className="space-y-3">
+                    {/* Route of Admin (Moved to top) */}
+                    <div className="bg-teal-50/50 dark:bg-teal-900/10 p-3 rounded-lg border border-teal-100 dark:border-teal-900/30 space-y-2">
+                        <label className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase ml-1">Route of Administration</label>
+                        <div className="grid grid-cols-2 gap-2">
+                            <ParameterBtn active={route === 'iv'} onClick={() => setRoute('iv')} label="IV / SQ" />
+                            <ParameterBtn active={route === 'po'} onClick={() => setRoute('po')} label="Oral (PO)" />
+                        </div>
+                    </div>
 
                     {/* Demographics & PRODIGY */}
                     <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700/50 space-y-3 shadow-sm">
@@ -450,13 +458,6 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                             </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Route of Admin</label>
-                            <div className="grid grid-cols-2 gap-2">
-                                <ParameterBtn active={route === 'iv'} onClick={() => setRoute('iv')} label="IV / SQ" />
-                                <ParameterBtn active={route === 'po'} onClick={() => setRoute('po')} label="Oral (PO)" />
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

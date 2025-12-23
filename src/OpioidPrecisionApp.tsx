@@ -8,7 +8,8 @@ import {
     BookOpen,
     Stethoscope,
     Moon,
-    Sun
+    Sun,
+    ClipboardCheck
 } from 'lucide-react';
 
 import { AssessmentView } from './AssessmentView';
@@ -16,6 +17,7 @@ import { CalculatorView } from './CalculatorView';
 import { ReferenceView } from './ReferenceView';
 import { ToolkitView } from './ToolkitView';
 import { ProtocolsView } from './ProtocolsView';
+import { SBIRTView } from './SBIRTView';
 
 // --- Shell ---
 
@@ -57,13 +59,14 @@ const OpioidPrecisionApp = () => {
             {/* Sidebar Navigation (Desktop) */}
             <nav className="hidden md:flex w-20 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col items-center py-6 z-20 flex-none bg-opacity-80 backdrop-blur-md">
                 <div className="mb-8">
-                    <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center text-white shadow-teal-200 shadow-lg">
+                    <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center text-white shadow-teal-200 dark:shadow-teal-900/20 shadow-lg">
                         <Activity className="w-6 h-6" />
                     </div>
                 </div>
 
                 <div className="flex-1 w-full px-2 overflow-y-auto custom-scrollbar">
                     <SidebarItem active={activeTab === 'decision'} onClick={() => setActiveTab('decision')} icon={Home} label="Risk" />
+                    <SidebarItem active={activeTab === 'sbirt'} onClick={() => setActiveTab('sbirt')} icon={ClipboardCheck} label="SBIRT" />
                     <SidebarItem active={activeTab === 'moud'} onClick={() => setActiveTab('moud')} icon={Stethoscope} label="Toolkit" />
                     <SidebarItem active={activeTab === 'proto'} onClick={() => setActiveTab('proto')} icon={BookOpen} label="Protocols" />
                     <SidebarItem active={activeTab === 'calc'} onClick={() => setActiveTab('calc')} icon={Calculator} label="Dose" />
@@ -91,7 +94,8 @@ const OpioidPrecisionApp = () => {
                 <header className="h-14 md:h-16 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 bg-white/80 dark:bg-slate-900/90 backdrop-blur-md z-10 flex-none">
                     <div>
                         <h1 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-200">
-                            {activeTab === 'decision' && 'Patient Assessment'}
+                            {activeTab === 'decision' && 'Selection & Risk'}
+                            {activeTab === 'sbirt' && 'SBIRT Assessment'}
                             {activeTab === 'moud' && 'Assessment Toolkit'}
                             {activeTab === 'proto' && 'Clinical Protocols'}
                             {activeTab === 'calc' && 'Conversion Calculator'}
@@ -107,6 +111,7 @@ const OpioidPrecisionApp = () => {
                 <main className={`flex-1 relative ${activeTab === 'decision' ? 'overflow-hidden' : 'overflow-y-auto p-4 md:p-6'} pb-20 md:pb-0`}>
                     <div key={activeTab} className="h-full animate-fade-in">
                         {activeTab === 'decision' && <AssessmentView />}
+                        {activeTab === 'sbirt' && <SBIRTView />}
                         {activeTab === 'moud' && <ToolkitView />}
                         {activeTab === 'proto' && <ProtocolsView />}
                         {activeTab === 'calc' && <CalculatorView />}
@@ -119,6 +124,10 @@ const OpioidPrecisionApp = () => {
                     <button onClick={() => setActiveTab('decision')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'decision' ? 'text-teal-600 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/10' : 'text-slate-400 dark:text-slate-500'}`}>
                         <Home className="w-5 h-5" />
                         <span className="text-[9px] font-bold mt-1">Risk</span>
+                    </button>
+                    <button onClick={() => setActiveTab('sbirt')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'sbirt' ? 'text-teal-600 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/10' : 'text-slate-400 dark:text-slate-500'}`}>
+                        <ClipboardCheck className="w-5 h-5" />
+                        <span className="text-[9px] font-bold mt-1">SBIRT</span>
                     </button>
                     <button onClick={() => setActiveTab('moud')} className={`flex flex-col items-center p-2 rounded-lg ${activeTab === 'moud' ? 'text-teal-600 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/10' : 'text-slate-400 dark:text-slate-500'}`}>
                         <Stethoscope className="w-5 h-5" />
