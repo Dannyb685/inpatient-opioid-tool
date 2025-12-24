@@ -119,8 +119,28 @@ export const AssessmentView = () => {
 
         // --- CLINICAL LOGIC (Progressive) ---
 
+        // Helpers to avoid duplication for IV/PO choices
+        const addIVRecs = (isRenalBad: boolean) => {
+            if (isRenalBad) {
+                r.push({ name: 'Fentanyl IV', reason: 'Preferred (No metabolites).', detail: 'Safest renal option.', type: 'safe' });
+                r.push({ name: 'Hydromorphone IV', reason: 'Caution.', detail: 'Reduce dose 50%. Watch for H3G accumulation.', type: 'caution' });
+            } else {
+                r.push({ name: 'Morphine IV', reason: 'Standard.', detail: 'Ideal first-line unless hypotensive.', type: 'safe' });
+                r.push({ name: 'Hydromorphone IV', reason: 'Standard.', detail: 'Preferred in high tolerance.', type: 'safe' });
+            }
+        };
+
+        const addPORecs = (isRenalBad: boolean) => {
+            if (isRenalBad) {
+                r.push({ name: 'Oxycodone PO', reason: 'Caution.', detail: 'Reduce frequency. Monitor for sedation.', type: 'caution' });
+                r.push({ name: 'Hydromorphone PO', reason: 'Caution.', detail: 'Reduce dose 50%. Monitor carefully.', type: 'caution' });
+            } else {
+                r.push({ name: 'Oxycodone PO', reason: 'Preferred.', detail: 'Superior bioavailability to PO Morphine.', type: 'safe' });
+                r.push({ name: 'Morphine PO', reason: 'Standard.', detail: 'Reliable if renal function is normal.', type: 'safe' });
+            }
+        };
+
         // 1. HEMODYNAMICS (Immediate Override)
-        // If unstable, we recommend Fentanyl immediately, regardless of other states.
         if (hemo === 'unstable') {
             rReasons.push('Hemodynamic Instability');
             score = 'High';
@@ -128,55 +148,43 @@ export const AssessmentView = () => {
             w.push('Morphine: Histamine release precipitates vasodilation/hypotension.');
         }
 
-        // 2. STANDARD OPIOID SELECTION (Requires Renal & Hemo Status)
-        // Only proceed with standard suggestions if we know renal status and we aren't already forced into Fentanyl-only by instability.
+        // 2. STANDARD OPIOID SELECTION
         if (renal && hemo !== 'unstable') {
-            if (renal === 'dialysis' || renal === 'impaired') {
+            const isRenalBad = renal === 'dialysis' || renal === 'impaired';
+            if (isRenalBad) {
                 rReasons.push('Renal Insufficiency');
                 score = 'High';
-
-                // Safe Options
-                r.push({ name: 'Fentanyl', reason: 'Safe (no active metabolites).', detail: 'Watch context-sensitive t1/2 in ICU infusions.', type: 'safe' });
-                r.push({ name: 'Methadone', reason: 'Safe (fecal excretion).', detail: 'Use low dose; monitor QTc and day 3-5 accumulation.', type: 'safe' });
-
-                // Cautious Options (Only if Route is known or default to IV warnings)
-                if (route === 'po') {
-                    r.push({ name: 'Hydromorphone PO', reason: 'Use with caution.', detail: 'Reduce dose 50%. Monitor for allodynia (H3G).', type: 'caution' });
-                    r.push({ name: 'Oxycodone', reason: 'Use with caution.', detail: 'Reduce frequency. Monitor sedation.', type: 'caution' });
-                } else if (route === 'iv' || !route) { // Default to IV assumptions if route unknown but renal implies strictness
-                    r.push({ name: 'Hydromorphone IV', reason: 'Caution.', detail: 'Reduce dose. Dialyzable, but H3G neurotoxicity is real.', type: 'caution' });
-                }
                 w.push('Morphine Contraindicated: M6G/M3G accumulation causes coma and myoclonus.');
+            }
 
-            } else {
-                // Normal Renal Function
-                if (route === 'po') {
-                    r.push({ name: 'Oxycodone', reason: 'Preferred.', detail: 'Superior bioavailability to Morphine/Dilaudid PO.', type: 'safe' });
-                } else {
-                    // IV or Route Unknown (standard defaults)
-                    r.push({ name: 'Morphine', reason: 'Standard.', detail: 'Ideal unless hypotension present.', type: 'safe' });
-                    r.push({ name: 'Hydromorphone', reason: 'Standard.', detail: 'Preferred in high tolerance.', type: 'safe' });
+            // Apply Route Logic
+            if (route === 'iv') {
+                addIVRecs(isRenalBad);
+            } else if (route === 'po') {
+                addPORecs(isRenalBad);
+            } else if (route === 'both' || route === 'either') {
+                addIVRecs(isRenalBad);
+                addPORecs(isRenalBad);
+                if (route === 'either') {
+                    adj.push('Route Preference: Determine based on GI tolerance and required speed of onset.');
                 }
+            } else {
+                // Default if route unknown
+                addIVRecs(isRenalBad);
             }
         }
 
         // 3. HEPATIC SAFETY GATES
-        // Can apply to existing recommendations
         if (hepatic) {
             if (hepatic === 'failure') {
                 rReasons.push('Hepatic Failure');
                 score = 'High';
-                w.push('Liver Failure (Child-Pugh C): Avoid Methadone (accumulation) and Morphine/Codeine (prodrug failure).');
-
-                // Filter unsafe
+                w.push('Liver Failure (Child-Pugh C): Avoid Methadone and Morphine/Codeine.');
                 r = r.filter(x => x.name !== 'Methadone' && !x.name.includes('Morphine'));
-
-                // Ensure Fentanyl is present if not already
-                if (!r.find(x => x.name === 'Fentanyl')) {
-                    r.unshift({ name: 'Fentanyl', reason: 'Preferred.', detail: 'Safest option in failures (no active metabolites).', type: 'safe' });
+                if (!r.find(x => x.name === 'Fentanyl' || x.name === 'Fentanyl IV')) {
+                    r.unshift({ name: 'Fentanyl', reason: 'Preferred.', detail: 'Safest in failure.', type: 'safe' });
                 }
-                r = r.map(x => ({ ...x, detail: x.detail + ' Reduce initial dose 50% and extend interval.' }));
-
+                r = r.map(x => ({ ...x, detail: x.detail + ' Reduce dose 50%.' }));
             } else if (hepatic === 'impaired') {
                 rReasons.push('Hepatic Impairment');
                 if (score !== 'High') score = 'Moderate';
@@ -186,86 +194,47 @@ export const AssessmentView = () => {
 
         // 4. GI / NPO Logic
         if (gi === 'npo') {
-            if (route === 'po') {
-                r = []; // Clear PO recs
-                w.push('PO Contraindicated: Patient is NPO / AMS. Switch to IV or Patch.');
+            if (route === 'po' || route === 'both' || route === 'either') {
+                const poNames = ['Oxycodone PO', 'Hydromorphone PO', 'Morphine PO', 'Oxycodone'];
+                if (route === 'po') r = [];
+                else r = r.filter(x => !poNames.includes(x.name));
+                w.push('PO Contraindicated: Patient is NPO / AMS. Switch to IV.');
             }
         } else if (gi === 'tube') {
-            if (route === 'po') {
-                w.push('DO NOT CRUSH Extended Release (ER/LA) formulations. Fatal dose dumping risk.');
-                r = r.map(x => ({ ...x, detail: x.detail + ' Use liquid formulation.' }));
+            const poIndicators = ['PO', 'Oxycodone', 'Hydromorphone PO'];
+            if (r.some(x => poIndicators.some(ind => x.name.includes(ind)))) {
+                w.push('Tube Access: Use liquid formulations. Do not crush ER/LA meds.');
             }
         }
 
-        // 5. PAIN TYPE ADJUVANTS (Can appear independently)
+        // 5. PAIN TYPE ADJUVANTS
         if (painType) {
             if (painType === 'neuropathic') {
-                // Modify existing opioids if Methadone present
-                const methadone = r.find(x => x.name === 'Methadone');
-                if (methadone) {
-                    r = r.filter(x => x.name !== 'Methadone');
-                    r.unshift({ ...methadone, type: 'safe', reason: 'Preferred.', detail: 'NMDA antagonism treats neuropathic component. Monitor QTc.' });
-                }
-                // Add specific adjuvants
-                adj.push('Gabapentinoids: Gabapentin (start 100-300mg TID) or Pregabalin (Lyrica) 25-75mg BID.');
-                adj.push('Antidepressants: Duloxetine (Cymbalta) 30mg daily or Nortriptyline/Amitriptyline 10mg qHS.');
-                adj.push('Topicals: Lidocaine 5% patch or Capsaicin (if localized).');
+                adj.push('Gabapentinoids: Gabapentin or Pregabalin (Lyrica).');
+                adj.push('Antidepressants: Duloxetine (Cymbalta) or Nortriptyline.');
+                adj.push('Topicals: Lidocaine 5% patch.');
             } else if (painType === 'inflammatory') {
-                adj.push('NSAIDs: Naproxen 500mg BID or Celecoxib 100-200mg BID (if GI risk).');
-                adj.push('Acetaminophen: 650-1000mg q6h (Max 3-4g/day).');
-                adj.push('Corticosteroids: Dexamethasone 4mg daily (consider for acute inflammatory flares).');
+                adj.push('NSAIDs: Naproxen or Celecoxib.');
+                adj.push('Acetaminophen: 650-1000mg q6h.');
             } else if (painType === 'bone') {
-                adj.push('NSAIDs: Ketorolac (short term) or Naproxen (standard for PGE2-mediated bone pain).');
-                adj.push('Corticosteroids: Dexamethasone 4-8mg daily (superior for stretching of periosteum).');
-                adj.push('Bone-Targeted: Bisphosphonates (Zoledronic acid) or Denosumab.');
-                w.push('Bone Pain: Consider palliative radiation or orthopedic consult for pathologic fracture risk.');
+                adj.push('NSAIDs / Corticosteroids: Dexamethasone is superior for periosteal stretch.');
+                w.push('Bone Pain: Consider radiation oncology consult.');
             } else if (painType === 'nociceptive') {
-                adj.push('Acetaminophen: 650-1000mg q6h scheduled.');
-                adj.push('NSAIDs: Ibuprofen 400-600mg q6h (if renal function allows).');
+                adj.push('Acetaminophen / NSAIDs: Scheduled multimodal foundation.');
             }
         }
 
         // 6. CLINICAL SCENARIO CONTEXT
         if (indication) {
             if (indication === 'cancer_pain') {
-                w.push('Cancer Pain: Utilize short-acting opioids for initiation per NCCN/ASCO guidelines.');
-                // Escalation logic
-                w.push('Palliative Crisis: If severe/uncontrolled, consider rapid titration (IV/SQ) +50-100% q15min.');
-                if (painType === 'bone') {
-                    adj.push('Bone Pain: NSAIDs / Acetaminophen are effective adjuvants.');
-                    adj.push('Metabolic warning: Monitor for Hypercalcemia of Malignancy.');
-                }
-                if (painType === 'neuropathic') {
-                    adj.push('Neuropathic Adjuvants (NCCN): SNRIs (Duloxetine), TCAs (Nortriptyline), or Gabapentinoids.');
-                }
+                w.push('Cancer Pain: Utilize short-acting opioids for titration.');
             } else if (indication === 'dyspnea') {
-                const hasMorphine = r.find(x => x.name === 'Morphine' || x.name === 'Morphine PO');
-                // Only suggest morphine specifically for dyspnea if we know it's safe (renal)
-                if (renal === 'normal' && !hasMorphine) {
-                    r.unshift({
-                        name: route === 'po' ? 'Morphine PO' : 'Morphine',
-                        reason: 'Gold Standard.',
-                        detail: 'Strongest evidence for reducing air hunger (ATS).',
-                        type: 'safe'
-                    });
-                } else if (renal && renal !== 'normal') {
-                    // Only warn if we actually know renal is bad
-                    w.push('Dyspnea: Morphine preferred but unsafe in renal failure. Consider Fentanyl/Hydromorphone.');
-                }
-                adj.push('Anxiety (associated with Dyspnea): Benzodiazepines (Lorazepam 0.5-1mg) may be added if anxiety is prominent.');
-            } else if (indication === 'standard') {
-                // Opioid Context
-                r = r.map(x => {
-                    if (['Morphine', 'Oxycodone', 'Hydromorphone'].some(d => x.name.includes(d))) {
-                        return { ...x, detail: x.detail + ' Reserve for severe pain; use short-acting formulations.' };
+                if (renal === 'normal' && (route === 'iv' || route === 'either' || route === 'both' || !route)) {
+                    if (!r.find(x => x.name === 'Morphine IV')) {
+                        r.unshift({ name: 'Morphine IV', reason: 'Gold Standard.', detail: 'Strong evidence for air hunger.', type: 'safe' });
                     }
-                    return x;
-                });
-
-                // Burn Pain Context (Inflammatory + Acute)
-                if (painType === 'inflammatory') {
-                    adj.push('Burn Pain (ABA): Multimodal approach critical. Acetaminophen + NSAIDs foundation. Determine if procedural.');
                 }
+                adj.push('Anxiety: Consider Low-dose Lorazepam (0.5mg).');
             }
         }
 
@@ -273,15 +242,7 @@ export const AssessmentView = () => {
         if (sleepApnea) {
             rReasons.push('Sleep Apnea (OSA)');
             score = score === 'High' ? 'High' : 'Moderate';
-            w.push('OSA Risk: Continuous pulse oximetry recommended. Avoid basal infusions.');
-        }
-        if (psychHistory) {
-            rReasons.push('Substance/Psych History');
-            score = 'High';
-            w.push('High Risk: Consult Addiction Med / Check PDMP. Strict pill counts strictly.');
-        }
-        if (naive) {
-            w.push('Opioid Naive: Start low and titrate. PRODIGY: +5 points for Naivety.');
+            w.push('OSA: Avoid basal infusions. Monitoring is critical.');
         }
 
         setRecs(r);
@@ -297,8 +258,6 @@ export const AssessmentView = () => {
 Opioid Risk Assessment
 ----------------------
 PRODIGY Score: ${prodigyScore} (${prodigyRisk.toUpperCase()} RISK)
-Prob. Resp Depression: ${prodigyScore >= 21 ? '>20%' : prodigyScore >= 10 ? '11-20%' : '<10%'}
-
 Monitoring Plan:
 ${monitoringRecs.map(m => `- ${m}`).join('\n')}
 
@@ -307,14 +266,12 @@ ${sleepApnea ? '- Sleep Apnea (+4)' : ''}
 ${naive ? '- Opioid Naive (+5)' : ''}
 ${chf ? '- Chronic Heart Failure (+3)' : ''}
 ${sex === 'male' ? '- Male Sex (+3)' : ''}
-${parseInt(age) >= 60 ? '- Age > 60 (+2-6)' : ''}
-${benzos ? '- Concurrent Benzodiazepines' : ''}
 
 Clinical Recommendations:
 ${recs.map(r => `- ${r.name}: ${r.reason} (${r.detail})`).join('\n')}
 ${adjuvants.length > 0 ? '\nAdjuvants:\n' + adjuvants.map(a => `- ${a}`).join('\n') : ''}
 ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n') : ''}
-    `.trim(); // Clean up empty lines
+    `.trim();
         navigator.clipboard.writeText(note);
     };
 
@@ -324,14 +281,6 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
             <div className="lg:w-1/3 flex-none space-y-3 lg:overflow-y-auto pr-2 custom-scrollbar">
                 <h2 className="text-lg font-bold text-text-primary mb-2 px-1">Selection & Risk</h2>
                 <div className="space-y-3">
-                    {/* Route of Admin (Moved to top) */}
-                    <div className="bg-action-bg/50 p-3 rounded-2xl border border-action-border/30 space-y-2">
-                        <label className="text-[10px] font-bold text-action uppercase ml-1">Route of Administration</label>
-                        <div className="grid grid-cols-2 gap-2">
-                            <ParameterBtn active={route === 'iv'} onClick={() => setRoute('iv')} label="IV / SQ" />
-                            <ParameterBtn active={route === 'po'} onClick={() => setRoute('po')} label="Oral (PO)" />
-                        </div>
-                    </div>
 
                     {/* Demographics & PRODIGY */}
                     <div className="bg-surface-highlight p-3 rounded-2xl border border-border space-y-3">
@@ -429,9 +378,20 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                             </div>
                         </div>
 
-                        {/* 4. Hepatic Function */}
+                        {/* 4. Desired Route */}
+                        <div className="space-y-1.5 bg-action-bg/5 px-2 py-3 rounded-xl border border-action-border/10">
+                            <label className="text-[10px] font-bold text-action uppercase ml-1">4. Desired Route</label>
+                            <div className="grid grid-cols-2 gap-2 mt-1">
+                                <ParameterBtn active={route === 'iv'} onClick={() => setRoute('iv')} label="IV / SQ" />
+                                <ParameterBtn active={route === 'po'} onClick={() => setRoute('po')} label="Oral (PO)" />
+                                <ParameterBtn active={route === 'both'} onClick={() => setRoute('both')} label="Both" />
+                                <ParameterBtn active={route === 'either'} onClick={() => setRoute('either')} label="Either" />
+                            </div>
+                        </div>
+
+                        {/* 5. Hepatic Function */}
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-tertiary uppercase ml-1">4. Hepatic Function</label>
+                            <label className="text-[10px] font-bold text-text-tertiary uppercase ml-1">5. Hepatic Function</label>
                             <div className="space-y-1">
                                 <ParameterBtn active={hepatic === 'normal'} onClick={() => setHepatic('normal')} label="Normal Function" />
                                 <ParameterBtn active={hepatic === 'impaired'} onClick={() => setHepatic('impaired')} label="Impaired / Cirrhosis" sub="Child-Pugh A/B" />
@@ -439,8 +399,9 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                             </div>
                         </div>
 
+                        {/* 6. Clinical Scenario */}
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-tertiary uppercase ml-1">Clinical Scenario</label>
+                            <label className="text-[10px] font-bold text-text-tertiary uppercase ml-1">6. Clinical Scenario</label>
                             <div className="space-y-1">
                                 <ParameterBtn active={indication === 'standard'} onClick={() => setIndication('standard')} label="General / Acute Pain" sub="Post-Op / Trauma / Medical" />
                                 <ParameterBtn active={indication === 'dyspnea'} onClick={() => setIndication('dyspnea')} label="Palliative Dyspnea" sub="End of Life / Air Hunger" />
@@ -448,8 +409,9 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                             </div>
                         </div>
 
+                        {/* 7. Dominant Pathophysiology */}
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-text-tertiary uppercase ml-1">Dominant Pathophysiology</label>
+                            <label className="text-[10px] font-bold text-text-tertiary uppercase ml-1">7. Dominant Pathophysiology</label>
                             <div className="space-y-1">
                                 <ParameterBtn active={painType === 'nociceptive'} onClick={() => setPainType('nociceptive')} label="Nociceptive (Tissue)" sub="Somatic / Visceral" />
                                 <ParameterBtn active={painType === 'neuropathic'} onClick={() => setPainType('neuropathic')} label="Neuropathic (Nerve)" sub="Radiculopathy / Spinal Cord" />
