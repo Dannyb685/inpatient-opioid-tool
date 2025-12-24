@@ -10,9 +10,130 @@ import {
     ChevronRight,
     Stethoscope,
     ShieldCheck,
-    Pill
+    Pill,
+    CheckCircle2,
+    ShieldAlert
 } from 'lucide-react';
-import { ClinicalCard, Badge } from './Shared';
+import { ClinicalCard, Badge, ParameterBtn } from './Shared';
+
+const SOSView = () => (
+    <ClinicalCard title="SOS Score (Stopping Opioids after Surgery)">
+        <div className="space-y-4">
+            <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Purpose</h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 mb-3 leading-relaxed">
+                    Predicts the risk of sustained opioid use after surgery. Validated for perioperative, trauma, and surgical patients.
+                </p>
+
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Key Inputs</h4>
+                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1 mb-3 list-disc list-inside">
+                    <li>Surgery Type</li>
+                    <li>Length of Stay</li>
+                    <li>Preoperative Opioid Exposure</li>
+                    <li>Psychiatric Comorbidity</li>
+                </ul>
+
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Risk Stratification</h4>
+                <div className="flex gap-2">
+                    <Badge text="Low Risk (4%)" type="safe" />
+                    <Badge text="Intermediate (17%)" type="caution" />
+                    <Badge text="High Risk (50%)" type="unsafe" />
+                </div>
+            </div>
+        </div>
+    </ClinicalCard>
+);
+
+const PEGView = () => (
+    <ClinicalCard title="PEG Scale (Pain, Enjoyment, General Activity)">
+        <div className="space-y-4">
+            <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Purpose</h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 mb-3 leading-relaxed">
+                    Monitor functional outcomes and pain control during opioid therapy. Suitable for all patients, particularly chronic/cancer pain.
+                </p>
+
+                <div className="bg-white dark:bg-slate-800 p-3 rounded border border-slate-200 dark:border-slate-700 mb-3">
+                    <h5 className="text-xs font-bold mb-1">Three-Item Assessment (0-10)</h5>
+                    <ol className="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-decimal list-inside">
+                        <li>Average pain intensity (past week)</li>
+                        <li>Interference with enjoyment of life</li>
+                        <li>Interference with general activity</li>
+                    </ol>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-bold text-teal-700 dark:text-teal-400">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Clinically Meaningful Improvement: ≥ 30% reduction
+                </div>
+            </div>
+        </div>
+    </ClinicalCard>
+);
+
+const ORTView = () => (
+    <ClinicalCard title="Opioid Risk Tool (ORT) / Revised ORT">
+        <div className="space-y-4">
+            <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Purpose</h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 mb-3 leading-relaxed">
+                    Assess risk for opioid misuse or OUD before initiating therapy. Brief, patient-administered.
+                </p>
+
+                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 text-xs rounded border border-amber-100 dark:border-amber-800/50 mb-3">
+                    <strong>Note:</strong> Limited accuracy when used alone. Should be supplemented with PDMP data and clinical assessment.
+                </div>
+
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Target Population</h4>
+                <div className="flex flex-wrap gap-2">
+                    <span className="px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[10px] font-bold text-slate-500">Chronic Pain</span>
+                    <span className="px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[10px] font-bold text-slate-500">Perioperative</span>
+                    <span className="px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[10px] font-bold text-slate-500">Misuse Risk</span>
+                </div>
+            </div>
+        </div>
+    </ClinicalCard>
+);
+
+const SOAPPView = () => (
+    <ClinicalCard title="SOAPP-R (Screener and Opioid Assessment)">
+        <div className="space-y-4">
+            <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Purpose</h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 mb-3 leading-relaxed">
+                    Predict OUD risk in patients with chronic pain. Validated specifically in chronic pain populations.
+                </p>
+
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Format</h4>
+                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1 mb-3 list-disc list-inside">
+                    <li>Patient-administered</li>
+                    <li>Variable predictive accuracy across settings</li>
+                    <li> Revised version (SOAPP-R) available</li>
+                </ul>
+            </div>
+        </div>
+    </ClinicalCard>
+);
+
+const BRIView = () => (
+    <ClinicalCard title="Brief Risk Interview (BRI)">
+        <div className="space-y-4">
+            <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Purpose</h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 mb-3 leading-relaxed">
+                    Assess opioid misuse risk through a structured interview.
+                </p>
+
+                <div className="flex items-start gap-2 p-3 bg-teal-50 dark:bg-teal-900/20 rounded border border-teal-100 dark:border-teal-800/50">
+                    <Activity className="w-4 h-4 text-teal-600 mt-0.5" />
+                    <div className="text-xs text-teal-800 dark:text-teal-200">
+                        <strong>Performance:</strong> Better sensitivity and predictive accuracy than ORT or SOAPP-R, though more time-consuming. Validated in patients already on opioids.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ClinicalCard>
+);
 
 type ScaleItem = {
     id: string;
@@ -35,57 +156,110 @@ const COWS_DATA: ScaleItem[] = [
 ];
 
 const AssessmentModule = () => {
+    const [subTab, setSubTab] = useState<'screen' | 'sos' | 'peg' | 'ort' | 'soapp' | 'bri'>('screen');
+
     return (
         <div className="space-y-6 animate-in fade-in">
-            <ClinicalCard title="Initial OUD Assessment">
-                <div className="space-y-4">
-                    <div className="bg-teal-50 dark:bg-teal-900/20 p-4 rounded-lg border border-teal-100 dark:border-teal-800/50">
-                        <h4 className="text-xs font-bold text-teal-800 dark:text-teal-200 uppercase mb-2">Single Question Screener</h4>
-                        <p className="text-sm font-medium text-teal-900 dark:text-teal-100 italic">
-                            "How many times in the past year have you used an illegal drug or prescription medication for nonmedical reasons?"
-                        </p>
-                        <div className="mt-2 text-[10px] text-teal-600 dark:text-teal-400 font-bold">
-                            POSITIVE SCREEN: At least once (Note: Does not equate to OUD)
-                        </div>
-                    </div>
+            <div className="flex bg-slate-100 dark:bg-slate-900 rounded-lg p-1 w-full overflow-x-auto no-scrollbar gap-1">
+                {[
+                    { id: 'screen', label: 'Initial' },
+                    { id: 'sos', label: 'SOS' },
+                    { id: 'peg', label: 'PEG' },
+                    { id: 'ort', label: 'ORT' },
+                    { id: 'soapp', label: 'SOAPP' },
+                    { id: 'bri', label: 'BRI' }
+                ].map((s) => (
+                    <button
+                        key={s.id}
+                        onClick={() => setSubTab(s.id as any)}
+                        className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all whitespace-nowrap flex-1 ${subTab === s.id
+                            ? 'bg-white dark:bg-slate-800 text-teal-600 shadow-sm'
+                            : 'text-slate-400 hover:text-slate-600'
+                            }`}
+                    >
+                        {s.label}
+                    </button>
+                ))}
+            </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">DSM-V 6Cs Criteria</h4>
-                            <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
-                                <li>• <strong>Control</strong>: Lost control / unable to cut back</li>
-                                <li>• <strong>Cravings</strong>: Strong desire to use</li>
-                                <li>• <strong>Consequences</strong>: Health/Physical issues</li>
-                                <li>• <strong>Consequences</strong>: Relationship/Social strain</li>
-                                <li>• <strong>C</strong>ommunity: Significant time obtaining/using</li>
-                                <li>• <strong>C</strong>areer: Interfere with work/school/home</li>
-                            </ul>
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Severity & Other Factors</h4>
-                            <div className="flex flex-wrap gap-2 mb-3">
-                                <Badge text="Mild: 2-3" type="safe" />
-                                <Badge text="Mod: 4-5" type="caution" />
-                                <Badge text="Severe: 6+" type="unsafe" />
+            {subTab === 'screen' && (
+                <ClinicalCard title="Initial OUD Assessment">
+                    <div className="space-y-4">
+                        <div className="bg-teal-50 dark:bg-teal-900/20 p-4 rounded-lg border border-teal-100 dark:border-teal-800/50">
+                            <h4 className="text-xs font-bold text-teal-800 dark:text-teal-200 uppercase mb-2">Single Question Screener</h4>
+                            <p className="text-sm font-medium text-teal-900 dark:text-teal-100 italic">
+                                "How many times in the past year have you used an illegal drug or prescription medication for nonmedical reasons?"
+                            </p>
+                            <div className="mt-2 text-[10px] text-teal-600 dark:text-teal-400 font-bold">
+                                POSITIVE SCREEN: At least once (Note: Does not equate to OUD)
                             </div>
-                            <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
-                                <li>• Pattern of use & overdose history</li>
-                                <li>• Syringe access & injection practices</li>
-                                <li>• Treatment history & patient goals</li>
-                            </ul>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">DSM-V 6Cs Criteria</h4>
+                                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                                    <li>• <strong>Control</strong>: Lost control / unable to cut back</li>
+                                    <li>• <strong>Cravings</strong>: Strong desire to use</li>
+                                    <li>• <strong>Consequences</strong>: Health/Physical issues</li>
+                                    <li>• <strong>Consequences</strong>: Relationship/Social strain</li>
+                                    <li>• <strong>C</strong>ommunity: Significant time obtaining/using</li>
+                                    <li>• <strong>C</strong>areer: Interfere with work/school/home</li>
+                                </ul>
+                            </div>
+                            <div className="space-y-2">
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Severity & Other Factors</h4>
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    <Badge text="Mild: 2-3" type="safe" />
+                                    <Badge text="Mod: 4-5" type="caution" />
+                                    <Badge text="Severe: 6+" type="unsafe" />
+                                </div>
+                                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                                    <li>• Pattern of use & overdose history</li>
+                                    <li>• Syringe access & injection practices</li>
+                                    <li>• Treatment history & patient goals</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                            <h4 className="text-xs font-bold mb-2">Recommended Workup</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {['UTox', 'Pregnancy', 'LFTs', 'HIV', 'Hep Panel', 'PDMP Check'].map(test => (
+                                    <span key={test} className="px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[10px] font-bold text-slate-500">{test}</span>
+                                ))}
+                            </div>
                         </div>
                     </div>
+                </ClinicalCard>
+            )}
 
-                    <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
-                        <h4 className="text-xs font-bold mb-2">Recommended Workup</h4>
-                        <div className="flex flex-wrap gap-2">
-                            {['UTox', 'Pregnancy', 'LFTs', 'HIV', 'Hep Panel', 'PDMP Check'].map(test => (
-                                <span key={test} className="px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[10px] font-bold text-slate-500">{test}</span>
-                            ))}
-                        </div>
+            {subTab === 'sos' && <SOSView />}
+            {subTab === 'peg' && <PEGView />}
+            {subTab === 'ort' && <ORTView />}
+            {subTab === 'soapp' && <SOAPPView />}
+            {subTab === 'bri' && <BRIView />}
+
+            <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg space-y-3">
+                <div className="flex items-start gap-3">
+                    <ShieldAlert className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-none" />
+                    <div className="text-xs leading-relaxed text-amber-900 dark:text-amber-100">
+                        <strong>CDC & ASCO Guideline Alert:</strong> Risk stratification tools demonstrate limited accuracy and should <span className="underline decoration-amber-500/50">never be used in isolation</span>.
                     </div>
                 </div>
-            </ClinicalCard>
+                <div className="flex items-start gap-3 pt-3 border-t border-amber-200 dark:border-amber-800">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-none" />
+                    <div className="text-xs leading-relaxed text-amber-900 dark:text-amber-100">
+                        <strong>SUD Protocol:</strong> For patients with substance use disorders:
+                        <ul className="list-disc list-inside mt-1 space-y-0.5 ml-1 opacity-90">
+                            <li>Increase monitoring frequency</li>
+                            <li>Offer Naloxone</li>
+                            <li>Coordinate with Addiction Med</li>
+                            <li>Use PDMP data alongside screening tools</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
