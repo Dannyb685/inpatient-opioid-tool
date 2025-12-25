@@ -27,7 +27,7 @@ struct ScreeningView: View {
                         } else if selectedTab == "cows" {
                             COWSView(store: toolkitStore)
                         } else if selectedTab == "tools" {
-                            RiskToolsModule()
+                            RiskToolsModule(store: toolkitStore)
                         }
                     }
                     .padding()
@@ -115,6 +115,28 @@ struct SBIRTModule: View {
             } else if subTab == "visual" {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Standard Drink Equivalents").font(.headline).foregroundColor(.white)
+                    
+                    // Visual Asset Placeholder (Generation Pending)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(ClinicalTheme.slate800)
+                            .frame(height: 150)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [5]))
+                                    .foregroundColor(ClinicalTheme.slate500)
+                            )
+                        
+                        VStack(spacing: 8) {
+                            Image(systemName: "photo")
+                                .font(.largeTitle)
+                                .foregroundColor(ClinicalTheme.slate500)
+                            Text("Visual Asset Generation Pending")
+                                .font(.caption)
+                                .foregroundColor(ClinicalTheme.slate500)
+                        }
+                    }
+                    
                     ForEach(ToolkitData.drinkEquivalents, id: \.0) { item in
                         HStack {
                             Text(item.0).bold().foregroundColor(.white)
@@ -153,40 +175,106 @@ struct SBIRTModule: View {
 }
 
 struct RiskToolsModule: View {
+    @ObservedObject var store: ToolkitStore
+    
     var body: some View {
         VStack(spacing: 20) {
-            // SOS
-            VStack(alignment: .leading, spacing: 8) {
-                Text("SOS Score (Surgical Risk)").font(.headline).foregroundColor(.white)
-                Text("Predicts sustained opioid use after surgery.").font(.caption).foregroundColor(ClinicalTheme.slate400)
+            // SOS SCORE
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Badge(text: "Low (4%)", type: "safe")
-                    Badge(text: "Med (17%)", type: "caution")
-                    Badge(text: "High (50%)", type: "unsafe")
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("SOS Score").font(.headline).foregroundColor(.white)
+                        Text("Surgical Risk Prediction").font(.caption).foregroundColor(ClinicalTheme.slate400)
+                    }
+                    Spacer()
+                    Text(store.sosRiskLabel)
+                        .font(.headline)
+                        .fontWeight(.black)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(store.sosRiskLabel.contains("Low") ? ClinicalTheme.teal500.opacity(0.2) : (store.sosRiskLabel.contains("Med") ? ClinicalTheme.amber500.opacity(0.2) : ClinicalTheme.rose500.opacity(0.2)))
+                        .foregroundColor(store.sosRiskLabel.contains("Low") ? ClinicalTheme.teal500 : (store.sosRiskLabel.contains("Med") ? ClinicalTheme.amber500 : ClinicalTheme.rose500))
+                        .cornerRadius(8)
                 }
-                Text("Inputs: Surgery Type, Pre-op Use, Psych Comorbidity").font(.caption2).foregroundColor(ClinicalTheme.slate500)
+                
+                Toggle("High Risk Surgery (Thoracic/Upper Abd)", isOn: $store.sosSurgeryHighRisk)
+                Toggle("Preoperative Opioid Use", isOn: $store.sosPreOpOpioid)
+                Toggle("Psych Comorbidity (Depression/Anxiety)", isOn: $store.sosPsych)
             }
+            .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.teal500))
             .clinicalCard()
             
             // ORT
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Opioid Risk Tool (ORT)").font(.headline).foregroundColor(.white)
-                Text("Validates risk for aberrant behaviors.").font(.caption).foregroundColor(ClinicalTheme.slate400)
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Badge(text: "0-3 Low", type: "safe")
-                    Badge(text: "4-7 Mod", type: "caution")
-                    Badge(text: ">8 High", type: "unsafe")
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Opioid Risk Tool (ORT)").font(.headline).foregroundColor(.white)
+                        Text("Aberrant Behavior Risk").font(.caption).foregroundColor(ClinicalTheme.slate400)
+                    }
+                    Spacer()
+                    Text(store.ortRisk)
+                        .font(.headline)
+                        .fontWeight(.black)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(store.ortRisk.contains("Low") ? ClinicalTheme.teal500.opacity(0.2) : (store.ortRisk.contains("Mod") ? ClinicalTheme.amber500.opacity(0.2) : ClinicalTheme.rose500.opacity(0.2)))
+                        .foregroundColor(store.ortRisk.contains("Low") ? ClinicalTheme.teal500 : (store.ortRisk.contains("Mod") ? ClinicalTheme.amber500 : ClinicalTheme.rose500))
+                        .cornerRadius(8)
                 }
+                
+                HStack {
+                    Text("Total Score: \(Int(store.ortScoreInput))")
+                        .font(.title3).bold().foregroundColor(.white)
+                    Spacer()
+                    Stepper("", value: $store.ortScoreInput, in: 0...26)
+                        .labelsHidden()
+                }
+                .padding()
+                .background(ClinicalTheme.slate800)
+                .cornerRadius(8)
             }
             .clinicalCard()
             
-            // PEG
-            VStack(alignment: .leading, spacing: 8) {
-                Text("PEG Scale").font(.headline).foregroundColor(.white)
-                Text("Pain, Enjoyment, General Activity (0-10)").font(.caption).foregroundColor(ClinicalTheme.slate400)
-                Text("Clinically meaningful improvement: ≥30% reduction.").font(.caption).bold().foregroundColor(ClinicalTheme.teal500)
+            // PEG SCALE
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("PEG Scale").font(.headline).foregroundColor(.white)
+                        Text("Pain, Enjoyment, General Activity").font(.caption).foregroundColor(ClinicalTheme.slate400)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing) {
+                        Text(String(format: "%.1f / 10", store.pegScore))
+                            .font(.title2).fontWeight(.black).foregroundColor(ClinicalTheme.teal500)
+                        Text("Goal: < \(String(format: "%.1f", store.pegScore * 0.7))")
+                            .font(.caption).foregroundColor(ClinicalTheme.slate500)
+                    }
+                }
+                
+                VStack(spacing: 12) {
+                    PegSlider(label: "Pain (Average)", value: $store.pegPain)
+                    PegSlider(label: "Enjoyment of Life", value: $store.pegEnjoyment)
+                    PegSlider(label: "General Activity", value: $store.pegActivity)
+                }
             }
             .clinicalCard()
+        }
+    }
+}
+
+struct PegSlider: View {
+    let label: String
+    @Binding var value: Double
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(label).font(.caption).bold().foregroundColor(ClinicalTheme.slate300)
+                Spacer()
+                Text("\(Int(value))").font(.caption).bold().foregroundColor(.white)
+            }
+            Slider(value: $value, in: 0...10, step: 1)
+                .accentColor(ClinicalTheme.teal500)
         }
     }
 }

@@ -7,8 +7,18 @@ class AssessmentStore: ObservableObject {
     // Demographics
     @Published var age: String = "" { didSet { calculate() } }
     @Published var sex: Sex = .male { didSet { calculate() } }
-    @Published var naive: Bool = false { didSet { calculate() } }
-    @Published var mat: Bool = false { didSet { calculate() } } // Home Buprenorphine
+    @Published var naive: Bool = false { 
+        didSet { 
+            if naive { mat = false } // Contradiction check
+            calculate() 
+        } 
+    }
+    @Published var mat: Bool = false { 
+        didSet { 
+            if mat { naive = false } // Contradiction check
+            calculate() 
+        } 
+    } // Home Buprenorphine
     
     // Clinical Parameters
     @Published var renalFunction: RenalStatus = .normal { didSet { calculate() } }
@@ -123,8 +133,8 @@ class AssessmentStore: ObservableObject {
                      return "Titrate to effect"
                 }
             }
-             if drug == "Fentanyl" && route == "IV" {
-                if naive {
+            if drug == "Fentanyl" && route == "IV" {
+                 if naive {
                     return isElderly ? "Start 12.5-25mcg" : "Start 25-50mcg"
                 } else {
                      return "Titrate to effect"
@@ -184,13 +194,13 @@ class AssessmentStore: ObservableObject {
             riskReasons.append("Hemodynamic Instability")
             generalRiskScore = "High"
             let fentDose = getStartingDose(drug: "Fentanyl", route: "IV")
-            recs.append(DrugRecommendation(name: "Fentanyl", reason: "Preferred.", detail: "Cardiostable; no histamine release. \(fentDose)", type: .safe))
+            recs.append(DrugRecommendation(name: "Fentanyl IV", reason: "Preferred.", detail: "Cardiostable; no histamine release. \(fentDose)", type: .safe))
             warns.append("Morphine: Histamine release precipitates vasodilation/hypotension.")
         }
         // Step 2: MAT
         else if mat {
             riskReasons.append("Home MAT")
-            recs.append(DrugRecommendation(name: "Home Buprenorphine", reason: "Maintenance.", detail: "Continue basal to prevent withdrawal.", type: .safe))
+            recs.append(DrugRecommendation(name: "Home Buprenorphine (SL/Patch)", reason: "Maintenance.", detail: "Continue basal to prevent withdrawal.", type: .safe))
             recs.append(DrugRecommendation(name: "Breakthrough Agonist", reason: "Acute Pain.", detail: "Add high-affinity agonist (Fentanyl/Dilaudid) on top of MAT.", type: .safe))
             
             if isRenalBad {
@@ -208,7 +218,7 @@ class AssessmentStore: ObservableObject {
                 generalRiskScore = "High"
                 warns.append("Avoid: Morphine, Codeine, Tramadol, Meperidine (Active metabolites/Seizure risk).")
                 // Methadone logic: "Safe" in terms of metabolites, but complex
-                recs.append(DrugRecommendation(name: "Methadone", reason: "Safe.", detail: "Fecal excretion. Consult Pain Svc.", type: .safe))
+                recs.append(DrugRecommendation(name: "Methadone PO", reason: "Safe.", detail: "Fecal excretion. Consult Specialist.", type: .safe))
             } else {
                  // Explicit Meperidine Warning for General Population too
                  warns.append("Avoid Meperidine (Neurotoxic metabolites, Seizure risk).")
@@ -239,7 +249,7 @@ class AssessmentStore: ObservableObject {
             
             // Ensure Fentanyl if not present
             if !recs.contains(where: { $0.name.contains("Fentanyl") }) {
-                recs.insert(DrugRecommendation(name: "Fentanyl", reason: "Preferred.", detail: "Safest choice in liver failure.", type: .safe), at: 0)
+                recs.insert(DrugRecommendation(name: "Fentanyl IV", reason: "Preferred.", detail: "Safest choice in liver failure.", type: .safe), at: 0)
             }
             
             // Add reduction note

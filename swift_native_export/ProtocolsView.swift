@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct ProtocolsView: View {
-    @State private var selectedTab = "cond" // cond, path, best
+    @State private var selectedTab = "proto" // proto, induct, best
+    @State private var protocolMode = "guide" // guide, algo
     
     var body: some View {
         NavigationView {
@@ -9,8 +10,7 @@ struct ProtocolsView: View {
                 // Custom Tab Bar
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
-                        TabButton(id: "cond", label: "Conditions", icon: "stethoscope", selected: $selectedTab)
-                        TabButton(id: "path", label: "Pathways", icon: "arrow.triangle.branch", selected: $selectedTab)
+                        TabButton(id: "proto", label: "Clinical Protocols", icon: "doc.text.magnifyingglass", selected: $selectedTab)
                         TabButton(id: "induct", label: "Induction", icon: "shield.checkerboard", selected: $selectedTab)
                         TabButton(id: "best", label: "Symptom Care", icon: "heart.text.square.fill", selected: $selectedTab)
                     }
@@ -21,10 +21,20 @@ struct ProtocolsView: View {
                 // Content
                 ScrollView {
                     VStack(spacing: 20) {
-                        if selectedTab == "cond" {
-                            ConditionGuidesView()
-                        } else if selectedTab == "path" {
-                            FlowchartView()
+                        if selectedTab == "proto" {
+                            // Sub-Picker for Consolidated View
+                            Picker("Type", selection: $protocolMode) {
+                                Text("Guidelines").tag("guide")
+                                Text("Algorithms").tag("algo")
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal)
+                            
+                            if protocolMode == "guide" {
+                                ConditionGuidesView()
+                            } else {
+                                FlowchartView()
+                            }
                         } else if selectedTab == "induct" {
                             InductionView()
                         } else if selectedTab == "best" {

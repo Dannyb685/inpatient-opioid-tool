@@ -40,6 +40,9 @@ struct CalculatorView: View {
                         // INPUTS
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Parameters").font(.headline).foregroundColor(ClinicalTheme.slate400).padding(.horizontal)
+                            Text("Estimate only. Do NOT use for Methadone conversion.")
+                                .font(.caption).bold().foregroundColor(ClinicalTheme.rose500)
+                                .padding(.horizontal)
                             
                             // Morphine Input
                             VStack(alignment: .leading, spacing: 8) {
