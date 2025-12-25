@@ -4,8 +4,8 @@ import SwiftUI
 // MARK: - Enums (Replicating React State Options)
 
 enum RenalStatus: String, CaseIterable, Identifiable {
-    case normal = "Normal"
-    case impaired = "Impaired"
+    case normal = "Normal (>30)"
+    case impaired = "Impaired (<30)"
     case dialysis = "Dialysis"
     var id: String { self.rawValue }
 }

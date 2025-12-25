@@ -263,12 +263,14 @@ class AssessmentStore: ObservableObject {
         
         // Step 5: GI / NPO Logic
         if gi == .npo {
+            // UNIVERSAL SAFETY FILTER: Remove all PO/Oral meds regardless of route selection
+            // This prevents "Methadone PO" or other auto-added PO meds from leaking through even if Route=IV
+            recs = recs.filter { !$0.name.contains("PO") && !$0.name.contains("Oral") }
+            
+            // Context-aware warnings
             if route == .po || route == .both || route == .either {
                  if route == .po {
                      recs = [] // Clear if ONLY PO requested
-                 } else {
-                     // Filter out PO
-                     recs = recs.filter { !$0.name.contains("PO") && !$0.name.contains("Oral") }
                  }
                  warns.append("PO Contraindicated: Patient is NPO. Switch to IV.")
             }
