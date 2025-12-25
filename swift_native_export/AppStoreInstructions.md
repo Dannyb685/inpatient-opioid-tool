@@ -7,9 +7,25 @@
     * **Interface**: SwiftUI
     * **Language**: Swift
     * **Organization Identifier**: com.danbergholz
-4. **Create Files**:
-    * Create `ClinicalLogic.swift` and paste the provided code.
-    * Replace `ContentView.swift` with the provided code.
+4. **Drag and Drop** the following files from the `swift_native_export/` folder into the `PrecisionAnalgesia` group in Xcode:
+    * `AnalgesiaToolApp.swift` (Entry Point)
+    * `MainTabView.swift` (Root Tab Controller)
+    * `Theme.swift` (Medical Dark Mode System)
+    * `ClinicalData.swift` (Static Constants)
+    * `SegmentedButton.swift` (Custom UI Component)
+    * **Stores**:
+        * `AssessmentStore.swift`
+        * `ScreeningStore.swift`
+        * `CalculatorStore.swift`
+        * `ToolkitStore.swift`
+    * **Views**:
+        * `RiskAssessmentView.swift`
+        * `ScreeningView.swift`
+        * `CalculatorView.swift`
+        * `ToolkitView.swift`
+        * `COWSView.swift`
+        * `ProtocolDetailView.swift`
+    * *Note: Delete ContentView.swift if Xcode created one automatically.*
 5. **Add Privacy Manifest (Required)**:
     * Drag `PrivacyInfo.xcprivacy` from the export folder into the Xcode project navigator.
 6. **Add App Icon**:

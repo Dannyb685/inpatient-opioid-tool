@@ -4,7 +4,8 @@ import SwiftUI
 struct AnalgesiaToolApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
+                .preferredColorScheme(.dark)
         }
     }
 }
