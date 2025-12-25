@@ -33,8 +33,7 @@ enum GIStatus: String, CaseIterable, Identifiable {
 enum OpioidRoute: String, CaseIterable, Identifiable {
     case iv = "IV / SQ"
     case po = "Oral (PO)"
-    case both = "Both"
-    case either = "Either"
+    case both = "Both / Either"
     var id: String { self.rawValue }
 }
 

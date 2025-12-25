@@ -208,8 +208,8 @@ class AssessmentStore: ObservableObject {
             }
             
             // Simplified route logic for MAT breakthrough
-            if route == .iv || route == .both || route == .either { addIVRecs() }
-            if route == .po || route == .both || route == .either { addPORecs() }
+            if route == .iv || route == .both { addIVRecs() }
+            if route == .po || route == .both { addPORecs() }
         }
         // Step 3: STANDARD LOGIC
         else {
@@ -226,12 +226,10 @@ class AssessmentStore: ObservableObject {
             
             if route == .iv { addIVRecs() }
             else if route == .po { addPORecs() }
-            else if route == .both || route == .either {
+            else if route == .both {
                 addIVRecs()
                 addPORecs()
-                if route == .either {
-                    adj.append("Route Preference: Determine based on GI tolerance.")
-                }
+                adj.append("Route Preference: Determine based on GI tolerance.")
             } else {
                 addIVRecs() // Default fallback
             }
@@ -322,7 +320,11 @@ class AssessmentStore: ObservableObject {
             warns.append("OSA: Avoid basal infusions. Monitor SpO2/EtCO2.")
         }
         
-        self.recommendations = recs
+        // Step 9: Final Route Prioritization (PO > IV)
+        let poRecs = recs.filter { $0.name.contains("PO") }
+        let ivRecs = recs.filter { !$0.name.contains("PO") }
+        
+        self.recommendations = poRecs + ivRecs
         self.adjuvants = adj
         self.warnings = warns
     }
