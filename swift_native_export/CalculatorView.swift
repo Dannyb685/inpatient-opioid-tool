@@ -44,22 +44,46 @@ struct CalculatorView: View {
                                 .font(.caption).bold().foregroundColor(ClinicalTheme.rose500)
                                 .padding(.horizontal)
                             
-                            // Morphine Input
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Morphine IV (24h Total)").font(.caption).foregroundColor(ClinicalTheme.teal500).textCase(.uppercase)
-                                HStack {
-                                    TextField("0", text: $store.morphineIV)
-                                        .keyboardType(.decimalPad)
-                                        .font(.title3)
-                                        .padding()
+                            // DRUG INPUT LIST
+                            VStack(alignment: .leading, spacing: 0) {
+                                ForEach(store.inputs) { input in
+                                    HStack {
+                                        Text(input.drug.name)
+                                            .foregroundColor(.white)
+                                            .font(.body)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        
+                                        HStack(spacing: 4) {
+                                            TextField("0", text: Binding(
+                                                get: { input.dose },
+                                                set: { store.updateDose(for: input.id, dose: $0) }
+                                            ))
+                                            .keyboardType(.decimalPad)
+                                            .multilineTextAlignment(.trailing)
+                                            .font(.body.monospacedDigit())
+                                            .foregroundColor(ClinicalTheme.teal500)
+                                            
+                                            Text("mg")
+                                                .font(.caption)
+                                                .foregroundColor(ClinicalTheme.slate400)
+                                        }
+                                        .frame(width: 100)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 12)
                                         .background(ClinicalTheme.slate800)
-                                        .cornerRadius(8)
-                                        .foregroundColor(.white)
-                                    Text("mg")
-                                        .foregroundColor(ClinicalTheme.slate400)
+                                        .cornerRadius(6)
+                                    }
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal)
+                                    
+                                    if input.id != store.inputs.last?.id {
+                                        Divider().background(ClinicalTheme.slate700)
+                                    }
                                 }
                             }
-                            .clinicalCard()
+                            .background(ClinicalTheme.slate900)
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.slate700, lineWidth: 1))
                             .padding(.horizontal)
                             
                             // Toggles

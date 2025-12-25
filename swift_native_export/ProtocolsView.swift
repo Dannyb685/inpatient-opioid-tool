@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ProtocolsView: View {
-    @State private var selectedTab = "proto" // proto, induct, best
+    @State private var selectedTab = "proto" // proto, moud
     @State private var protocolMode = "guide" // guide, algo
     
     var body: some View {
@@ -11,8 +11,7 @@ struct ProtocolsView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         TabButton(id: "proto", label: "Clinical Protocols", icon: "doc.text.magnifyingglass", selected: $selectedTab)
-                        TabButton(id: "induct", label: "Induction", icon: "shield.checkerboard", selected: $selectedTab)
-                        TabButton(id: "best", label: "Symptom Care", icon: "heart.text.square.fill", selected: $selectedTab)
+                        TabButton(id: "moud", label: "MOUD", icon: "shield.checkerboard", selected: $selectedTab)
                     }
                     .padding()
                 }
@@ -24,7 +23,7 @@ struct ProtocolsView: View {
                         if selectedTab == "proto" {
                             // Sub-Picker for Consolidated View
                             Picker("Type", selection: $protocolMode) {
-                                Text("Guidelines").tag("guide")
+                                Text("Guide").tag("guide")
                                 Text("Algorithms").tag("algo")
                             }
                             .pickerStyle(.segmented)
@@ -35,10 +34,8 @@ struct ProtocolsView: View {
                             } else {
                                 FlowchartView()
                             }
-                        } else if selectedTab == "induct" {
-                            InductionView()
-                        } else if selectedTab == "best" {
-                            BestPracticesView()
+                        } else if selectedTab == "moud" {
+                            MOUDView()
                         }
                     }
                     .padding()
@@ -189,41 +186,22 @@ struct ConditionGuidesView: View {
     }
 }
 
-struct InductionView: View {
-    @State private var mode = "temple" // temple, bernese
+struct MOUDView: View {
+    @State private var mode = "bernese" // bernese, symptom
     
     var body: some View {
         VStack(spacing: 20) {
             Picker("Protocol", selection: $mode) {
-                Text("Temple Protocol").tag("temple")
-                Text("Bernese Method").tag("bernese")
+                Text("Micro-Induction").tag("bernese")
+                Text("Symptom Care").tag("symptom")
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
             
-            if mode == "temple" {
+            if mode == "bernese" {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text(ProtocolData.templeData.title).font(.headline).foregroundColor(.white)
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Oral Regimen").font(.caption).bold().foregroundColor(ClinicalTheme.teal500).textCase(.uppercase)
-                        ForEach(ProtocolData.templeData.oral, id: \.self) { line in
-                            Text("• " + line).font(.caption).foregroundColor(ClinicalTheme.slate300)
-                        }
-                    }
-                    .clinicalCard()
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Breakthrough / PCA").font(.caption).bold().foregroundColor(ClinicalTheme.teal500).textCase(.uppercase)
-                        ForEach(ProtocolData.templeData.breakthrough, id: \.self) { line in
-                            Text("• " + line).font(.caption).foregroundColor(ClinicalTheme.slate300)
-                        }
-                    }
-                    .clinicalCard()
-                }
-            } else {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Bernese Method (Micro-Induction)").font(.headline).foregroundColor(.white)
+                    Text("Buprenorphine Micro-Induction (Bernese Method)").font(.headline).foregroundColor(.white)
+                        .padding(.bottom, 4)
                     
                     ForEach(ProtocolData.berneseData) { step in
                         HStack(spacing: 16) {
@@ -243,67 +221,41 @@ struct InductionView: View {
                         .cornerRadius(12)
                     }
                 }
+            } else {
+                VStack(spacing: 24) {
+                    ForEach(ProtocolData.symptomManagement) { category in
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(category.title)
+                                .font(.headline)
+                                .foregroundColor(ClinicalTheme.teal500)
+                                .textCase(.uppercase)
+                                .padding(.horizontal)
+                            
+                            VStack(alignment: .leading, spacing: 0) {
+                                ForEach(Array(category.items.enumerated()), id: \.element.id) { index, item in
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        HStack {
+                                            Text(item.drug).font(.subheadline).bold().foregroundColor(.white)
+                                            Spacer()
+                                            Text(item.dose).font(.caption).foregroundColor(ClinicalTheme.teal500)
+                                        }
+                                        Text(item.note).font(.caption2).foregroundColor(ClinicalTheme.slate400)
+                                    }
+                                    .padding()
+                                    
+                                    if index < category.items.count - 1 {
+                                        Divider().background(ClinicalTheme.slate700)
+                                    }
+                                }
+                            }
+                            .background(ClinicalTheme.slate800)
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.slate700, lineWidth: 1))
+                            .padding(.horizontal)
+                        }
+                    }
+                }
             }
-        }
-    }
-}
-
-struct BestPracticesView: View {
-    var body: some View {
-        VStack(spacing: 24) {
-             // Pain Management
-             VStack(alignment: .leading, spacing: 12) {
-                 Text("Pain & Symptom Management").font(.headline).foregroundColor(ClinicalTheme.slate400).padding(.horizontal)
-                 
-                 VStack(alignment: .leading, spacing: 12) {
-                     Text("Clinician Best Practices").font(.caption).bold().foregroundColor(ClinicalTheme.teal500).textCase(.uppercase)
-                     Group {
-                         Text("• Ask about pain/SOB/Nausea/Anxiety EVERY DAY.")
-                         Text("• Never leave a patient in pain without a plan.")
-                         Text("• Verify home opioid dose before hospital orders.")
-                         Text("• Set expectations for OVERNIGHT care.")
-                     }.font(.caption).foregroundColor(ClinicalTheme.slate300)
-                 }
-                 .clinicalCard()
-                 .padding(.horizontal)
-             }
-             
-             // Anti-Emetics Table
-             VStack(alignment: .leading, spacing: 12) {
-                 Text("Nausea & Vomiting Control").font(.headline).foregroundColor(ClinicalTheme.slate400).padding(.horizontal)
-                 
-                 ScrollView(.horizontal, showsIndicators: false) {
-                     VStack(alignment: .leading, spacing: 0) {
-                         // Header
-                         HStack(spacing: 0) {
-                             Text("Drug").frame(width: 120, alignment: .leading)
-                             Text("Review").frame(width: 100, alignment: .leading)
-                             Text("Dose").frame(width: 150, alignment: .leading)
-                         }
-                         .font(.caption).bold().foregroundColor(ClinicalTheme.slate500)
-                         .padding()
-                         .background(ClinicalTheme.slate900)
-                         
-                         ForEach(ProtocolData.antiEmetics) { item in
-                             HStack(spacing: 0) {
-                                 Text(item.drug).font(.caption).bold().foregroundColor(.white).frame(width: 120, alignment: .leading)
-                                 Text(item.site).font(.caption2).foregroundColor(ClinicalTheme.slate400).frame(width: 100, alignment: .leading)
-                                 Text(item.dose).font(.caption).foregroundColor(ClinicalTheme.slate300).frame(width: 150, alignment: .leading)
-                             }
-                             .padding()
-                            .overlay(
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundColor(ClinicalTheme.slate800),
-                                alignment: .top
-                            )
-                         }
-                     }
-                     .background(ClinicalTheme.slate800)
-                     .cornerRadius(12)
-                 }
-                 .padding(.horizontal)
-             }
         }
     }
 }

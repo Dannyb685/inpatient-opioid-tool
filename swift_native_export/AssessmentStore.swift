@@ -266,7 +266,7 @@ class AssessmentStore: ObservableObject {
             recs = recs.filter { !$0.name.contains("PO") && !$0.name.contains("Oral") }
             
             // Context-aware warnings
-            if route == .po || route == .both || route == .either {
+            if route == .po || route == .both {
                  if route == .po {
                      recs = [] // Clear if ONLY PO requested
                  }

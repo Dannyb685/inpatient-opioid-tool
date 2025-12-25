@@ -30,10 +30,17 @@ struct AntiEmetic: Identifiable {
 }
 
 // --- Induction Models ---
-struct TempleRegimen {
+struct SymptomItem: Identifiable, Hashable {
+    let id = UUID()
+    let drug: String
+    let dose: String
+    let note: String
+}
+
+struct SymptomCategory: Identifiable {
+    let id = UUID()
     let title: String
-    let oral: [String] // "Oxycodone ER 30-60mg TID"
-    let breakthrough: [String] // "Dilaudid 2mg IV"
+    let items: [SymptomItem]
 }
 
 struct BerneseStep: Identifiable {
@@ -160,24 +167,31 @@ struct ProtocolData {
         ])
     ]
     
-    // --- Anti-Emetics ---
-    static let antiEmetics: [AntiEmetic] = [
-        AntiEmetic(drug: "Metoclopramide", site: "D2 (gut), 5HT3 (high dose)", dose: "5-20 mg PO/IV before meals/QHS", effects: "Dystonia, akathisia"),
-        AntiEmetic(drug: "Haloperidol", site: "D2 (CTZ)", dose: "0.5-4 mg PO/SQ/IV q6h", effects: "Dystonia, sedation, QTc"),
-        AntiEmetic(drug: "Prochlorperazine", site: "D2 (CTZ)", dose: "5-10 mg PO/IV q6h or 25 mg PR", effects: "Dystonia, akathisia, QTc"),
-        AntiEmetic(drug: "Olanzapine", site: "D2, 5HT2A", dose: "2.5-10 mg daily", effects: "Metabolic, sedation, orthostasis"),
-        AntiEmetic(drug: "Promethazine", site: "H1, ACh, D2", dose: "12.5-25 mg PO/IV/IM q6h", effects: "Anticholinergic, sedation"),
-        AntiEmetic(drug: "Ondansetron", site: "5HT3", dose: "4-8 mg PO/IV q4-8h", effects: "Headache, constipation, QTc"),
-        AntiEmetic(drug: "Scopolamine", site: "ACh, H1", dose: "1.5 mg Patch q72h", effects: "Dry mouth, blurred vision"),
-        AntiEmetic(drug: "Dexamethasone", site: "Steroid", dose: "4-8 mg PO q4-6h", effects: "Psychosis, insomnia, fluid")
+    // --- Symptom Management ---
+    static let symptomManagement: [SymptomCategory] = [
+        SymptomCategory(title: "Pain", items: [
+            SymptomItem(drug: "Acetaminophen", dose: "650 mg PO q6h PRN", note: "Mild pain, headache, myalgias (5 days)")
+        ]),
+        SymptomCategory(title: "Anxiety", items: [
+            SymptomItem(drug: "Hydroxyzine", dose: "25 mg PO q6h PRN", note: "Anxiety (5 days)"),
+            SymptomItem(drug: "Clonidine", dose: "0.1 mg PO q6h PRN", note: "Restlessness or anxiety"),
+            SymptomItem(drug: "Gabapentin", dose: "100-300 mg PO TID PRN", note: "Anxiety (5 days)")
+        ]),
+        SymptomCategory(title: "GI Symptoms", items: [
+            SymptomItem(drug: "Hyoscyamine", dose: "125 mcg PO q6h PRN", note: "Cramping or abdominal pain (5 days)"),
+            SymptomItem(drug: "Loperamide", dose: "2 mg PO q6h PRN", note: "Diarrhea (5 days)"),
+            SymptomItem(drug: "Ondansetron ODT", dose: "4 mg PO q6h PRN", note: "Nausea or vomiting (5 days)")
+        ]),
+        SymptomCategory(title: "Sleep", items: [
+            SymptomItem(drug: "Trazodone", dose: "50 mg PO QHS PRN", note: "Sleep (5 days)"),
+            SymptomItem(drug: "Gabapentin", dose: "100-300 mg PO QHS PRN", note: "Sleep (5 days)")
+        ]),
+        SymptomCategory(title: "Harm Reduction", items: [
+            SymptomItem(drug: "Naloxone", dose: "Distribution", note: "Referral to IDEA Exchange")
+        ])
     ]
     
     // --- Induction Protocols ---
-    static let templeData = TempleRegimen(
-        title: "Temple Protocol (Aggressive MOUD)",
-        oral: ["Oxycodone ER: 30-60mg TID (Up by 20mg q8h PRN)", "Oxycodone IR: 15-30mg q4h PRN"],
-        breakthrough: ["Standard: Dilaudid 2mg IV PRN", "PCA: Dilaudid 1mg/hr basal + 0.5-1mg demand q10min"]
-    )
     
     static let berneseData: [BerneseStep] = [
         BerneseStep(day: 1, dose: "0.5 mg once", note: "Continue full agonist."),
