@@ -26,7 +26,7 @@ enum Hemodynamics: String, CaseIterable, Identifiable {
 enum GIStatus: String, CaseIterable, Identifiable {
     case intact = "Intact / Alert"
     case tube = "Tube / Dysphagia"
-    case npo = "NPO / GI Failure"
+    case npo = "NPO / GI Failure / AMS"
     var id: String { self.rawValue }
 }
 

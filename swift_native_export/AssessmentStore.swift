@@ -272,7 +272,7 @@ class AssessmentStore: ObservableObject {
                  if route == .po {
                      recs = [] // Clear if ONLY PO requested
                  }
-                 warns.append("PO Contraindicated: Patient is NPO. Switch to IV.")
+                 warns.append("PO Contraindicated: Patient is NPO/AMS. Switch to IV.")
             }
         }
         
