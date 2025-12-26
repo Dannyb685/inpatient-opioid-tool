@@ -2,23 +2,12 @@ import SwiftUI
 
 struct ScreeningView: View {
     @State private var selectedTab = "sbirt" // sbirt, cows, tools
+    @EnvironmentObject var themeManager: ThemeManager
     @StateObject private var screeningStore = ScreeningStore()
     @StateObject private var toolkitStore = ToolkitStore()
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Custom Tab Bar
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        TabButton(id: "sbirt", label: "SBIRT (Addiction)", icon: "person.fill.questionmark", selected: $selectedTab)
-                        TabButton(id: "cows", label: "COWS (Withdrawal)", icon: "activity", selected: $selectedTab)
-                        TabButton(id: "tools", label: "Risk Tools", icon: "exclamationmark.triangle", selected: $selectedTab)
-                    }
-                    .padding()
-                }
-                .background(ClinicalTheme.slate900)
-                
                 // Content
                 ScrollView {
                     VStack(spacing: 20) {
@@ -33,13 +22,51 @@ struct ScreeningView: View {
                     .padding()
                     .padding(.bottom, 40)
                 }
-                .background(ClinicalTheme.slate900.edgesIgnoringSafeArea(.all))
+                .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
             }
-            .background(ClinicalTheme.slate900.edgesIgnoringSafeArea(.all))
-            .navigationTitle("Screening & Tools")
+            .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
+            .navigationTitle("Screening")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(action: { selectedTab = "sbirt" }) {
+                            Label("SBIRT", systemImage: "text.book.closed")
+                        }
+                        Button(action: { selectedTab = "cows" }) {
+                            Label("COWS Assessment", systemImage: "waveform.path.ecg")
+                        }
+                        Button(action: { selectedTab = "tools" }) {
+                            Label("Risk Tools", systemImage: "star.of.life")
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(tabName(for: selectedTab))
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Image(systemName: "chevron.down")
+                                .font(.caption)
+                        }
+                        .foregroundColor(ClinicalTheme.teal500)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(ClinicalTheme.teal500.opacity(0.1))
+                        .cornerRadius(8)
+                    }
+                }
+            }
+
+    }
+    
+    func tabName(for tab: String) -> String {
+        switch tab {
+        case "sbirt": return "SBIRT"
+        case "cows": return "COWS"
+        case "tools": return "Tools"
+        default: return "Screening"
         }
     }
+
 }
 
 // MARK: - Modules
@@ -51,38 +78,32 @@ struct SBIRTModule: View {
     var body: some View {
         VStack(spacing: 16) {
             // Sub-Tabs
-            HStack {
-                Button("DAST-10") { subTab = "dast" }
-                    .font(.caption).bold()
-                    .foregroundColor(subTab == "dast" ? .white : .gray)
-                    .padding(8)
-                    .background(subTab == "dast" ? ClinicalTheme.teal500 : Color.clear)
-                    .cornerRadius(6)
-                
-                Button("Visual Aids") { subTab = "visual" }
-                    .font(.caption).bold()
-                    .foregroundColor(subTab == "visual" ? .white : .gray)
-                    .padding(8)
-                    .background(subTab == "visual" ? ClinicalTheme.teal500 : Color.clear)
-                    .cornerRadius(6)
-                
-                Button("Intervention") { subTab = "brief" }
-                    .font(.caption).bold()
-                    .foregroundColor(subTab == "brief" ? .white : .gray)
-                    .padding(8)
-                    .background(subTab == "brief" ? ClinicalTheme.teal500 : Color.clear)
-                    .cornerRadius(6)
+            // Sub-Tabs
+            // Sub-Tabs (Chips)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach([("dast", "DAST-10"), ("assist", "ASSIST-Lyte"), ("visual", "Visual Aids"), ("brief", "Intervention")], id: \.0) { key, label in
+                        Button(action: { withAnimation { subTab = key } }) {
+                            Text(label)
+                                .font(.caption).fontWeight(.bold)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(subTab == key ? ClinicalTheme.teal500 : ClinicalTheme.backgroundCard)
+                                .foregroundColor(subTab == key ? .white : ClinicalTheme.textSecondary)
+                                .cornerRadius(20)
+                                .overlay(RoundedRectangle(cornerRadius: 20).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                        }
+                    }
+                }
+                .padding(.horizontal)
             }
-            .padding(4)
-            .background(ClinicalTheme.slate800)
-            .cornerRadius(8)
             
             if subTab == "dast" {
                 // Existing DAST Logic
                 VStack(spacing: 16) {
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("Risk Level").font(.caption).foregroundColor(ClinicalTheme.slate400).textCase(.uppercase)
+                            Text("Risk Level").font(.caption).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
                             Text(store.riskLevel)
                                 .font(.title2)
                                 .fontWeight(.black)
@@ -91,66 +112,71 @@ struct SBIRTModule: View {
                         Spacer()
                         Text("\(store.riskScore)/10")
                             .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(ClinicalTheme.textPrimary)
                     }
                     .padding()
-                    .background(ClinicalTheme.slate800)
+                    .background(ClinicalTheme.backgroundCard)
                     .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                     
-                    Text("Questionnaire (Last 12 Months)").font(.headline).foregroundColor(ClinicalTheme.slate400)
+                    Text("Questionnaire (Last 12 Months)").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
                     
                     ForEach($store.questions) { $q in
                         Toggle(isOn: $q.isYes) {
                             Text(q.text)
-                                .foregroundColor(.white)
+                                .foregroundColor(ClinicalTheme.textPrimary)
                                 .fixedSize(horizontal: false, vertical: true)
                                 .padding(.vertical, 4)
                         }
                         .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.teal500))
                         .padding()
-                        .background(ClinicalTheme.slate800)
+                        .background(ClinicalTheme.backgroundCard)
                         .cornerRadius(12)
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                     }
                 }
+            } else if subTab == "assist" {
+                AssistLyteView(store: store)
             } else if subTab == "visual" {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Standard Drink Equivalents").font(.headline).foregroundColor(.white)
+                    Text("Standard Drink Equivalents").font(.headline).foregroundColor(ClinicalTheme.textPrimary)
                     
-                    // Visual Asset Placeholder (Generation Pending)
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(ClinicalTheme.slate800)
-                            .frame(height: 150)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [5]))
-                                    .foregroundColor(ClinicalTheme.slate500)
-                            )
-                        
-                        VStack(spacing: 8) {
-                            Image(systemName: "photo")
-                                .font(.largeTitle)
-                                .foregroundColor(ClinicalTheme.slate500)
-                            Text("Visual Asset Generation Pending")
-                                .font(.caption)
-                                .foregroundColor(ClinicalTheme.slate500)
-                        }
-                    }
-                    
-                    ForEach(ToolkitData.drinkEquivalents, id: \.0) { item in
-                        HStack {
-                            Text(item.0).bold().foregroundColor(.white)
-                            Spacer()
-                            Text(item.1).foregroundColor(ClinicalTheme.teal500)
-                        }
+                    // Visual Asset Placeholder
+                    // Visual Asset Placeholder
+                    Image(systemName: "wineglass.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 100)
+                        .foregroundColor(ClinicalTheme.teal500)
                         .padding()
-                        .background(ClinicalTheme.slate800)
-                        .cornerRadius(8)
+                        .background(ClinicalTheme.backgroundCard)
+                        .cornerRadius(12)
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                    
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(Array(ToolkitData.drinkEquivalents.enumerated()), id: \.offset) { index, item in
+                             HStack {
+                                Text(item.0).bold().foregroundColor(ClinicalTheme.textPrimary)
+                                Spacer()
+                                VStack(alignment: .trailing) {
+                                    Text(item.1).font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                                    Text(item.2).font(.caption2).bold().foregroundColor(ClinicalTheme.teal500)
+                                }
+                            }
+                            .padding()
+                            
+                            if index < ToolkitData.drinkEquivalents.count - 1 {
+                                Divider().background(ClinicalTheme.divider)
+                            }
+                        }
                     }
+                    .background(ClinicalTheme.backgroundCard)
+                    .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                 }
             } else if subTab == "brief" {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("FRAMES Model").font(.headline).foregroundColor(.white)
+                    Text("FRAMES Model").font(.headline).foregroundColor(ClinicalTheme.textPrimary)
                     ForEach(ToolkitData.framesData, id: \.0) { item in
                         HStack(alignment: .top, spacing: 12) {
                             Text(item.0)
@@ -159,17 +185,93 @@ struct SBIRTModule: View {
                                 .foregroundColor(ClinicalTheme.teal500)
                                 .frame(width: 30)
                             VStack(alignment: .leading) {
-                                Text(item.1).bold().foregroundColor(.white)
-                                Text(item.2).font(.caption).foregroundColor(ClinicalTheme.slate400)
+                                Text(item.1).bold().foregroundColor(ClinicalTheme.textPrimary)
+                                Text(item.2).font(.caption).foregroundColor(ClinicalTheme.textSecondary)
                             }
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(ClinicalTheme.slate800)
+                        .background(ClinicalTheme.backgroundCard)
                         .cornerRadius(8)
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                     }
                 }
             }
+        }
+    }
+}
+
+struct AssistLyteView: View {
+    @ObservedObject var store: ScreeningStore
+    
+    var body: some View {
+        VStack(spacing: 24) {
+             Text("Past 3 Months Only").font(.caption).bold().foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
+            
+            ForEach($store.assistSubstances) { $substance in
+                VStack(alignment: .leading, spacing: 12) {
+                    Toggle(isOn: $substance.usedInPast3Months) {
+                        Text("Did you use \(substance.name)?")
+                            .font(.headline)
+                            .foregroundColor(ClinicalTheme.textPrimary)
+                    }
+                    .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.teal500))
+                    
+                    if substance.usedInPast3Months {
+                        Divider()
+                        if substance.id == "tobacco" {
+                            Toggle("Usually smoke > 10 cigs/day?", isOn: $substance.q1_Frequency)
+                            Toggle("Smoke within 30 mins of waking?", isOn: $substance.q3_Extra)
+                        } else if substance.id == "alcohol" {
+                            Toggle(">4 drinks on any occasion?", isOn: $substance.q1_Frequency)
+                            Toggle("Failed to control/stop?", isOn: $substance.q3_Extra)
+                            Toggle("Anyone expressed concern?", isOn: $substance.q2_Concern)
+                        } else if substance.id == "other" {
+                            Text("Not scored. Prompts further assessment.")
+                                .font(.caption).italic().foregroundColor(ClinicalTheme.textSecondary)
+                        } else {
+                            // General Logic (Cannabis, Stimulants, Sedatives, Opioids)
+                            Toggle("Strong urge/use weekly or more?", isOn: $substance.q1_Frequency)
+                            Toggle("Anyone expressed concern?", isOn: $substance.q2_Concern)
+                            if substance.id == "opioids" {
+                                Toggle("Failed to control/stop?", isOn: $substance.q3_Extra) // Used q3 slot for "Failed to stop"
+                            }
+                        }
+                        
+                        if substance.id != "other" {
+                            HStack {
+                                Text("Risk Category:")
+                                    .font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                                Spacer()
+                                Text(substance.riskCategory)
+                                    .font(.caption).fontWeight(.bold)
+                                    .foregroundColor(substance.riskCategory == "Low" ? ClinicalTheme.teal500 : (substance.riskCategory == "Moderate" ? ClinicalTheme.amber500 : ClinicalTheme.rose500))
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 2)
+                                    .background((substance.riskCategory == "Low" ? ClinicalTheme.teal500 : (substance.riskCategory == "Moderate" ? ClinicalTheme.amber500 : ClinicalTheme.rose500)).opacity(0.1))
+                                    .cornerRadius(4)
+                            }
+                            .padding(.top, 4)
+                        }
+                    }
+                }
+                .padding()
+                .background(ClinicalTheme.backgroundCard)
+                .cornerRadius(12)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+            }
+            
+            // Key
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Rapid Guide").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
+                HStack { Text("Low").bold().foregroundColor(ClinicalTheme.teal500); Text("Health advice, encourage not to increase.") }
+                HStack { Text("Mod").bold().foregroundColor(ClinicalTheme.amber500); Text("Brief Intervention (FRAMES), take-home info.") }
+                HStack { Text("High").bold().foregroundColor(ClinicalTheme.rose500); Text("Brief Intervention + Specialist Referral.") }
+            }
+            .font(.caption)
+            .padding()
+            .background(ClinicalTheme.backgroundMain)
+            .cornerRadius(8)
         }
     }
 }
@@ -183,8 +285,8 @@ struct RiskToolsModule: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("SOS Score").font(.headline).foregroundColor(.white)
-                        Text("Surgical Risk Prediction").font(.caption).foregroundColor(ClinicalTheme.slate400)
+                        Text("SOS Score").font(.headline).foregroundColor(ClinicalTheme.textPrimary)
+                        Text("Surgical Risk Prediction").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
                     }
                     Spacer()
                     Text(store.sosRiskLabel)
@@ -208,8 +310,8 @@ struct RiskToolsModule: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Opioid Risk Tool (ORT)").font(.headline).foregroundColor(.white)
-                        Text("Aberrant Behavior Risk").font(.caption).foregroundColor(ClinicalTheme.slate400)
+                        Text("Opioid Risk Tool (ORT)").font(.headline).foregroundColor(ClinicalTheme.textPrimary)
+                        Text("Aberrant Behavior Risk").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
                     }
                     Spacer()
                     Text(store.ortRisk)
@@ -224,14 +326,15 @@ struct RiskToolsModule: View {
                 
                 HStack {
                     Text("Total Score: \(Int(store.ortScoreInput))")
-                        .font(.title3).bold().foregroundColor(.white)
+                        .font(.title3).bold().foregroundColor(ClinicalTheme.textPrimary)
                     Spacer()
                     Stepper("", value: $store.ortScoreInput, in: 0...26)
                         .labelsHidden()
                 }
                 .padding()
-                .background(ClinicalTheme.slate800)
+                .background(ClinicalTheme.backgroundCard)
                 .cornerRadius(8)
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
             }
             .clinicalCard()
             
@@ -239,15 +342,15 @@ struct RiskToolsModule: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("PEG Scale").font(.headline).foregroundColor(.white)
-                        Text("Pain, Enjoyment, General Activity").font(.caption).foregroundColor(ClinicalTheme.slate400)
+                        Text("PEG Scale").font(.headline).foregroundColor(ClinicalTheme.textPrimary)
+                        Text("Pain, Enjoyment, General Activity").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
                     }
                     Spacer()
                     VStack(alignment: .trailing) {
                         Text(String(format: "%.1f / 10", store.pegScore))
                             .font(.title2).fontWeight(.black).foregroundColor(ClinicalTheme.teal500)
                         Text("Goal: < \(String(format: "%.1f", store.pegScore * 0.7))")
-                            .font(.caption).foregroundColor(ClinicalTheme.slate500)
+                            .font(.caption).foregroundColor(ClinicalTheme.textMuted)
                     }
                 }
                 
@@ -269,12 +372,13 @@ struct PegSlider: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text(label).font(.caption).bold().foregroundColor(ClinicalTheme.slate300)
+                Text(label).font(.caption).bold().foregroundColor(ClinicalTheme.textSecondary)
                 Spacer()
-                Text("\(Int(value))").font(.caption).bold().foregroundColor(.white)
+                Text("\(Int(value))").font(.caption).bold().foregroundColor(ClinicalTheme.textPrimary)
             }
             Slider(value: $value, in: 0...10, step: 1)
                 .accentColor(ClinicalTheme.teal500)
+                .frame(height: 44) // Increase touch target
         }
     }
 }

@@ -8,7 +8,7 @@ struct ProtocolDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text(content)
-                    .foregroundColor(ClinicalTheme.slate400)
+                    .foregroundColor(ClinicalTheme.textPrimary)
                     .lineSpacing(6)
             }
             .clinicalCard()

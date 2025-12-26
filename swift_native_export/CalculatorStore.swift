@@ -1,16 +1,11 @@
 import Foundation
 import Combine
 
-enum ToleranceStatus: String, CaseIterable, Identifiable {
-    case naive = "Opioid Naive"
-    case tolerant = "Opioid Tolerant" // e.g., >60mg MME/day for 7 days
-    var id: String { self.rawValue }
-}
-
-enum ConversionContext: String, CaseIterable, Identifiable {
-    case rotation = "Opioid Rotation" // Switching drugs
-    case routeSwitch = "Route Change Only" // Same drug, new route (e.g. IV -> PO)
-    var id: String { self.rawValue }
+// MARK: - Calculator Data Models
+struct CalculatorInput: Identifiable {
+    let id = UUID()
+    let drug: DrugData
+    var dose: String = ""
 }
 
 struct TargetDose: Identifiable {
@@ -18,129 +13,115 @@ struct TargetDose: Identifiable {
     let drug: String
     let route: String
     let totalDaily: String
-    let breakthrough: String
+    let breakthrough: String // ~10% of TDD
     let unit: String
     let ratioLabel: String
-    let type: String // "safe", "caution"
 }
 
-struct CalculatorInput: Identifiable {
-    let id = UUID()
-    var drug: OpioidOption
-    var dose: String
+enum ToleranceStatus: String, CaseIterable, Identifiable {
+    case naive = "Naive"
+    case tolerant = "Tolerant"
+    var id: String { self.rawValue }
 }
 
-struct OpioidOption: Hashable, Identifiable {
-    let id: String
-    let name: String
-    let mmeFactor: Double // Factor to convert TO Oral Morphine MME
-    
-    static let all: [OpioidOption] = [
-        OpioidOption(id: "morphine_iv", name: "Morphine IV", mmeFactor: 3.0),
-        OpioidOption(id: "morphine_po", name: "Morphine PO", mmeFactor: 1.0),
-        OpioidOption(id: "oxycodone_po", name: "Oxycodone PO", mmeFactor: 1.5),
-        OpioidOption(id: "hydrocodone_po", name: "Hydrocodone PO", mmeFactor: 1.0),
-        OpioidOption(id: "hydromorphone_iv", name: "Hydromorphone IV", mmeFactor: 20.0), // 1.5mg IV = 30 MME -> 30/1.5 = 20
-        OpioidOption(id: "hydromorphone_po", name: "Hydromorphone PO", mmeFactor: 4.0), // 7.5mg PO = 30 MME -> 30/7.5 = 4
-        OpioidOption(id: "fentanyl_iv", name: "Fentanyl IV (mcg)", mmeFactor: 0.3), // 100mcg = 30 MME -> 30/100 = 0.3
-        OpioidOption(id: "codeine_po", name: "Codeine PO", mmeFactor: 0.15), // 200mg = 30 MME -> 30/200 = 0.15
-        OpioidOption(id: "tramadol_po", name: "Tramadol PO", mmeFactor: 0.1) // 300mg = 30 MME -> 30/300 = 0.1
-    ]
+enum ConversionContext: String, CaseIterable, Identifiable {
+    case rotation = "Rotation"
+    case routeSwitch = "Route Switch"
+    var id: String { self.rawValue }
 }
 
+// MARK: - Store Implementation
 class CalculatorStore: ObservableObject {
-    // Initialize with ALL options for the static list view
-    @Published var inputs: [CalculatorInput] = OpioidOption.all.map { CalculatorInput(drug: $0, dose: "") } {
-        didSet { calculateTargets() }
-    }
+    @Published var inputs: [CalculatorInput] = []
+    @Published var reduction: Double = 30.0
+    @Published var tolerance: ToleranceStatus = .tolerant
+    @Published var context: ConversionContext = .rotation
     
-    @Published var reduction: Double = 30 { didSet { calculateTargets() } }
-    @Published var tolerance: ToleranceStatus = .naive { didSet { calculateTargets() } }
-    @Published var context: ConversionContext = .rotation { didSet { calculateTargets() } }
-    
+    // Outputs
+    @Published var resultMME: String = "0"
     @Published var targetDoses: [TargetDose] = []
+    @Published var warningText: String = ""
     
-    // Computed property for real-time MME calc (Pinned Header)
-    var resultMME: String {
-        let total = calculateTotalMME()
-        return String(format: "%.1f", total)
+    init() {
+        // Initialize with standard drug set for the calculator
+        let commonIds = ["morphine", "hydromorphone", "oxycodone", "fentanyl"]
+        self.inputs = ClinicalData.drugData
+            .filter { commonIds.contains($0.id) }
+            .map { CalculatorInput(drug: $0) }
     }
     
-    private func calculateTotalMME() -> Double {
-        return inputs.reduce(0) { sum, input in
-            guard let dose = Double(input.dose) else { return sum }
-            return sum + (dose * input.drug.mmeFactor)
-        }
-    }
-    
-    var warningText: String {
-        if context == .routeSwitch && tolerance == .tolerant {
-            return "Note: No cross-tolerance reduction applied for active chronic therapy (same drug)."
-        }
-        if tolerance == .naive {
-             return "Warning: Opioid Naive. Recommended start: 50% of calculated dose."
-        }
-        return "Standard Cross-Tolerance Reduction Applied."
-    }
-    
-    // Direct binding updates
-    func updateDose(for inputID: UUID, dose: String) {
-        if let index = inputs.firstIndex(where: { $0.id == inputID }) {
+    func updateDose(for inputId: UUID, dose: String) {
+        if let index = inputs.firstIndex(where: { $0.id == inputId }) {
             inputs[index].dose = dose
+            calculate()
         }
     }
     
-    func calculateTargets() {
-        let totalMME = calculateTotalMME()
+    func calculate() {
+        var totalMME: Double = 0
         
-        guard totalMME > 0 else {
+        // 1. Calculate MME
+        for input in inputs {
+            guard let val = Double(input.dose), val > 0 else { continue }
+            var factor = 0.0
+            
+            // Standard NCCN Factors
+            switch input.drug.id {
+            case "morphine": factor = 1.0 // Assuming PO input for calculator safety
+            case "hydromorphone": factor = 4.0 
+            case "oxycodone": factor = 1.5
+            case "fentanyl": factor = 300.0 // 0.1mg IV Fent (100mcg) ~= 30mg PO Morph
+            case "hydrocodone": factor = 1.0
+            case "oxymorphone": factor = 3.0
+            case "codeine": factor = 0.15
+            case "tramadol": factor = 0.1
+            default: factor = 0
+            }
+            totalMME += val * factor
+        }
+        
+        self.resultMME = String(format: "%.0f", totalMME)
+        
+        // 2. Reduction
+        let reducedMME = totalMME * (1.0 - (reduction / 100.0))
+        
+        if reducedMME <= 0 {
             targetDoses = []
+            warningText = ""
             return
         }
         
-        var doses: [TargetDose] = []
+        // 3. Targets
+        var targets: [TargetDose] = []
         
-        // 1. Determine Reduction Factor
-        var reductionFactor = reduction / 100.0
-        if context == .routeSwitch && tolerance == .tolerant {
-            reductionFactor = 0.0 // No reduction for same-drug chronic switch
+        // Target: Oxycodone PO (1.5:1)
+        let oxyDaily = reducedMME / 1.5
+        targets.append(createTarget(drug: "Oxycodone", route: "PO", total: oxyDaily, ratio: "1.5 : 1"))
+        
+        // Target: Hydromorphone PO (4:1)
+        let dilDaily = reducedMME / 4.0
+        targets.append(createTarget(drug: "Hydromorphone", route: "PO", total: dilDaily, ratio: "4 : 1"))
+        
+        // Target: Morphine IV (3:1 vs PO)
+        let morDaily = reducedMME / 3.0
+        targets.append(createTarget(drug: "Morphine", route: "IV", total: morDaily, ratio: "IV Ratio 3:1"))
+        
+        self.targetDoses = targets
+        
+        if totalMME > 90 {
+            warningText = "⚠️ >90 MME: High Overdose Risk. Naloxone indicated."
+        } else {
+            warningText = ""
         }
-        
-        let targetMME = totalMME * (1.0 - reductionFactor)
-        
-        // Helper to create dose from Target MME
-        func addDose(drug: String, route: String, mmeInverseFactor: Double, unit: String, ratio: String) {
-            // Target Dose = Target MME / MME Factor
-            // Here we use the stored factors effectively.
-            // Morphine IV Factor is 3.0 (IV -> MME). So MME -> IV is / 3.0.
-            
-            let dailyDose = targetMME / mmeInverseFactor
-            let breakthrough = dailyDose * 0.10 // 10% for BT
-            
-            doses.append(TargetDose(
-                drug: drug,
-                route: route,
-                totalDaily: String(format: "%.1f", dailyDose),
-                breakthrough: String(format: "%.1f", breakthrough),
-                unit: unit,
-                ratioLabel: ratio,
-                type: "safe"
-            ))
-        }
-        
-        // 2. Logic Parity
-        // Hydromorphone IV (Factor 20.0). MME / 20.
-        addDose(drug: "Hydromorphone", route: "IV", mmeInverseFactor: 20.0, unit: "mg", ratio: "Ratio 1:6.7 (vs MS IV)")
-        
-        // Fentanyl IV (Factor 0.3). MME / 0.3.
-        addDose(drug: "Fentanyl", route: "IV", mmeInverseFactor: 0.3, unit: "mcg", ratio: "Ratio 1:100 (vs MS IV)")
-        
-        // Oxycodone PO (Factor 1.5). MME / 1.5.
-        addDose(drug: "Oxycodone", route: "PO", mmeInverseFactor: 1.5, unit: "mg", ratio: "OME Ratio 1:1.5")
-        
-        // Hydromorphone PO (Factor 4.0). MME / 4.0.
-        addDose(drug: "Hydromorphone", route: "PO", mmeInverseFactor: 4.0, unit: "mg", ratio: "OME Ratio 1:4")
-        
-        self.targetDoses = doses
+    }
+    
+    private func createTarget(drug: String, route: String, total: Double, ratio: String) -> TargetDose {
+        let bt = total * 0.10
+        return TargetDose(
+            drug: drug, route: route,
+            totalDaily: String(format: "%.1f", total),
+            breakthrough: String(format: "%.1f", bt),
+            unit: "mg", ratioLabel: ratio
+        )
     }
 }

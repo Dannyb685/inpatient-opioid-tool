@@ -22,14 +22,22 @@
         * `RiskAssessmentView.swift`
         * `ScreeningView.swift`
         * `CalculatorView.swift`
+        * `ProtocolsView.swift`
+        * `ReferenceView.swift`
         * `ToolkitView.swift`
         * `COWSView.swift`
         * `ProtocolDetailView.swift`
+        * `SelectionView.swift`
+    * **Data Models**:
+        * `ClinicalData.swift`
+        * `ProtocolData.swift`
+        * `ToolkitData.swift`
     * *Note: Delete ContentView.swift if Xcode created one automatically.*
 5. **Add Privacy Manifest (Required)**:
     * Drag `PrivacyInfo.xcprivacy` from the export folder into the Xcode project navigator.
-6. **Add App Icon**:
-    * Located in `assets/app_icon_medical_precision.png`.
-    * Drag and drop the PNG into the 1024x1024 slot in Assets.
+6. **Add Assets**:
+    * Drag the `Assets.xcassets` folder from `swift_native_export/` into the Xcode Project Navigator.
+    * When prompted, choose "Create folder references" or "Create groups" (Create groups is standard for xcassets).
+    * If an empty `Assets.xcassets` already exists in Xcode, replace it or merge contents.
 7. **Run**: Select a simulator and press Cmd+R.
 8. **Archive**: Select "Any iOS Device" and go to `Product > Archive`.

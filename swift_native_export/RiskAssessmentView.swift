@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RiskAssessmentView: View {
     @StateObject private var store = AssessmentStore()
+    @EnvironmentObject var themeManager: ThemeManager
     @State private var showFullDetails = false
     
     var body: some View {
@@ -20,7 +21,7 @@ struct RiskAssessmentView: View {
                     .padding(.top)
                 }
             }
-            .background(ClinicalTheme.slate900.edgesIgnoringSafeArea(.all))
+            .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
             .navigationTitle("Risk Assessment")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showFullDetails) {
@@ -34,43 +35,17 @@ struct RiskAssessmentView: View {
     var pinnedHeader: some View {
         VStack(spacing: 12) {
             // 1. PRODIGY Score Row
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("PRODIGY Score").font(.caption).foregroundColor(ClinicalTheme.slate400).textCase(.uppercase)
-                    HStack(alignment: .firstTextBaseline) {
-                        Text("\(store.prodigyScore)")
-                            .font(.system(size: 32, weight: .black))
-                            .foregroundColor(scoreColor)
-                        
-                        Text(store.prodigyRisk)
-                            .font(.headline)
-                            .foregroundColor(scoreColor)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(scoreColor.opacity(0.15))
-                            .cornerRadius(6)
-                    }
-                }
-                Spacer()
-                
-                if !store.recommendations.isEmpty {
-                    Button(action: { showFullDetails = true }) {
-                        HStack(spacing: 4) {
-                            Text("Full Protocol")
-                            Image(systemName: "chevron.right")
-                        }
-                        .font(.caption).bold()
-                        .foregroundColor(ClinicalTheme.teal500)
-                        .padding(8)
-                        .background(ClinicalTheme.teal500.opacity(0.1))
-                        .cornerRadius(20)
-                    }
-                }
-            }
+            ScoreResultCard(
+                title: "PRODIGY Score",
+                subtitle: "Respiratory Depression Risk",
+                value: "\(store.prodigyScore)",
+                badgeText: store.prodigyRisk,
+                badgeColor: store.prodigyRisk == "High" ? ClinicalTheme.rose500 : (store.prodigyRisk == "Intermediate" ? ClinicalTheme.amber500 : ClinicalTheme.teal500)
+            )
             
             // 2. Recommendations Preview (Top 2)
             if !store.recommendations.isEmpty {
-                Divider().background(ClinicalTheme.slate700)
+                Divider().background(ClinicalTheme.divider)
                 
                 VStack(spacing: 8) {
                     ForEach(store.recommendations.prefix(2)) { rec in
@@ -78,9 +53,9 @@ struct RiskAssessmentView: View {
                             Circle()
                                 .fill(rec.type == .safe ? ClinicalTheme.teal500 : ClinicalTheme.amber500)
                                 .frame(width: 8, height: 8)
-                            Text(rec.name).font(.subheadline).bold().foregroundColor(.white)
+                            Text(rec.name).font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
                             Spacer()
-                            Text(rec.reason).font(.caption).foregroundColor(ClinicalTheme.slate400)
+                            Text(rec.reason).font(.caption).foregroundColor(ClinicalTheme.textSecondary)
                         }
                     }
                 }
@@ -88,13 +63,16 @@ struct RiskAssessmentView: View {
                 Text("Enter patient parameters below")
                     .font(.caption)
                     .italic()
-                    .foregroundColor(ClinicalTheme.slate400)
+                    .foregroundColor(ClinicalTheme.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+        .onTapGesture {
+            showFullDetails = true
+        }
         .clinicalCard()
         .padding()
-        .background(ClinicalTheme.slate900) // Ensure opaque background for pinning
+        .background(ClinicalTheme.backgroundMain) // Ensure opaque background for pinning
         .zIndex(1)
     }
     
@@ -103,38 +81,35 @@ struct RiskAssessmentView: View {
             // Age & Sex
             HStack {
                 VStack(alignment: .leading) {
-                    Text("Age").font(.caption).foregroundColor(ClinicalTheme.slate400).textCase(.uppercase)
+                    Text("Age").font(.caption).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
                     TextField("Yrs", text: $store.age)
                         .keyboardType(.numberPad)
-                        .foregroundColor(.white)
+                        .foregroundColor(ClinicalTheme.textPrimary)
                         .padding()
-                        .background(ClinicalTheme.slate800)
+                        .background(ClinicalTheme.backgroundInput)
                         .cornerRadius(8)
+                        .addKeyboardDoneButton()
                 }
                 VStack(alignment: .leading) {
-                    SelectionView(
-                        title: "Sex",
-                        options: Sex.allCases,
-                        selection: $store.sex,
-                        titleMapper: { $0 == .male ? "M" : "F" },
-                        colorMapper: nil
-                    )
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Sex").font(.caption).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
+                    Picker("Sex", selection: $store.sex) {
+                        ForEach(Sex.allCases, id: \.self) { sex in
+                            Text(sex == .male ? "Male" : "Female").tag(sex)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .colorMultiply(ClinicalTheme.teal500) // Tint for segmented picker
+                }
                 }
             }
             .padding(.horizontal)
             
-            // Basic Toggles
-            VStack(spacing: 16) {
-                Toggle("Opioid Naive", isOn: $store.naive)
-                Toggle("Home Buprenorphine (MAT)", isOn: $store.mat)
-            }
-            .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.teal500))
-            .padding()
-            .background(ClinicalTheme.slate800)
-            .cornerRadius(12)
-            .padding(.horizontal)
         }
     }
+
+    
+    // clinicalInputsSection & additionalParametersSection use SelectionView which needs separate update if not using Theme in SelectionView.swift
     
     var clinicalInputsSection: some View {
         Group {
@@ -220,9 +195,9 @@ struct RiskAssessmentView: View {
                 .accentColor(ClinicalTheme.teal500)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
-                .background(ClinicalTheme.slate800)
+                .background(ClinicalTheme.backgroundCard)
                 .cornerRadius(10)
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(ClinicalTheme.slate700, lineWidth: 1))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
             }
             .clinicalCard()
             .padding(.horizontal)
@@ -231,7 +206,9 @@ struct RiskAssessmentView: View {
     
     var riskFactorsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-             Text("Risk Factors (PRODIGY)").font(.headline).foregroundColor(ClinicalTheme.slate400)
+             Text("Risk Factors (PRODIGY)").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
+             Toggle("Opioid Naive", isOn: $store.naive)
+             Toggle("Home Buprenorphine (MAT)", isOn: $store.mat)
              Toggle("Sleep Apnea (OSA)", isOn: $store.sleepApnea)
              Toggle("CHF", isOn: $store.chf)
              Toggle("Benzos / Sedatives", isOn: $store.benzos)
@@ -251,11 +228,11 @@ struct RiskAssessmentView: View {
                     // 1. Monitoring Plan (High Priority)
                     if !store.monitoringPlan.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("MONITORING PLAN").font(.caption).fontWeight(.black).foregroundColor(ClinicalTheme.slate400)
+                            Text("MONITORING PLAN").font(.caption).fontWeight(.black).foregroundColor(ClinicalTheme.textSecondary)
                             ForEach(store.monitoringPlan, id: \.self) { plan in
                                 HStack(alignment: .top) {
-                                    Image(systemName: "lungs.fill").foregroundColor(ClinicalTheme.slate400).font(.caption)
-                                    Text(plan).font(.subheadline).foregroundColor(.white)
+                                    Image(systemName: "lungs.fill").foregroundColor(ClinicalTheme.textSecondary).font(.caption)
+                                    Text(plan).font(.subheadline).foregroundColor(ClinicalTheme.textPrimary)
                                 }
                                 .padding(.vertical, 2)
                             }
@@ -271,7 +248,7 @@ struct RiskAssessmentView: View {
                             ForEach(store.warnings, id: \.self) { warn in
                                 HStack(alignment: .top) {
                                     Image(systemName: "exclamationmark.triangle.fill").foregroundColor(ClinicalTheme.rose500)
-                                    Text(warn).font(.subheadline).foregroundColor(.white)
+                                    Text(warn).font(.subheadline).foregroundColor(ClinicalTheme.textPrimary)
                                 }
                             }
                         }
@@ -286,7 +263,7 @@ struct RiskAssessmentView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("ADJUVANTS").font(.caption).fontWeight(.black).foregroundColor(ClinicalTheme.teal500)
                             ForEach(store.adjuvants, id: \.self) { adj in
-                                Text("• " + adj).font(.subheadline).foregroundColor(.white)
+                                Text("• " + adj).font(.subheadline).foregroundColor(ClinicalTheme.textPrimary)
                             }
                         }
                         .padding()
@@ -297,7 +274,7 @@ struct RiskAssessmentView: View {
                     
                     // 4. Recommendations
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Recommendations").font(.title3).bold().foregroundColor(.white).padding(.horizontal)
+                        Text("Recommendations").font(.title3).bold().foregroundColor(ClinicalTheme.textPrimary).padding(.horizontal)
                         ForEach(store.recommendations) { rec in
                             RecommendationCard(rec: rec)
                         }
@@ -305,7 +282,7 @@ struct RiskAssessmentView: View {
                 }
                 .padding(.vertical)
             }
-            .background(ClinicalTheme.slate900.edgesIgnoringSafeArea(.all))
+            .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
             .navigationTitle("Assessment Details")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -313,7 +290,7 @@ struct RiskAssessmentView: View {
                 }
             }
         }
-        .colorScheme(.dark) // Force sheets to dark mode if needed
+        // Removed .colorScheme(.dark)
     }
     
     var scoreColor: Color {
@@ -336,21 +313,22 @@ struct RecommendationCard: View {
         case .unsafe: return ClinicalTheme.rose500
         }
     }
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(rec.name).font(.title3).fontWeight(.bold).foregroundColor(.white)
+                Text(rec.name).font(.title3).fontWeight(.bold).foregroundColor(ClinicalTheme.textPrimary)
                 Spacer()
                 Text(rec.type == .safe ? "Preferred" : "Monitor")
                     .font(.caption).fontWeight(.bold).padding(.horizontal, 8).padding(.vertical, 4)
                     .background(color.opacity(0.2)).foregroundColor(color).cornerRadius(6)
             }
             // Improved legibility: slate300 instead of slate400
-            Text(rec.reason).font(.subheadline).fontWeight(.medium).foregroundColor(ClinicalTheme.slate300)
-            Text(rec.detail).font(.caption).italic().foregroundColor(ClinicalTheme.slate400)
+            Text(rec.reason).font(.subheadline).fontWeight(.medium).foregroundColor(ClinicalTheme.textSecondary)
+            Text(rec.detail).font(.caption).italic().foregroundColor(ClinicalTheme.textMuted)
         }
-        .padding().background(ClinicalTheme.slate800).cornerRadius(16)
+        .padding().background(ClinicalTheme.backgroundCard).cornerRadius(16)
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(color.opacity(0.5), lineWidth: 1))
         .padding(.horizontal)
     }

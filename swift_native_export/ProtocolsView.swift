@@ -2,32 +2,45 @@ import SwiftUI
 
 struct ProtocolsView: View {
     @State private var selectedTab = "proto" // proto, moud
+    @EnvironmentObject var themeManager: ThemeManager
     @State private var protocolMode = "guide" // guide, algo
     
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
                 // Custom Tab Bar
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        TabButton(id: "proto", label: "Clinical Protocols", icon: "doc.text.magnifyingglass", selected: $selectedTab)
-                        TabButton(id: "moud", label: "MOUD", icon: "shield.checkerboard", selected: $selectedTab)
-                    }
-                    .padding()
+                // Segmented Picker Header
+                Picker("Tab", selection: $selectedTab) {
+                    Text("Clinical Protocols").tag("proto")
+                    Text("MOUD").tag("moud")
                 }
-                .background(ClinicalTheme.slate900)
+                .pickerStyle(.segmented)
+                .padding()
+                .background(ClinicalTheme.backgroundMain)
                 
                 // Content
                 ScrollView {
                     VStack(spacing: 20) {
                         if selectedTab == "proto" {
                             // Sub-Picker for Consolidated View
-                            Picker("Type", selection: $protocolMode) {
-                                Text("Guide").tag("guide")
-                                Text("Algorithms").tag("algo")
+                            // Sub-Picker (Chips)
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach([("guide", "Condition Guide"), ("algo", "Algorithms")], id: \.0) { key, label in
+                                        Button(action: { withAnimation { protocolMode = key } }) {
+                                            Text(label)
+                                                .font(.caption).fontWeight(.bold)
+                                                .padding(.horizontal, 16)
+                                                .padding(.vertical, 8)
+                                                .background(protocolMode == key ? ClinicalTheme.teal500 : ClinicalTheme.backgroundCard)
+                                                .foregroundColor(protocolMode == key ? .white : ClinicalTheme.textSecondary)
+                                                .cornerRadius(20)
+                                                .overlay(RoundedRectangle(cornerRadius: 20).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal)
                             }
-                            .pickerStyle(.segmented)
-                            .padding(.horizontal)
                             
                             if protocolMode == "guide" {
                                 ConditionGuidesView()
@@ -41,9 +54,9 @@ struct ProtocolsView: View {
                     .padding()
                     .padding(.bottom, 40)
                 }
-                .background(ClinicalTheme.slate900.edgesIgnoringSafeArea(.all))
+                .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
             }
-            .background(ClinicalTheme.slate900.edgesIgnoringSafeArea(.all))
+            .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
             .navigationTitle("Protocols")
             .navigationBarTitleDisplayMode(.inline)
         }
@@ -74,13 +87,13 @@ struct FlowchartView: View {
                     Text("Recommendation")
                         .font(.headline)
                         .textCase(.uppercase)
-                        .foregroundColor(ClinicalTheme.slate400)
+                        .foregroundColor(ClinicalTheme.textSecondary)
                     
                     Text(outcome)
                         .font(.title3)
                         .fontWeight(.medium)
                         .multilineTextAlignment(.center)
-                        .foregroundColor(.white)
+                        .foregroundColor(ClinicalTheme.textPrimary)
                         .padding()
                     
                     Button(action: {
@@ -91,11 +104,12 @@ struct FlowchartView: View {
                     }) {
                         Text("Reset Pathway")
                             .font(.headline)
-                            .foregroundColor(ClinicalTheme.slate300)
+                            .foregroundColor(ClinicalTheme.textSecondary)
                             .padding(.horizontal, 20)
                             .padding(.vertical, 10)
-                            .background(ClinicalTheme.slate800)
+                            .background(ClinicalTheme.backgroundCard)
                             .cornerRadius(8)
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                     }
                     
                 } else if let node = currentNode {
@@ -104,7 +118,7 @@ struct FlowchartView: View {
                         .font(.title3)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
-                        .foregroundColor(.white)
+                        .foregroundColor(ClinicalTheme.textPrimary)
                         .padding(.bottom, 10)
                     
                     ForEach(node.options) { option in
@@ -124,18 +138,18 @@ struct FlowchartView: View {
                                 Image(systemName: "arrow.right")
                             }
                             .padding()
-                            .background(ClinicalTheme.slate800)
+                            .background(ClinicalTheme.backgroundCard)
                             .cornerRadius(12)
-                            .foregroundColor(.white)
-                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.slate700, lineWidth: 1))
+                            .foregroundColor(ClinicalTheme.textPrimary)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                         }
                     }
                 }
             }
             .padding(24)
-            .background(ClinicalTheme.slate900) // Inner card bg
+            .background(ClinicalTheme.backgroundCard) // Inner card bg
             .cornerRadius(16)
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(ClinicalTheme.slate700, lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
             
             // Breadcrumbs
             if history.count > 1 {
@@ -148,7 +162,7 @@ struct FlowchartView: View {
                             .font(.caption)
                     }
                 }
-                .foregroundColor(ClinicalTheme.slate500)
+                .foregroundColor(ClinicalTheme.textMuted)
             }
         }
     }
@@ -156,8 +170,8 @@ struct FlowchartView: View {
 
 struct ConditionGuidesView: View {
     var body: some View {
-        VStack(spacing: 12) {
-            ForEach(ProtocolData.conditionGuides) { guide in
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(ProtocolData.conditionGuides.enumerated()), id: \.element.id) { index, guide in
                 DisclosureGroup(
                     content: {
                         VStack(alignment: .leading, spacing: 8) {
@@ -166,7 +180,7 @@ struct ConditionGuidesView: View {
                                     Circle().fill(ClinicalTheme.teal500).frame(width: 6, height: 6).padding(.top, 6)
                                     Text(rec)
                                         .font(.caption)
-                                        .foregroundColor(ClinicalTheme.slate300)
+                                        .foregroundColor(ClinicalTheme.textSecondary)
                                 }
                             }
                         }
@@ -175,14 +189,20 @@ struct ConditionGuidesView: View {
                     label: {
                         Text(guide.title)
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(ClinicalTheme.textPrimary)
                     }
                 )
                 .padding()
-                .background(ClinicalTheme.slate800)
-                .cornerRadius(12)
+                
+                if index < ProtocolData.conditionGuides.count - 1 {
+                    Divider().background(ClinicalTheme.divider)
+                }
             }
         }
+        .background(ClinicalTheme.backgroundCard)
+        .cornerRadius(12)
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+        .padding(.horizontal)
     }
 }
 
@@ -200,7 +220,7 @@ struct MOUDView: View {
             
             if mode == "bernese" {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Buprenorphine Micro-Induction (Bernese Method)").font(.headline).foregroundColor(.white)
+                    Text("Buprenorphine Micro-Induction (Bernese Method)").font(.headline).foregroundColor(ClinicalTheme.textPrimary)
                         .padding(.bottom, 4)
                     
                     ForEach(ProtocolData.berneseData) { step in
@@ -211,14 +231,15 @@ struct MOUDView: View {
                                 .overlay(Text("D\(step.day)").font(.caption).bold().foregroundColor(ClinicalTheme.teal500))
                             
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(step.dose).font(.subheadline).bold().foregroundColor(.white)
-                                Text(step.note).font(.caption).foregroundColor(ClinicalTheme.slate400)
+                                Text(step.dose).font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
+                                Text(step.note).font(.caption).foregroundColor(ClinicalTheme.textSecondary)
                             }
                             Spacer()
                         }
                         .padding()
-                        .background(ClinicalTheme.slate800)
+                        .background(ClinicalTheme.backgroundCard)
                         .cornerRadius(12)
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                     }
                 }
             } else {
@@ -235,22 +256,22 @@ struct MOUDView: View {
                                 ForEach(Array(category.items.enumerated()), id: \.element.id) { index, item in
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack {
-                                            Text(item.drug).font(.subheadline).bold().foregroundColor(.white)
+                                            Text(item.drug).font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
                                             Spacer()
                                             Text(item.dose).font(.caption).foregroundColor(ClinicalTheme.teal500)
                                         }
-                                        Text(item.note).font(.caption2).foregroundColor(ClinicalTheme.slate400)
+                                        Text(item.note).font(.caption2).foregroundColor(ClinicalTheme.textSecondary)
                                     }
                                     .padding()
                                     
                                     if index < category.items.count - 1 {
-                                        Divider().background(ClinicalTheme.slate700)
+                                        Divider().background(ClinicalTheme.divider)
                                     }
                                 }
                             }
-                            .background(ClinicalTheme.slate800)
+                            .background(ClinicalTheme.backgroundCard)
                             .cornerRadius(12)
-                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.slate700, lineWidth: 1))
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                             .padding(.horizontal)
                         }
                     }
@@ -260,24 +281,4 @@ struct MOUDView: View {
     }
 }
 
-struct TabButton: View {
-    let id: String
-    let label: String
-    let icon: String
-    @Binding var selected: String
-    
-    var body: some View {
-        Button(action: { withAnimation { selected = id } }) {
-            HStack {
-                Image(systemName: icon)
-                Text(label)
-            }
-            .font(.caption).bold()
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(selected == id ? ClinicalTheme.teal500 : ClinicalTheme.slate800)
-            .foregroundColor(selected == id ? .white : ClinicalTheme.slate400)
-            .cornerRadius(8)
-        }
-    }
-}
+

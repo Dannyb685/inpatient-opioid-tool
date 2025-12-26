@@ -59,10 +59,10 @@ struct ToolkitRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(ClinicalTheme.textPrimary)
                 Text(subtitle)
                     .font(.caption)
-                    .foregroundColor(ClinicalTheme.slate400)
+                    .foregroundColor(ClinicalTheme.textSecondary)
             }
             
             Spacer()

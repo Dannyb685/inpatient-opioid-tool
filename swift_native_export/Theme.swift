@@ -1,24 +1,42 @@
 import SwiftUI
+import Combine
 
 class ThemeManager: ObservableObject {
     static let shared = ThemeManager()
-    @Published var isDarkMode: Bool = true
+    @Published var isDarkMode: Bool = false
+    
+    private init() {}
 }
 
 struct ClinicalTheme {
-    // Dynamic Colors based on ThemeManager
-    static var slate900: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.08, green: 0.10, blue: 0.13) : Color(red: 0.95, green: 0.96, blue: 0.97) } // Dark: Slate900 | Light: Slate50
-    static var slate800: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.12, green: 0.15, blue: 0.18) : Color.white } // Dark: Slate800 | Light: White
-    static var slate700: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.20, green: 0.24, blue: 0.28) : Color(red: 0.88, green: 0.91, blue: 0.94) } // Dark: Slate700 | Light: Slate200
+    // MARK: - Semantic Colors (Use these in Views)
     
-    static var slate500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.39, green: 0.45, blue: 0.55) : Color(red: 0.39, green: 0.45, blue: 0.55) } // Muted Text (Same)
-    static var slate400: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.58, green: 0.64, blue: 0.72) : Color(red: 0.40, green: 0.45, blue: 0.50) } // Secondary (Darken for light mode)
-    static var slate300: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.80, green: 0.84, blue: 0.88) : Color(red: 0.10, green: 0.13, blue: 0.17) } // Text (Invert)
+    // Text
+    static var textPrimary: Color { Color(UIColor.label) }
+    static var textSecondary: Color { Color(UIColor.secondaryLabel) }
+    static var textMuted: Color { Color(UIColor.placeholderText) }
     
-    // Accents (Keep roughly same, maybe adjust readability)
-    static var teal500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.08, green: 0.75, blue: 0.72) : Color(red: 0.06, green: 0.60, blue: 0.58) } // Darker Teal for light bg
-    static let amber500 = Color(red: 0.96, green: 0.64, blue: 0.15)
-    static let rose500  = Color(red: 0.94, green: 0.25, blue: 0.33)
+    // Backgrounds
+    static var backgroundMain: Color { Color(UIColor.systemGroupedBackground) }
+    static var backgroundCard: Color { Color(UIColor.secondarySystemGroupedBackground) } // White in Light, Dark Grey in Dark
+    static var backgroundInput: Color { Color(UIColor.tertiarySystemFill) }
+    
+    // UI Elements
+    static var divider: Color { Color(UIColor.separator) }
+    static var cardBorder: Color { Color(UIColor.opaqueSeparator) }
+    
+    // Accents
+    static var teal500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.08, green: 0.75, blue: 0.72) : Color(red: 0.00, green: 0.55, blue: 0.55) }
+    static var amber500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.96, green: 0.64, blue: 0.15) : Color(red: 0.85, green: 0.55, blue: 0.00) }
+    static var rose500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.94, green: 0.25, blue: 0.33) : Color(red: 0.85, green: 0.15, blue: 0.25) }
+    
+    // Legacy mapping (Deprecated)
+    static var slate900: Color { backgroundMain }
+    static var slate800: Color { backgroundCard }
+    static var slate700: Color { divider }
+    static var slate500: Color { textMuted }
+    static var slate400: Color { textSecondary }
+    static var slate300: Color { textPrimary }
 }
 
 struct ClinicalCardModifier: ViewModifier {
@@ -29,11 +47,11 @@ struct ClinicalCardModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(16)
-            .background(ClinicalTheme.slate800)
+            .background(ClinicalTheme.backgroundCard)
             .cornerRadius(16)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(ClinicalTheme.slate700, lineWidth: 1)
+                    .stroke(ClinicalTheme.cardBorder, lineWidth: 1)
             )
             .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
     }

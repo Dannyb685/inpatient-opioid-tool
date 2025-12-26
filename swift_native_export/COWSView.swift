@@ -2,6 +2,7 @@ import SwiftUI
 
 struct COWSView: View {
     @ObservedObject var store: ToolkitStore
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         ScrollView {
@@ -10,7 +11,7 @@ struct COWSView: View {
                 VStack {
                     Text("Total Score")
                         .font(.caption)
-                        .foregroundColor(ClinicalTheme.slate400)
+                        .foregroundColor(ClinicalTheme.textSecondary)
                         .textCase(.uppercase)
                     Text("\(store.cowsScore)")
                         .font(.system(size: 64, weight: .black))
@@ -20,7 +21,7 @@ struct COWSView: View {
                         .foregroundColor(.white)
                         .padding(.vertical, 4)
                         .padding(.horizontal, 12)
-                        .background(ClinicalTheme.slate700)
+                        .background(ClinicalTheme.textSecondary)
                         .cornerRadius(8)
                 }
                 .frame(maxWidth: .infinity)
@@ -74,13 +75,16 @@ struct COWSView: View {
                 Button(action: { store.resetCOWS() }) {
                     Text("Reset Scale")
                         .font(.headline)
-                        .foregroundColor(ClinicalTheme.slate400)
-                        .padding()
+                        .foregroundColor(ClinicalTheme.teal500)
+                        .padding(.horizontal, 32)
+                        .padding(.vertical, 12)
+                        .background(ClinicalTheme.teal500.opacity(0.1))
+                        .cornerRadius(20)
                 }
             }
             .padding(.vertical)
         }
-        .slateBackground()
+        .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
         .navigationTitle("COWS Assessment")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -90,16 +94,17 @@ struct CowsItem: View {
     let title: String
     @Binding var selection: Int
     let options: [Int: String]
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(title).font(.headline).foregroundColor(.white)
+            Text(title).font(.headline).foregroundColor(ClinicalTheme.textPrimary)
             
             ForEach(options.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                 Button(action: { selection = key }) {
                     HStack {
                         Text(value)
-                            .foregroundColor(selection == key ? .white : ClinicalTheme.slate400)
+                            .foregroundColor(selection == key ? .primary : ClinicalTheme.textSecondary)
                             .multilineTextAlignment(.leading)
                         Spacer()
                         if selection == key {
@@ -107,15 +112,15 @@ struct CowsItem: View {
                                 .foregroundColor(ClinicalTheme.teal500)
                         } else {
                             Image(systemName: "circle")
-                                .foregroundColor(ClinicalTheme.slate700)
+                                .foregroundColor(ClinicalTheme.textMuted)
                         }
                     }
                     .padding()
-                    .background(selection == key ? ClinicalTheme.slate700.opacity(0.5) : ClinicalTheme.slate900)
+                    .background(selection == key ? ClinicalTheme.teal500.opacity(0.15) : ClinicalTheme.backgroundMain)
                     .cornerRadius(8)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(selection == key ? ClinicalTheme.teal500 : Color.clear, lineWidth: 1)
+                            .stroke(selection == key ? ClinicalTheme.teal500 : ClinicalTheme.cardBorder, lineWidth: 1)
                     )
                 }
             }

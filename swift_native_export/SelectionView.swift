@@ -4,6 +4,7 @@ struct SelectionView<T: Hashable & Identifiable & RawRepresentable>: View where 
     let title: String?
     let options: [T]
     @Binding var selection: T
+    @EnvironmentObject var themeManager: ThemeManager
     let titleMapper: ((T) -> String)?
     let colorMapper: ((T) -> Color)?
     
@@ -72,14 +73,14 @@ struct SelectionView<T: Hashable & Identifiable & RawRepresentable>: View where 
                 // Radio circle for vertical layout
                 if shouldUseVerticalLayout {
                     Circle()
-                        .strokeBorder(isSelected ? baseColor : ClinicalTheme.slate500, lineWidth: 2)
+                        .strokeBorder(isSelected ? baseColor : ClinicalTheme.textMuted, lineWidth: 2)
                         .background(Circle().fill(isSelected ? baseColor : Color.clear))
                         .frame(width: 18, height: 18)
                 }
                 
                 Text(titleMapper?(option) ?? option.rawValue)
                     .font(.system(size: 15, weight: isSelected ? .bold : .medium))
-                    .foregroundColor(isSelected ? .white : ClinicalTheme.slate300)
+                    .foregroundColor(isSelected ? (shouldUseVerticalLayout ? ClinicalTheme.textPrimary : .white) : ClinicalTheme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(shouldUseVerticalLayout ? .leading : .center)
                 
@@ -89,12 +90,12 @@ struct SelectionView<T: Hashable & Identifiable & RawRepresentable>: View where 
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(shouldUseVerticalLayout ? ClinicalTheme.slate800 : (isSelected ? baseColor : ClinicalTheme.slate800))
+                    .fill(shouldUseVerticalLayout ? ClinicalTheme.backgroundInput : (isSelected ? baseColor : ClinicalTheme.backgroundInput))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(
-                        isSelected ? baseColor : ClinicalTheme.slate700,
+                        isSelected ? baseColor : ClinicalTheme.cardBorder,
                         lineWidth: 1
                     )
             )
