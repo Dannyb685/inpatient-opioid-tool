@@ -21,11 +21,11 @@ class ToolkitStore: ObservableObject {
     
     var cowsSeverity: String {
         switch cowsScore {
-        case 0...4: return "Mild"
-        case 5...12: return "Moderate"
-        case 13...24: return "Moderately Severe"
-        case 25...36: return "Severe"
-        default: return "Severe (>36)"
+        case 5...12: return "Mild"
+        case 13...24: return "Moderate"
+        case 25...36: return "Moderately Severe"
+        case 37...Int.max: return "Severe"
+        default: return "Sub-clinical"
         }
     }
     

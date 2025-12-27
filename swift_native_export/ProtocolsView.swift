@@ -207,18 +207,39 @@ struct ConditionGuidesView: View {
 }
 
 struct MOUDView: View {
-    @State private var mode = "bernese" // bernese, symptom
+    @State private var mode = "standard" // standard, bernese, symptom
     
     var body: some View {
         VStack(spacing: 20) {
             Picker("Protocol", selection: $mode) {
-                Text("Micro-Induction").tag("bernese")
+                Text("Standard").tag("standard")
+                Text("Micro (Bernese)").tag("bernese")
                 Text("Symptom Care").tag("symptom")
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
             
-            if mode == "bernese" {
+            if mode == "standard" {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Standard Buprenorphine Induction").font(.headline).foregroundColor(ClinicalTheme.textPrimary)
+                        .padding(.bottom, 4)
+                    
+                    ForEach(ProtocolData.standardInduction) { item in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text(item.step).font(.caption).bold().foregroundColor(ClinicalTheme.teal500).textCase(.uppercase)
+                                Spacer()
+                            }
+                            Text(item.action).font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
+                            Text(item.note).font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                        }
+                        .padding()
+                        .background(ClinicalTheme.backgroundCard)
+                        .cornerRadius(12)
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                    }
+                }
+            } else if mode == "bernese" {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Buprenorphine Micro-Induction (Bernese Method)").font(.headline).foregroundColor(ClinicalTheme.textPrimary)
                         .padding(.bottom, 4)

@@ -29,6 +29,7 @@ struct ClinicalTheme {
     static var teal500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.08, green: 0.75, blue: 0.72) : Color(red: 0.00, green: 0.55, blue: 0.55) }
     static var amber500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.96, green: 0.64, blue: 0.15) : Color(red: 0.85, green: 0.55, blue: 0.00) }
     static var rose500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.94, green: 0.25, blue: 0.33) : Color(red: 0.85, green: 0.15, blue: 0.25) }
+    static var purple500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.70, green: 0.45, blue: 0.95) : Color(red: 0.55, green: 0.20, blue: 0.80) }
     
     // Legacy mapping (Deprecated)
     static var slate900: Color { backgroundMain }

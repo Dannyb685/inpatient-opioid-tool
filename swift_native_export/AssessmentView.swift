@@ -110,6 +110,25 @@ struct AssessmentView: View {
                                 }
                                 .padding(8).background(Color.red.opacity(0.1)).cornerRadius(8)
                             }
+                            
+                            // MONITORING SECTION
+                            if !store.monitoringPlan.isEmpty {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Monitoring & Safety").font(.caption).bold().foregroundColor(.secondary).textCase(.uppercase)
+                                    ForEach(store.monitoringPlan, id: \.self) { monitor in
+                                        HStack(alignment: .top, spacing: 10) {
+                                            Image(systemName: "waveform.path.ecg").foregroundColor(ClinicalTheme.teal500).font(.caption)
+                                            Text(monitor).font(.caption).foregroundColor(ClinicalTheme.textPrimary)
+                                                .fixedSize(horizontal: false, vertical: true)
+                                        }
+                                        .padding(10).frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(ClinicalTheme.backgroundCard)
+                                        .cornerRadius(8)
+                                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                                    }
+                                }
+                                .padding(.top, 8)
+                            }
                         }
                         .clinicalCard()
                         .padding(.horizontal)

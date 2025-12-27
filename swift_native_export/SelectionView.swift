@@ -41,12 +41,9 @@ struct SelectionView<T: Hashable & Identifiable & RawRepresentable>: View where 
                     }
                 }
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(options) { option in
-                            selectionButton(for: option)
-                        }
-                    }
+                // Flow Layout (Wrapping Chips) to avoid Scroll-in-Scroll conflict
+                SimpleFlowLayout(items: options, spacing: 8) { option in
+                    selectionButton(for: option)
                 }
             }
         }
@@ -101,5 +98,63 @@ struct SelectionView<T: Hashable & Identifiable & RawRepresentable>: View where 
             )
         }
         .buttonStyle(PlainButtonStyle())
+    }
+}
+
+// MARK: - Flow Layout Helper
+struct SimpleFlowLayout<Data: RandomAccessCollection, Content: View>: View where Data.Element: Identifiable, Data.Element: Hashable {
+    let items: Data
+    let spacing: CGFloat
+    let content: (Data.Element) -> Content
+    @State private var totalHeight: CGFloat = .zero
+
+    var body: some View {
+        GeometryReader { geometry in
+            self.generateContent(in: geometry)
+        }
+        .frame(height: totalHeight)
+    }
+
+    private func generateContent(in g: GeometryProxy) -> some View {
+        var width = CGFloat.zero
+        var height = CGFloat.zero
+
+        return ZStack(alignment: .topLeading) {
+            ForEach(items) { item in
+                content(item)
+                    .padding([.horizontal, .vertical], 4)
+                    .alignmentGuide(.leading, computeValue: { d in
+                        if (abs(width - d.width) > g.size.width) {
+                            width = 0
+                            height -= d.height
+                        }
+                        let result = width
+                        if item == self.items.last! {
+                            width = 0
+                        } else {
+                            width -= d.width
+                        }
+                        return result
+                    })
+                    .alignmentGuide(.top, computeValue: {d in
+                        let result = height
+                        if item == self.items.last! {
+                            height = 0
+                        }
+                        return result
+                    })
+            }
+        }
+        .background(viewHeightReader($totalHeight))
+    }
+
+    private func viewHeightReader(_ binding: Binding<CGFloat>) -> some View {
+        return GeometryReader { geometry -> Color in
+            let rect = geometry.frame(in: .local)
+            DispatchQueue.main.async {
+                binding.wrappedValue = rect.size.height
+            }
+            return .clear
+        }
     }
 }

@@ -2,7 +2,12 @@ import SwiftUI
 
 struct MainTabView: View {
     @ObservedObject var themeManager = ThemeManager.shared
+    @AppStorage("hasAcceptedDisclaimer") private var hasAcceptedDisclaimer = false
+    @State private var showDisclaimer = false
     
+    // Shared State for Tabs (LIFTED)
+    @StateObject private var calculatorStore = CalculatorStore()
+
     var body: some View {
         TabView {
             // Tab 1: Assessment
@@ -20,20 +25,27 @@ struct MainTabView: View {
                 }
             
             // Tab 3: MME Calc
-            CalculatorView()
+            CalculatorView(sharedStore: calculatorStore)
                 .tabItem {
                     Image(systemName: "pills")
                     Text("MME Calc")
                 }
                 
-            // Tab 4: Protocols
+            // Tab 4: Taper Tool (New v1.5.5)
+            TaperScheduleView(calculatorStore: calculatorStore)
+                .tabItem {
+                    Image(systemName: "chart.line.downtrend.xyaxis")
+                    Text("Taper")
+                }
+                
+            // Tab 5: Protocols
             ProtocolsView()
                 .tabItem {
                     Image(systemName: "arrow.triangle.branch")
                     Text("Protocols")
                 }
 
-            // Tab 5: Reference
+            // Tab 6: Reference
             ReferenceView()
                 .tabItem {
                     Image(systemName: "book.fill")
@@ -41,8 +53,22 @@ struct MainTabView: View {
                 }
         }
         .accentColor(ClinicalTheme.teal500)
-        .onAppear { updateTabBar() }
+        .onAppear {
+            updateTabBar()
+            if !hasAcceptedDisclaimer {
+                showDisclaimer = true
+            }
+        }
         .onChange(of: themeManager.isDarkMode) { _, _ in updateTabBar() }
+        .alert(isPresented: $showDisclaimer) {
+            Alert(
+                title: Text("Clinical Disclaimer"),
+                message: Text("This tool is intended for ADULT patients (18+) only. It is NOT validated for pediatric use.\n\nCalculations are estimates. Clinical judgment is mandatory."),
+                dismissButton: .default(Text("I Understand")) {
+                    hasAcceptedDisclaimer = true
+                }
+            )
+        }
     }
 
 

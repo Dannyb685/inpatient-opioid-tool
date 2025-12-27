@@ -191,6 +191,20 @@ struct ProtocolData {
         ])
     ]
     
+    struct InductionStep: Identifiable {
+        let id = UUID()
+        let step: String
+        let action: String
+        let note: String
+    }
+    
+    static let standardInduction: [InductionStep] = [
+        InductionStep(step: "Assessment", action: "Wait for COWS ≥ 8", note: "Mild-moderate withdrawal; 12-24h since last short-acting opioid."),
+        InductionStep(step: "Initial Dose", action: "2 mg - 4 mg Sublingual", note: "Dissolve fully under tongue. Observe for 60 minutes."),
+        InductionStep(step: "Re-Assessment", action: "Repeated COWS Score", note: "If symptoms persist and no precipitated withdrawal, repeat 4mg dose."),
+        InductionStep(step: "Titration", action: "Max 12-16 mg Day 1", note: "Aim for symptom relief. Establish maintenance dose on Day 2.")
+    ]
+    
     // --- Induction Protocols ---
     
     static let berneseData: [BerneseStep] = [

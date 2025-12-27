@@ -1,12 +1,93 @@
 import SwiftUI
 
+
+
+
+// MARK: - Data Models (References)
+struct ReferenceItem: Identifiable {
+    let id = UUID()
+    let title: String
+    let citation: String
+    let urlString: String
+}
+
+struct ReferenceCategory: Identifiable {
+    let id = UUID()
+    let name: String
+    let icon: String
+    let items: [ReferenceItem]
+}
+
+struct ReferenceLibrary {
+    static let categories: [ReferenceCategory] = [
+        ReferenceCategory(name: "Core Guidelines", icon: "text.book.closed.fill", items: [
+            ReferenceItem(
+                title: "CDC Clinical Practice Guideline (2022)",
+                citation: "Dowell D, et al. MMWR Recomm Rep. 2022;71(3):1–95.",
+                urlString: "https://doi.org/10.15585/mmwr.rr7103a1"
+            ),
+            ReferenceItem(
+                title: "VA/DoD Clinical Practice Guideline",
+                citation: "VA/DoD CPG for Opioids in Chronic Pain. Dept of Veterans Affairs; 2022.",
+                urlString: "https://www.healthquality.va.gov/guidelines/Pain/cot/"
+            ),
+            ReferenceItem(
+                title: "ASCO Cancer Pain Guideline (2023)",
+                citation: "Paice JA, et al. J Clin Oncol. 2023;41(6):1274-1298.",
+                urlString: "https://doi.org/10.1200/JCO.22.01932"
+            )
+        ]),
+        ReferenceCategory(name: "Special Populations", icon: "person.2.circle.fill", items: [
+            ReferenceItem(
+                title: "AGS Beers Criteria® (2023)",
+                citation: "AGS Expert Panel. J Am Geriatr Soc. 2023;71(7):2052-2081.",
+                urlString: "https://doi.org/10.1111/jgs.18372"
+            ),
+            ReferenceItem(
+                title: "Frailty in Older Adults",
+                citation: "Kim DH, Rockwood K. N Engl J Med. 2024;391(6):532-544.",
+                urlString: "https://www.nejm.org/doi/full/10.1056/NEJMra2301292"
+            ),
+            ReferenceItem(
+                title: "Opioids in Renal Insufficiency",
+                citation: "Davison SN. UpToDate. Waltham, MA: UpToDate; 2024.",
+                urlString: "https://www.uptodate.com/contents/clinical-pharmacology-of-opioids-in-patients-with-renal-insufficiency"
+            )
+        ]),
+        ReferenceCategory(name: "Neuropathic & Non-Opioid", icon: "brain.head.profile", items: [
+            ReferenceItem(
+                title: "NeuPSIG Recommendations (Neuropathic)",
+                citation: "Finnerup NB, et al. Lancet Neurol. 2015;14(2):162-173.",
+                urlString: "https://pubmed.ncbi.nlm.nih.gov/25608771/"
+            ),
+            ReferenceItem(
+                title: "IV Lidocaine for Renal Colic",
+                citation: "Motov S, et al. Am J Emerg Med. 2019;37(12):2202-2207.",
+                urlString: "https://pubmed.ncbi.nlm.nih.gov/31349072/"
+            )
+        ]),
+        ReferenceCategory(name: "Pharmacology & Labels", icon: "pills.fill", items: [
+            ReferenceItem(
+                title: "Methadone Prescribing Info",
+                citation: "FDA. Methadone Hydrochloride Tablets USP. Revised 2023.",
+                urlString: "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=090171"
+            ),
+            ReferenceItem(
+                title: "Fentanyl Patch (Duragesic)",
+                citation: "FDA. Duragesic (Fentanyl Transdermal System). Revised 2023.",
+                urlString: "https://www.accessdata.fda.gov/drugsatfda_docs/label/2005/19813s039lbl.pdf"
+            )
+        ])
+    ]
+}
+
 struct ReferenceView: View {
     @EnvironmentObject var store: AssessmentStore // Add this
     @EnvironmentObject var themeManager: ThemeManager
     @State private var searchText = ""
     // Track expanded item ID locally
     @State private var expandedId: String? = nil
-    @State private var showCitations = false
+    @State private var showSettings = false // For About/Settings Sheet
     
     var filteredDrugs: [DrugData] {
         if searchText.isEmpty {
@@ -38,8 +119,6 @@ struct ReferenceView: View {
                 
                 ScrollView {
                     VStack(spacing: 12) {
-
-                        
                         ForEach(filteredDrugs) { drug in
                             ReferenceCard(drug: drug, isExpanded: expandedId == drug.id) {
                                 withAnimation(.spring()) {
@@ -53,7 +132,61 @@ struct ReferenceView: View {
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, 24)
+                    
+                    Divider().padding(.vertical, 8)
+                    
+                    // CITATIONS & REFERENCES SECTION
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Clinical References")
+                            .font(.title2).bold().foregroundColor(ClinicalTheme.teal500)
+                            .padding(.horizontal)
+                        
+                        // Disclaimer Card
+                        DisclaimerCard()
+                            .padding(.horizontal)
+
+                        // Reference Categories
+                        ForEach(ReferenceLibrary.categories) { category in
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Image(systemName: category.icon).foregroundColor(ClinicalTheme.teal500)
+                                    Text(category.name).font(.headline).foregroundColor(ClinicalTheme.textPrimary)
+                                }
+                                .padding(.horizontal)
+                                
+                                VStack(spacing: 0) {
+                                    ForEach(category.items) { item in
+                                        Link(destination: URL(string: item.urlString)!) {
+                                            ReferenceRow(item: item)
+                                        }
+                                        .buttonStyle(PlainButtonStyle()) // Important for list look
+                                        
+                                        if item.id != category.items.last?.id {
+                                            Divider()
+                                        }
+                                    }
+                                }
+                                .background(ClinicalTheme.backgroundCard)
+                                .cornerRadius(12)
+                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                                .padding(.horizontal)
+                            }
+                            .padding(.bottom, 8)
+                        }
+                        
+                        // Footer
+                        VStack(alignment: .center, spacing: 4) {
+                            Text("Opioid Precision v1.0")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            Text("© 2025 Clinical Tools Inc.")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 20)
+                    }
+                    .padding(.bottom, 40)
                 }
             }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
@@ -61,15 +194,27 @@ struct ReferenceView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        withAnimation {
-                            themeManager.isDarkMode.toggle()
+                    HStack(spacing: 16) {
+                        Button(action: {
+                            withAnimation {
+                                themeManager.isDarkMode.toggle()
+                            }
+                        }) {
+                            Image(systemName: themeManager.isDarkMode ? "sun.max.fill" : "moon.stars.fill")
+                                .foregroundColor(ClinicalTheme.textSecondary)
                         }
-                    }) {
-                        Image(systemName: themeManager.isDarkMode ? "sun.max.fill" : "moon.stars.fill")
-                            .foregroundColor(ClinicalTheme.teal500)
+                        
+                        Button(action: {
+                            showSettings = true
+                        }) {
+                            Image(systemName: "gearshape.fill")
+                                .foregroundColor(ClinicalTheme.teal500)
+                        }
                     }
                 }
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
             }
         }
     }
@@ -218,5 +363,85 @@ struct ReferenceBadgeView: View {
         .background(color.opacity(0.15))
         .cornerRadius(4)
         .overlay(RoundedRectangle(cornerRadius: 4).stroke(color.opacity(0.3), lineWidth: 1))
+    }
+}
+// MARK: - Reference Subviews (ReferenceRow & DisclaimerCard)
+
+struct ReferenceRow: View {
+    let item: ReferenceItem
+    
+    var body: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(ClinicalTheme.textPrimary)
+                
+                Text(item.citation)
+                    .font(.caption)
+                    .foregroundColor(ClinicalTheme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer()
+            Image(systemName: "arrow.up.right.square")
+                .font(.caption)
+                .foregroundColor(ClinicalTheme.teal500)
+                .padding(.top, 2)
+        }
+        .padding()
+    }
+}
+
+struct DisclaimerCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(.orange)
+                Text("Clinical Decision Support Disclaimer")
+                    .font(.headline)
+                    .bold()
+                    .foregroundColor(ClinicalTheme.textPrimary)
+            }
+            
+            Text("'Opioid Precision' is a clinical decision support tool intended for use by licensed healthcare professionals. The calculation of Morphine Milligram Equivalents (MME) is based on published equianalgesic tables (CDC 2022, ASCO 2023).")
+                .font(.caption)
+                .foregroundColor(ClinicalTheme.textSecondary)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Important Safety Limitations:")
+                    .font(.caption)
+                    .bold()
+                    .foregroundColor(ClinicalTheme.textPrimary)
+                
+                HStack(alignment: .top) {
+                    Text("•").bold()
+                    Text("Estimates Only: Patient response varies due to genetics and organ function.")
+                }.font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                
+                HStack(alignment: .top) {
+                    Text("•").bold()
+                    Text("Non-Linear Drugs: Methadone & Buprenorphine linear conversion is suppressed to prevent overdose.")
+                }.font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                
+                HStack(alignment: .top) {
+                    Text("•").bold()
+                    Text("Pediatric Exclusion: NOT validated for patients <18 years.")
+                }.font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+            }
+            
+            Text("This application does not replace clinical judgment. The treating physician is solely responsible for final dosing.")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .padding(.top, 4)
+        }
+        .padding()
+        .background(Color.orange.opacity(0.1))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+        )
     }
 }

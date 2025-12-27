@@ -20,6 +20,16 @@ struct ToolkitView: View {
                     }
                     .padding(.horizontal)
                     
+                    // Evidence & Algorithm Section
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Evidence & Algorithm").font(.headline).foregroundColor(ClinicalTheme.slate400).padding(.leading)
+                        
+                        NavigationLink(destination: AlgorithmInfoView()) {
+                            ToolkitRow(icon: "function", title: "How This Works", subtitle: "Logic Mappings & Guidelines")
+                        }
+                    }
+                    .padding(.horizontal)
+                    
                     // Protocols Section
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Protocols").font(.headline).foregroundColor(ClinicalTheme.slate400).padding(.leading)
@@ -82,5 +92,55 @@ struct ToolkitRow: View {
             }
         }
         .clinicalCard()
+    }
+}
+
+struct AlgorithmInfoView: View {
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Algorithm & Evidence")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(ClinicalTheme.textPrimary)
+                
+                // 1. Logic Mappings
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Logic Mappings").font(.headline).foregroundColor(ClinicalTheme.teal500)
+                    
+                    Text("Renal Toggle (Quick Mode)")
+                        .font(.subheadline).bold()
+                    Text("• Maps to eGFR <60 mL/min/1.73m² (CKD Stage 3+).")
+                    
+                    Text("Hepatic Toggle (Quick Mode)")
+                        .font(.subheadline).bold()
+                    Text("• Maps to Child-Pugh B (Moderate Impairment) or worse.")
+                    
+                    Text("Dose Reduction")
+                        .font(.subheadline).bold()
+                    Text("• Standard 30% reduction applied for cross-tolerance.")
+                }
+                .clinicalCard()
+                
+                // 2. Guidelines
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Guidelines & Sources").font(.headline).foregroundColor(ClinicalTheme.teal500)
+                    
+                    Text("• CDC 2022 Clinical Practice Guideline")
+                    Text("• NCCN Adult Cancer Pain Guidelines")
+                    Text("• Trauma / Acute Pain Management Guidelines")
+                }
+                .clinicalCard()
+                
+                Text("This tool is for clinical decision support only. Clinical judgment always supersedes algorithmic recommendations.")
+                    .font(.caption)
+                    .foregroundColor(ClinicalTheme.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding()
+            }
+            .padding()
+        }
+        .slateBackground()
+        .navigationTitle("Algorithm")
     }
 }

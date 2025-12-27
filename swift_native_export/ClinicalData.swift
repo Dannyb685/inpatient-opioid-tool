@@ -77,9 +77,9 @@ extension DrugData {
 }
 
 enum OpioidRoute: String, CaseIterable, Identifiable {
+    case both = "Both / Either"
     case iv = "IV / SQ"
     case po = "Oral (PO)"
-    case both = "Both / Either"
     var id: String { self.rawValue }
 }
 

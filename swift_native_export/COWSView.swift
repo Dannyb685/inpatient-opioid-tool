@@ -59,15 +59,54 @@ struct COWSView: View {
                         5: "Extremely dilated"
                     ])
                     
-                     CowsItem(title: "Bone/Joint Ache", selection: $store.cowsBoneAche, options: [
+                    CowsItem(title: "Bone or Joint Aches", selection: $store.cowsBoneAche, options: [
                         0: "Not present",
                         1: "Mild diffuse discomfort",
                         2: "Patient reports severe aching",
                         4: "Rubbing joints/muscles + unable to sit"
                     ])
                     
-                    // Add more items as needed (GI, Tremor, etc.)
-                    // Truncated for brevity - in a real implementation we would add all 11 questions.
+                    CowsItem(title: "Runny Nose or Tearing", selection: $store.cowsRunnyNose, options: [
+                        0: "Not present",
+                        1: "Nasal congestion or tearing",
+                        2: "Symptoms are observable",
+                        4: "Constant tearing or redness"
+                    ])
+                    
+                    CowsItem(title: "GI Upset", selection: $store.cowsGI, options: [
+                        0: "No GI symptoms",
+                        1: "Stomach cramps",
+                        2: "Nausea or loose stool",
+                        3: "Vomiting or diarrhea",
+                        5: "Multiple diarrhea/vomiting"
+                    ])
+                    
+                    CowsItem(title: "Tremor", selection: $store.cowsTremor, options: [
+                        0: "No tremor",
+                        1: "Tremor can be felt/not seen",
+                        2: "Slight tremor observable",
+                        4: "Gross tremor / twitching"
+                    ])
+                    
+                    CowsItem(title: "Yawning", selection: $store.cowsYawning, options: [
+                        0: "No yawning",
+                        1: "Yawning 1-2 times during assessment",
+                        2: "Yawning 3+ times during assessment",
+                        4: "Yawning several times per minute"
+                    ])
+                    
+                    CowsItem(title: "Anxiety or Irritability", selection: $store.cowsAnxiety, options: [
+                        0: "None",
+                        1: "Reports increased irritability",
+                        2: "Obviously irritable or anxious",
+                        4: "Difficult to participate"
+                    ])
+                    
+                    CowsItem(title: "Gooseflesh Skin", selection: $store.cowsGooseflesh, options: [
+                        0: "Skin is smooth",
+                        3: "Piloerection can be felt",
+                        5: "Prominent piloerection"
+                    ])
                     
                 }
                 .padding(.horizontal)
