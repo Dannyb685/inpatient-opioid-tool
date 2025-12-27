@@ -183,7 +183,7 @@ class CalculatorStore: ObservableObject {
         
         // Compliance Warning logic
         if reduction < 25 {
-            complianceWarning = "Inadequate Analgesia (10-25%). Pain is uncontrolled. Lower reduction maintains higher potency."
+            complianceWarning = "Aggressive Rotation (<25%). High risk of toxicity/overdose due to incomplete cross-tolerance. Only use if pain is severe and unmanaged."
         } else if reduction <= 40 {
             complianceWarning = "Standard / Reason for Rotation (25-40%). Routine rotation or standard safety margin (2025 Consensus)."
         } else {
