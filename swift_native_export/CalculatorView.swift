@@ -49,8 +49,9 @@ struct CalculatorView: View {
                             // DRUG INPUT LIST
                             VStack(alignment: .leading, spacing: 0) {
                                 ForEach(store.inputs) { input in
+                                        // Name is now pre-formatted in Store (e.g. "Morphine (IV)")
                                     HStack {
-                                        Text(input.drug.name)
+                                        Text(input.name)
                                             .foregroundColor(ClinicalTheme.textPrimary)
                                             .font(.body)
                                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -68,12 +69,26 @@ struct CalculatorView: View {
                                                 .multilineTextAlignment(.trailing)
                                                 .font(.body.monospacedDigit())
                                                 .foregroundColor(ClinicalTheme.teal500)
-                                                .addKeyboardDoneButton()
+                                                // .addKeyboardDoneButton() moved to container
                                             }
                                             
-                                            Text("mg")
-                                                .font(.caption)
-                                                .foregroundColor(ClinicalTheme.textSecondary)
+                                                // DYNAMIC UNIT LABEL: Precise Patch Units
+                                                // DYNAMIC UNIT LABEL: Type-Safe Logic
+                                                let unitLabel: String = {
+                                                    switch input.routeType {
+                                                    case .patch: return "mcg/hr"
+                                                    case .ivDrip: return "mg/hr"
+                                                    case .microgramIO: return "mcg"
+                                                    default: return "mg"
+                                                    }
+                                                }()
+                                                
+                                                let isHighRisk = input.routeType == .patch || input.routeType == .microgramIO
+
+                                                Text(unitLabel)
+                                                    .font(.caption)
+                                                    .fontWeight(isHighRisk ? .bold : .regular)
+                                                    .foregroundColor(isHighRisk ? ClinicalTheme.rose500 : ClinicalTheme.textSecondary)
                                         }
                                         .frame(width: 100)
                                         .padding(.vertical, 8)
@@ -105,9 +120,29 @@ struct CalculatorView: View {
                                     ForEach(ConversionContext.allCases) { Text($0.rawValue).tag($0) }
                                 }.pickerStyle(.segmented)
                                 
-                                // Slider
+                                // Presets & Slider
                                 if !(store.context == .routeSwitch && store.tolerance == .tolerant) {
-                                    VStack(alignment: .leading, spacing: 8) {
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        // Presets
+                                        HStack(spacing: 8) {
+                                            ForEach([0, 30, 50], id: \.self) { val in
+                                                Button(action: { store.reduction = Double(val) }) {
+                                                    VStack(spacing: 2) {
+                                                        Text("\(val)%").font(.headline)
+                                                        Text(val == 0 ? "Aggressive" : (val == 30 ? "Standard" : "Conservative"))
+                                                            .font(.system(size: 8)).textCase(.uppercase)
+                                                    }
+                                                    .frame(maxWidth: .infinity)
+                                                    .padding(.vertical, 8)
+                                                    .background(store.reduction == Double(val) ? ClinicalTheme.teal500.opacity(0.15) : ClinicalTheme.backgroundMain)
+                                                    .foregroundColor(store.reduction == Double(val) ? ClinicalTheme.teal500 : ClinicalTheme.textSecondary)
+                                                    .cornerRadius(8)
+                                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(store.reduction == Double(val) ? ClinicalTheme.teal500 : ClinicalTheme.cardBorder, lineWidth: 1))
+                                                }
+                                            }
+                                        }
+                                        
+                                        // Slider Header
                                         HStack {
                                             Text("Reduction").font(.caption).foregroundColor(ClinicalTheme.teal500).textCase(.uppercase)
                                             Spacer()
@@ -115,6 +150,20 @@ struct CalculatorView: View {
                                                 .font(.headline).foregroundColor(ClinicalTheme.amber500)
                                         }
                                         Slider(value: $store.reduction, in: 0...75, step: 5).accentColor(ClinicalTheme.amber500)
+                                        
+                                        // Compliance Warning
+                                        HStack(alignment: .top, spacing: 8) {
+                                            Image(systemName: store.reduction > 40 ? "exclamationmark.triangle.fill" : (store.reduction < 25 ? "bolt.fill" : "checkmark.circle.fill"))
+                                                .foregroundColor(store.reduction > 40 ? .orange : (store.reduction < 25 ? .red : .teal))
+                                                .font(.caption)
+                                            Text(store.complianceWarning)
+                                                .font(.caption)
+                                                .foregroundColor(ClinicalTheme.textSecondary)
+                                                .fixedSize(horizontal: false, vertical: true)
+                                        }
+                                        .padding(8)
+                                        .background(ClinicalTheme.backgroundMain)
+                                        .cornerRadius(8)
                                     }
                                 }
                             }
@@ -180,6 +229,7 @@ struct CalculatorView: View {
                 }
             }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
+            .addKeyboardDoneButton() // Applies to all inputs in this view
             .navigationTitle("MME Calculator")
             .navigationBarTitleDisplayMode(.inline)
         }
@@ -207,7 +257,7 @@ struct TargetDoseCard: View {
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(ClinicalTheme.teal500)
-                    Text(dose.unit + "/24h")
+                    Text(dose.unit + (dose.unit.contains("/hr") ? "" : "/24h"))
                         .font(.caption)
                         .scaleEffect(0.8)
                         .foregroundColor(ClinicalTheme.textSecondary)

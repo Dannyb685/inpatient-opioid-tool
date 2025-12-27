@@ -143,15 +143,49 @@ struct SBIRTModule: View {
                     
                     // Visual Asset Placeholder
                     // Visual Asset Placeholder
-                    Image(systemName: "wineglass.fill")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 100)
-                        .foregroundColor(ClinicalTheme.teal500)
-                        .padding()
-                        .background(ClinicalTheme.backgroundCard)
-                        .cornerRadius(12)
-                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                    HStack(alignment: .bottom, spacing: 12) {
+                        // Beer
+                        VStack {
+                            ZStack(alignment: .bottom) {
+                                RoundedRectangle(cornerRadius: 2).stroke(ClinicalTheme.textSecondary, lineWidth: 1).frame(width: 30, height: 60)
+                                RoundedRectangle(cornerRadius: 2).fill(ClinicalTheme.amber500.opacity(0.8)).frame(width: 30, height: 55)
+                            }
+                            Text("Beer").font(.caption2).bold()
+                            Text("12oz").font(.caption2).foregroundColor(.secondary)
+                        }
+                        // Malt
+                        VStack {
+                            ZStack(alignment: .bottom) {
+                                RoundedRectangle(cornerRadius: 2).stroke(ClinicalTheme.textSecondary, lineWidth: 1).frame(width: 25, height: 50)
+                                RoundedRectangle(cornerRadius: 2).fill(ClinicalTheme.amber500.opacity(0.6)).frame(width: 25, height: 40)
+                            }
+                            Text("Malt").font(.caption2).bold()
+                            Text("8oz").font(.caption2).foregroundColor(.secondary)
+                        }
+                        // Wine
+                        VStack {
+                            ZStack(alignment: .bottom) {
+                                Image(systemName: "wineglass").resizable().frame(width: 20, height: 30).foregroundColor(ClinicalTheme.textSecondary)
+                                Circle().fill(ClinicalTheme.rose500.opacity(0.8)).frame(width: 15, height: 15).offset(y: 4)
+                            }
+                            Text("Wine").font(.caption2).bold()
+                            Text("5oz").font(.caption2).foregroundColor(.secondary)
+                        }
+                        // Spirits
+                        VStack {
+                            ZStack(alignment: .bottom) {
+                                RoundedRectangle(cornerRadius: 1).stroke(ClinicalTheme.textSecondary, lineWidth: 1).frame(width: 20, height: 25)
+                                RoundedRectangle(cornerRadius: 1).fill(ClinicalTheme.textPrimary.opacity(0.8)).frame(width: 20, height: 15)
+                            }
+                            Text("Shot").font(.caption2).bold()
+                            Text("1.5oz").font(.caption2).foregroundColor(.secondary)
+                        }
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(ClinicalTheme.backgroundCard)
+                    .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                     
                     VStack(alignment: .leading, spacing: 0) {
                         ForEach(Array(ToolkitData.drinkEquivalents.enumerated()), id: \.offset) { index, item in
@@ -170,6 +204,22 @@ struct SBIRTModule: View {
                             }
                         }
                     }
+                    .background(ClinicalTheme.backgroundCard)
+                    .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                }
+                
+                // Opioid Visuals
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Opioid Potency (Oral MME Factor)").font(.headline).foregroundColor(ClinicalTheme.textPrimary).padding(.top, 16)
+                    
+                    VStack(spacing: 12) {
+                        PotencyBar(label: "Morphine", factor: 1.0, color: ClinicalTheme.teal500)
+                        PotencyBar(label: "Oxycodone", factor: 1.5, color: ClinicalTheme.amber500)
+                        PotencyBar(label: "Hydromorphone", factor: 4.0, color: ClinicalTheme.rose500)
+                        PotencyBar(label: "Fentanyl (IV)", factor: 100.0, color: .purple, isScaleBreak: true) // 0.1mg = 30 MME implies 300x? No, 100mcg = 30 MME. But visual needs to be readable.
+                    }
+                    .padding()
                     .background(ClinicalTheme.backgroundCard)
                     .cornerRadius(12)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
@@ -405,5 +455,41 @@ struct Badge: View {
             .background(color.opacity(0.1))
             .cornerRadius(4)
             .overlay(RoundedRectangle(cornerRadius: 4).stroke(color.opacity(0.3), lineWidth: 1))
+    }
+}
+
+struct PotencyBar: View {
+    let label: String
+    let factor: Double
+    let color: Color
+    var isScaleBreak: Bool = false
+    
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.caption)
+                .bold()
+                .foregroundColor(ClinicalTheme.textSecondary)
+                .frame(width: 100, alignment: .leading)
+            
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(ClinicalTheme.backgroundInput).frame(height: 8)
+                    if isScaleBreak {
+                        Capsule().fill(color).frame(width: geo.size.width, height: 8)
+                            .overlay(Text("100x+").font(.caption2).bold().foregroundColor(.white).padding(.leading, 4), alignment: .leading)
+                    } else {
+                        Capsule().fill(color).frame(width: geo.size.width * CGFloat(factor / 5.0), height: 8)
+                    }
+                }
+            }
+            .frame(height: 8)
+            
+            Text("\(String(format: "%.1f", factor))x")
+                .font(.caption)
+                .bold()
+                .foregroundColor(ClinicalTheme.textPrimary)
+                .frame(width: 40, alignment: .trailing)
+        }
     }
 }

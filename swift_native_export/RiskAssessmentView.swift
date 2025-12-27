@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RiskAssessmentView: View {
-    @StateObject private var store = AssessmentStore()
+    @EnvironmentObject var store: AssessmentStore
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showFullDetails = false
     
@@ -22,8 +22,16 @@ struct RiskAssessmentView: View {
                 }
             }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
-            .navigationTitle("Risk Assessment")
+            .navigationTitle("Opioid Risk Assessment")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Reset") {
+                        withAnimation { store.reset() }
+                    }
+                    .foregroundColor(.red)
+                }
+            }
             .sheet(isPresented: $showFullDetails) {
                 detailsSheet
             }
@@ -187,20 +195,11 @@ struct RiskAssessmentView: View {
             )
             
             // 7. Pain Type
-            VStack(alignment: .leading, spacing: 10) {
-                Text("7. Pain Type").font(.headline).foregroundColor(ClinicalTheme.teal500)
-                Picker("Pain", selection: $store.painType) {
-                    ForEach(PainType.allCases) { Text($0.rawValue).tag($0) }
-                }.pickerStyle(.menu)
-                .accentColor(ClinicalTheme.teal500)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(ClinicalTheme.backgroundCard)
-                .cornerRadius(10)
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-            }
-            .clinicalCard()
-            .padding(.horizontal)
+            SelectionView(
+                title: "7. Pain Type",
+                options: PainType.allCases,
+                selection: $store.painType
+            )
         }
     }
     

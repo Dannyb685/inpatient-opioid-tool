@@ -30,6 +30,52 @@ enum GIStatus: String, CaseIterable, Identifiable {
     var id: String { self.rawValue }
 }
 
+// MARK: - Safety Extensions
+extension DrugData {
+    // Dynamic Safety Resolver based on active patient Assessment
+    func getRenalBadge(patientRenal: RenalStatus) -> (label: String, color: Color, icon: String) {
+        if patientRenal == .normal {
+            return ("Compatible", ClinicalTheme.teal500, "checkmark.circle")
+        }
+        
+        switch self.renalSafety {
+        case "Unsafe":
+            return ("Avoid (Metabolites)", ClinicalTheme.rose500, "hand.raised.fill")
+        case "Caution":
+            if patientRenal == .dialysis {
+                return ("Strict Caution", ClinicalTheme.amber500, "exclamationmark.triangle.fill")
+            }
+            return ("Reduce Dose", ClinicalTheme.amber500, "exclamationmark.triangle.fill")
+        case "Safe":
+            return ("Safe Option", ClinicalTheme.teal500, "checkmark.shield.fill")
+        default:
+            return ("Monitor", .gray, "questionmark")
+        }
+    }
+    
+    func getHepaticBadge(patientHepatic: HepaticStatus) -> (label: String, color: Color, icon: String) {
+        if patientHepatic == .normal {
+            return ("Compatible", ClinicalTheme.teal500, "checkmark.circle")
+        }
+        
+        // Specific Hydromorphone Shunt Check
+        if self.name.contains("Hydromorphone") && patientHepatic == .failure {
+             return ("Caution (Shunt Risk)", ClinicalTheme.amber500, "exclamationmark.triangle.fill")
+        }
+
+        switch self.hepaticSafety {
+        case "Unsafe":
+            return ("Contraindicated", ClinicalTheme.rose500, "hand.raised.fill")
+        case "Caution":
+            return ("Reduce Dose", ClinicalTheme.amber500, "arrow.down.circle.fill")
+        case "Safe":
+            return ("Safe Option", ClinicalTheme.teal500, "checkmark.shield.fill")
+        default:
+            return ("Monitor", .gray, "questionmark")
+        }
+    }
+}
+
 enum OpioidRoute: String, CaseIterable, Identifiable {
     case iv = "IV / SQ"
     case po = "Oral (PO)"

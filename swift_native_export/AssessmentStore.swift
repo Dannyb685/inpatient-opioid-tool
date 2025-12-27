@@ -156,8 +156,23 @@ class AssessmentStore: ObservableObject {
         else if mat {
             recs.append(DrugRecommendation(name: "Home Buprenorphine", reason: "Maintenance.", detail: "Continue basal to prevent withdrawal.", type: .safe))
             recs.append(DrugRecommendation(name: "Breakthrough Agonist", reason: "Acute Pain.", detail: "High-affinity agonist (Fentanyl/Dilaudid) required.", type: .safe))
-            if route == .iv || route == .both { addIVRecs() }
-            if route == .po || route == .both { addPORecs() }
+            if route == .iv || route == .both { 
+                addIVRecs()
+                // FIX: Remove Morphine as it is blocked by Buprenorphine
+                // NEW (Stricter Blockade Logic):
+                let blockedDrugs = ["Morphine", "Oxycodone", "Codeine", "Hydrocodone", "Tramadol"]
+                recs.removeAll { rec in 
+                    blockedDrugs.contains { blocked in rec.name.contains(blocked) }
+                }
+            }
+            if route == .po || route == .both { 
+                addPORecs() 
+                // FIX: Remove Morphine PO
+                let blockedDrugs = ["Morphine", "Oxycodone", "Codeine", "Hydrocodone", "Tramadol"]
+                recs.removeAll { rec in 
+                    blockedDrugs.contains { blocked in rec.name.contains(blocked) }
+                }
+            }
         }
         else {
             if isRenalBad { warns.append("Avoid: Morphine, Codeine, Tramadol, Meperidine.") }
@@ -240,5 +255,14 @@ class AssessmentStore: ObservableObject {
         self.recommendations = recs
         self.adjuvants = adj
         self.warnings = warns
+    }
+    
+    func reset() {
+        age = ""; sex = .male; naive = false; mat = false
+        renalFunction = .normal; hepaticFunction = .normal; hemo = .stable
+        gi = .intact; route = .iv; indication = .standard; painType = .nociceptive
+        sleepApnea = false; chf = false; benzos = false; copd = false
+        psychHistory = false
+        calculate()
     }
 }

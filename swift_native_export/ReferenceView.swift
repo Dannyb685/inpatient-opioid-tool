@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ReferenceView: View {
+    @EnvironmentObject var store: AssessmentStore // Add this
     @EnvironmentObject var themeManager: ThemeManager
     @State private var searchText = ""
     // Track expanded item ID locally
@@ -78,9 +79,13 @@ struct ReferenceCard: View {
     let drug: DrugData
     let isExpanded: Bool
     let onTap: () -> Void
+    @EnvironmentObject var store: AssessmentStore
     
     var body: some View {
-        VStack(spacing: 0) {
+        let renalBadge = drug.getRenalBadge(patientRenal: store.renalFunction)
+        let hepaticBadge = drug.getHepaticBadge(patientHepatic: store.hepaticFunction)
+        
+        return VStack(spacing: 0) {
             // Header
             Button(action: onTap) {
                 HStack {
@@ -90,7 +95,12 @@ struct ReferenceCard: View {
                                 .font(.headline)
                                 .foregroundColor(ClinicalTheme.textPrimary)
                             
-                            SafetyBadge(safety: drug.renalSafety, label: "Renal")
+
+                            // Dynamic Badges
+                            ReferenceBadgeView(label: renalBadge.label, color: renalBadge.color, icon: renalBadge.icon)
+                            if hepaticBadge.label != "Compatible" {
+                                ReferenceBadgeView(label: hepaticBadge.label, color: hepaticBadge.color, icon: hepaticBadge.icon)
+                            }
                         }
                         Text(drug.type)
                             .font(.caption)
@@ -190,27 +200,23 @@ struct ReferenceCard: View {
     }
 }
 
-struct SafetyBadge: View {
-    let safety: String
+struct ReferenceBadgeView: View {
     let label: String
-    
-    var color: Color {
-        switch safety {
-        case "Safe": return ClinicalTheme.teal500
-        case "Caution": return ClinicalTheme.amber500
-        case "Unsafe": return ClinicalTheme.rose500
-        default: return ClinicalTheme.textMuted
-        }
-    }
+    let color: Color
+    let icon: String
     
     var body: some View {
-        Text(safety == "Safe" ? "\(label) Safe" : (safety == "Unsafe" ? "Avoid" : "Caution"))
-            .font(.system(size: 10, weight: .bold))
-            .foregroundColor(color)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(color.opacity(0.15))
-            .cornerRadius(4)
-            .overlay(RoundedRectangle(cornerRadius: 4).stroke(color.opacity(0.3), lineWidth: 1))
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 8))
+            Text(label)
+                .font(.system(size: 10, weight: .bold))
+        }
+        .foregroundColor(color)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .background(color.opacity(0.15))
+        .cornerRadius(4)
+        .overlay(RoundedRectangle(cornerRadius: 4).stroke(color.opacity(0.3), lineWidth: 1))
     }
 }
