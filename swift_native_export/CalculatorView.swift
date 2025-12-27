@@ -104,14 +104,14 @@ struct CalculatorView: View {
                                     List {
                                         ForEach(store.inputs.filter { $0.isVisible }) { input in
                                             ActiveMedicationRow(input: input, store: store)
-                                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                                                .listRowBackground(Color.clear)
                                                 .listRowSeparator(.hidden)
+                                                .listRowBackground(Color.clear)
+                                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                                         }
                                     }
-                                    .frame(minHeight: CGFloat(store.inputs.filter { $0.isVisible }.count) * 100)
                                     .listStyle(.plain)
-                                    .padding(.horizontal)
+                                    .scrollDisabled(true)
+                                    .frame(height: CGFloat(store.inputs.filter { $0.isVisible }.count) * 92) // Exact height for 76pt card + 16pt spacing
                                 }
                             }
                             
@@ -332,7 +332,7 @@ struct CalculatorView: View {
                             .cornerRadius(12)
                             .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, style: StrokeStyle(lineWidth: 1, dash: [5])))
                             .padding(.horizontal)
-                            .padding(.bottom, 40)
+                            .padding(.bottom, 140)
                             
                             Spacer().frame(height: 100)
                 }
@@ -440,15 +440,15 @@ struct ActiveMedicationRow: View {
     var body: some View {
         HStack(spacing: 12) {
             // Label
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(input.name)
-                    .font(.body)
-                    .fontWeight(.medium)
+                    .font(.system(size: 16, weight: .semibold)) // Explicit Hierarchy
                     .foregroundColor(ClinicalTheme.textPrimary)
                 
                 Text(routeLabel(for: input.routeType))
-                    .font(.caption2)
+                    .font(.system(size: 13, weight: .regular))
                     .foregroundColor(ClinicalTheme.textSecondary)
+                    .padding(.top, 2) // Separation
                     
                 // SAFETY: Inline Contraindication Warning
                 if shouldFlagContraindication(for: input) {
@@ -482,6 +482,7 @@ struct ActiveMedicationRow: View {
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 12)
+            .frame(height: 44) // Standard Touch Target
             .background(ClinicalTheme.backgroundInput)
             .cornerRadius(8)
             .overlay(
@@ -495,6 +496,10 @@ struct ActiveMedicationRow: View {
                     .foregroundColor(ClinicalTheme.amber500)
             }
         }
+        .padding(.vertical, 16)
+        .padding(.horizontal, 12)
+        .background(ClinicalTheme.backgroundCard)
+        .cornerRadius(12)
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
