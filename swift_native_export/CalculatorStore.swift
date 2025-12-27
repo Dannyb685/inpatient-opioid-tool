@@ -1,4 +1,5 @@
 import UIKit // For Haptics
+import Combine
 
 // MARK: - Calculator Data Models
 struct CalculatorInput: Identifiable {
@@ -19,6 +20,7 @@ struct TargetDose: Identifiable {
     let breakthrough: String // ~10% of TDD
     let unit: String
     let ratioLabel: String
+    var originalDaily: String? // for showing strikethrough of unadjusted dose
 }
 
 enum DrugRouteType {
@@ -92,18 +94,7 @@ class CalculatorStore: ObservableObject {
     @Published var targetDoses: [TargetDose] = []
     @Published var warningText: String = ""
     @Published var calculationReceipt: [String] = []
-
-    @Published var calculationReceipt: [String] = []
     
-    @Published var showNaloxoneAlert: Bool = false {
-        didSet {
-            // HAPTIC SAFETY: Trigger Error haptic on new Red Alert
-            if !oldValue && showNaloxoneAlert {
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.error)
-            }
-        }
-    }
     @Published var complianceWarning: String = "Standard / Reason for Rotation (25-40%). Routine rotation or standard safety margin (2025 Consensus)."
     
     init() {
@@ -239,7 +230,9 @@ class CalculatorStore: ObservableObject {
                 if renalStatus == .dialysis {
                     activeWarnings.append("⚠️ AVOID CODEINE: Metabolites accumulate in dialysis.")
                 }
-            case "tramadol": factor = 0.1
+            case "tramadol": 
+                factor = 0.2 // Updated CDC 2022
+                if activeWarnings.isEmpty { activeWarnings.append("NOTE: Tramadol factor updated to 0.2 per CDC 2022.") }
             case "tapentadol": factor = 0.4
             case "meperidine": 
                 factor = 0.1
@@ -310,15 +303,8 @@ class CalculatorStore: ObservableObject {
             activeWarnings.append("⚠️ >90 MME: High Overdose Risk. Naloxone indicated.")
         }
         
-        // Naloxone Flag (CDC 2022 Criteria)
-        // 1. >50 MME
-        // 2. Benzos
-        // 3. Hx Overdose / SUD
-        // 4. Sleep-Disordered Breathing (Apnea, COPD not explicitly but Apnea is)
         if totalMME > 50 || matchesBenzos || historyOverdose || sleepApnea {
-            self.showNaloxoneAlert = true
-        } else {
-            self.showNaloxoneAlert = false
+            activeWarnings.append("📋 RECOMMENDATION: Prescribe Naloxone (High Overdose Risk per CDC criteria).")
         }
         
         self.warningText = activeWarnings.joined(separator: "\n")
@@ -489,12 +475,67 @@ class CalculatorStore: ObservableObject {
     }
     
     private func createTarget(drug: String, route: String, total: Double, ratio: String, unit: String) -> TargetDose {
-        let bt = total * 0.10
+        var adjustedTotal = total
+        var adjustmentNote = ratio
+        var originalTotalString: String? = nil
+        
+        // 1. Renal Adjustment: Hydromorphone
+        if drug.contains("Hydromorphone") && renalStatus != .normal {
+            // Dialysis: 0.25 (75% reduction) | Impaired: 0.5 (50% reduction)
+            let reductionFactor: Double = (renalStatus == .dialysis) ? 0.25 : 0.5
+            
+            // Store original before modifying
+            originalTotalString = String(format: "%.1f", total)
+            
+            adjustedTotal = total * reductionFactor
+            let percentage = Int((1.0 - reductionFactor) * 100)
+            adjustmentNote = "\(ratio) | ⚠️ Renal: -\(percentage)% (FDA)"
+        }
+        
+        // 2. Renal Adjustment: Morphine
+
+        else if drug.contains("Morphine") && renalStatus != .normal {
+            if renalStatus == .dialysis {
+                // Hard Avoidance
+                adjustmentNote = "⚠️ CONTRAINDICATED (Neurotoxic Metabolites)"
+                adjustedTotal = 0 // Will result in 0.0 displayed but handled by View logic ideally, or just text warning
+                return TargetDose(
+                    drug: drug, route: route,
+                    totalDaily: "AVOID",
+                    breakthrough: "N/A",
+                    unit: unit, ratioLabel: adjustmentNote,
+                    originalDaily: String(format: "%.1f", total)
+                )
+            } else {
+                 // Impaired: 0.75 (25% reduction)
+                let reductionFactor: Double = 0.75
+                originalTotalString = String(format: "%.1f", total)
+                adjustedTotal = total * reductionFactor
+                adjustmentNote = "\(ratio) | ⚠️ Renal: -25% (Metabolites)"
+            }
+        }
+        
+        // 3. Hepatic Adjustment: Hydromorphone PO (Failure only)
+        if drug.contains("Hydromorphone") && route.contains("PO") && hepaticStatus == .failure {
+             // User Request: Replace math with Specialist Consult
+             return TargetDose(
+                drug: drug, route: route,
+                totalDaily: "CONSULT",
+                breakthrough: "N/A",
+                unit: unit, 
+                ratioLabel: "\(ratio) | ⚠️ CONTRAINDICATED (Hepatic Shunting Risk)",
+                originalDaily: String(format: "%.1f", total)
+             )
+        }
+
+        let bt = adjustedTotal * 0.10
+        
         return TargetDose(
             drug: drug, route: route,
-            totalDaily: String(format: "%.1f", total),
+            totalDaily: String(format: "%.1f", adjustedTotal),
             breakthrough: String(format: "%.1f", bt),
-            unit: unit, ratioLabel: ratio
+            unit: unit, ratioLabel: adjustmentNote,
+            originalDaily: originalTotalString
         )
     }
     

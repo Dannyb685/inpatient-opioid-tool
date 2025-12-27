@@ -4,16 +4,16 @@ import SwiftUI
 // MARK: - Enums (Replicating React State Options)
 
 enum RenalStatus: String, CaseIterable, Identifiable {
-    case normal = "Normal (>30)"
-    case impaired = "Impaired (<30)"
-    case dialysis = "Dialysis"
+    case normal = "Normal (>60)"
+    case impaired = "Mild/Mod (30-60)"
+    case dialysis = "Severe / Failure (<30)"
     var id: String { self.rawValue }
 }
 
 enum HepaticStatus: String, CaseIterable, Identifiable {
-    case normal = "Normal"
-    case impaired = "Impaired (A/B)"
-    case failure = "Failure (C)"
+    case normal = "Normal (Class A)"
+    case impaired = "Moderate (Class B)"
+    case failure = "Severe (Class C)"
     var id: String { self.rawValue }
 }
 
@@ -78,7 +78,7 @@ extension DrugData {
 
 enum OpioidRoute: String, CaseIterable, Identifiable {
     case both = "Both / Either"
-    case iv = "IV / SQ"
+    case iv = "Injectable (IV/SQ)"
     case po = "Oral (PO)"
     var id: String { self.rawValue }
 }

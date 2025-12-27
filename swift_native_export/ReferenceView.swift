@@ -103,120 +103,147 @@ struct ReferenceView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Search Bar
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(ClinicalTheme.textSecondary)
-                    TextField("Search drug, metabolite, mechanism...", text: $searchText)
-                        .foregroundColor(ClinicalTheme.textPrimary)
-                }
-                .padding()
-                .background(ClinicalTheme.backgroundCard)
-                .cornerRadius(12)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                .padding()
-                
-                ScrollView {
-                    VStack(spacing: 12) {
-                        ForEach(filteredDrugs) { drug in
-                            ReferenceCard(drug: drug, isExpanded: expandedId == drug.id) {
-                                withAnimation(.spring()) {
-                                    if expandedId == drug.id {
-                                        expandedId = nil
-                                    } else {
-                                        expandedId = drug.id
-                                    }
+            ReferenceContentView(searchText: $searchText, expandedId: $expandedId)
+                .navigationTitle("Pharmacology")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        HStack(spacing: 16) {
+                            Button(action: {
+                                withAnimation {
+                                    themeManager.isDarkMode.toggle()
                                 }
+                            }) {
+                                Image(systemName: themeManager.isDarkMode ? "sun.max.fill" : "moon.stars.fill")
+                                    .foregroundColor(ClinicalTheme.textSecondary)
+                            }
+                            
+                            Button(action: {
+                                showSettings = true
+                            }) {
+                                Image(systemName: "gearshape.fill")
+                                    .foregroundColor(ClinicalTheme.teal500)
                             }
                         }
                     }
-                    .padding(.horizontal)
-                    
-                    Divider().padding(.vertical, 8)
-                    
-                    // CITATIONS & REFERENCES SECTION
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Clinical References")
-                            .font(.title2).bold().foregroundColor(ClinicalTheme.teal500)
-                            .padding(.horizontal)
-                        
-                        // Disclaimer Card
-                        DisclaimerCard()
-                            .padding(.horizontal)
+                }
+                .sheet(isPresented: $showSettings) {
+                    SettingsView()
+                }
+        }
+    }
+}
 
-                        // Reference Categories
-                        ForEach(ReferenceLibrary.categories) { category in
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
-                                    Image(systemName: category.icon).foregroundColor(ClinicalTheme.teal500)
-                                    Text(category.name).font(.headline).foregroundColor(ClinicalTheme.textPrimary)
-                                }
-                                .padding(.horizontal)
-                                
-                                VStack(spacing: 0) {
-                                    ForEach(category.items) { item in
-                                        Link(destination: URL(string: item.urlString)!) {
-                                            ReferenceRow(item: item)
-                                        }
-                                        .buttonStyle(PlainButtonStyle()) // Important for list look
-                                        
-                                        if item.id != category.items.last?.id {
-                                            Divider()
-                                        }
-                                    }
-                                }
-                                .background(ClinicalTheme.backgroundCard)
-                                .cornerRadius(12)
-                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                                .padding(.horizontal)
-                            }
-                            .padding(.bottom, 8)
-                        }
-                        
-                        // Footer
-                        VStack(alignment: .center, spacing: 4) {
-                            Text("Opioid Precision v1.0")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            Text("© 2025 Clinical Tools Inc.")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, 20)
-                    }
-                    .padding(.bottom, 40)
-                }
-            }
-            .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
-            .navigationTitle("Pharmacology")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack(spacing: 16) {
-                        Button(action: {
-                            withAnimation {
-                                themeManager.isDarkMode.toggle()
-                            }
-                        }) {
-                            Image(systemName: themeManager.isDarkMode ? "sun.max.fill" : "moon.stars.fill")
-                                .foregroundColor(ClinicalTheme.textSecondary)
-                        }
-                        
-                        Button(action: {
-                            showSettings = true
-                        }) {
-                            Image(systemName: "gearshape.fill")
-                                .foregroundColor(ClinicalTheme.teal500)
-                        }
-                    }
-                }
-            }
-            .sheet(isPresented: $showSettings) {
-                SettingsView()
+struct ReferenceContentView: View {
+    @EnvironmentObject var store: AssessmentStore
+    @EnvironmentObject var themeManager: ThemeManager
+    @Binding var searchText: String
+    @Binding var expandedId: String?
+    
+    var filteredDrugs: [DrugData] {
+        if searchText.isEmpty {
+            return ClinicalData.drugData
+        } else {
+            return ClinicalData.drugData.filter { drug in
+                drug.name.localizedCaseInsensitiveContains(searchText) ||
+                drug.clinicalNuance.localizedCaseInsensitiveContains(searchText) ||
+                drug.type.localizedCaseInsensitiveContains(searchText)
             }
         }
+    }
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Search Bar
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(ClinicalTheme.textSecondary)
+                TextField("Search drug, metabolite, mechanism...", text: $searchText)
+                    .foregroundColor(ClinicalTheme.textPrimary)
+            }
+            .padding()
+            .background(ClinicalTheme.backgroundCard)
+            .cornerRadius(12)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+            .padding()
+            
+            ScrollView {
+                VStack(spacing: 12) {
+                    ForEach(filteredDrugs) { drug in
+                        ReferenceCard(drug: drug, isExpanded: expandedId == drug.id) {
+                            withAnimation(.spring()) {
+                                if expandedId == drug.id {
+                                    expandedId = nil
+                                } else {
+                                    expandedId = drug.id
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal)
+                
+                Divider().padding(.vertical, 8)
+                
+                // CITATIONS \u0026 REFERENCES SECTION
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Clinical References")
+                        .font( .title2).bold().foregroundColor(ClinicalTheme.teal500)
+                        .padding(.horizontal)
+                    
+                    // Disclaimer Card
+                    DisclaimerCard()
+                        .padding(.horizontal)
+
+                    // Reference Categories
+                    ForEach(ReferenceLibrary.categories) { category in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Image(systemName: category.icon).foregroundColor(ClinicalTheme.teal500)
+                                Text(category.name).font(.headline).foregroundColor(ClinicalTheme.textPrimary)
+                            }
+                            .padding(.horizontal)
+                            
+                            VStack(spacing: 0) {
+                                ForEach(category.items) { item in
+                                    if let url = URL(string: item.urlString) {
+                                        Link(destination: url) {
+                                            ReferenceRow(item: item)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    } else {
+                                        ReferenceRow(item: item)
+                                    }
+                                    
+                                    if item.id != category.items.last?.id {
+                                        Divider()
+                                    }
+                                }
+                            }
+                            .background(ClinicalTheme.backgroundCard)
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                            .padding(.horizontal)
+                        }
+                        .padding(.bottom, 8)
+                    }
+                    
+                    // Footer
+                    VStack(alignment: .center, spacing: 4) {
+                        Text("Opioid Precision v1.0")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Text("\u{00A9} 2025 Clinical Tools Inc.")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 20)
+                }
+                .padding(.bottom, 40)
+            }
+        }
+        .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
     }
 }
 

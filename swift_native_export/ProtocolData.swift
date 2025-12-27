@@ -140,6 +140,12 @@ struct ProtocolData {
             "IV Propofol 10 mg IVP q5 min (Intractable migraine)",
             "Refractory: Ketamine 0.2-0.3 mg/kg short infusion"
         ]),
+        ConditionGuide(title: "Medical Cannabis (Adjuvant)", recommendations: [
+            "Indication: Select outpatients w/ chronic pain on long-term opioids (Regulated states only).",
+            "Evidence: Potential 22-51% opioid dose reduction (Observational). RCT data limited.",
+            "Protocol: Requires structured initiation, frequent monitoring & multimodal integration.",
+            "Contraindications: Pregnancy, Active SUD, Unstable Psychiatric Conditions."
+        ]),
         ConditionGuide(title: "MSK (Musculoskeletal)", recommendations: [
             "US guided nerve block",
             "IV Ketorolac 10-15 mg OR IV Diclofenac 75 mg OR IV Metimazole 1g",

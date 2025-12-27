@@ -19,7 +19,7 @@ struct RiskAssessmentView: View {
                 
                 // MARK: - SCROLLABLE INPUTS
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 24) {
                         // MODE TOGGLE
                         Picker("Assessment Mode", selection: Binding(
                             get: { self.isQuickMode },
@@ -41,6 +41,7 @@ struct RiskAssessmentView: View {
                         riskFactorsSection
                     }
                     .padding(.top)
+                    .padding(.bottom, 100)
                 }
             }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
@@ -162,9 +163,7 @@ struct RiskAssessmentView: View {
                         .padding()
                         .background(ClinicalTheme.backgroundInput)
                         .cornerRadius(8)
-                        .addKeyboardDoneButton()
                 }
-                VStack(alignment: .leading) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Sex").font(.caption).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
                     Picker("Sex", selection: $store.sex) {
@@ -174,7 +173,6 @@ struct RiskAssessmentView: View {
                     }
                     .pickerStyle(.segmented)
                     .colorMultiply(ClinicalTheme.teal500) // Tint for segmented picker
-                }
                 }
             }
             .padding(.horizontal)
@@ -222,149 +220,33 @@ struct RiskAssessmentView: View {
                 }
             )
             
-            // 3. Renal Function (Toggle in Quick Mode)
-            if isQuickMode {
-                VStack(spacing: 8) {
-                    Toggle(isOn: Binding(
-                        get: { store.renalFunction != .normal },
-                        set: { 
-                            UISelectionFeedbackGenerator().selectionChanged()
-                            store.renalFunction = $0 ? .impaired : .normal 
-                        }
-                    )) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("3. Renal Impairment / CKD").font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
-                            Text("Maps to CrCl <60 (Standard Precautions)").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-                        }
-                    }
-                    .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.amber500))
-                    
-                    if store.renalFunction != .normal {
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundColor(store.renalFunction == .dialysis ? ClinicalTheme.rose500 : ClinicalTheme.amber500)
-                                Text("Status: \(store.renalFunction.rawValue)")
-                                    .font(.caption).bold()
-                                    .foregroundColor(ClinicalTheme.textPrimary)
-                            }
-                            Text("Is the patient on Dialysis? Strict avoidance of Morphine/Codeine required to prevent neurotoxicity.")
-                                .font(.system(size: 10))
-                                .foregroundColor(ClinicalTheme.textSecondary)
-                            
-                            Button(action: {
-                                let isEscalating = (store.renalFunction != .dialysis)
-                                if isEscalating { UINotificationFeedbackGenerator().notificationOccurred(.error) }
-                                else { UISelectionFeedbackGenerator().selectionChanged() }
-                                
-                                withAnimation {
-                                    store.renalFunction = (store.renalFunction == .dialysis) ? .impaired : .dialysis
-                                }
-                            }) {
-                                Text(store.renalFunction == .dialysis ? "Revert to Standard CKD" : "Escalate to Dialysis")
-                                    .font(.caption2).bold()
-                                    .foregroundColor(store.renalFunction == .dialysis ? ClinicalTheme.teal500 : ClinicalTheme.rose500)
-                                    .padding(.vertical, 4)
-                                    .padding(.horizontal, 8)
-                                    .background((store.renalFunction == .dialysis ? ClinicalTheme.teal500 : ClinicalTheme.rose500).opacity(0.1))
-                                    .cornerRadius(6)
-                            }
-                        }
-                        .padding(8)
-                        .background(ClinicalTheme.backgroundMain.opacity(0.3))
-                        .cornerRadius(8)
+            // 3. Renal Function (CrCl)
+            SelectionView(
+                title: "3. Renal Function (CrCl)",
+                options: RenalStatus.allCases,
+                selection: $store.renalFunction,
+                colorMapper: { status in
+                    switch status {
+                    case .normal: return ClinicalTheme.teal500
+                    case .impaired: return ClinicalTheme.amber500
+                    case .dialysis: return ClinicalTheme.rose500
                     }
                 }
-                .padding()
-                .background(ClinicalTheme.backgroundCard)
-                .cornerRadius(12)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-            } else {
-                SelectionView(
-                    title: "3. Renal Function (CrCl)",
-                    options: RenalStatus.allCases,
-                    selection: $store.renalFunction,
-                    colorMapper: { status in
-                        switch status {
-                        case .normal: return ClinicalTheme.teal500
-                        case .impaired: return ClinicalTheme.amber500
-                        case .dialysis: return ClinicalTheme.rose500
-                        }
-                    }
-                )
-            }
+            )
             
-            // 4. Hepatic Function (Toggle in Quick Mode)
-            if isQuickMode {
-                VStack(spacing: 8) {
-                    Toggle(isOn: Binding(
-                        get: { store.hepaticFunction != .normal },
-                        set: { 
-                            UISelectionFeedbackGenerator().selectionChanged()
-                            store.hepaticFunction = $0 ? .impaired : .normal 
-                        }
-                    )) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("4. Liver Disease / Impairment").font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
-                            Text("Maps to Child-Pugh B (Standard Precautions)").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-                        }
-                    }
-                    .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.amber500))
-                    
-                    if store.hepaticFunction != .normal {
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundColor(store.hepaticFunction == .failure ? ClinicalTheme.rose500 : ClinicalTheme.amber500)
-                                Text("Status: \(store.hepaticFunction.rawValue)")
-                                    .font(.caption).bold()
-                                    .foregroundColor(ClinicalTheme.textPrimary)
-                            }
-                            Text("Does this patient have LIVER FAILURE (Child-Pugh C)? Hydromorphone bioavailability increases 4x vs baseline.")
-                                .font(.system(size: 10))
-                                .foregroundColor(ClinicalTheme.textSecondary)
-                            
-                            Button(action: {
-                                let isEscalating = (store.hepaticFunction != .failure)
-                                if isEscalating { UINotificationFeedbackGenerator().notificationOccurred(.error) }
-                                else { UISelectionFeedbackGenerator().selectionChanged() }
-                                
-                                withAnimation {
-                                    store.hepaticFunction = (store.hepaticFunction == .failure) ? .impaired : .failure
-                                }
-                            }) {
-                                Text(store.hepaticFunction == .failure ? "Revert to Moderate Impairment" : "Escalate to Liver Failure (Child-Pugh C)")
-                                    .font(.caption2).bold()
-                                    .foregroundColor(store.hepaticFunction == .failure ? ClinicalTheme.teal500 : ClinicalTheme.rose500)
-                                    .padding(.vertical, 4)
-                                    .padding(.horizontal, 8)
-                                    .background((store.hepaticFunction == .failure ? ClinicalTheme.teal500 : ClinicalTheme.rose500).opacity(0.1))
-                                    .cornerRadius(6)
-                            }
-                        }
-                        .padding(8)
-                        .background(ClinicalTheme.backgroundMain.opacity(0.3))
-                        .cornerRadius(8)
+            // 4. Hepatic Function
+            SelectionView(
+                title: "4. Hepatic Function",
+                options: HepaticStatus.allCases,
+                selection: $store.hepaticFunction,
+                colorMapper: { status in
+                    switch status {
+                    case .normal: return ClinicalTheme.teal500
+                    case .impaired: return ClinicalTheme.amber500
+                    case .failure: return ClinicalTheme.rose500
                     }
                 }
-                .padding()
-                .background(ClinicalTheme.backgroundCard)
-                .cornerRadius(12)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-            } else {
-                SelectionView(
-                    title: "4. Hepatic Function",
-                    options: HepaticStatus.allCases,
-                    selection: $store.hepaticFunction,
-                    colorMapper: { status in
-                        switch status {
-                        case .normal: return ClinicalTheme.teal500
-                        case .impaired: return ClinicalTheme.amber500
-                        case .failure: return ClinicalTheme.rose500
-                        }
-                    }
-                )
-            }
+            )
             
             // 5. GI / Mental Status (HIDDEN IN QUICK MODE)
             if !isQuickMode {
@@ -539,6 +421,7 @@ struct RiskAssessmentView: View {
         default: return ClinicalTheme.teal500
         }
     }
+}
 
 // Helper Components
 // RiskAssessmentView.swift - Removing InputSection as it is replaced by SelectionView

@@ -24,8 +24,8 @@ struct ScoreResultCard: View {
     }
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
+        HStack(spacing: 20) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(title)
                     .font(.headline)
                     .foregroundColor(ClinicalTheme.textPrimary)
@@ -35,25 +35,25 @@ struct ScoreResultCard: View {
                         .foregroundColor(ClinicalTheme.textSecondary)
                 }
             }
+            
             Spacer()
             
             // Score & Badge Column
-            VStack(alignment: .trailing, spacing: 4) {
+            VStack(alignment: .trailing, spacing: 6) {
                // Badge
                 Text(badgeText)
                     .font(.caption2)
-                    .fontWeight(.bold)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .fontWeight(.black)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
                     .background(badgeColor.opacity(0.15))
                     .foregroundColor(badgeColor)
-                    .cornerRadius(6)
+                    .cornerRadius(8)
                 
                 // Score Value
-                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(value)
-                        .font(.title2)
-                        .fontWeight(.black)
+                        .font(.system(size: 28, weight: .black))
                         .foregroundColor(badgeColor)
                     
                     if let label = valueLabel {
@@ -65,6 +65,7 @@ struct ScoreResultCard: View {
                 }
             }
         }
+        .padding(.vertical, 8)
         .clinicalCard()
     }
 }

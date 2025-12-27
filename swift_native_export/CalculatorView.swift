@@ -14,7 +14,8 @@ struct CalculatorView: View {
     // UI State
     @State private var showAddDrugSheet = false
     @State private var showComplexHelpers = false
-    @State private var expandedInfoTab: String? = "Instructions & Warnings"
+
+    @State private var expandedInfoTab: String? = nil // Collapsed by default (User Feedback)
     @State private var showAdjuvants: Bool = false // Default collapsed (v1.5.5)
     @State private var showMathSheet = false // Show Math Feature
     
@@ -25,30 +26,34 @@ struct CalculatorView: View {
                 // BACKGROUND
                 ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all)
                 
-                VStack(spacing: 0) {
+                VStack(spacing: 20) {
+                    VStack(spacing: 0) {
                     
                     // MARK: - 1. PINNED RESULT CARD (Hero)
                     // Matches visual consistency of Assessment View
-                    VStack(spacing: 0) {
-                        ScoreResultCard(
-                            title: "Total 24h MME",
-                            subtitle: "Oral Morphine Equivalents",
-                            value: store.resultMME,
-                            valueLabel: "mg daily",
-                            badgeText: store.resultMME == "---" ? "Exclusion" : "Daily Load",
-                            badgeColor: store.resultMME == "---" ? ClinicalTheme.amber500 : ClinicalTheme.teal500
-                        )
-                        .overlay(alignment: .trailing) {
+                        HStack(spacing: 12) {
+                            ScoreResultCard(
+                                title: "Total 24h MME",
+                                subtitle: "Oral Morphine Equivalents",
+                                value: store.resultMME,
+                                valueLabel: "mg daily",
+                                badgeText: store.resultMME == "---" ? "Exclusion" : "Daily Load",
+                                badgeColor: store.resultMME == "---" ? ClinicalTheme.amber500 : ClinicalTheme.teal500
+                            )
+                            
                             Button(action: { showMathSheet = true }) {
-                                Image(systemName: "function")
-                                    .font(.caption).bold()
-                                    .padding(8)
-                                    .background(ClinicalTheme.teal500.opacity(0.1))
-                                    .foregroundColor(ClinicalTheme.teal500)
-                                    .clipShape(Circle())
+                                VStack(spacing: 4) {
+                                    Image(systemName: "function")
+                                        .font(.title3).bold()
+                                    Text("Calc").font(.system(size: 10, weight: .bold))
+                                }
+                                .padding(12)
+                                .background(ClinicalTheme.teal500.opacity(0.1))
+                                .foregroundColor(ClinicalTheme.teal500)
+                                .cornerRadius(12)
                             }
-                            .padding(.trailing, 16)
                         }
+                        .padding(.horizontal)
                         
                         // Stewardship Warning (if any)
                         if !store.warningText.isEmpty {
@@ -96,11 +101,16 @@ struct CalculatorView: View {
                                 if store.inputs.filter({ $0.isVisible }).isEmpty {
                                     EmptyStateView(action: { showAddDrugSheet = true })
                                 } else {
-                                    VStack(spacing: 12) {
+                                    List {
                                         ForEach(store.inputs.filter { $0.isVisible }) { input in
                                             ActiveMedicationRow(input: input, store: store)
+                                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                                                .listRowBackground(Color.clear)
+                                                .listRowSeparator(.hidden)
                                         }
                                     }
+                                    .frame(minHeight: CGFloat(store.inputs.filter { $0.isVisible }.count) * 100)
+                                    .listStyle(.plain)
                                     .padding(.horizontal)
                                 }
                             }
@@ -162,6 +172,7 @@ struct CalculatorView: View {
                                             }
                                         }
                                         .padding(10)
+                                        .frame(maxWidth: .infinity)
                                         .background(ClinicalTheme.backgroundMain.opacity(0.5))
                                         .cornerRadius(8)
                                     }
@@ -204,6 +215,7 @@ struct CalculatorView: View {
                                             }
                                         }
                                         .padding(10)
+                                        .frame(maxWidth: .infinity)
                                         .background(ClinicalTheme.backgroundMain.opacity(0.5))
                                         .cornerRadius(8)
                                     }
@@ -223,7 +235,22 @@ struct CalculatorView: View {
                                 .background(ClinicalTheme.backgroundCard)
                                 .cornerRadius(12)
                                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                                .padding()
+                                .background(ClinicalTheme.backgroundCard)
+                                .cornerRadius(12)
+                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                                 .padding(.horizontal)
+                                
+                                // LOGIC CLARIFICATION
+                                if assessmentStore.renalFunction != .normal || assessmentStore.hepaticFunction != .normal {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "shield.lefthalf.filled").foregroundColor(ClinicalTheme.teal500)
+                                        Text("Safety Logic: Renal/Hepatic restrictions applied IN ADDITION to this reduction.")
+                                            .font(.caption2)
+                                            .foregroundColor(ClinicalTheme.textSecondary)
+                                    }
+                                    .padding(.horizontal, 24)
+                                }
                                 
                                 // Warning Banner
                                 if !store.warningText.isEmpty {
@@ -306,17 +333,17 @@ struct CalculatorView: View {
                             .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, style: StrokeStyle(lineWidth: 1, dash: [5])))
                             .padding(.horizontal)
                             .padding(.bottom, 40)
-                        }
-                        .padding(.top, 20)
-                    }
+                            
+                            Spacer().frame(height: 100)
                 }
             }
+        }
             .navigationTitle("MME Calculator")
             .navigationBarTitleDisplayMode(.inline)
-            .addKeyboardDoneButton()
+            // Removed redundant done button modifier
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack {
+                    HStack(spacing: 16) {
                         Button(action: copyToClipboard) {
                             Image(systemName: "doc.on.doc")
                                 .foregroundColor(ClinicalTheme.teal500)
@@ -330,6 +357,12 @@ struct CalculatorView: View {
                             Image(systemName: themeManager.isDarkMode ? "sun.max.fill" : "moon.stars.fill")
                                 .foregroundColor(ClinicalTheme.teal500)
                         }
+                        
+                        Button("Done") {
+                            UIApplication.shared.endEditing()
+                        }
+                        .font(.subheadline.bold())
+                        .foregroundColor(ClinicalTheme.teal500)
                     }
                 }
             }
@@ -341,13 +374,6 @@ struct CalculatorView: View {
             }
 
             .overlay(alignment: .top) {
-                if store.showNaloxoneAlert {
-                    NaloxoneBanner(dismiss: {
-                         withAnimation { store.showNaloxoneAlert = false } // Session dismiss
-                    })
-                    .transition(.move(edge: .top))
-                    .zIndex(100)
-                }
             }
             .overlay {
                 if store.isPediatric {
@@ -365,7 +391,8 @@ struct CalculatorView: View {
             .onChange(of: assessmentStore.age) { syncWithAssessment() }
             .preferredColorScheme(themeManager.isDarkMode ? .dark : .light)
         }
-
+    }
+    } // Close body
     
     private func syncWithAssessment() {
         store.giStatus = assessmentStore.gi
@@ -397,7 +424,6 @@ struct CalculatorView: View {
         
         Plan:
         \(store.warningText.isEmpty ? "- Standard monitoring" : "- Caution: High Risk. " + store.warningText)
-        \(store.showNaloxoneAlert ? "- Naloxone Co-prescribed (Overdose Risk)." : "")
         - PDMP Checked.
         """
         UIPasteboard.general.string = note
@@ -413,13 +439,6 @@ struct ActiveMedicationRow: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            // Delete Button
-            Button(action: { withAnimation { store.removeInput(inputId: input.id) } }) {
-                Image(systemName: "minus.circle.fill")
-                    .font(.title3)
-                    .foregroundColor(ClinicalTheme.rose500)
-            }
-            
             // Label
             VStack(alignment: .leading, spacing: 2) {
                 Text(input.name)
@@ -427,10 +446,17 @@ struct ActiveMedicationRow: View {
                     .fontWeight(.medium)
                     .foregroundColor(ClinicalTheme.textPrimary)
                 
-                // Route Hint
                 Text(routeLabel(for: input.routeType))
                     .font(.caption2)
                     .foregroundColor(ClinicalTheme.textSecondary)
+                    
+                // SAFETY: Inline Contraindication Warning
+                if shouldFlagContraindication(for: input) {
+                    Text("⛔️ CONTRAINDICATED")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundColor(ClinicalTheme.rose500)
+                        .padding(.top, 2)
+                }
             }
             
             Spacer()
@@ -443,7 +469,6 @@ struct ActiveMedicationRow: View {
                 ))
                 .keyboardType(.decimalPad)
                 .multilineTextAlignment(.trailing)
-                .addKeyboardDoneButton() // Extension from ViewExtensions.swift
                 .font(.body.monospacedDigit().bold())
                 .foregroundColor(ClinicalTheme.teal500)
                 .frame(width: 70)
@@ -459,11 +484,25 @@ struct ActiveMedicationRow: View {
             .padding(.horizontal, 12)
             .background(ClinicalTheme.backgroundInput)
             .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(shouldFlagContraindication(for: input) ? ClinicalTheme.rose500 : Color.clear, lineWidth: 2)
+            )
+            
+            // FAT FINGER CHECK (Extreme Dose)
+            if isExtremeDose(input) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(ClinicalTheme.amber500)
+            }
         }
-        .padding(12)
-        .background(ClinicalTheme.backgroundCard)
-        .cornerRadius(12)
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) {
+                withAnimation { store.removeInput(inputId: input.id) }
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
     }
     
     func routeLabel(for type: DrugRouteType) -> String {
@@ -482,6 +521,29 @@ struct ActiveMedicationRow: View {
         case .microgramIO: return "mcg"
         default: return "mg"
         }
+    }
+    
+    // Helper: Check for specific "AVOID" warnings in the store text matching this drug
+    func shouldFlagContraindication(for input: CalculatorInput) -> Bool {
+        return store.warningText.uppercased().contains("AVOID \(input.name.uppercased())") || 
+               store.warningText.uppercased().contains("CONTRAINDICATED") && input.name == "Morphine" && store.renalStatus == .dialysis // Fallback exact check
+    }
+    
+    // Helper: Fat Finger Logic
+    func isExtremeDose(_ input: CalculatorInput) -> Bool {
+        guard let val = Double(input.dose) else { return false }
+        
+        // Thresholds
+        if input.routeType == .ivPush || input.routeType == .ivDrip {
+             if input.name.contains("Hydromorphone") && val > 4.0 { return true }
+             if input.name.contains("Morphine") && val > 20.0 { return true }
+             if input.name.contains("Fentanyl") && val > 200.0 { return true } // mcg
+        } else {
+             // PO
+             if input.name.contains("Oxycodone") && val > 120.0 { return true }
+             if input.name.contains("Morphine") && val > 200.0 { return true }
+        }
+        return false
     }
 }
 
@@ -757,11 +819,19 @@ struct TargetDoseCard: View {
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 4) {
+                // Visual Indicator for Safety Adjustments
+                if let original = dose.originalDaily {
+                    Text(original)
+                        .font(.caption)
+                        .strikethrough()
+                        .foregroundColor(ClinicalTheme.textMuted)
+                }
+                
                 HStack(alignment: .firstTextBaseline, spacing: 2) {
                     Text(dose.totalDaily)
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(ClinicalTheme.teal500)
+                        .foregroundColor(dose.originalDaily != nil ? ClinicalTheme.amber500 : ClinicalTheme.teal500)
                     Text(dose.unit + (dose.unit.contains("/hr") ? "" : "/24h"))
                         .font(.caption)
                         .scaleEffect(0.8)
@@ -817,33 +887,6 @@ struct PediatricLockScreen: View {
     }
 }
 
-struct NaloxoneBanner: View {
-    var dismiss: () -> Void
-    
-    var body: some View {
-        VStack {
-            HStack(spacing: 12) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundColor(.white)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("High Overdose Risk").font(.subheadline).bold().foregroundColor(.white)
-                    Text("Prescribe Naloxone.").font(.caption).foregroundColor(.white.opacity(0.9))
-                }
-                Spacer()
-                Button(action: dismiss) {
-                    Image(systemName: "xmark").foregroundColor(.white.opacity(0.8))
-                }
-            }
-            .padding()
-            .background(ClinicalTheme.rose500)
-            .cornerRadius(8)
-            .shadow(radius: 5)
-        }
-        .padding(.horizontal)
-        .padding(.top, 8) // Safe area inset logic handled by parent overlay?
-    }
-}
-}
 
 // MARK: - MATH RECEIPT
 struct MathReceiptView: View {

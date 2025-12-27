@@ -45,26 +45,7 @@ class AssessmentStore: ObservableObject {
     @Published var route: OpioidRoute = .both { didSet { calculate() } }
     @Published var indication: ClinicalIndication = .standard { didSet { calculate() } }
     @Published var painType: PainType = .nociceptive { didSet { calculate() } }
-    
-    // ... (rest of vars)
 
-    // ... (down to line 278) ...
-    
-        if painType == .neuropathic {
-            if !isNPO {
-                // VECTOR 3 FIX: Specific Dialysis Dosing
-                if renalFunction == .dialysis {
-                    adj.append("Gabapentin: Max 100mg post-dialysis ONLY.")
-                } else {
-                    adj.append("Gabapentin (Renal adjust).")
-                }
-                
-                if !isHepaticBad && !isRenalBad { adj.append("Duloxetine (Cymbalta).") }
-                else { warns.append("Avoid Duloxetine in Renal/Hepatic impairment.") }
-            }
-            adj.append("Lidocaine 5% patch.")
-        } else if painType == .inflammatory || painType == .bone {
-    
     // Risk Factors
     @Published var sleepApnea: Bool = false { didSet { calculate() } }
     @Published var chf: Bool = false { didSet { calculate() } }
@@ -338,9 +319,10 @@ class AssessmentStore: ObservableObject {
             }
         }
         
+        
         // NPO Filter for Adjuvants
         if isNPO {
-             adj = adj.filter { $0.contains("Patch") || $0.contains("IV") }
+             adj = adj.filter { $0.contains("Patch") || $0.contains("IV") || $0.contains("Outpatient") }
         }
 
         self.recommendations = recs

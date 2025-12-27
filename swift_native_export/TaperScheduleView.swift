@@ -1,27 +1,86 @@
 import SwiftUI
 import Combine
+import Charts
 
 struct TaperScheduleView: View {
     @ObservedObject var themeManager = ThemeManager.shared
     
     // Taper Configuration State
-    @State private var drugName: String
-    @State private var currentDose: String
+    @State private var startMME: String
     @State private var useLongDuration: Bool = false // False = Short (<1yr), True = Long (>1yr)
-    @State private var reductionPerStep: Double = 10 // Default 10%
+    // Default to 10% reduction per MME step
+    @State private var reductionPerStep: Double = 10 
     
-    // Safety Gates
+    // Reverse Conversion State
+    @State private var selectedTaperDrug: TaperDrug = .morphinePO
+    
+    enum TaperDrug: String, CaseIterable, Identifiable {
+        case mmeOnly = "MME Only (No Conversion)"
+        case morphinePO = "Morphine PO"
+        case oxycodonePO = "Oxycodone PO"
+        case hydrocodonePO = "Hydrocodone PO"
+        case hydromorphonePO = "Hydromorphone PO"
+        case tramadolPO = "Tramadol PO"
+        
+        var id: String { self.rawValue }
+        
+        func conversionFactor(assessment: AssessmentStore) -> Double {
+            switch self {
+            case .mmeOnly: return 1.0
+            case .morphinePO:
+                // Renal Safety: Morphine metabolites accumulate
+                if assessment.renalFunction == .dialysis { return 0.0 } // CONTRAINDICATED
+                if assessment.renalFunction == .impaired { return 1.0 * 0.75 } // 25% reduction
+                return 1.0
+            case .oxycodonePO: return 1.5
+            case .hydrocodonePO: return 1.0
+            case .hydromorphonePO:
+                // 1. Hepatic Failure (Priority Risk: Shunting)
+                if assessment.hepaticFunction == .failure { return 0.0 } // CONTRAINDICATED (Consult Specialist)
+                
+                // 2. Renal Safety (Metabolite H3G)
+                if assessment.renalFunction == .dialysis { return 5.0 * 0.25 } // 75% reduction
+                if assessment.renalFunction == .impaired { return 5.0 * 0.5 } // 50% reduction
+                
+                return 5.0 // Updated CDC 2022 Ratio
+            case .tramadolPO:
+                 // Renal Safety
+                 if assessment.renalFunction != .normal { return 0.2 * 0.5 } // 50% reduction per label
+                 return 0.2
+            }
+        }
+        
+        func safetyWarning(assessment: AssessmentStore) -> (String, Color)? {
+            switch self {
+            case .morphinePO:
+                 if assessment.renalFunction == .dialysis { return ("⛔️ CONTRAINDICATED: Avoid Morphine in Dialysis (Neurotoxic Metabolites)", ClinicalTheme.rose500) }
+                 if assessment.renalFunction == .impaired { return ("⚠️ Renal Impairment: Dose reduced 25%", ClinicalTheme.amber500) }
+            case .hydromorphonePO:
+                 if assessment.hepaticFunction == .failure { return ("⛔️ CONTRAINDICATED: Avoid Hydromorphone in Liver Failure (Shunt Risk)", ClinicalTheme.rose500) }
+                 if assessment.renalFunction == .dialysis || assessment.renalFunction == .impaired { return ("⚠️ Renal Impairment: Dose reduced \(assessment.renalFunction == .dialysis ? "75%" : "50%")", ClinicalTheme.amber500) }
+            case .tramadolPO:
+                 if assessment.renalFunction != .normal { return ("⚠️ Renal Impairment: Dose reduced 50%", ClinicalTheme.amber500) }
+            default: return nil
+            }
+            return nil
+        }
+        
+        var unit: String {
+            return self == .mmeOnly ? "MME" : "mg"
+        }
+    }
+    
     // Safety Gates
     @EnvironmentObject var assessmentStore: AssessmentStore
     @State private var showWithdrawalWarning: Bool = true
+    @State private var showChart: Bool = false
     
     // Optional Calculator Source (for Sync)
     var calculatorStore: CalculatorStore?
     
     init(calculatorStore: CalculatorStore? = nil) {
         self.calculatorStore = calculatorStore
-        _drugName = State(initialValue: "")
-        _currentDose = State(initialValue: "")
+        _startMME = State(initialValue: "")
     }
     
     var body: some View {
@@ -37,22 +96,28 @@ struct TaperScheduleView: View {
                         }
                         .foregroundColor(ClinicalTheme.textSecondary)
                         
-                        // Drug & Dose
+                        // MME Input
                         HStack(spacing: 12) {
-                            TextField("Drug (e.g. Oxycodone)", text: $drugName)
-                                .padding()
-                                .background(ClinicalTheme.backgroundInput)
-                                .cornerRadius(8)
-                                .addKeyboardDoneButton()
+                            Text("Starting daily dose:")
+                                .foregroundColor(ClinicalTheme.textPrimary)
                             
-                            TextField("Mg/Day", text: $currentDose)
+                            TextField("Total MME/Day", text: $startMME)
                                 .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.center)
                                 .padding()
-                                .frame(width: 100)
                                 .background(ClinicalTheme.backgroundInput)
                                 .cornerRadius(8)
-                                .addKeyboardDoneButton()
+                                .cornerRadius(8)
+
+                                .overlay(
+                                    HStack {
+                                        Spacer()
+                                        Text("MME")
+                                            .font(.caption)
+                                            .foregroundColor(ClinicalTheme.textSecondary)
+                                            .padding(.trailing, 8)
+                                    }
+                                )
                         }
                         
                         Divider()
@@ -81,10 +146,58 @@ struct TaperScheduleView: View {
                             HStack {
                                 Text("Reduction Rate").font(.caption).bold().foregroundColor(ClinicalTheme.textSecondary)
                                 Spacer()
-                                Text("\(Int(reductionPerStep))%").font(.headline).bold().foregroundColor(ClinicalTheme.teal500)
+                                if reductionPerStep > 25 {
+                                    Text("⚠️ \(Int(reductionPerStep))% (Caution: Rapid)").font(.headline).bold().foregroundColor(ClinicalTheme.amber500)
+                                } else {
+                                    Text("\(Int(reductionPerStep))%").font(.headline).bold().foregroundColor(ClinicalTheme.teal500)
+                                }
                             }
                             Slider(value: $reductionPerStep, in: 5...50, step: 5)
                                 .accentColor(ClinicalTheme.teal500)
+                        }
+                        
+                        Divider()
+                        
+                        // Reverse Conversion (New Feature)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Medication Converter").font(.caption).bold().foregroundColor(ClinicalTheme.textSecondary)
+                            
+                            HStack {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .foregroundColor(ClinicalTheme.teal500)
+                                Picker("Taper Medication", selection: $selectedTaperDrug) {
+                                    ForEach(TaperDrug.allCases) { drug in
+                                        Text(drug.rawValue).tag(drug)
+                                    }
+                                }
+                                .pickerStyle(MenuPickerStyle())
+                                .accentColor(ClinicalTheme.teal500)
+                            }
+                            
+                            if selectedTaperDrug != .mmeOnly {
+                                Text("Schedule will show estimated \(selectedTaperDrug.unit) dose based on MME.")
+                                    .font(.caption2)
+                                    .italic()
+                                    .foregroundColor(ClinicalTheme.textSecondary)
+                            }
+                            
+                            // Safety Warning Banner
+                            if let warning = selectedTaperDrug.safetyWarning(assessment: assessmentStore) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: warning.1 == ClinicalTheme.rose500 ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
+                                        .foregroundColor(warning.1)
+                                    Text(warning.0)
+                                        .font(.caption).bold()
+                                        .foregroundColor(warning.1)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                .padding(10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(warning.1.opacity(0.1))
+                                .cornerRadius(8)
+                                .transition(.opacity)
+                                .animation(.spring(), value: selectedTaperDrug)
+                            }
                         }
                         
                         // Pregnancy Gate (Synced with Assessment Tab)
@@ -107,11 +220,114 @@ struct TaperScheduleView: View {
                     .clinicalCard()
                     .padding(.horizontal)
                     
+                    // MARK: - ALGORITHM TRANSPARENCY CARD
+                    VStack(alignment: .leading, spacing: 0) {
+                        DisclosureGroup {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Divider().padding(.vertical, 4)
+                                
+                                Text("Tapering Protocol (CDC 2022)")
+                                    .font(.headline)
+                                    .foregroundColor(ClinicalTheme.textPrimary)
+                                
+                                HStack(alignment: .top) {
+                                    Text("•").bold()
+                                    Text("Short-Term (<1yr): Uses '2-Phase' logic. Phase 1 is Linear (10% of BASELINE dose) until 30% remains. Phase 2 is Exponential (10% of CURRENT dose) to prevent withdrawal at low thresholds.")
+                                }
+                                .font(.caption)
+                                .foregroundColor(ClinicalTheme.textSecondary)
+                                
+                                HStack(alignment: .top) {
+                                    Text("•").bold()
+                                    Text("Long-Term (≥1yr): Uses 'Slow Taper' logic. Pure Exponential reduction (10% of CURRENT dose) performed monthly.")
+                                }
+                                .font(.caption)
+                                .foregroundColor(ClinicalTheme.textSecondary)
+                                
+                                Divider().padding(.vertical, 4)
+                                
+                                Text("Reverse Conversion Logic")
+                                    .font(.headline)
+                                    .foregroundColor(ClinicalTheme.textPrimary)
+                                
+                                Text("Drug Dose = Target MME ÷ Factor")
+                                    .font(.caption.monospaced())
+                                    .padding(4)
+                                    .background(ClinicalTheme.backgroundInput)
+                                    .cornerRadius(4)
+                                
+                                Text("Factors Used:")
+                                    .font(.caption).bold()
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("• Oxycodone: 1.5").font(.caption)
+                                    
+                                    // Hydromorphone Dynamic Label
+                                    let hmFactor = TaperDrug.hydromorphonePO.conversionFactor(assessment: assessmentStore)
+                                    if hmFactor < 4.0 {
+                                        Text("• Hydromorphone: \(String(format: "%.1f", hmFactor)) (⚠️ SAFETY REDUCED)").font(.caption).bold().foregroundColor(ClinicalTheme.amber500)
+                                    } else {
+                                         Text("• Hydromorphone: 4.0 (Conservative)").font(.caption)
+                                    }
+                                    
+                                    Text("• Tramadol: 0.1").font(.caption)
+                                }
+                                .foregroundColor(ClinicalTheme.textSecondary)
+                            }
+                            .padding(.top, 8)
+                            
+                        } label: {
+                            HStack {
+                                Image(systemName: "function")
+                                    .foregroundColor(ClinicalTheme.teal500)
+                                Text("Algorithm & Evidence")
+                                    .font(.headline)
+                                    .foregroundColor(ClinicalTheme.textPrimary)
+                            }
+                        }
+                    }
+                    .clinicalCard()
+                    .padding(.horizontal)
+                    
                     // 2. GENERATED SCHEDULE
-                    if let startDose = Double(currentDose), startDose > 0, !assessmentStore.isPregnant {
-                        let schedule = generateSchedule(start: startDose)
+                    if let start = Double(startMME), start > 0, !assessmentStore.isPregnant {
+                        let factor = selectedTaperDrug.conversionFactor(assessment: assessmentStore)
+                        
+                        // BLOCK if Factor is 0 (Contraindicated)
+                        if factor > 0 {
+                            let schedule = generateSchedule(start: start)
                         
                         VStack(alignment: .leading, spacing: 0) {
+                            
+                            // VISUALIZE PLAN BUTTON (Collapsible)
+                            Button(action: { withAnimation { showChart.toggle() } }) {
+                                HStack {
+                                    Image(systemName: "chart.xyaxis.line")
+                                        .foregroundColor(ClinicalTheme.teal500)
+                                    Text("Visualize Plan")
+                                        .font(.headline)
+                                        .foregroundColor(ClinicalTheme.textPrimary)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .rotationEffect(.degrees(showChart ? 90 : 0))
+                                        .foregroundColor(ClinicalTheme.textSecondary)
+                                }
+                                .padding()
+                                .background(ClinicalTheme.backgroundCard)
+                                .cornerRadius(12)
+                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, 16)
+                            .padding(.bottom, 8)
+                            
+                            if showChart {
+                                TaperChartVisualizer(schedule: schedule)
+                                    .padding(.horizontal)
+                                    .padding(.bottom, 16)
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
+                            
                             // Header
                             HStack {
                                 Image(systemName: "calendar.badge.clock")
@@ -120,7 +336,7 @@ struct TaperScheduleView: View {
                                     .font(.headline)
                                     .foregroundColor(ClinicalTheme.textPrimary)
                                 Spacer()
-                                Button(action: { copySchedule(start: startDose, schedule: schedule) }) {
+                                Button(action: { copySchedule(start: start, schedule: schedule) }) {
                                     Image(systemName: "doc.on.doc").foregroundColor(ClinicalTheme.teal500)
                                 }
                             }
@@ -143,9 +359,22 @@ struct TaperScheduleView: View {
                                         
                                         // Action / Dose
                                         VStack(alignment: .trailing, spacing: 2) {
-                                            Text(step.doseString)
-                                                .font(.body).bold()
-                                                .foregroundColor(ClinicalTheme.textPrimary)
+                                            // Primary Display (Variable based on selection)
+                                            if selectedTaperDrug == .mmeOnly {
+                                                Text(step.doseString) // MME
+                                                    .font(.body).bold()
+                                                    .foregroundColor(ClinicalTheme.textPrimary)
+                                            } else {
+                                                // Drug Dose
+                                                Text(step.drugDoseString)
+                                                    .font(.body).bold()
+                                                    .foregroundColor(ClinicalTheme.textPrimary)
+                                                // MME Subtext
+                                                Text(step.doseString)
+                                                    .font(.caption)
+                                                    .foregroundColor(ClinicalTheme.textSecondary)
+                                            }
+                                            
                                             
                                             if !step.instruction.isEmpty {
                                                 Text(step.instruction)
@@ -183,8 +412,24 @@ struct TaperScheduleView: View {
                         HStack(alignment: .top, spacing: 12) {
                             Image(systemName: "drop.fill").foregroundColor(ClinicalTheme.teal500)
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Liquid Formulations (<10mg Daily)").font(.caption).bold().foregroundColor(ClinicalTheme.textPrimary)
-                                Text("When tablets limit titration, use Oral Solution (e.g. Oxycodone 5mg/5mL) to enable 1mg decrements. Alternatively, extend interval (q24h → q48h) before stopping.")
+                                Text("Liquid Formulations (<10 MME Daily)").font(.caption).bold().foregroundColor(ClinicalTheme.textPrimary)
+                                Text("When tablets limit titration, use Oral Solution (e.g. Oxycodone 5mg/5mL or Morphine 10mg/5mL) to enable small decrements.")
+                                    .font(.caption2).foregroundColor(ClinicalTheme.textSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        .padding()
+                        .background(ClinicalTheme.backgroundCard)
+                        .cornerRadius(12)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+
+                        // Clinical Note: Medical Cannabis (Adjuvant)
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: "leaf.fill").foregroundColor(ClinicalTheme.teal500)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Medical Cannabis (Adjuvant)").font(.caption).bold().foregroundColor(ClinicalTheme.textPrimary)
+                                Text("Consider as adjuvant for dose reduction (Regulated states only). Evidence suggests potential to lower opioid requirements by 22-51% during taper.")
                                     .font(.caption2).foregroundColor(ClinicalTheme.textSecondary)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
@@ -195,6 +440,7 @@ struct TaperScheduleView: View {
                         .padding(.horizontal)
                         .padding(.top, 8)
                         
+                        }
                     } else if assessmentStore.isPregnant {
                          // Empty State for Pregnancy Block
                         VStack(spacing: 12) {
@@ -212,20 +458,27 @@ struct TaperScheduleView: View {
                     Spacer()
                 }
                 .padding(.vertical)
+                .padding(.bottom, 120)
+                .addKeyboardDoneButton()
+                .onTapGesture {
+                    UIApplication.shared.endEditing()
+                }
             }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
             .navigationTitle("Taper Tool")
             .navigationBarTitleDisplayMode(.inline)
-            .addKeyboardDoneButton()
+
             .onAppear {
                 if let calc = calculatorStore {
-                    // Sync only if local fields are empty (don't overwrite user work)
-                    if drugName.isEmpty && !calc.primaryDrugName.isEmpty {
-                        drugName = calc.primaryDrugName
+                    // Sync MME if empty
+                    if startMME.isEmpty && calc.totalDailyMME != "0" && calc.totalDailyMME != "---" {
+                        startMME = calc.totalDailyMME
                     }
-                    if currentDose.isEmpty && calc.totalDailyMME != "0" && calc.totalDailyMME != "---" {
-                        currentDose = calc.totalDailyMME
-                    }
+                    
+                    // Note: Ideally we would detect which drug the user "clicked" to get here, 
+                    // but since this is a tab switch, we just sync the MME base.
+                    // The Safety Logic is now handled by the TaperDrug.conversionFactor method 
+                    // which checks the shared AssessmentStore directly.
                 }
             }
         }
@@ -235,12 +488,20 @@ struct TaperScheduleView: View {
     
     struct TaperStep {
         let label: String
-        let dose: Double
+        let dose: Double // MME
+        let drugDose: Double // Converted Drug Dose
+        let drugName: String // Selected Drug Name
+        let drugUnit: String
         let instruction: String
         
         var doseString: String {
             if dose < 0.1 { return "Discontinue" }
-            return String(format: "%.1f mg/day", dose)
+            return String(format: "%.1f MME/day", dose)
+        }
+        
+        var drugDoseString: String {
+            if dose < 0.1 { return "Discontinue" }
+            return String(format: "%.1f \(drugUnit)/day \(drugName)", drugDose)
         }
     }
     
@@ -251,46 +512,85 @@ struct TaperScheduleView: View {
         let rate = reductionPerStep / 100.0
         var current = start
         
-        // CDC Short Term Logic:
-        // 1. Decrease by 10% of ORIGINAL dose until 30% reached (Linear)
-        // 2. Then decrease by 10% of REMAINING dose (Exponential)
+        let factor = selectedTaperDrug.conversionFactor(assessment: assessmentStore)
+        guard factor > 0 else { return [] } // Safety Gate
         
+        // CDC Short Term Logic
         let threshold30 = start * 0.30
-        let linearStep = start * rate // Fixed mg amount
+        let linearStep = start * rate
         
         var week = 1
+        var heldPreviousStep = false
         
-        // Max 50 steps to accommodate long tapers (>4 years if monthly)
+        // Max 50 steps
         for _ in 1...50 {
             var nextDose = 0.0
             var instruction = ""
             
             if !useLongDuration && current > threshold30 {
-                 // Phase 1: Linear (Fixed rate)
+                 // Phase 1: Linear
                  nextDose = current - linearStep
             } else {
-                 // Phase 2 or Long Term: Exponential (Percentage of current)
+                 // Phase 2 or Long Term: Exponential
                  nextDose = current * (1.0 - rate)
             }
             
-            // LOW DOSE HANDLING (< 10mg) - Liquid Transition Zone
-            if nextDose < 10.0 && nextDose > 0.0 {
-                // FDA: "It may be necessary to provide lower dosage strengths... using liquid formulations."
-                if nextDose < 2.5 {
-                     instruction = "Liquid Required (e.g. 1mg/1mL) or Stop"
-                } else if nextDose < 5.0 {
-                     instruction = "Use Liquid (5mg/5mL) or Extend Interval (q48h)"
+            // MINIMUM DECREMENT FLOOR (Prevent Micro-tapering)
+            // If the calculated drop is < 1 MME, hold the dose for a week to consolidate, 
+            // then drop by a clinically significant amount (= 2 MME or calculated amount) the next week.
+            let proposedDrop = current - nextDose
+            
+            if proposedDrop < 1.0 && current > 5.0 {
+                if !heldPreviousStep {
+                    // ACTION: HOLD DOSE
+                    nextDose = current
+                    instruction = "Hold Dose (Consolidate Decrement)"
+                    heldPreviousStep = true
                 } else {
-                     instruction = "Consider Liquid for <1mg adjustments"
+                    // ACTION: FORCE STEP
+                    // Drop by at least 2.0 MME (or the rest if < 2)
+                    let forcedDrop = 2.0
+                    nextDose = max(0, current - forcedDrop)
+                    heldPreviousStep = false // Reset
                 }
+            } else {
+                heldPreviousStep = false
             }
             
-            if nextDose < 1.0 {
-                steps.append(TaperStep(label: useLongDuration ? "Month \(week)" : "Week \(week)", dose: 0, instruction: "Discontinue"))
+            // LOW DOSE HANDLING (< 10 MME)
+            if nextDose < 10.0 && nextDose > 0.0 && !instruction.contains("Hold") {
+                instruction = "Consider liquid formulations for small decrements"
+            }
+            
+            // Convert to Selected Drug
+            // Formula: MME / Factor = Drug Dose
+            // e.g. 90 MME / 1.5 (Oxy) = 60mg Oxy
+            // Factor already calculated safely above
+            let convertedDose = nextDose / factor
+            
+            let drugNameRaw = selectedTaperDrug == .mmeOnly ? "" : selectedTaperDrug.rawValue.replacingOccurrences(of: " PO", with: "")
+            
+            if nextDose < 1.0 { // Terminate
+                steps.append(TaperStep(
+                    label: useLongDuration ? "Month \(week)" : "Week \(week)",
+                    dose: 0,
+                    drugDose: 0,
+                    drugName: drugNameRaw,
+                    drugUnit: selectedTaperDrug.unit,
+                    instruction: "Discontinue"
+                ))
                 break
             }
             
-            steps.append(TaperStep(label: useLongDuration ? "Month \(week)" : "Week \(week)", dose: nextDose, instruction: instruction))
+            steps.append(TaperStep(
+                label: useLongDuration ? "Month \(week)" : "Week \(week)",
+                dose: nextDose,
+                drugDose: convertedDose,
+                drugName: drugNameRaw,
+                drugUnit: selectedTaperDrug.unit,
+                instruction: instruction
+            ))
+            
             current = nextDose
             week += 1
         }
@@ -299,23 +599,70 @@ struct TaperScheduleView: View {
     }
     
     func copySchedule(start: Double, schedule: [TaperStep]) {
-        let mode = useLongDuration ? "Long Term (>1yr)" : "Short Term (<1yr)"
-        let strat = useLongDuration ? "Slow Taper (10% Monthly)" : "CDC 2-Phase Protocol"
-        
         var text = """
         Opioid Taper Plan
-        Drug: \(drugName.isEmpty ? "Opioid" : drugName)
-        Starting Dose: \(start) mg/day
-        Strategy: \(strat)
+        Starting Dose: \(start) MME/day
+        Target Medication: \(selectedTaperDrug.rawValue)
+        Mode: \(useLongDuration ? "Long Term (>1yr)" : "Short Term (<1yr)")
+        Strategy: \(useLongDuration ? "Slow Taper (10% Monthly)" : "CDC 2-Phase Protocol")
         
         """
         
         for step in schedule {
-            text += "\(step.label): \(step.doseString) \(step.instruction.isEmpty ? "" : "(\(step.instruction))")\n"
+            if selectedTaperDrug == .mmeOnly {
+                text += "\(step.label): \(step.doseString) \(step.instruction.isEmpty ? "" : "(\(step.instruction))")\n"
+            } else {
+                text += "\(step.label): \(step.drugDoseString) [\(step.doseString)] \(step.instruction.isEmpty ? "" : "(\(step.instruction))")\n"
+            }
         }
         
         text += "\nWARNING: Pause taper if withdrawal symptoms occur. Consult provider immediately for severe symptoms."
         
         UIPasteboard.general.string = text
+    }
+}
+
+// MARK: - Visualizer
+struct TaperChartVisualizer: View {
+    let schedule: [TaperScheduleView.TaperStep]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Step-Down Visualization")
+                .font(.caption).bold()
+                .foregroundColor(ClinicalTheme.textSecondary)
+                .padding(.leading, 4)
+            
+            Chart {
+                ForEach(Array(schedule.enumerated()), id: \.offset) { index, step in
+                    LineMark(
+                        x: .value("Week", index + 1),
+                        y: .value("Dose (MME)", step.dose)
+                    )
+                    .interpolationMethod(.stepEnd) // Creates the "Stair-Step"
+                    .foregroundStyle(step.dose < 10 ? ClinicalTheme.amber500 : ClinicalTheme.teal500)
+                    .symbol {
+                        Circle()
+                            .fill(step.dose < 10 ? ClinicalTheme.amber500 : ClinicalTheme.teal500)
+                            .frame(width: 6, height: 6)
+                    }
+                }
+                
+                // Liquid Threshold
+                RuleMark(y: .value("Liquid Threshold", 10))
+                    .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
+                    .foregroundStyle(.gray.opacity(0.5))
+                    .annotation(position: .top, alignment: .leading) {
+                        Text("Liquid Form. (<10)")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                    }
+            }
+            .frame(height: 200)
+            .padding()
+            .background(ClinicalTheme.backgroundCard)
+            .cornerRadius(12)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+        }
     }
 }

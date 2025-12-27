@@ -8,56 +8,67 @@ struct ScreeningView: View {
     
     var body: some View {
         NavigationView {
-                // Content
-                ScrollView {
-                    VStack(spacing: 20) {
-                        if selectedTab == "sbirt" {
-                            SBIRTModule(store: screeningStore)
-                        } else if selectedTab == "cows" {
-                            COWSView(store: toolkitStore)
-                        } else if selectedTab == "tools" {
-                            RiskToolsModule(store: toolkitStore)
-                        }
+            ScreeningContentView(selectedTab: $selectedTab)
+                .navigationTitle("Screening")
+                .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+struct ScreeningContentView: View {
+    @Binding var selectedTab: String
+    @StateObject private var screeningStore = ScreeningStore()
+    @StateObject private var toolkitStore = ToolkitStore()
+    @EnvironmentObject var themeManager: ThemeManager
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Content
+            ScrollView {
+                VStack(spacing: 20) {
+                    if selectedTab == "sbirt" {
+                        SBIRTModule(store: screeningStore)
+                    } else if selectedTab == "cows" {
+                        COWSView(store: toolkitStore)
+                    } else if selectedTab == "tools" {
+                        RiskToolsModule(store: toolkitStore)
                     }
-                    .padding()
-                    .padding(.bottom, 40)
                 }
-                .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
+                .padding()
+                .padding(.bottom, 40)
             }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
-            .navigationTitle("Screening")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button(action: { selectedTab = "sbirt" }) {
-                            Label("SBIRT", systemImage: "text.book.closed")
-                        }
-                        Button(action: { selectedTab = "cows" }) {
-                            Label("COWS Assessment", systemImage: "waveform.path.ecg")
-                        }
-                        Button(action: { selectedTab = "tools" }) {
-                            Label("Risk Tools", systemImage: "star.of.life")
-                        }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(tabName(for: selectedTab))
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            Image(systemName: "chevron.down")
-                                .font(.caption)
-                        }
-                        .foregroundColor(ClinicalTheme.teal500)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(ClinicalTheme.teal500.opacity(0.1))
-                        .cornerRadius(8)
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button(action: { selectedTab = "sbirt" }) {
+                        Label("SBIRT", systemImage: "text.book.closed")
                     }
+                    Button(action: { selectedTab = "cows" }) {
+                        Label("COWS Assessment", systemImage: "waveform.path.ecg")
+                    }
+                    Button(action: { selectedTab = "tools" }) {
+                        Label("Risk Tools", systemImage: "star.of.life")
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(tabName(for: selectedTab))
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        Image(systemName: "chevron.down")
+                            .font(.caption)
+                    }
+                    .foregroundColor(ClinicalTheme.teal500)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(ClinicalTheme.teal500.opacity(0.1))
+                    .cornerRadius(8)
                 }
             }
-
+        }
     }
-    
+
     func tabName(for tab: String) -> String {
         switch tab {
         case "sbirt": return "SBIRT"
@@ -66,7 +77,6 @@ struct ScreeningView: View {
         default: return "Screening"
         }
     }
-
 }
 
 // MARK: - Modules
@@ -77,8 +87,6 @@ struct SBIRTModule: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            // Sub-Tabs
-            // Sub-Tabs
             // Sub-Tabs (Chips)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {

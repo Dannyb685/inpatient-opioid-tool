@@ -38,18 +38,11 @@ struct MainTabView: View {
                     Text("Taper")
                 }
                 
-            // Tab 5: Protocols
+            // Tab 5: Protocols & Reference
             ProtocolsView()
                 .tabItem {
-                    Image(systemName: "arrow.triangle.branch")
+                    Image(systemName: "books.vertical.fill")
                     Text("Protocols")
-                }
-
-            // Tab 6: Reference
-            ReferenceView()
-                .tabItem {
-                    Image(systemName: "book.fill")
-                    Text("Reference")
                 }
         }
         .accentColor(ClinicalTheme.teal500)

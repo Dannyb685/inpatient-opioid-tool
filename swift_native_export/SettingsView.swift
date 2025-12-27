@@ -1,147 +1,159 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var themeManager: ThemeManager
+    @ObservedObject var themeManager = ThemeManager.shared
+    @State private var diagnosticLog: String = ""
+    @State private var showDiagnostics: Bool = false
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    
-                    // HEADER
-                    VStack(spacing: 8) {
-                        Image("Calculator_PixelArt") // Using existing asset or generic
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 80, height: 80)
-                            .cornerRadius(16)
-                        
-                        Text("Inpatient Opioid Tool")
-                            .font(.title2).bold()
-                            .foregroundColor(ClinicalTheme.textPrimary)
-                        
-                        Text("v1.5.4 • Standard of Care: CDC 2022")
-                            .font(.caption)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(ClinicalTheme.teal500.opacity(0.1))
-                            .foregroundColor(ClinicalTheme.teal500)
-                            .cornerRadius(8)
-                    }
-                    .padding(.top, 20)
-                    
-                    // SECTION 1: LEGAL DISCLAIMER
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "hand.raised.fill")
-                                .foregroundColor(ClinicalTheme.textMuted)
-                            Text("Legal Disclaimer")
-                                .font(.headline)
-                                .foregroundColor(ClinicalTheme.textPrimary)
-                        }
-                        
-                        Text("This application is a Clinical Decision Support (CDS) tool. It is intended to assist, not replace, the clinical judgment of a licensed healthcare provider. The prescriber assumes full responsibility for all dosing decisions.")
-                            .font(.caption)
-                            .foregroundColor(ClinicalTheme.textSecondary)
-                            .lineSpacing(4)
-                    }
-                    .padding()
-                    .background(ClinicalTheme.backgroundCard) // Grayish in Light Mode if configured
-                    .cornerRadius(12)
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                    .padding(.horizontal)
-                    
-                    // SECTION 2: REFERENCES
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "book.closed.fill")
-                                .foregroundColor(ClinicalTheme.teal500)
-                            Text("Clinical References")
-                                .font(.headline)
-                                .foregroundColor(ClinicalTheme.textPrimary)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            SettingsReferenceRow(title: "CDC Clinical Practice Guideline (2022)", subtitle: "Opioid Prescribing for Pain")
-                            Divider()
-                            SettingsReferenceRow(title: "NCCN Guidelines", subtitle: "Adult Cancer Pain")
-                            Divider()
-                            SettingsReferenceRow(title: "ASCO Guidelines (2023)", subtitle: "Management of Chronic Pain")
-                        }
-                    }
-                    .padding()
-                    .background(ClinicalTheme.backgroundCard)
-                    .cornerRadius(12)
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                    .padding(.horizontal)
-                    
-                    // SECTION 3: SAFETY PROTOCOLS
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "shield.check.fill")
-                                .foregroundColor(ClinicalTheme.textPrimary) // Dark/Light adaptive
-                            Text("Active Safety Protocols")
-                                .font(.headline)
-                                .foregroundColor(ClinicalTheme.textPrimary)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 12) {
-                            SafetyRow(icon: "figure.child.and.lock.fill", color: ClinicalTheme.rose500, title: "Pediatric Lock", desc: "Blocks calculation for age <18.")
-                            SafetyRow(icon: "cross.case.fill", color: ClinicalTheme.amber500, title: "Renal Gate", desc: "Filters Morphine/Codeine in Dialysis/CKD.")
-                            SafetyRow(icon: "person.2.fill", color: ClinicalTheme.purple500, title: "Perinatal Mode", desc: "Prioritizes Buprenorphine/Methadone.")
-                        }
-                    }
-                    .padding()
-                    .background(ClinicalTheme.backgroundCard)
-                    .cornerRadius(12)
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                    .padding(.horizontal)
-                    
-                    Spacer()
-                }
-                .padding(.bottom, 40)
-            }
-            .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
-            .navigationTitle("About & Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-            }
-            .preferredColorScheme(themeManager.isDarkMode ? .dark : .light)
-        }
-    }
-}
-
-struct SettingsReferenceRow: View {
-    let title: String
-    let subtitle: String
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title).font(.subheadline).fontWeight(.medium).foregroundColor(ClinicalTheme.textPrimary)
-            Text(subtitle).font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-        }
-    }
-}
-
-struct SafetyRow: View {
-    let icon: String
-    let color: Color
-    let title: String
-    let desc: String
-    
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: icon)
-                .foregroundColor(color)
-                .frame(width: 20)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
-                Text(desc).font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-            }
+             ScrollView {
+                 VStack(alignment: .leading, spacing: 24) {
+                     
+                     // 1. LEGAL DISCLAIMER (The Shield)
+                     VStack(alignment: .leading, spacing: 12) {
+                         HStack {
+                             Image(systemName: "exclamationmark.shield.fill")
+                                 .font(.title2)
+                                 .foregroundColor(ClinicalTheme.rose500)
+                             Text("Educational Use Only")
+                                 .font(.title3).bold()
+                                 .foregroundColor(ClinicalTheme.textPrimary)
+                         }
+                         
+                         Text("This application is intended solely as an educational aid for qualified healthcare professionals. It is NOT a substitute for clinical judgment or professional medical advice.")
+                             .font(.subheadline)
+                             .foregroundColor(ClinicalTheme.textPrimary)
+                             .fixedSize(horizontal: false, vertical: true)
+                         
+                         Text("The authors and developers assume no liability for any diagnosis, treatment, decision, or action taken in reliance upon information contained in this application. Always verify calculations and check official prescribing information.")
+                             .font(.caption)
+                             .foregroundColor(ClinicalTheme.textSecondary)
+                             .fixedSize(horizontal: false, vertical: true)
+                     }
+                     .clinicalCard()
+                     .padding(.horizontal)
+                     .padding(.top)
+                     
+                     // 2. CLINICAL REFERENCES
+                     VStack(alignment: .leading, spacing: 12) {
+                         HStack {
+                             Image(systemName: "book.fill")
+                                 .foregroundColor(ClinicalTheme.teal500)
+                             Text("Evidence Base")
+                                 .font(.headline)
+                                 .foregroundColor(ClinicalTheme.textPrimary)
+                         }
+                         
+                         VStack(alignment: .leading, spacing: 8) {
+                             Text("CDC Clinical Practice Guideline for Prescribing Opioids for Pain (2022)")
+                                 .font(.subheadline).bold()
+                                 .foregroundColor(ClinicalTheme.textPrimary)
+                             
+                             Text("Dowell D, Ragan KR, Jones CM, Baldwin GT, Chou R. MMWR Recomm Rep 2022;71(No. RR-3):1–95.")
+                                 .font(.caption)
+                                 .foregroundColor(ClinicalTheme.textSecondary)
+                                 .italic()
+                                 .fixedSize(horizontal: false, vertical: true)
+                             
+                             Link("View Guideline Source ↗", destination: URL(string: "https://www.cdc.gov/mmwr/volumes/71/rr/rr7103a1.htm")!)
+                                 .font(.caption).bold()
+                                 .foregroundColor(ClinicalTheme.teal500)
+                         }
+                         
+                         Divider()
+                         
+                         VStack(alignment: .leading, spacing: 8) {
+                             Text("Equianalgesic Dosing Data")
+                                 .font(.subheadline).bold()
+                                 .foregroundColor(ClinicalTheme.textPrimary)
+                             Text("Compiled from CMS, FDA Prescribing Information, and peer-reviewed literature (McPherson 2018).")
+                                 .font(.caption)
+                                 .foregroundColor(ClinicalTheme.textSecondary)
+                                 .fixedSize(horizontal: false, vertical: true)
+                         }
+                     }
+                     .clinicalCard()
+                     .padding(.horizontal)
+                     
+                     // 3. APP INFO
+                     VStack(alignment: .leading, spacing: 12) {
+                         HStack {
+                             Image(systemName: "info.circle")
+                                 .foregroundColor(ClinicalTheme.textSecondary)
+                             Text("About")
+                                 .font(.headline)
+                                 .foregroundColor(ClinicalTheme.textPrimary)
+                         }
+                         
+                         HStack {
+                             Text("Version").foregroundColor(ClinicalTheme.textSecondary)
+                             Spacer()
+                             Text("1.0.0 (Release Candidate)").bold().foregroundColor(ClinicalTheme.textPrimary)
+                         }
+                         
+                         Divider()
+                         
+                         HStack {
+                             Text("Build").foregroundColor(ClinicalTheme.textSecondary)
+                             Spacer()
+                             Text("2025.12.RC1").font(.caption).monospaced().foregroundColor(ClinicalTheme.textSecondary)
+                         }
+                     }
+                     .clinicalCard()
+                     .padding(.horizontal)
+                     
+                     Spacer()
+                     
+                     // Footer
+                     VStack(spacing: 8) {
+                         Text("Designed with 🤍 for Patient Safety")
+                             .font(.caption2)
+                             .foregroundColor(ClinicalTheme.textMuted)
+                         Text("© 2025 Inpatient Opioid Tool")
+                             .font(.caption2)
+                             .foregroundColor(ClinicalTheme.textMuted)
+                         
+                         // Developer Diagnostics
+                         Button("Run Clinical Validation Suite") {
+                             diagnosticLog = ValidationEngine.shared.runAll()
+                             showDiagnostics = true
+                         }
+                         .font(.caption2)
+                         .foregroundColor(ClinicalTheme.teal500.opacity(0.5))
+                         .padding(.top, 20)
+                     }
+                     .frame(maxWidth: .infinity)
+                     .padding(.bottom, 20)
+                 }
+                 .padding(.vertical)
+             }
+             .sheet(isPresented: $showDiagnostics) {
+                 NavigationView {
+                     ScrollView {
+                         Text(diagnosticLog)
+                             .font(.system(.caption, design: .monospaced))
+                             .padding()
+                     }
+                     .navigationTitle("Validation Results")
+                     .navigationBarTitleDisplayMode(.inline)
+                 }
+             }
+             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
+             .navigationTitle("Settings & Info")
+             .navigationBarTitleDisplayMode(.inline)
+             .toolbar {
+                 ToolbarItem(placement: .navigationBarTrailing) {
+                     Button(action: {
+                         withAnimation {
+                             themeManager.isDarkMode.toggle()
+                         }
+                     }) {
+                         Image(systemName: themeManager.isDarkMode ? "sun.max.fill" : "moon.stars.fill")
+                             .foregroundColor(ClinicalTheme.teal500)
+                     }
+                 }
+             }
         }
     }
 }

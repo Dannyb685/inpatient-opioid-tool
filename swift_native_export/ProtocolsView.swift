@@ -1,9 +1,13 @@
 import SwiftUI
 
 struct ProtocolsView: View {
-    @State private var selectedTab = "proto" // proto, moud
+    @State private var selectedTab = "proto" // proto, moud, ref
     @EnvironmentObject var themeManager: ThemeManager
     @State private var protocolMode = "guide" // guide, algo
+    
+    // States for Library (v1.5.5 consolidation)
+    @State private var refSearchText = ""
+    @State private var refExpandedId: String? = nil
     
     var body: some View {
         NavigationView {
@@ -11,53 +15,61 @@ struct ProtocolsView: View {
                 // Custom Tab Bar
                 // Segmented Picker Header
                 Picker("Tab", selection: $selectedTab) {
-                    Text("Clinical Protocols").tag("proto")
+                    Text("Protocols").tag("proto")
                     Text("MOUD").tag("moud")
+                    Text("Library").tag("ref")
                 }
                 .pickerStyle(.segmented)
                 .padding()
                 .background(ClinicalTheme.backgroundMain)
                 
                 // Content
-                ScrollView {
-                    VStack(spacing: 20) {
-                        if selectedTab == "proto" {
-                            // Sub-Picker for Consolidated View
-                            // Sub-Picker (Chips)
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 8) {
-                                    ForEach([("guide", "Condition Guide"), ("algo", "Algorithms")], id: \.0) { key, label in
-                                        Button(action: { withAnimation { protocolMode = key } }) {
-                                            Text(label)
-                                                .font(.caption).fontWeight(.bold)
-                                                .padding(.horizontal, 16)
-                                                .padding(.vertical, 8)
-                                                .background(protocolMode == key ? ClinicalTheme.teal500 : ClinicalTheme.backgroundCard)
-                                                .foregroundColor(protocolMode == key ? .white : ClinicalTheme.textSecondary)
-                                                .cornerRadius(20)
-                                                .overlay(RoundedRectangle(cornerRadius: 20).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                Group {
+                    if selectedTab == "proto" {
+                        ScrollView {
+                            VStack(spacing: 20) {
+                                // Sub-Picker (Chips)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 8) {
+                                        ForEach([("guide", "Condition Guide"), ("algo", "Algorithms")], id: \.0) { key, label in
+                                            Button(action: { withAnimation { protocolMode = key } }) {
+                                                Text(label)
+                                                    .font(.caption).fontWeight(.bold)
+                                                    .padding(.horizontal, 16)
+                                                    .padding(.vertical, 8)
+                                                    .background(protocolMode == key ? ClinicalTheme.teal500 : ClinicalTheme.backgroundCard)
+                                                    .foregroundColor(protocolMode == key ? .white : ClinicalTheme.textSecondary)
+                                                    .cornerRadius(20)
+                                                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                                            }
                                         }
                                     }
+                                    .padding(.horizontal)
                                 }
-                                .padding(.horizontal)
+                                
+                                if protocolMode == "guide" {
+                                    ConditionGuidesView()
+                                } else {
+                                    FlowchartView()
+                                }
                             }
-                            
-                            if protocolMode == "guide" {
-                                ConditionGuidesView()
-                            } else {
-                                FlowchartView()
-                            }
-                        } else if selectedTab == "moud" {
-                            MOUDView()
+                            .padding()
+                            .padding(.bottom, 40)
                         }
+                    } else if selectedTab == "moud" {
+                        ScrollView {
+                            MOUDView()
+                                .padding()
+                                .padding(.bottom, 40)
+                        }
+                    } else if selectedTab == "ref" {
+                        ReferenceContentView(searchText: $refSearchText, expandedId: $refExpandedId)
                     }
-                    .padding()
-                    .padding(.bottom, 40)
                 }
                 .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
             }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
-            .navigationTitle("Protocols")
+            .navigationTitle(selectedTab == "ref" ? "Pharmacology Library" : "Clinical Protocols")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
