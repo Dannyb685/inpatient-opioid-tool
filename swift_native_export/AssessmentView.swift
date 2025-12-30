@@ -20,7 +20,6 @@ struct AssessmentView: View {
                                     .keyboardType(.numberPad)
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
                                     .frame(width: 80)
-                                    .addKeyboardDoneButton()
                             }
                             
                             Spacer()
@@ -137,6 +136,11 @@ struct AssessmentView: View {
                     Spacer(minLength: 50)
                 }
                 .padding(.top)
+                .padding(.bottom, 100) // Extra padding for scrolling
+                .addKeyboardDoneButton()
+                .onTapGesture {
+                    UIApplication.shared.endEditing()
+                }
             }
             .background(ClinicalTheme.backgroundMain.ignoresSafeArea())
             .navigationTitle("Risk Assessment")
