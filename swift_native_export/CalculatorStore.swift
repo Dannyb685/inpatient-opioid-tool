@@ -1,4 +1,4 @@
-import UIKit // For Haptics
+import Foundation
 import Combine
 
 // MARK: - Calculator Data Models
@@ -56,7 +56,7 @@ struct AdjuvantRecommendation: Identifiable {
 // MARK: - Store Implementation
 class CalculatorStore: ObservableObject {
     @Published var inputs: [CalculatorInput] = []
-    @Published var reduction: Double = 30.0
+    @Published var reduction: Double = 30.0 { didSet { calculate() } }
     @Published var tolerance: ToleranceStatus = .tolerant
     @Published var context: ConversionContext = .rotation
     
@@ -207,19 +207,19 @@ class CalculatorStore: ObservableObject {
             case "morphine":
                 factor = 1.0
                 if renalStatus == .dialysis {
-                    activeWarnings.append("⚠️ AVOID MORPHINE: Active metabolites (M3G/M6G) accumulate in dialysis. Neurotoxicity risk.")
+                    activeWarnings.append("AVOID MORPHINE: Active metabolites (M3G/M6G) accumulate in dialysis. Neurotoxicity risk.")
                 }
             case "morphine_iv": 
                 factor = 3.0
                 activeWarnings.append("NOTE: IV:PO Morphine 3:1 is standard for chronic dosing. Acute ratio may range to 1:6.")
                 if renalStatus == .dialysis {
-                    activeWarnings.append("⚠️ AVOID MORPHINE IV: Active metabolites (M3G/M6G) accumulate in dialysis. Neurotoxicity risk.")
+                    activeWarnings.append("AVOID MORPHINE IV: Active metabolites (M3G/M6G) accumulate in dialysis. Neurotoxicity risk.")
                 }
             case "hydromorphone": 
                 factor = 5.0
                 activeWarnings.append("NOTE: Hydromorphone conversion varies (3.7-5:1). Monitor closely.")
                 if hepaticStatus == .failure {
-                    activeWarnings.append("⚠️ HEPATIC SHUNT: Oral Hydromorphone bioavailability increases ~4x in Liver Failure (Portosystemic shunts). MME calculation may SIGNIFICANTLY underestimate risk. Use extreme caution.")
+                    activeWarnings.append("HEPATIC SHUNT: Oral Hydromorphone bioavailability increases ~4x in Liver Failure (Portosystemic shunts). MME calculation may SIGNIFICANTLY underestimate risk. Use extreme caution.")
                 }
             case "hydromorphone_iv": factor = 20.0
             case "oxycodone": factor = 1.5
@@ -228,7 +228,7 @@ class CalculatorStore: ObservableObject {
             case "codeine": 
                 factor = 0.15
                 if renalStatus == .dialysis {
-                    activeWarnings.append("⚠️ AVOID CODEINE: Metabolites accumulate in dialysis.")
+                    activeWarnings.append("AVOID CODEINE: Metabolites accumulate in dialysis.")
                 }
             case "tramadol": 
                 factor = 0.2 // Updated CDC 2022
@@ -237,7 +237,7 @@ class CalculatorStore: ObservableObject {
             case "meperidine": 
                 factor = 0.1
                 if renalStatus == .dialysis {
-                    activeWarnings.append("⚠️ AVOID MEPERIDINE: Normeperidine accumulates. Seizure risk. Contraindicated.")
+                    activeWarnings.append("AVOID MEPERIDINE: Normeperidine accumulates. Seizure risk. Contraindicated.")
                 }
                 
             // DRIPS (mg/hr -> mg/24h -> MME)
@@ -257,20 +257,20 @@ class CalculatorStore: ObservableObject {
                 if isPregnant {
                      factor = 0
                      hasExclusion = true
-                     activeWarnings.append("⚠️ Methadone Calculation Blocked in Perinatal Mode (CYP Induction). Consult Specialist.")
+                     activeWarnings.append("Methadone Calculation Blocked in Perinatal Mode (CYP Induction). Consult Specialist.")
                 } else {
                      factor = 0
                      hasExclusion = true
-                     activeWarnings.append("⚠️ Methadone Excluded: Non-linear kinetics.")
+                     activeWarnings.append("Methadone Excluded: Non-linear kinetics.")
                 }
             case "sublingual_fentanyl":
                 factor = 0
                 hasExclusion = true
-                activeWarnings.append("⚠️ Sublingual Fentanyl Excluded: Bioavailability varies.")
+                activeWarnings.append("Sublingual Fentanyl Excluded: Bioavailability varies.")
             case "buprenorphine", "butrans":
                 factor = 0
                 hasExclusion = true
-                activeWarnings.append("⚠️ Buprenorphine Excluded: Partial agonist.")
+                activeWarnings.append("Buprenorphine Excluded: Partial agonist.")
                 
             default: factor = 0
             }
@@ -300,11 +300,11 @@ class CalculatorStore: ObservableObject {
         // Finalize Warnings
         // Finalize Warnings
         if totalMME > 90 {
-            activeWarnings.append("⚠️ >90 MME: High Overdose Risk. Naloxone indicated.")
+            activeWarnings.append(">90 MME: High Overdose Risk. Naloxone indicated.")
         }
         
         if totalMME > 50 || matchesBenzos || historyOverdose || sleepApnea {
-            activeWarnings.append("📋 RECOMMENDATION: Prescribe Naloxone (High Overdose Risk per CDC criteria).")
+            activeWarnings.append("RECOMMENDATION: Prescribe Naloxone (High Overdose Risk per CDC criteria).")
         }
         
         self.warningText = activeWarnings.joined(separator: "\n")
@@ -497,7 +497,7 @@ class CalculatorStore: ObservableObject {
         else if drug.contains("Morphine") && renalStatus != .normal {
             if renalStatus == .dialysis {
                 // Hard Avoidance
-                adjustmentNote = "⚠️ CONTRAINDICATED (Neurotoxic Metabolites)"
+                adjustmentNote = "CONTRAINDICATED (Neurotoxic Metabolites)"
                 adjustedTotal = 0 // Will result in 0.0 displayed but handled by View logic ideally, or just text warning
                 return TargetDose(
                     drug: drug, route: route,
@@ -511,7 +511,7 @@ class CalculatorStore: ObservableObject {
                 let reductionFactor: Double = 0.75
                 originalTotalString = String(format: "%.1f", total)
                 adjustedTotal = total * reductionFactor
-                adjustmentNote = "\(ratio) | ⚠️ Renal: -25% (Metabolites)"
+                adjustmentNote = "\(ratio) | Renal: -25% (Metabolites)"
             }
         }
         
@@ -523,9 +523,17 @@ class CalculatorStore: ObservableObject {
                 totalDaily: "CONSULT",
                 breakthrough: "N/A",
                 unit: unit, 
-                ratioLabel: "\(ratio) | ⚠️ CONTRAINDICATED (Hepatic Shunting Risk)",
+                ratioLabel: "\(ratio) | CONTRAINDICATED (Hepatic Shunting Risk)",
                 originalDaily: String(format: "%.1f", total)
              )
+        }
+
+        // 4. Hepatic Failure: General Reduction (Oxycodone, Morphine, Hydromorphone IV)
+        if hepaticStatus == .failure && !drug.contains("Fentanyl") {
+             let reductionFactor: Double = 0.50
+             if originalTotalString == nil { originalTotalString = String(format: "%.1f", adjustedTotal) }
+             adjustedTotal = adjustedTotal * reductionFactor
+             adjustmentNote += " | Hepatic: -50% (Clearance)"
         }
 
         let bt = adjustedTotal * 0.10

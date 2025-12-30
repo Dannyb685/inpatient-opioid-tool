@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // v1.5.1 verified
 struct CalculatorView: View {
@@ -27,314 +28,24 @@ struct CalculatorView: View {
                 ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all)
                 
                 VStack(spacing: 20) {
-                    VStack(spacing: 0) {
-                    
                     // MARK: - 1. PINNED RESULT CARD (Hero)
-                    // Matches visual consistency of Assessment View
-                        HStack(spacing: 12) {
-                            ScoreResultCard(
-                                title: "Total 24h MME",
-                                subtitle: "Oral Morphine Equivalents",
-                                value: store.resultMME,
-                                valueLabel: "mg daily",
-                                badgeText: store.resultMME == "---" ? "Exclusion" : "Daily Load",
-                                badgeColor: store.resultMME == "---" ? ClinicalTheme.amber500 : ClinicalTheme.teal500
-                            )
-                            
-                            Button(action: { showMathSheet = true }) {
-                                VStack(spacing: 4) {
-                                    Image(systemName: "function")
-                                        .font(.title3).bold()
-                                    Text("Calc").font(.system(size: 10, weight: .bold))
-                                }
-                                .padding(12)
-                                .background(ClinicalTheme.teal500.opacity(0.1))
-                                .foregroundColor(ClinicalTheme.teal500)
-                                .cornerRadius(12)
-                            }
-                        }
-                        .padding(.horizontal)
-                        
-                        // Stewardship Warning (if any)
-                        if !store.warningText.isEmpty {
-                            HStack(alignment: .top, spacing: 6) {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundColor(ClinicalTheme.amber500)
-                                    .font(.caption)
-                                Text(store.warningText)
-                                    .font(.caption)
-                                    .foregroundColor(ClinicalTheme.amber500)
-                                    .multilineTextAlignment(.leading)
-                                Spacer()
-                            }
-                            .padding(.top, 8)
-                            .padding(.horizontal)
-                        }
-                    }
-                    .clinicalCard()
-                    .padding()
-                    .background(ClinicalTheme.backgroundMain) // Opaque background for pinning
-                    .zIndex(10)
-                    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 5)
+                    headerSection
                     
                     // MARK: - 2. SCROLLABLE CONTENT
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
                             
                             // A. ACTIVE MEDICATIONS LIST
-                            VStack(alignment: .leading, spacing: 12) {
-                                HStack {
-                                    Text("Active Medications").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
-                                    Spacer()
-                                    Button(action: { showAddDrugSheet = true }) {
-                                        Label("Add Drug", systemImage: "plus")
-                                            .font(.caption).bold()
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
-                                            .background(ClinicalTheme.teal500)
-                                            .foregroundColor(.white)
-                                            .cornerRadius(20)
-                                    }
-                                }
-                                .padding(.horizontal)
-                                
-                                if store.inputs.filter({ $0.isVisible }).isEmpty {
-                                    EmptyStateView(action: { showAddDrugSheet = true })
-                                } else {
-                                    List {
-                                        ForEach(store.inputs.filter { $0.isVisible }) { input in
-                                            ActiveMedicationRow(input: input, store: store)
-                                                .listRowSeparator(.hidden)
-                                                .listRowBackground(Color.clear)
-                                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                                        }
-                                    }
-                                    .listStyle(.plain)
-                                    .scrollDisabled(true)
-                                    .frame(height: CGFloat(store.inputs.filter { $0.isVisible }.count) * 92) // Exact height for 76pt card + 16pt spacing
-                                }
-                            }
+                            activeMedsList
                             
                             // B. CLINICAL CONTEXT & SAFETY (Redesigned v1.5.5)
-                            VStack(alignment: .leading, spacing: 12) {
-                                HStack {
-                                    Image(systemName: "cross.case.fill").foregroundColor(ClinicalTheme.teal500)
-                                    Text("Clinical Context").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
-                                }
-                                .padding(.horizontal)
-                                
-                                VStack(spacing: 12) {
-                                    // 1. Route Preference
-                                    Picker("Route Preference", selection: $store.routePreference) {
-                                        Text("Oral Preferred (PO)").tag(OpioidRoute.po)
-                                        Text("IV / SubQ Priority").tag(OpioidRoute.iv)
-                                    }
-                                    .pickerStyle(SegmentedPickerStyle())
-                                    
-                                    Divider().padding(.vertical, 4)
-                                    
-                                    // 2. Safety Toggles (Binary - Synced with Assessment Tab)
-                                    Toggle(isOn: $assessmentStore.isRenalImpaired) {
-                                        VStack(alignment: .leading) {
-                                            Text("Renal Impairment").font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
-                                            Text("eGFR <60 (CKD 3+)").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-                                        }
-                                    }
-                                    .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.amber500))
-                                    
-                                    // Renal Escalation Footer (v1.5.5 Safety)
-                                    if assessmentStore.renalFunction != .normal {
-                                        VStack(alignment: .leading, spacing: 8) {
-                                            HStack {
-                                                Image(systemName: "exclamationmark.triangle.fill")
-                                                    .foregroundColor(assessmentStore.renalFunction == .dialysis ? ClinicalTheme.rose500 : ClinicalTheme.amber500)
-                                                Text("Status: \(assessmentStore.renalFunction.rawValue)")
-                                                    .font(.caption).bold()
-                                                    .foregroundColor(ClinicalTheme.textPrimary)
-                                            }
-                                            
-                                            Text("Dialysis status requires strict avoidance of Morphine/Codeine/Meperidine due to neurotoxic metabolite accumulation.")
-                                                .font(.system(size: 10))
-                                                .foregroundColor(ClinicalTheme.textSecondary)
-                                            
-                                            Button(action: {
-                                                withAnimation {
-                                                    assessmentStore.renalFunction = (assessmentStore.renalFunction == .dialysis) ? .impaired : .dialysis
-                                                }
-                                            }) {
-                                                Text(assessmentStore.renalFunction == .dialysis ? "Revert to Standard CKD" : "Escalate to Dialysis")
-                                                    .font(.caption2).bold()
-                                                    .foregroundColor(assessmentStore.renalFunction == .dialysis ? ClinicalTheme.teal500 : ClinicalTheme.rose500)
-                                                    .padding(.vertical, 4)
-                                                    .padding(.horizontal, 8)
-                                                    .background((assessmentStore.renalFunction == .dialysis ? ClinicalTheme.teal500 : ClinicalTheme.rose500).opacity(0.1))
-                                                    .cornerRadius(6)
-                                            }
-                                        }
-                                        .padding(10)
-                                        .frame(maxWidth: .infinity)
-                                        .background(ClinicalTheme.backgroundMain.opacity(0.5))
-                                        .cornerRadius(8)
-                                    }
-                                    
-                                    Toggle(isOn: $assessmentStore.isHepaticImpaired) {
-                                        VStack(alignment: .leading) {
-                                            Text("Hepatic Impairment").font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
-                                            Text("Child-Pugh B+").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-                                        }
-                                    }
-                                    .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.amber500))
-                                    
-                                    // Hepatic Escalation Footer (v1.5.5 Safety)
-                                    if assessmentStore.hepaticFunction != .normal {
-                                        VStack(alignment: .leading, spacing: 8) {
-                                            HStack {
-                                                Image(systemName: "exclamationmark.triangle.fill")
-                                                    .foregroundColor(assessmentStore.hepaticFunction == .failure ? ClinicalTheme.rose500 : ClinicalTheme.amber500)
-                                                Text("Status: \(assessmentStore.hepaticFunction.rawValue)")
-                                                    .font(.caption).bold()
-                                                    .foregroundColor(ClinicalTheme.textPrimary)
-                                            }
-                                            
-                                            Text("Liver Failure (Child-Pugh C) increases Hydromorphone PO bioavailability 4x via portosystemic shunting.")
-                                                .font(.system(size: 10))
-                                                .foregroundColor(ClinicalTheme.textSecondary)
-                                            
-                                            Button(action: {
-                                                withAnimation {
-                                                    assessmentStore.hepaticFunction = (assessmentStore.hepaticFunction == .failure) ? .impaired : .failure
-                                                }
-                                            }) {
-                                                Text(assessmentStore.hepaticFunction == .failure ? "Revert to Moderate Impairment" : "Escalate to Liver Failure (Child-Pugh C)")
-                                                    .font(.caption2).bold()
-                                                    .foregroundColor(assessmentStore.hepaticFunction == .failure ? ClinicalTheme.teal500 : ClinicalTheme.rose500)
-                                                    .padding(.vertical, 4)
-                                                    .padding(.horizontal, 8)
-                                                    .background((assessmentStore.hepaticFunction == .failure ? ClinicalTheme.teal500 : ClinicalTheme.rose500).opacity(0.1))
-                                                    .cornerRadius(6)
-                                            }
-                                        }
-                                        .padding(10)
-                                        .frame(maxWidth: .infinity)
-                                        .background(ClinicalTheme.backgroundMain.opacity(0.5))
-                                        .cornerRadius(8)
-                                    }
-                                    
-                                    Divider().padding(.vertical, 4)
-                                    
-                                    // 3. Tolerance & Reduction
-                                    HStack {
-                                        Text("Correction").font(.subheadline).foregroundColor(ClinicalTheme.textSecondary)
-                                        Spacer()
-                                        Text("-\(Int(store.reduction))%").font(.headline).bold().foregroundColor(ClinicalTheme.teal500)
-                                    }
-                                    Slider(value: $store.reduction, in: 0...75, step: 5)
-                                        .accentColor(ClinicalTheme.teal500)
-                                }
-                                .padding()
-                                .background(ClinicalTheme.backgroundCard)
-                                .cornerRadius(12)
-                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                                .padding()
-                                .background(ClinicalTheme.backgroundCard)
-                                .cornerRadius(12)
-                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                                .padding(.horizontal)
-                                
-                                // LOGIC CLARIFICATION
-                                if assessmentStore.renalFunction != .normal || assessmentStore.hepaticFunction != .normal {
-                                    HStack(spacing: 6) {
-                                        Image(systemName: "shield.lefthalf.filled").foregroundColor(ClinicalTheme.teal500)
-                                        Text("Safety Logic: Renal/Hepatic restrictions applied IN ADDITION to this reduction.")
-                                            .font(.caption2)
-                                            .foregroundColor(ClinicalTheme.textSecondary)
-                                    }
-                                    .padding(.horizontal, 24)
-                                }
-                                
-                                // Warning Banner
-                                if !store.warningText.isEmpty {
-                                    HStack(alignment: .top, spacing: 12) {
-                                        Image(systemName: "exclamationmark.triangle.fill")
-                                            .font(.headline)
-                                            .foregroundColor(ClinicalTheme.amber500)
-                                            .padding(.top, 2)
-                                        
-                                        Text(store.warningText)
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundColor(ClinicalTheme.textPrimary)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                    }
-                                    .padding()
-                                    .background(ClinicalTheme.amber500.opacity(0.1))
-                                    .cornerRadius(12)
-                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.amber500.opacity(0.3), lineWidth: 1))
-                                    .padding(.horizontal)
-                                }
-                            }
-                            .animation(.easeInOut, value: store.warningText)
+                            // B. CLINICAL CONTEXT & SAFETY
+                            clinicalContextView
                             
                             // C. ESTIMATED TARGETS
-                            if !store.targetDoses.isEmpty {
-                                VStack(alignment: .leading, spacing: 16) {
-                                    Text("Estimated Targets").font(.headline).foregroundColor(ClinicalTheme.textSecondary).padding(.horizontal)
-                                    
-                                    ForEach(store.targetDoses) { dose in
-                                        TargetDoseCard(dose: dose)
-                                    }
-                                    
-                                    // Complex Conversions (Methadone/Patch)
-                                    ComplexConversionCard(isExpanded: $showComplexHelpers)
-                                        .padding(.horizontal)
-                                }
-                            }
+                            targetsSection
                             
-                            // D. ADJUVANTS
-                            let adjuvants = store.getAdjuvants()
-                            if !adjuvants.isEmpty {
-                                VStack(alignment: .leading, spacing: 0) {
-                                    Button(action: { withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { showAdjuvants.toggle() } }) {
-                                        HStack {
-                                            Image(systemName: "list.bullet.clipboard").foregroundColor(ClinicalTheme.teal500)
-                                            Text("Recommended Adjuvants").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
-                                            Spacer()
-                                            Image(systemName: showAdjuvants ? "chevron.up" : "chevron.down").foregroundColor(ClinicalTheme.textMuted)
-                                        }
-                                        .padding()
-                                        .background(ClinicalTheme.backgroundCard)
-                                    }
-                                    
-                                    if showAdjuvants {
-                                        VStack(alignment: .leading, spacing: 12) {
-                                            ForEach(adjuvants) { item in
-                                                AdjuvantRow(item: item)
-                                            }
-                                        }
-                                        .padding(.horizontal)
-                                        .padding(.bottom)
-                                    }
-                                }
-                                .cornerRadius(12)
-                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                                .padding(.horizontal)
-                            }
-                            
-                            // E. CLINICAL CONTEXT (MDCalc Style)
-                            // Instructions, Pearls, Evidence
-                            VStack(spacing: 1) {
-                                InfoAccordion(title: "Instructions & Warnings", icon: "exclamationmark.circle", content: InfoContent.instructions, expandedItem: $expandedInfoTab)
-                                InfoAccordion(title: "Algorithm Transparency", icon: "function", content: InfoContent.algorithm, expandedItem: $expandedInfoTab)
-                                InfoAccordion(title: "Pearls & Pitfalls", icon: "lightbulb", content: InfoContent.pearls, expandedItem: $expandedInfoTab)
-                                InfoAccordion(title: "Evidence (CDC 2022)", icon: "book.closed", content: InfoContent.evidence, expandedItem: $expandedInfoTab)
-                            }
-                            .background(ClinicalTheme.backgroundCard)
-                            .cornerRadius(12)
-                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, style: StrokeStyle(lineWidth: 1, dash: [5])))
-                            .padding(.horizontal)
-                            .padding(.bottom, 140)
-                            
-                            Spacer().frame(height: 100)
+                            adjuvantsAndInfoSection
                 }
             }
         }
@@ -357,12 +68,6 @@ struct CalculatorView: View {
                             Image(systemName: themeManager.isDarkMode ? "sun.max.fill" : "moon.stars.fill")
                                 .foregroundColor(ClinicalTheme.teal500)
                         }
-                        
-                        Button("Done") {
-                            UIApplication.shared.endEditing()
-                        }
-                        .font(.subheadline.bold())
-                        .foregroundColor(ClinicalTheme.teal500)
                     }
                 }
             }
@@ -383,13 +88,9 @@ struct CalculatorView: View {
             }
             // Sync with Assessment Store
             .onAppear { syncWithAssessment() }
-            .onChange(of: assessmentStore.gi) { syncWithAssessment() }
-            .onChange(of: assessmentStore.renalFunction) { syncWithAssessment() }
-            .onChange(of: assessmentStore.hepaticFunction) { syncWithAssessment() }
-            .onChange(of: assessmentStore.benzos) { syncWithAssessment() }
-            .onChange(of: assessmentStore.isPregnant) { syncWithAssessment() }
-            .onChange(of: assessmentStore.age) { syncWithAssessment() }
+            .onReceive(assessmentStore.didUpdate) { _ in syncWithAssessment() }
             .preferredColorScheme(themeManager.isDarkMode ? .dark : .light)
+            .addKeyboardDoneButton()
         }
     }
     } // Close body
@@ -468,8 +169,8 @@ struct ActiveMedicationRow: View {
                     set: { store.updateDose(for: input.id, dose: $0) }
                 ))
                 .keyboardType(.decimalPad)
-                .multilineTextAlignment(.trailing)
-                .font(.body.monospacedDigit().bold())
+                .multilineTextAlignment(TextAlignment.trailing)
+                .font(Font.body.monospacedDigit().bold())
                 .foregroundColor(ClinicalTheme.teal500)
                 .frame(width: 70)
                 
@@ -593,7 +294,7 @@ struct ComplexConversionCard: View {
                     Spacer()
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                 }
-                .font(.caption).bold()
+                .font(Font.caption.weight(.bold))
                 .foregroundColor(ClinicalTheme.amber500)
                 .padding()
                 .background(ClinicalTheme.amber500.opacity(0.1))
@@ -912,10 +613,295 @@ struct MathReceiptView: View {
             }
             .navigationTitle("Math Receipt")
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
                 }
             }
         }
+    }
+}
+
+extension CalculatorView {
+    var clinicalContextView: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "cross.case.fill").foregroundColor(ClinicalTheme.teal500)
+                Text("Clinical Context").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
+            }
+            .padding(.horizontal)
+            
+            VStack(spacing: 12) {
+                // 1. Route Preference
+                Picker("Route Preference", selection: $store.routePreference) {
+                    Text("Oral Preferred (PO)").tag(OpioidRoute.po)
+                    Text("IV / SubQ Priority").tag(OpioidRoute.iv)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                
+                Divider().padding(.vertical, 4)
+                
+                // 2. Safety Toggles (Binary - Synced with Assessment Tab)
+                Toggle(isOn: $assessmentStore.isRenalImpaired) {
+                    VStack(alignment: .leading) {
+                        Text("Renal Impairment").font(.subheadline).fontWeight(.bold).foregroundColor(ClinicalTheme.textPrimary)
+                        Text("eGFR <60 (CKD 3+)").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                    }
+                }
+                .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.amber500))
+                
+                // Renal Escalation Footer (v1.5.5 Safety)
+                if assessmentStore.renalFunction != .normal {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(assessmentStore.renalFunction == .dialysis ? ClinicalTheme.rose500 : ClinicalTheme.amber500)
+                            Text("Status: \(assessmentStore.renalFunction.rawValue)")
+                                .font(.caption).fontWeight(.bold)
+                                .foregroundColor(ClinicalTheme.textPrimary)
+                        }
+                        
+                        Text("Dialysis status requires strict avoidance of Morphine/Codeine/Meperidine due to neurotoxic metabolite accumulation.")
+                            .font(.system(size: 10))
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                        
+                        Button(action: {
+                            withAnimation {
+                                assessmentStore.renalFunction = (assessmentStore.renalFunction == .dialysis) ? .impaired : .dialysis
+                            }
+                        }) {
+                            Text(assessmentStore.renalFunction == .dialysis ? "Revert to Standard CKD" : "Escalate to Dialysis")
+                                .font(.caption2).fontWeight(.bold)
+                                .foregroundColor(assessmentStore.renalFunction == .dialysis ? ClinicalTheme.teal500 : ClinicalTheme.rose500)
+                                .padding(.vertical, 4)
+                                .padding(.horizontal, 8)
+                                .background((assessmentStore.renalFunction == .dialysis ? ClinicalTheme.teal500 : ClinicalTheme.rose500).opacity(0.1))
+                                .cornerRadius(6)
+                        }
+                    }
+                    .padding(10)
+                    .frame(maxWidth: .infinity)
+                    .background(ClinicalTheme.backgroundMain.opacity(0.5))
+                    .cornerRadius(8)
+                }
+                
+                Toggle(isOn: $assessmentStore.isHepaticImpaired) {
+                    VStack(alignment: .leading) {
+                        Text("Hepatic Impairment").font(.subheadline).fontWeight(.bold).foregroundColor(ClinicalTheme.textPrimary)
+                        Text("Child-Pugh B+").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                    }
+                }
+                .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.amber500))
+                
+                // Hepatic Escalation Footer (v1.5.5 Safety)
+                if assessmentStore.hepaticFunction != .normal {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(assessmentStore.hepaticFunction == .failure ? ClinicalTheme.rose500 : ClinicalTheme.amber500)
+                            Text("Status: \(assessmentStore.hepaticFunction.rawValue)")
+                                .font(.caption).fontWeight(.bold)
+                                .foregroundColor(ClinicalTheme.textPrimary)
+                        }
+                        
+                        Text("Liver Failure (Child-Pugh C) increases Hydromorphone PO bioavailability 4x via portosystemic shunting.")
+                            .font(.system(size: 10))
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                        
+                        Button(action: {
+                            withAnimation {
+                                assessmentStore.hepaticFunction = (assessmentStore.hepaticFunction == .failure) ? .impaired : .failure
+                            }
+                        }) {
+                            Text(assessmentStore.hepaticFunction == .failure ? "Revert to Moderate Impairment" : "Escalate to Liver Failure (Child-Pugh C)")
+                                .font(.caption2).fontWeight(.bold)
+                                .foregroundColor(assessmentStore.hepaticFunction == .failure ? ClinicalTheme.teal500 : ClinicalTheme.rose500)
+                                .padding(.vertical, 4)
+                                .padding(.horizontal, 8)
+                                .background((assessmentStore.hepaticFunction == .failure ? ClinicalTheme.teal500 : ClinicalTheme.rose500).opacity(0.1))
+                                .cornerRadius(6)
+                        }
+                    }
+                    .padding(10)
+                    .frame(maxWidth: .infinity)
+                    .background(ClinicalTheme.backgroundMain.opacity(0.5))
+                    .cornerRadius(8)
+                }
+                
+                Divider().padding(.vertical, 4)
+                
+                // 3. Tolerance & Reduction
+                HStack {
+                    Text("Correction").font(.subheadline).foregroundColor(ClinicalTheme.textSecondary)
+                    Spacer()
+                    Text("-\(Int(store.reduction))%").font(.headline).fontWeight(.bold).foregroundColor(ClinicalTheme.teal500)
+                }
+                Slider(value: $store.reduction, in: 0...75, step: 5)
+                    .accentColor(ClinicalTheme.teal500)
+            }
+            .padding()
+            .background(ClinicalTheme.backgroundCard)
+            .cornerRadius(12)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+            .padding(.horizontal)
+            
+            // LOGIC CLARIFICATION
+            if assessmentStore.renalFunction != .normal || assessmentStore.hepaticFunction != .normal {
+                HStack(spacing: 6) {
+                    Image(systemName: "shield.lefthalf.filled").foregroundColor(ClinicalTheme.teal500)
+                    Text("Safety Logic: Renal/Hepatic restrictions applied IN ADDITION to this reduction.")
+                        .font(.caption2)
+                        .foregroundColor(ClinicalTheme.textSecondary)
+                }
+                .padding(.horizontal, 24)
+            }
+        }
+    }
+}
+
+extension CalculatorView {
+    var activeMedsList: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Active Medications").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
+                Spacer()
+                Button(action: { showAddDrugSheet = true }) {
+                    Label("Add Drug", systemImage: "plus")
+                        .font(Font.caption.weight(.bold))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(ClinicalTheme.teal500)
+                        .foregroundColor(.white)
+                        .cornerRadius(20)
+                }
+            }
+            .padding(.horizontal)
+            
+            if store.inputs.filter({ $0.isVisible }).isEmpty {
+                EmptyStateView(action: { showAddDrugSheet = true })
+            } else {
+                List {
+                    ForEach(store.inputs.filter { $0.isVisible }) { input in
+                        ActiveMedicationRow(input: input, store: store)
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                    }
+                }
+                .listStyle(.plain)
+                .frame(height: CGFloat(store.inputs.filter { $0.isVisible }.count) * 92) // Exact height for 76pt card + 16pt spacing
+            }
+        }
+    }
+}
+
+extension CalculatorView {
+    var adjuvantsAndInfoSection: some View {
+        Group {
+            // D. ADJUVANTS
+            let adjuvants = store.getAdjuvants()
+            if !adjuvants.isEmpty {
+                VStack(alignment: .leading, spacing: 0) {
+                    Button(action: { withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { showAdjuvants.toggle() } }) {
+                        HStack {
+                            Image(systemName: "list.bullet.clipboard").foregroundColor(ClinicalTheme.teal500)
+                            Text("Recommended Adjuvants").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
+                            Spacer()
+                            Image(systemName: showAdjuvants ? "chevron.up" : "chevron.down").foregroundColor(ClinicalTheme.textMuted)
+                        }
+                        .padding()
+                        .background(ClinicalTheme.backgroundCard)
+                    }
+                    
+                    if showAdjuvants {
+                        VStack(alignment: .leading, spacing: 12) {
+                            ForEach(adjuvants) { item in
+                                AdjuvantRow(item: item)
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom)
+                    }
+                }
+                .cornerRadius(12)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                .padding(.horizontal)
+            }
+            
+            // E. CLINICAL CONTEXT (MDCalc Style)
+            // Instructions, Pearls, Evidence
+            VStack(spacing: 1) {
+                InfoAccordion(title: "Instructions & Warnings", icon: "exclamationmark.circle", content: InfoContent.instructions, expandedItem: $expandedInfoTab)
+                InfoAccordion(title: "Algorithm Transparency", icon: "function", content: InfoContent.algorithm, expandedItem: $expandedInfoTab)
+                InfoAccordion(title: "Pearls & Pitfalls", icon: "lightbulb", content: InfoContent.pearls, expandedItem: $expandedInfoTab)
+                InfoAccordion(title: "Evidence (CDC 2022)", icon: "book.closed", content: InfoContent.evidence, expandedItem: $expandedInfoTab)
+            }
+            .background(ClinicalTheme.backgroundCard)
+            .cornerRadius(12)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, style: StrokeStyle(lineWidth: 1, dash: [5])))
+            .padding(.horizontal)
+            .padding(.bottom, 140)
+            
+            Spacer().frame(height: 100)
+        }
+    }
+}
+
+extension CalculatorView {
+    var targetsSection: some View {
+        Group {
+            if !store.targetDoses.isEmpty {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Estimated Targets").font(.headline).foregroundColor(ClinicalTheme.textSecondary).padding(.horizontal)
+                    
+                    ForEach(store.targetDoses) { dose in
+                        TargetDoseCard(dose: dose)
+                    }
+                    
+                    // Complex Conversions (Methadone/Patch)
+                    ComplexConversionCard(isExpanded: $showComplexHelpers)
+                        .padding(.horizontal)
+                }
+            }
+        }
+    }
+}
+
+extension CalculatorView {
+    var headerSection: some View {
+        VStack(spacing: 12) {
+            ScoreResultCard(
+                title: "Total 24h MME",
+                subtitle: "Oral Morphine Equivalents",
+                value: store.resultMME,
+                valueLabel: "mg daily",
+                badgeText: store.resultMME == "---" ? "Exclusion" : "Daily Load",
+                badgeColor: store.resultMME == "---" ? ClinicalTheme.amber500 : ClinicalTheme.teal500
+            )
+            .padding(.horizontal)
+            
+            // Stewardship Warning (Pinned Below Card)
+            if !store.warningText.isEmpty {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(ClinicalTheme.amber500)
+                        .font(.headline)
+                    Text(store.warningText)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundColor(ClinicalTheme.textPrimary)
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                }
+                .padding(12)
+                .background(ClinicalTheme.amber500.opacity(0.1))
+                .cornerRadius(12)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.amber500.opacity(0.3), lineWidth: 1))
+                .padding(.horizontal)
+            }
+        }
+        .padding(.bottom, 12)
+        .background(ClinicalTheme.backgroundMain) // Opaque background for pinning
+        .zIndex(10)
+        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 5)
     }
 }

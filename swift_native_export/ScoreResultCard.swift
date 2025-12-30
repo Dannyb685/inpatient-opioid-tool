@@ -49,12 +49,14 @@ struct ScoreResultCard: View {
                     .background(badgeColor.opacity(0.15))
                     .foregroundColor(badgeColor)
                     .cornerRadius(8)
+                    .padding(.bottom, 4) // Vertical Rhythm: 4px gap
                 
                 // Score Value
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(value)
                         .font(.system(size: 28, weight: .black))
                         .foregroundColor(badgeColor)
+                        .fixedSize() // Prevent Wrapping
                     
                     if let label = valueLabel {
                         Text(label)
@@ -65,7 +67,10 @@ struct ScoreResultCard: View {
                 }
             }
         }
-        .padding(.vertical, 8)
-        .clinicalCard()
+        .padding(20) // Even 20px padding
+        .background(ClinicalTheme.backgroundCard)
+        .cornerRadius(16)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
 }

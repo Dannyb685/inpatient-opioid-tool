@@ -9,7 +9,7 @@ extension View {
                     UIApplication.shared.endEditing()
                 }
                 .foregroundColor(ClinicalTheme.teal500)
-                .fontWeight(.bold)
+                .font(Font.body.weight(.bold))
             }
         }
     }

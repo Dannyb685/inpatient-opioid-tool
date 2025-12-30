@@ -81,6 +81,8 @@ class AssessmentStore: ObservableObject {
     @Published var prodigyRisk: String = "Low"
     @Published var monitoringPlan: [String] = []
     
+    let didUpdate = PassthroughSubject<Void, Never>()
+    
     // No more Combine pipeline needed
     
     init() {
@@ -255,23 +257,26 @@ class AssessmentStore: ObservableObject {
         
         // --- 4. HEPATIC SAFETY GATES (CRITICAL FIXES) ---
         if isHepaticFailure { // Child-Pugh C
-            warns.append("Liver Failure: Avoid Morphine, Oxycodone, Methadone, Tramadol, Tapentadol.")
+            warns.append("Liver Failure: Avoid Morphine, Codeine, Methadone, Tramadol, Meperidine.")
             
-            // FIX: Expanded Toxic List (Oxymorphone, Tapentadol, Tramadol)
-            let toxic = ["Morphine", "Codeine", "Methadone", "Oxycodone", "Oxymorphone", "Tapentadol", "Tramadol"]
+            // FIX: Toxic List - Removed Oxycodone (Is First Line), Added Meperidine
+            let toxic = ["Morphine", "Codeine", "Methadone", "Oxymorphone", "Tapentadol", "Tramadol", "Meperidine"]
             recs = recs.filter { r in !toxic.contains { t in r.name.contains(t) } }
             
             // Ensure Fentanyl if not present
             if !recs.contains(where: { $0.name.contains("Fentanyl") }) {
                 let fentDose = getStartingDose(drug: "Fentanyl", route: "IV")
-                recs.insert(DrugRecommendation(name: "Fentanyl IV", reason: "Preferred.", detail: "Safest choice in liver failure. \(fentDose)", type: .safe), at: 0)
+                recs.insert(DrugRecommendation(name: "Fentanyl IV", reason: "Preferred.", detail: "Safest choice (No hepatic metabolism). \(fentDose)", type: .safe), at: 0)
             }
             
-            // FIX: Hydromorphone Shunt Warning
+            // FIX: Hydromorphone & Oxycodone Adjustments
              recs = recs.map { r in
                  if r.name.contains("Hydromorphone") && r.name.contains("PO") {
-                    return DrugRecommendation(name: r.name, reason: "EXTREME CAUTION", detail: "AVOID PREFERRED. Danger: Shunt Effect (400% Bioavailability). If used, reduce 75%.", type: .caution)
+                    return DrugRecommendation(name: r.name, reason: "Caution (Shunt Risk)", detail: "Bioavailability increases 4x. Start 1mg PO. Extended interval.", type: .caution)
                 }
+                 if r.name.contains("Oxycodone") {
+                     return DrugRecommendation(name: r.name, reason: "Caution", detail: "Start 2.5mg PO. Extended interval. Monitor sedation.", type: .caution)
+                 }
                  if !r.detail.contains("Reduce") {
                      return DrugRecommendation(name: r.name, reason: r.reason, detail: r.detail + " Reduce dose 50%.", type: r.type)
                  }
@@ -328,6 +333,8 @@ class AssessmentStore: ObservableObject {
         self.recommendations = recs
         self.adjuvants = adj
         self.warnings = warns
+        
+        didUpdate.send()
     }
     
     func reset() {
