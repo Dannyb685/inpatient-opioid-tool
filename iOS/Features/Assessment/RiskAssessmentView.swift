@@ -42,6 +42,10 @@ struct RiskAssessmentView: View {
                     }
                     .padding(.top)
                     .padding(.bottom, 100)
+                    .addKeyboardDoneButton()
+                    .onTapGesture {
+                        UIApplication.shared.endEditing()
+                    }
                 }
             }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
