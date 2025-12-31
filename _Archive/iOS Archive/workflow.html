@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Workflow | Opioid Precision</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .mono-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hero-pattern {
+            background-color: #0f172a;
+            background-image: radial-gradient(#1e293b 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <a href="index.html" class="flex items-center gap-2">
+                        <i data-lucide="activity" class="text-blue-600 h-6 w-6"></i>
+                        <span class="font-bold text-xl tracking-tight text-slate-900">Opioid Precision</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html"
+                        class="text-sm font-medium text-slate-500 hover:text-slate-900 transition">Home</a>
+                    <span class="text-sm font-medium text-blue-600">Clinical Workflow</span>
+                    <a href="#"
+                        class="text-sm font-medium text-slate-500 hover:text-slate-900 transition">Pharmacokinetics</a>
+                    <button
+                        class="bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-slate-800 transition">
+                        Request Access
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-white pt-32 pb-16 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold uppercase tracking-wider mb-6">
+                    Workflow Architecture
+                </div>
+                <h1 class="text-4xl font-bold text-slate-900 mb-6">
+                    Reducing Cognitive Load in <br>
+                    <span class="text-blue-600">High-Acuity Environments.</span>
+                </h1>
+                <p class="text-lg text-slate-600 leading-relaxed">
+                    Calculation errors are often symptoms of interface fatigue. Opioid Precision streamlines the
+                    prescribing interface based on clinical context, suppressing non-urgent data while highlighting
+                    lethal parameters.
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Trauma Bay Protocol -->
+    <section class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-6">
+                        <i data-lucide="zap" class="w-6 h-6 text-amber-600"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Trauma Bay Protocol</h2>
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        In resuscitation scenarios, "alert fatigue" can be fatal. The Trauma Bay Protocol activates a
+                        stripped-down interface designed for speed and safety.
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                            <div>
+                                <strong class="block text-slate-900 text-sm">Signal-to-Noise Optimization</strong>
+                                <span class="text-slate-500 text-sm">Hides non-urgent fields (e.g., insurance data,
+                                    chronic taper history) to focus purely on acute stabilization.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                            <div>
+                                <strong class="block text-slate-900 text-sm">Persistent Safety Rails</strong>
+                                <span class="text-slate-500 text-sm">Despite the simplified view, "Lethal Gates" (Renal
+                                    function, Benzodiazepine co-load) remain permanently visible and active.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                            <div>
+                                <strong class="block text-slate-900 text-sm">Conservative Defaults</strong>
+                                <span class="text-slate-500 text-sm">Auto-applies a 50% dose reduction for incomplete
+                                    cross tolerance, requiring an active override to prescribe full calculated
+                                    equivalence.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- UI Visualization -->
+                <div class="relative bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-900 px-4 py-3 flex justify-between items-center">
+                        <span class="text-slate-300 text-xs font-mono">INTERFACE_MODE: TRAUMA_BAY</span>
+                        <div class="flex gap-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                        </div>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-red-50 border border-red-100 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="alert-triangle" class="text-red-600 w-5 h-5"></i>
+                                <span class="text-red-900 font-medium text-sm">eGFR &lt; 60 detected</span>
+                            </div>
+                            <span class="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded">MORPHINE
+                                LOCKED</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg opacity-50">
+                                <span class="text-xs text-slate-400 block mb-1">Insurance Auth</span>
+                                <span class="text-sm font-medium text-slate-500">Hidden</span>
+                            </div>
+                            <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                <span class="text-xs text-blue-600 block mb-1">Recommended Agent</span>
+                                <span class="text-sm font-bold text-slate-900">Fentanyl IV</span>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                            <span class="text-xs text-slate-500 block mb-1">Calculated Equivalence</span>
+                            <div class="flex justify-between items-end">
+                                <span class="text-xl font-bold text-slate-900">25 mcg</span>
+                                <span class="text-xs text-amber-600 font-medium">50% Reduction Applied</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Context Aware Formulary -->
+    <section class="py-20 bg-white border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl mx-auto text-center mb-16">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Context-Aware Formulary</h2>
+                <p class="text-slate-600">
+                    Standard calculators present a "Wall of Zeros"—a list of 20+ opioids, most irrelevant to the
+                    patient. Opioid Precision filters the formulary based on the clinical setting.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="p-6 bg-slate-50 rounded-xl border border-slate-100">
+                    <h3 class="font-bold text-slate-900 mb-2">The "Wall of Zeros" Problem</h3>
+                    <p class="text-sm text-slate-500 mb-4">Legacy interfaces show Meperidine, Levorphanol, and
+                        Oxymorphone alongside standard agents, increasing the probability of selection error.</p>
+                    <div class="h-1 w-full bg-slate-200 rounded overflow-hidden">
+                        <div class="h-full bg-slate-300 w-3/4"></div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="p-6 bg-white rounded-xl border border-blue-100 shadow-lg ring-1 ring-blue-500/10">
+                    <h3 class="font-bold text-blue-700 mb-2">Active-Only Filtering</h3>
+                    <p class="text-sm text-slate-600 mb-4">If "Trauma" is selected, the list narrows to Fentanyl,
+                        Hydromorphone, and Morphine. Oral agents and long-acting formulations are suppressed.</p>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-mono bg-blue-50 p-2 rounded">
+                            <span>Fentanyl IV</span>
+                            <span class="text-blue-700">ACTIVE</span>
+                        </div>
+                        <div class="flex justify-between text-xs font-mono bg-blue-50 p-2 rounded">
+                            <span>Hydromorphone IV</span>
+                            <span class="text-blue-700">ACTIVE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="p-6 bg-slate-50 rounded-xl border border-slate-100">
+                    <h3 class="font-bold text-slate-900 mb-2">Contraindication Masks</h3>
+                    <p class="text-sm text-slate-500 mb-4">Agents contraindicated by patient physiology (e.g., Codeine
+                        in pediatric patients or poor CYP2D6 metabolizers) are removed from the selection set entirely.
+                    </p>
+                    <div class="flex items-center gap-2 text-xs text-red-500 font-mono mt-4">
+                        <i data-lucide="x-circle" class="w-4 h-4"></i>
+                        <span>Codeine: BLOCKED (Age &lt;18)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resident Hero / Documentation -->
+    <section class="py-20 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div>
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-6">
+                        Documentation Engine
+                    </div>
+                    <h2 class="text-3xl font-bold mb-6">Resident Hero™</h2>
+                    <p class="text-slate-400 text-lg mb-8 leading-relaxed">
+                        In litigious environments, defensibility is paramount. The system auto-generates a chart-ready
+                        risk assessment that details the rationale behind every dose and rotation.
+                    </p>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                        Rather than simply documenting "Dose X given," the engine documents the <em>absence</em> of
+                        error: explicitly noting that renal function was checked, that interactions were screened, and
+                        that safety reductions were applied.
+                    </p>
+                    <button
+                        class="text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-2 transition">
+                        See Documentation Standards
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Mock Note -->
+                <div
+                    class="bg-slate-800 rounded-lg p-1 border border-slate-700 shadow-2xl font-mono text-xs md:text-sm">
+                    <div class="bg-slate-900 px-4 py-2 rounded-t flex items-center gap-2 border-b border-slate-700">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span class="ml-2 text-slate-500">generated_note.txt</span>
+                    </div>
+                    <div class="p-6 text-slate-300 leading-relaxed space-y-4">
+                        <p>
+                            <span class="text-blue-400">*** OPIOID SAFETY NOTE ***</span>
+                        </p>
+                        <p>
+                            <span class="text-slate-500">INDICATION:</span> Acute Pain (Post-Trauma)<br>
+                            <span class="text-slate-500">REGIMEN:</span> Rotation to Hydromorphone IV
+                        </p>
+                        <p>
+                            <span class="text-slate-500">SAFETY CHECKS:</span><br>
+                            1. <span class="text-emerald-400">[PASSED]</span> Age Check (Adult > 18)<br>
+                            2. <span class="text-amber-400">[WARNING]</span> Renal Impairment (eGFR 45)<br>
+                            &nbsp;&nbsp;&nbsp;-> ACTION: Morphine excluded due to M6G accumulation risk.<br>
+                            3. <span class="text-emerald-400">[PASSED]</span> Benzodiazepine Screen (None active)
+                        </p>
+                        <p>
+                            <span class="text-slate-500">DOSING LOGIC:</span><br>
+                            Calculated Equivalence: 1.5 mg<br>
+                            <span class="text-amber-400">Incomplete Cross-Tolerance Reduction: -50%</span><br>
+                            <span class="text-white font-bold">FINAL DOSE: 0.75 mg IV q4h prn</span>
+                        </p>
+                        <p>
+                            <span class="text-slate-500">STEWARDSHIP:</span><br>
+                            Naloxone co-prescription ordered (Protocol MME > 50).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <div class="flex items-center gap-2 mb-2">
+                    <i data-lucide="activity" class="text-slate-900 h-5 w-5"></i>
+                    <span class="font-bold text-lg text-slate-900">Opioid Precision</span>
+                </div>
+                <p class="text-slate-500 text-sm">© 2024 Clinical Systems. <strong>White Box Architecture</strong>: Full
+                    transparency on all logic.</p>
+            </div>
+            <div class="flex gap-6">
+                <a href="#" class="text-slate-400 hover:text-slate-900 transition text-sm">Privacy Policy</a>
+                <a href="#" class="text-slate-400 hover:text-slate-900 transition text-sm">Terms of Use</a>
+                <a href="#" class="text-slate-400 hover:text-slate-900 transition text-sm">Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

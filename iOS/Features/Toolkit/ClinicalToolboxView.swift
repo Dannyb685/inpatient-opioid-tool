@@ -45,7 +45,7 @@ struct ClinicalToolboxView: View {
 }
 
 struct ReferenceListView: View {
-    let category: ClinicalReferenceCategory
+    let category: OUDReferenceCategory
     
     var body: some View {
         List(category.items) { item in

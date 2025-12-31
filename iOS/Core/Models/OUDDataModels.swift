@@ -16,7 +16,7 @@ struct OUDReferenceItem: Identifiable {
     let subtitle: String?
 }
 
-struct ClinicalReferenceCategory: Identifiable {
+struct OUDReferenceCategory: Identifiable {
     let id: String
     let title: String
     let icon: String
@@ -39,8 +39,8 @@ struct OUDStaticData {
         DSMCriterion(id: 11, text: "Withdrawal (syndrome or taking to relieve symptoms)", isPhysiological: true)
     ]
 
-    static let toolboxCategories: [ClinicalReferenceCategory] = [
-        ClinicalReferenceCategory(id: "street", title: "Street Pricing", icon: "dollarsign.circle", items: [
+    static let toolboxCategories: [OUDReferenceCategory] = [
+        OUDReferenceCategory(id: "street", title: "Street Pricing", icon: "dollarsign.circle", items: [
             OUDReferenceItem(title: "Heroin/Fentanyl (Bag)", value: "$5 - $10", subtitle: "90-200+ MME (Service Unit)"),
             OUDReferenceItem(title: "Bundle (10-14 Bags)", value: "$40 - $100", subtitle: "Philly Bundle = 14 Bags"),
             OUDReferenceItem(title: "Brick (5 Bundles)", value: "$200 - $450", subtitle: "Wholesale vs Retail"),
@@ -49,18 +49,18 @@ struct OUDStaticData {
             OUDReferenceItem(title: "Gabapentin (Johnny)", value: "$0.50 - $3.00", subtitle: "Potentiator / Utility"),
             OUDReferenceItem(title: "Xanax (Press)", value: "$3 - $5", subtitle: "Bromazolam / Fentanyl Risk")
         ]),
-        ClinicalReferenceCategory(id: "tox", title: "Urine Toxicology", icon: "flask", items: [
+        OUDReferenceCategory(id: "tox", title: "Urine Toxicology", icon: "flask", items: [
             OUDReferenceItem(title: "Heroin (6-MAM)", value: "6-8 hours", subtitle: "Rapid metabolism"),
             OUDReferenceItem(title: "Morphine/Codeine", value: "2-3 days", subtitle: "Standard screen"),
             OUDReferenceItem(title: "Fentanyl", value: "1-3 days", subtitle: "Requires specific assay"),
             OUDReferenceItem(title: "Methadone", value: "3-14 days", subtitle: "Long elimination half-life")
         ]),
-        ClinicalReferenceCategory(id: "palliative", title: "Palliative Conversion", icon: "cross.case", items: [
+        OUDReferenceCategory(id: "palliative", title: "Palliative Conversion", icon: "cross.case", items: [
             OUDReferenceItem(title: "Morphine PO : IV", value: "3:1", subtitle: "Standard starting ratio"),
             OUDReferenceItem(title: "Hydromorphone PO : IV", value: "5:1", subtitle: "Approximate"),
             OUDReferenceItem(title: "Morphine : Hydrocodone", value: "1:1", subtitle: "Oral equivalence")
         ]),
-        ClinicalReferenceCategory(id: "withdraw", title: "Withdrawal Scales", icon: "list.clipboard", items: [
+        OUDReferenceCategory(id: "withdraw", title: "Withdrawal Scales", icon: "list.clipboard", items: [
             OUDReferenceItem(title: "COWS Mild", value: "5 - 12", subtitle: "Symptomatic treatment"),
             OUDReferenceItem(title: "COWS Moderate", value: "13 - 24", subtitle: "Consider induction"),
             OUDReferenceItem(title: "COWS Severe", value: "25 - 36", subtitle: "Urgent management"),

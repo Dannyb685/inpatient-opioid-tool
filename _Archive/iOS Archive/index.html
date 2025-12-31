@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opioid Precision | Acute Safety Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .hero-pattern {
+            background-color: #0f172a;
+            background-image: radial-gradient(#1e293b 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .medical-blue {
+            color: #0ea5e9;
+        }
+
+        .alert-red {
+            color: #ef4444;
+        }
+
+        .safety-gate-border {
+            border-left: 4px solid #ef4444;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="activity" class="text-blue-600 h-6 w-6"></i>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">Opioid Precision</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="workflow.html"
+                        class="text-sm font-medium text-slate-600 hover:text-blue-600 transition">Clinical Workflow</a>
+                    <a href="#safety"
+                        class="text-sm font-medium text-slate-600 hover:text-red-600 transition">Pharmacokinetics</a>
+                    <a href="#stewardship"
+                        class="text-sm font-medium text-slate-600 hover:text-emerald-600 transition">Induction &
+                        Taper</a>
+                    <button
+                        class="bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-slate-800 transition">
+                        Request Access
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-pattern pt-32 pb-20 lg:pt-48 lg:pb-32 text-white relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="max-w-3xl">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs font-semibold uppercase tracking-wider mb-6">
+                    Dynamic Clinical Decision Support
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">
+                    Static Nomograms <br>
+                    <span class="text-blue-400">Ignore Physiology.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-slate-400 mb-8 leading-relaxed max-w-2xl">
+                    Standard calculators rely on linear conversion tables that fail to account for incomplete cross
+                    tolerance, bidirectional asymmetry, and organ-specific clearance. Opioid Precision automates the
+                    pharmacokinetics required for high-acuity rotation and induction.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button
+                        class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2">
+                        View Clinical Demo
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                    <button
+                        class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-8 py-3 rounded-lg font-semibold transition border border-slate-700">
+                        Read Whitepaper
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Abstract Visual -->
+        <div class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/3 opacity-20 pointer-events-none">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-[800px] h-[800px] fill-blue-500">
+                <path
+                    d="M42.7,-62.9C55.2,-52.8,65.4,-41.6,71.5,-29.1C77.6,-16.6,79.6,-2.8,76.3,9.5C73,21.8,64.4,32.6,54.6,41.9C44.8,51.2,33.8,59,21.9,64.3C10,69.6,-2.8,72.4,-14.8,69.6C-26.8,66.8,-38,58.4,-48.5,49.1C-59,39.8,-68.8,29.6,-73.4,17.2C-78,4.8,-77.4,-9.8,-70.8,-21.8C-64.2,-33.8,-51.6,-43.2,-39.8,-53.5C-28,-63.8,-17,-75,-4.3,-78.4C8.4,-81.8,21,-77.4,30.2,-72.9Z"
+                    transform="translate(100 100)" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Core Features / Workflow -->
+    <section id="core" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Workflow Architecture</h2>
+                    <p class="text-slate-500 max-w-xl">Designed to mitigate alert fatigue while enforcing rigorous
+                        safety checks during the rotation and induction process.</p>
+                </div>
+                <div class="hidden md:block">
+                    <i data-lucide="zap" class="w-12 h-12 text-yellow-500 opacity-20"></i>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Feature 1 -->
+                <div class="p-6 rounded-xl bg-slate-50 border border-slate-100 hover:shadow-lg transition group">
+                    <div
+                        class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 transition">
+                        <i data-lucide="zap" class="w-6 h-6 text-blue-600 group-hover:text-white transition"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Trauma Bay Protocol</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Reduces cognitive load by suppressing non-urgent fields. Enforces conservative default dosing to
+                        account for incomplete cross tolerance.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="p-6 rounded-xl bg-slate-50 border border-slate-100 hover:shadow-lg transition group">
+                    <div
+                        class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-emerald-600 transition">
+                        <i data-lucide="list-filter"
+                            class="w-6 h-6 text-emerald-600 group-hover:text-white transition"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Context-Aware Formulary</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Replaces the "Wall of Zeros" with an active-only list. Filters irrelevant agents to prevent
+                        selection errors common with static tables.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="p-6 rounded-xl bg-slate-50 border border-slate-100 hover:shadow-lg transition group">
+                    <div
+                        class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-indigo-600 transition">
+                        <i data-lucide="file-text"
+                            class="w-6 h-6 text-indigo-600 group-hover:text-white transition"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Defensive Documentation</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Automates chart notes that justify clinical reasoning, explicitly citing renal status or MME
+                        thresholds to mitigate liability.
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="p-6 rounded-xl bg-slate-50 border border-slate-100 hover:shadow-lg transition group">
+                    <div
+                        class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-600 transition">
+                        <i data-lucide="trending-down"
+                            class="w-6 h-6 text-purple-600 group-hover:text-white transition"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Bernese Micro-Induction</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Automates the scheduling for Bernese Method micro-dosing, bridging the gap where clinicians
+                        currently rely on manual spreadsheets.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Safety Architecture / The Lethal Gates -->
+    <section id="safety" class="py-20 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+                <div>
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold uppercase tracking-wider mb-6">
+                        Pharmacokinetic Safety Engine
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6">Closing the Renal Blind Spot</h2>
+                    <p class="text-slate-400 text-lg mb-8 leading-relaxed">
+                        Most apps function as unregulated "black boxes" with up to 400% variance in conversion outputs.
+                        Opioid Precision employs physiological hard stops to prevent errors driven by the failure of
+                        linear algorithms.
+                    </p>
+
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="mt-1">
+                                <i data-lucide="shield-alert" class="text-red-500 w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Pediatric Variance Lock</h4>
+                                <p class="text-slate-400 text-sm mt-1">Adult-derived equations fail in pediatric
+                                    stabilization. The system locks if Age < 18 to prevent dangerous extrapolation of
+                                        standard MME factors.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="mt-1">
+                                <i data-lucide="activity" class="text-red-500 w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Metabolite Accumulation Logic</h4>
+                                <p class="text-slate-400 text-sm mt-1">
+                                    <span class="text-white font-semibold">M3G/M6G Gate:</span> Flags neurotoxic
+                                    morphine metabolite accumulation if eGFR < 60.<br>
+                                        <span class="text-white font-semibold">Hepatic Shunt:</span> Identifies
+                                        Child-Pugh C patients where hydromorphone bioavailability increases
+                                        unpredictably.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="mt-1">
+                                <i data-lucide="zap-off" class="text-red-500 w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Non-Linear Methadone Potency</h4>
+                                <p class="text-slate-400 text-sm mt-1">Replaces static ratios with dynamic logic to
+                                    address the dose-dependent potency paradox (ratio shift from 4:1 to 12:1),
+                                    preventing lethal accumulation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Visualization Mock -->
+                <div class="relative">
+                    <div class="absolute inset-0 bg-red-500 blur-3xl opacity-10 rounded-full"></div>
+                    <div class="relative bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl">
+                        <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-4">
+                            <span class="font-mono text-sm text-slate-400">CDSS_ENGINE_V1.0</span>
+                            <span class="flex h-3 w-3 relative">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            </span>
+                        </div>
+
+                        <!-- Mock Alert -->
+                        <div class="bg-red-500/10 border-l-4 border-red-500 p-4 mb-4 rounded-r-md">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h5 class="text-red-400 font-bold flex items-center gap-2">
+                                        <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                                        Active Metabolite Risk
+                                    </h5>
+                                    <p class="text-xs text-red-300 mt-1">Renal Gate Triggered</p>
+                                </div>
+                            </div>
+                            <div class="mt-2 text-sm text-slate-300">
+                                Patient eGFR: <strong>45 mL/min</strong><br>
+                                Alert: Morphine-6-glucuronide (M6G) accumulation likely. Rotation to Fentanyl or
+                                Hydromorphone recommended.
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-600 w-full"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-500 font-mono">
+                                <span>Creatinine Clearance: 45</span>
+                                <span>Morphine: LOCKED</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex gap-2">
+                            <button
+                                class="flex-1 bg-slate-700 py-2 rounded text-sm text-slate-400 cursor-not-allowed">Calculate
+                                MME</button>
+                            <button
+                                class="flex-1 bg-red-600 hover:bg-red-500 py-2 rounded text-sm font-semibold transition">View
+                                Alternatives</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stewardship Integration -->
+    <section id="stewardship" class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16">
+            <h2 class="text-3xl font-bold text-slate-900 mb-4">Stewardship & Induction</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto">Beyond simple math. The engine proactively identifies
+                respiratory depression risks using PRODIGY scores and supports complex induction protocols.</p>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Card 1 -->
+            <div class="glass-card p-8 rounded-xl shadow-sm hover:shadow-md transition">
+                <div class="w-14 h-14 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="stethoscope" class="w-7 h-7 text-teal-600"></i>
+                </div>
+                <h3 class="text-xl font-bold text-center mb-3">PRODIGY Risk Scoring</h3>
+                <p class="text-slate-600 text-center text-sm leading-relaxed">
+                    Quantifies respiratory depression risk based on Sleep Apnea, CHF, and Age. Shifts risk assessment
+                    from clinical intuition to evidence-based scoring.
+                </p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-card p-8 rounded-xl shadow-sm hover:shadow-md transition relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-16 h-16 bg-orange-100 rounded-bl-full -mr-8 -mt-8"></div>
+                <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="syringe" class="w-7 h-7 text-orange-600"></i>
+                </div>
+                <h3 class="text-xl font-bold text-center mb-3">Naloxone Automation</h3>
+                <p class="text-slate-600 text-center text-sm leading-relaxed">
+                    Persistent "Sticky Alert" triggers if MME > 50 or if Benzodiazepines are present. Ensures rescue
+                    medication is prescribed for high-risk cohorts.
+                </p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="glass-card p-8 rounded-xl shadow-sm hover:shadow-md transition">
+                <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="layers" class="w-7 h-7 text-blue-600"></i>
+                </div>
+                <h3 class="text-xl font-bold text-center mb-3">Adjuvant Logic</h3>
+                <p class="text-slate-600 text-center text-sm leading-relaxed">
+                    Suggests multimodal alternatives (Gabapentin, NSAIDs) dynamically adjusted for renal clearance to
+                    spare opioid load and improve analgesia.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <div class="flex items-center gap-2 mb-2">
+                    <i data-lucide="activity" class="text-slate-900 h-5 w-5"></i>
+                    <span class="font-bold text-lg text-slate-900">Opioid Precision</span>
+                </div>
+                <p class="text-slate-500 text-sm">© 2024 Clinical Systems. All rights reserved.</p>
+            </div>
+            <div class="flex gap-6">
+                <a href="#" class="text-slate-400 hover:text-slate-900 transition text-sm">Privacy Policy</a>
+                <a href="#" class="text-slate-400 hover:text-slate-900 transition text-sm">Terms of Use</a>
+                <a href="#" class="text-slate-400 hover:text-slate-900 transition text-sm">Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
