@@ -9,7 +9,7 @@ struct DSMCriterion: Identifiable, Hashable {
     let isPhysiological: Bool // Flags Tolerance and Withdrawal for medical supervision logic
 }
 
-struct ReferenceItem: Identifiable {
+struct OUDReferenceItem: Identifiable {
     let id = UUID()
     let title: String
     let value: String
@@ -20,7 +20,7 @@ struct ClinicalReferenceCategory: Identifiable {
     let id: String
     let title: String
     let icon: String
-    let items: [ReferenceItem]
+    let items: [OUDReferenceItem]
 }
 
 // MARK: - Static Data Repository
@@ -41,27 +41,30 @@ struct OUDStaticData {
 
     static let toolboxCategories: [ClinicalReferenceCategory] = [
         ClinicalReferenceCategory(id: "street", title: "Street Pricing", icon: "dollarsign.circle", items: [
-            ReferenceItem(title: "Heroin (Bag/Stamp)", value: "$5 - $20", subtitle: "Highly variable purity"),
-            ReferenceItem(title: "Oxycodone (Pressed)", value: "$1/mg (approx)", subtitle: "High fentanyl risk"),
-            ReferenceItem(title: "Fentanyl (Pressed Blue)", value: "$10 - $30", subtitle: "Per tablet"),
-            ReferenceItem(title: "Buprenorphine (Street)", value: "$5 - $20", subtitle: "Per 8mg strip")
+            OUDReferenceItem(title: "Heroin/Fentanyl (Bag)", value: "$5 - $10", subtitle: "90-200+ MME (Service Unit)"),
+            OUDReferenceItem(title: "Bundle (10-14 Bags)", value: "$40 - $100", subtitle: "Philly Bundle = 14 Bags"),
+            OUDReferenceItem(title: "Brick (5 Bundles)", value: "$200 - $450", subtitle: "Wholesale vs Retail"),
+            OUDReferenceItem(title: "Counterfeit Pill (M30)", value: "$1 - $5", subtitle: "Fentanyl/Xylazine (No Oxy)"),
+            OUDReferenceItem(title: "Buprenorphine (8mg)", value: "$5 - $20", subtitle: "Survival Economy (No High)"),
+            OUDReferenceItem(title: "Gabapentin (Johnny)", value: "$0.50 - $3.00", subtitle: "Potentiator / Utility"),
+            OUDReferenceItem(title: "Xanax (Press)", value: "$3 - $5", subtitle: "Bromazolam / Fentanyl Risk")
         ]),
         ClinicalReferenceCategory(id: "tox", title: "Urine Toxicology", icon: "flask", items: [
-            ReferenceItem(title: "Heroin (6-MAM)", value: "6-8 hours", subtitle: "Rapid metabolism"),
-            ReferenceItem(title: "Morphine/Codeine", value: "2-3 days", subtitle: "Standard screen"),
-            ReferenceItem(title: "Fentanyl", value: "1-3 days", subtitle: "Requires specific assay"),
-            ReferenceItem(title: "Methadone", value: "3-14 days", subtitle: "Long elimination half-life")
+            OUDReferenceItem(title: "Heroin (6-MAM)", value: "6-8 hours", subtitle: "Rapid metabolism"),
+            OUDReferenceItem(title: "Morphine/Codeine", value: "2-3 days", subtitle: "Standard screen"),
+            OUDReferenceItem(title: "Fentanyl", value: "1-3 days", subtitle: "Requires specific assay"),
+            OUDReferenceItem(title: "Methadone", value: "3-14 days", subtitle: "Long elimination half-life")
         ]),
         ClinicalReferenceCategory(id: "palliative", title: "Palliative Conversion", icon: "cross.case", items: [
-            ReferenceItem(title: "Morphine PO : IV", value: "3:1", subtitle: "Standard starting ratio"),
-            ReferenceItem(title: "Hydromorphone PO : IV", value: "5:1", subtitle: "Approximate"),
-            ReferenceItem(title: "Morphine : Hydrocodone", value: "1:1", subtitle: "Oral equivalence")
+            OUDReferenceItem(title: "Morphine PO : IV", value: "3:1", subtitle: "Standard starting ratio"),
+            OUDReferenceItem(title: "Hydromorphone PO : IV", value: "5:1", subtitle: "Approximate"),
+            OUDReferenceItem(title: "Morphine : Hydrocodone", value: "1:1", subtitle: "Oral equivalence")
         ]),
         ClinicalReferenceCategory(id: "withdraw", title: "Withdrawal Scales", icon: "list.clipboard", items: [
-            ReferenceItem(title: "COWS Mild", value: "5 - 12", subtitle: "Symptomatic treatment"),
-            ReferenceItem(title: "COWS Moderate", value: "13 - 24", subtitle: "Consider induction"),
-            ReferenceItem(title: "COWS Severe", value: "25 - 36", subtitle: "Urgent management"),
-            ReferenceItem(title: "COWS Extreme", value: "> 36", subtitle: "High risk")
+            OUDReferenceItem(title: "COWS Mild", value: "5 - 12", subtitle: "Symptomatic treatment"),
+            OUDReferenceItem(title: "COWS Moderate", value: "13 - 24", subtitle: "Consider induction"),
+            OUDReferenceItem(title: "COWS Severe", value: "25 - 36", subtitle: "Urgent management"),
+            OUDReferenceItem(title: "COWS Extreme", value: "> 36", subtitle: "High risk")
         ])
     ]
 }
