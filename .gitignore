@@ -5,3 +5,10 @@ styles.css
 web-dist/
 test_vault
 .exclude
+
+# iOS / Swift
+.build/
+.swiftpm/
+DerivedData/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+.generated/

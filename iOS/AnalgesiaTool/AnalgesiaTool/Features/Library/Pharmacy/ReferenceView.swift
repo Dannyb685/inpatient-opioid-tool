@@ -4,7 +4,7 @@ import SwiftUI
 
 
 // MARK: - Data Models (References)
-struct ArchiveReferenceItem: Identifiable {
+struct ReferenceItem: Identifiable {
     let id = UUID()
     let title: String
     let citation: String
@@ -82,8 +82,9 @@ struct ReferenceLibrary {
 }
 
 struct ReferenceView: View {
-    @EnvironmentObject var store: AssessmentStore // Add this
+    @EnvironmentObject var store: AssessmentStore
     @EnvironmentObject var themeManager: ThemeManager
+    @StateObject private var oudStore = OUDConsultStore() // Added for Workup tracking
     @State private var searchText = ""
     // Track expanded item ID locally
     @State private var expandedId: String? = nil
@@ -136,9 +137,12 @@ struct ReferenceView: View {
 
 struct ReferenceContentView: View {
     @EnvironmentObject var store: AssessmentStore
+    // Inject OUD Store for Workup persistence if needed, or use local state for checklist
+    @StateObject private var oudStore = OUDConsultStore() 
     @EnvironmentObject var themeManager: ThemeManager
     @Binding var searchText: String
     @Binding var expandedId: String?
+    @State private var showComplexConversion = false
     
     var filteredDrugs: [DrugData] {
         if searchText.isEmpty {
@@ -167,6 +171,10 @@ struct ReferenceContentView: View {
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
             .padding()
             
+
+                
+
+            
             ScrollView {
                 VStack(spacing: 12) {
                     ForEach(filteredDrugs) { drug in
@@ -184,6 +192,13 @@ struct ReferenceContentView: View {
                 .padding(.horizontal)
                 
                 Divider().padding(.vertical, 8)
+                
+             // Complex Conversion Tool (Moved here, scrollable)
+            ComplexConversionCard(isExpanded: $showComplexConversion)
+                .padding(.horizontal)
+                .padding(.bottom, 12)
+
+             Divider().padding(.vertical, 8)
                 
                 // CITATIONS \u0026 REFERENCES SECTION
                 VStack(alignment: .leading, spacing: 16) {
@@ -472,3 +487,56 @@ struct DisclaimerCard: View {
         )
     }
 }
+
+// MARK: - Complex Conversion Card (Moved from Calculator)
+struct ComplexConversionCard: View {
+    @Binding var isExpanded: Bool
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Button(action: { withAnimation { isExpanded.toggle() } }) {
+                HStack {
+                    Image(systemName: "exclamationmark.shield.fill")
+                    Text("Complex Conversions (Palliative)")
+                    Spacer()
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                }
+                .font(Font.caption.weight(.bold))
+                .foregroundColor(ClinicalTheme.amber500)
+                .padding()
+                .background(ClinicalTheme.amber500.opacity(0.1))
+            }
+            
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 12) {
+                    // Patch
+                    HStack {
+                        Text("Fentanyl Patch").bold().foregroundColor(ClinicalTheme.textPrimary)
+                        Spacer()
+                        Text("Consult").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                    }
+                    Text("WARNING: Patches take 12-24h to onset. Cover with short-acting during transition.")
+                        .font(.caption).foregroundColor(ClinicalTheme.amber500)
+                    
+                    Divider().background(ClinicalTheme.divider)
+                    
+                    // Methadone
+                    HStack {
+                        Text("Methadone").bold().foregroundColor(ClinicalTheme.textPrimary)
+                        Spacer()
+                        Text("Consult Pain Svc").font(.caption).bold().foregroundColor(ClinicalTheme.rose500)
+                    }
+                    Text("DO NOT ESTIMATE. Non-linear kinetics (Ratio 4:1 to 20:1). Risk of accumulation & overdose.")
+                        .font(.caption).foregroundColor(ClinicalTheme.rose500)
+                }
+                .padding()
+                .background(ClinicalTheme.backgroundCard)
+            }
+        }
+        .cornerRadius(12)
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.amber500.opacity(0.3), lineWidth: 1))
+    }
+}
+
+// MARK: - Workup Checkbox Component (Moved from OUDConsultView)
+
