@@ -38,16 +38,17 @@ struct RiskAssessmentView: View {
                         demographicsSection
                         clinicalInputsSection
                         additionalParametersSection
+                        medicationHistorySection
                         riskFactorsSection
                     }
                     .padding(.top)
                     .padding(.bottom, 100)
-                    .addKeyboardDoneButton()
                     .onTapGesture {
                         UIApplication.shared.endEditing()
                     }
                 }
             }
+            .addKeyboardDoneButton()
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
             .navigationTitle("Opioid Risk Assessment")
             .navigationBarTitleDisplayMode(.inline)
@@ -295,21 +296,28 @@ struct RiskAssessmentView: View {
         }
     }
     
+    var medicationHistorySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+             Text("Patient History").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
+             Toggle("Opioid Naive (No Home Opioids)", isOn: $store.naive)
+             Toggle("Home Buprenorphine (MAT)", isOn: $store.mat)
+        }
+        .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.teal500))
+        .clinicalCard()
+        .padding(.horizontal)
+    }
+
     var riskFactorsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
              Text("Risk Factors (PRODIGY)").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
-             Toggle("Opioid Naive", isOn: $store.naive)
-             Toggle("Home Buprenorphine (MAT)", isOn: $store.mat)
-             
-             Toggle("Benzos / Sedatives", isOn: $store.benzos) // CRITICAL OVERDOSE GATE - ALWAYS SHOW
-             Toggle("Sleep Apnea (OSA)", isOn: $store.sleepApnea) // CRITICAL RESPIRATORY GATE - ALWAYS SHOW
              
              if !isQuickMode {
                  Group {
+                     Toggle("Benzos / Sedatives", isOn: $store.benzos)
+                     Toggle("Sleep Apnea (OSA)", isOn: $store.sleepApnea)
                      Toggle("CHF", isOn: $store.chf)
-                     // Benzos moved up for safety
                      Toggle("Hx Overdose / Subst. Use", isOn: $store.historyOverdose)
-                     Toggle("Depression / Anxiety (Psych)", isOn: $store.psychHistory)
+                     Toggle("Depression / Anxiety", isOn: $store.psychHistory)
                  }
                  .transition(.opacity.combined(with: .move(edge: .top)))
              } else {
@@ -317,7 +325,7 @@ struct RiskAssessmentView: View {
                      withAnimation { isQuickMode = false }
                  }) {
                      HStack {
-                         Text("Show full PRODIGY risk factors...")
+                         Text("Show PRODIGY risk factors...")
                          Spacer()
                          Image(systemName: "chevron.down")
                      }
@@ -374,7 +382,7 @@ struct RiskAssessmentView: View {
                     // 3. ADJUVANTS
                     if !store.adjuvants.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Recommendations").font(.title3).bold().foregroundColor(ClinicalTheme.textPrimary).padding(.horizontal)
+                            Text("Adjuvant Options").font(.title3).bold().foregroundColor(ClinicalTheme.textPrimary).padding(.horizontal)
                             
                             VStack(alignment: .leading, spacing: 4) { // Reduced spacing for list feel
                                 ForEach(store.adjuvants) { adj in
@@ -421,7 +429,7 @@ struct RiskAssessmentView: View {
                 .padding(.bottom, 40)
             }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
-            .navigationTitle("Assessment Details")
+            .navigationTitle("Recommendations")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { showFullDetails = false }
@@ -454,20 +462,48 @@ struct RecommendationCard: View {
     @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(rec.name).font(.title3).fontWeight(.bold).foregroundColor(ClinicalTheme.textPrimary)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
+                Text(rec.name)
+                    .font(.headline) // Standardized Header
+                    .foregroundColor(ClinicalTheme.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.9)
+                
                 Spacer()
+                
+                // Status Badge (Kept as requested)
                 Text(rec.type == .safe ? "Preferred" : "Monitor")
-                    .font(.caption).fontWeight(.bold).padding(.horizontal, 8).padding(.vertical, 4)
-                    .background(color.opacity(0.2)).foregroundColor(color).cornerRadius(6)
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(color.opacity(0.15))
+                    .foregroundColor(color)
+                    .cornerRadius(6)
             }
-            // Improved legibility: slate300 instead of slate400
-            Text(rec.reason).font(.subheadline).fontWeight(.medium).foregroundColor(ClinicalTheme.textSecondary)
-            Text(rec.detail).font(.caption).italic().foregroundColor(ClinicalTheme.textMuted)
+            
+            // Refined Text Block
+            // Merging Reason + Detail for cleaner reading flow
+            // Removed italics and muted colors for better legibility
+            VStack(alignment: .leading, spacing: 4) {
+                if !rec.reason.isEmpty && rec.reason != "Standard." && rec.reason != "Preferred." {
+                     Text(rec.reason)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(ClinicalTheme.textPrimary) // High contrast
+                }
+                
+                Text(rec.detail)
+                    .font(.subheadline) // Increased from caption
+                    .foregroundColor(ClinicalTheme.textSecondary) // Better readability than muted
+                    .fixedSize(horizontal: false, vertical: true) // multiline support
+            }
         }
-        .padding().background(ClinicalTheme.backgroundCard).cornerRadius(16)
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(color.opacity(0.5), lineWidth: 1))
+        .padding(16)
+        .background(ClinicalTheme.backgroundCard)
+        .cornerRadius(12)
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(color.opacity(0.3), lineWidth: 1))
         .padding(.horizontal)
     }
 }

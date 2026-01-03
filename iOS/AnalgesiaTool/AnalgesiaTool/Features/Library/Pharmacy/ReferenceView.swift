@@ -30,11 +30,6 @@ struct ReferenceLibrary {
                 title: "VA/DoD Clinical Practice Guideline",
                 citation: "VA/DoD CPG for Opioids in Chronic Pain. Dept of Veterans Affairs; 2022.",
                 urlString: "https://www.healthquality.va.gov/guidelines/Pain/cot/"
-            ),
-            ReferenceItem(
-                title: "ASCO Cancer Pain Guideline (2023)",
-                citation: "Paice JA, et al. J Clin Oncol. 2023;41(6):1274-1298.",
-                urlString: "https://doi.org/10.1200/JCO.22.01932"
             )
         ]),
         ReferenceCategory(name: "Special Populations", icon: "person.2.circle.fill", items: [
@@ -42,36 +37,9 @@ struct ReferenceLibrary {
                 title: "AGS Beers Criteria® (2023)",
                 citation: "AGS Expert Panel. J Am Geriatr Soc. 2023;71(7):2052-2081.",
                 urlString: "https://doi.org/10.1111/jgs.18372"
-            ),
-            ReferenceItem(
-                title: "Frailty in Older Adults",
-                citation: "Kim DH, Rockwood K. N Engl J Med. 2024;391(6):532-544.",
-                urlString: "https://www.nejm.org/doi/full/10.1056/NEJMra2301292"
-            ),
-            ReferenceItem(
-                title: "Opioids in Renal Insufficiency",
-                citation: "Davison SN. UpToDate. Waltham, MA: UpToDate; 2024.",
-                urlString: "https://www.uptodate.com/contents/clinical-pharmacology-of-opioids-in-patients-with-renal-insufficiency"
-            )
-        ]),
-        ReferenceCategory(name: "Neuropathic & Non-Opioid", icon: "brain.head.profile", items: [
-            ReferenceItem(
-                title: "NeuPSIG Recommendations (Neuropathic)",
-                citation: "Finnerup NB, et al. Lancet Neurol. 2015;14(2):162-173.",
-                urlString: "https://pubmed.ncbi.nlm.nih.gov/25608771/"
-            ),
-            ReferenceItem(
-                title: "IV Lidocaine for Renal Colic",
-                citation: "Motov S, et al. Am J Emerg Med. 2019;37(12):2202-2207.",
-                urlString: "https://pubmed.ncbi.nlm.nih.gov/31349072/"
             )
         ]),
         ReferenceCategory(name: "Pharmacology & Labels", icon: "pills.fill", items: [
-            ReferenceItem(
-                title: "Methadone Prescribing Info",
-                citation: "FDA. Methadone Hydrochloride Tablets USP. Revised 2023.",
-                urlString: "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=090171"
-            ),
             ReferenceItem(
                 title: "Fentanyl Patch (Duragesic)",
                 citation: "FDA. Duragesic (Fentanyl Transdermal System). Revised 2023.",
@@ -84,7 +52,7 @@ struct ReferenceLibrary {
 struct ReferenceView: View {
     @EnvironmentObject var store: AssessmentStore
     @EnvironmentObject var themeManager: ThemeManager
-    @StateObject private var oudStore = OUDConsultStore() // Added for Workup tracking
+
     @State private var searchText = ""
     // Track expanded item ID locally
     @State private var expandedId: String? = nil
@@ -138,7 +106,7 @@ struct ReferenceView: View {
 struct ReferenceContentView: View {
     @EnvironmentObject var store: AssessmentStore
     // Inject OUD Store for Workup persistence if needed, or use local state for checklist
-    @StateObject private var oudStore = OUDConsultStore() 
+ 
     @EnvironmentObject var themeManager: ThemeManager
     @Binding var searchText: String
     @Binding var expandedId: String?

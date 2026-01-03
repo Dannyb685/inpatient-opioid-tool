@@ -17,12 +17,7 @@ struct MainTabView: View {
                     Text("Assessment")
                 }
             
-            // Tab 2: Protocols (New)
-            MOUDView() // Using MOUDView as the main Protocol Container since it now has Flowchart + Protocols
-                .tabItem {
-                    Image(systemName: "list.clipboard.fill")
-                    Text("Protocols")
-                }
+
 
             // Tab 3: MME Calc
             CalculatorView(sharedStore: calculatorStore)
@@ -48,9 +43,8 @@ struct MainTabView: View {
         .accentColor(ClinicalTheme.teal500)
         .onAppear {
             updateTabBar()
-            if !hasAcceptedDisclaimer {
-                showDisclaimer = true
-            }
+            // Legal Requirement: Show disclaimer every time app opens
+            showDisclaimer = true
         }
         .onChange(of: themeManager.isDarkMode) { _, _ in updateTabBar() }
         .alert(isPresented: $showDisclaimer) {

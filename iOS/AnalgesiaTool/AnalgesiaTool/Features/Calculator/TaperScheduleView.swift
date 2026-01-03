@@ -88,11 +88,11 @@ struct TaperScheduleView: View {
         ScrollView {
             VStack(spacing: 24) {
                 
-                // 1. CONFIGURATION CARD
+                // 1. INPUTS & CONTEXT CARD
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Image(systemName: "slider.horizontal.3")
-                        Text("Taper Configuration").font(.headline)
+                        Image(systemName: "square.and.pencil")
+                        Text("Clinical Data").font(.headline)
                     }
                     .foregroundColor(ClinicalTheme.textSecondary)
                     
@@ -101,7 +101,6 @@ struct TaperScheduleView: View {
                         Text("Starting daily dose:")
                             .foregroundColor(ClinicalTheme.textPrimary)
                         
-
                         TextField("Total MME/Day", text: $startMME, onEditingChanged: { isEditing in
                             if isEditing { hasOverride = true }
                         })
@@ -110,8 +109,6 @@ struct TaperScheduleView: View {
                             .padding()
                             .background(ClinicalTheme.backgroundInput)
                             .cornerRadius(8)
-                            .cornerRadius(8)
-
                             .overlay(
                                 HStack {
                                     Spacer()
@@ -125,48 +122,32 @@ struct TaperScheduleView: View {
                     
                     Divider()
                     
-                    // Duration Strategy (CDC 2022 Logic)
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Duration of Therapy").font(.caption).bold().foregroundColor(ClinicalTheme.textSecondary)
-                        
-                        Picker("Duration", selection: $useLongDuration) {
-                            Text("Short (<1 Year)").tag(false)
-                            Text("Long (≥1 Year)").tag(true)
-                        }
-                        .pickerStyle(SegmentedPickerStyle())
-                        
-                        HStack(alignment: .top, spacing: 6) {
-                            Image(systemName: "info.circle").font(.caption).foregroundColor(ClinicalTheme.teal500)
-                            Text(useLongDuration 
-                                 ? "Strategy: Slow Taper (10% Monthly). Better tolerated for long-term use."
-                                 : "Strategy: CDC 2-Phase (10% Weekly Linear → 10% Exponential).")
-                                .font(.caption).italic().foregroundColor(ClinicalTheme.textSecondary)
-                        }
+                    // Pregnancy Gate (Moved to Top)
+                    Toggle(isOn: $assessmentStore.isPregnant) {
+                        Text("Pregnant Person").font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
                     }
+                    .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.rose500))
                     
-                    // Reduction Velocity
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text("Reduction Rate").font(.caption).bold().foregroundColor(ClinicalTheme.textSecondary)
-                            Spacer()
-                            if reductionPerStep > 25 {
-                                Text("⚠️ \(Int(reductionPerStep))% (Caution: Rapid)").font(.headline).bold().foregroundColor(ClinicalTheme.amber500)
-                            } else {
-                                Text("\(Int(reductionPerStep))%").font(.headline).bold().foregroundColor(ClinicalTheme.teal500)
-                            }
+                    if assessmentStore.isPregnant {
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle.fill").foregroundColor(ClinicalTheme.rose500)
+                            Text("Specialist Required. Withdrawal risk to fetus.")
+                                .font(.caption).bold().foregroundColor(ClinicalTheme.rose500)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        Slider(value: $reductionPerStep, in: 5...50, step: 5)
-                            .accentColor(ClinicalTheme.teal500)
+                        .padding(8)
+                        .background(ClinicalTheme.rose500.opacity(0.1))
+                        .cornerRadius(8)
                     }
                     
                     Divider()
                     
-                    // Reverse Conversion (New Feature)
+                    // Medication Converter (Moved to Top)
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Medication Converter").font(.caption).bold().foregroundColor(ClinicalTheme.textSecondary)
+                        Text("Target Medication").font(.caption).bold().foregroundColor(ClinicalTheme.textSecondary)
                         
                         HStack {
-                            Image(systemName: "arrow.triangle.2.circlepath")
+                            Image(systemName: "pills.fill")
                                 .foregroundColor(ClinicalTheme.teal500)
                             Picker("Taper Medication", selection: $selectedTaperDrug) {
                                 ForEach(TaperDrug.allCases) { drug in
@@ -175,16 +156,15 @@ struct TaperScheduleView: View {
                             }
                             .pickerStyle(MenuPickerStyle())
                             .accentColor(ClinicalTheme.teal500)
+                            
+                            Spacer()
                         }
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 8)
+                         .background(ClinicalTheme.backgroundInput)
+                         .cornerRadius(8)
                         
-                        if selectedTaperDrug != .mmeOnly {
-                            Text("Schedule will show estimated \(selectedTaperDrug.unit) dose based on MME.")
-                                .font(.caption2)
-                                .italic()
-                                .foregroundColor(ClinicalTheme.textSecondary)
-                        }
-                        
-                        // Safety Warning Banner
+                        // Safety Warning Banner (Moved here)
                         if let warning = selectedTaperDrug.safetyWarning(assessment: assessmentStore) {
                             HStack(spacing: 8) {
                                 Image(systemName: warning.1 == ClinicalTheme.rose500 ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
@@ -198,26 +178,69 @@ struct TaperScheduleView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(warning.1.opacity(0.1))
                             .cornerRadius(8)
-                            .transition(.opacity)
-                            .animation(.spring(), value: selectedTaperDrug)
+                        }
+                        
+                        if selectedTaperDrug != .mmeOnly {
+                            Text("Schedule will show estimated \(selectedTaperDrug.unit) dose based on MME.")
+                                .font(.caption2)
+                                .italic()
+                                .foregroundColor(ClinicalTheme.textSecondary)
+                        }
+                    }
+                }
+                .clinicalCard()
+                .padding(.horizontal)
+                
+                // 2. STRATEGY CARD
+                 VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        Image(systemName: "slider.horizontal.3")
+                        Text("Taper Strategy").font(.headline)
+                    }
+                    .foregroundColor(ClinicalTheme.textSecondary)
+                    
+                    // Duration Strategy
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Duration of Therapy").font(.caption).bold().foregroundColor(ClinicalTheme.textSecondary)
+                        
+                        Picker("Duration", selection: $useLongDuration) {
+                            Text("Short (<1 Year)").tag(false)
+                            Text("Long (≥1 Year)").tag(true)
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        
+                        HStack(alignment: .top, spacing: 6) {
+                            Image(systemName: "info.circle").font(.caption).foregroundColor(ClinicalTheme.teal500)
+                            Text(useLongDuration
+                                 ? "Strategy: Slow Taper (10% Monthly). Better tolerated for long-term use."
+                                 : "Strategy: CDC 2-Phase (10% Weekly Linear → 10% Exponential).")
+                                .font(.caption).italic().foregroundColor(ClinicalTheme.textSecondary)
                         }
                     }
                     
-                    // Pregnancy Gate (Synced with Assessment Tab)
-                    Toggle(isOn: $assessmentStore.isPregnant) {
-                        Text("Pregnant Person").font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
-                    }
-                    .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.rose500))
+                    Divider()
                     
-                    if assessmentStore.isPregnant {
-                        HStack(spacing: 8) {
-                            Image(systemName: "exclamationmark.triangle.fill").foregroundColor(ClinicalTheme.rose500)
-                            Text("Specialist Required. Withdrawal risk to fetus.")
-                                .font(.caption).bold().foregroundColor(ClinicalTheme.rose500)
+                    // Reduction Velocity (Finer Control)
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text("Reduction Rate").font(.caption).bold().foregroundColor(ClinicalTheme.textSecondary)
+                            Spacer()
+                            if reductionPerStep > 25 {
+                                Text("⚠️ \(Int(reductionPerStep))% (Fast)").font(.headline).bold().foregroundColor(ClinicalTheme.amber500)
+                            } else {
+                                Text("\(Int(reductionPerStep))%").font(.headline).bold().foregroundColor(ClinicalTheme.teal500)
+                            }
                         }
-                        .padding(8)
-                        .background(ClinicalTheme.rose500.opacity(0.1))
-                        .cornerRadius(8)
+                        
+                        // Finer Step for 1-50 range (User Requested 0-10% granularity)
+                        Slider(value: $reductionPerStep, in: 1...50, step: 1)
+                            .accentColor(ClinicalTheme.teal500)
+                        
+                        HStack {
+                            Text("Slower").font(.caption2).foregroundColor(.secondary)
+                            Spacer()
+                            Text("Faster").font(.caption2).foregroundColor(.secondary)
+                        }
                     }
                 }
                 .clinicalCard()
@@ -462,10 +485,7 @@ struct TaperScheduleView: View {
             }
             .padding(.vertical)
             .padding(.bottom, 120)
-            .addKeyboardDoneButton()
-            .onTapGesture {
-                UIApplication.shared.endEditing()
-            }
+
         }
         .scrollContentBackground(.hidden)
         .background(Color.clear)

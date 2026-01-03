@@ -6,7 +6,7 @@ class AssessmentStore: ObservableObject {
     // --- INPUTS ---
     // Demographics
     @Published var age: String = "" { didSet { calculate() } }
-    @Published var sex: Sex = .male { didSet { calculate() } }
+    @Published var sex: Sex = .female { didSet { calculate() } }
     @Published var naive: Bool = false { 
         didSet { 
             if naive { mat = false } // Contradiction check
@@ -199,6 +199,10 @@ class AssessmentStore: ObservableObject {
         if naive && !mat { pScore += 3 }
         if sleepApnea { pScore += 5 }
         if chf { pScore += 7 }
+        // Extended Factors (Used for Clinical Logic, NOT PRODIGY Score)
+        // if benzos { pScore += 4 }
+        // if historyOverdose { pScore += 3 }
+        // if psychHistory { pScore += 2 }
         
         self.prodigyScore = pScore
         self.prodigyRisk = pScore >= 15 ? "High" : (pScore >= 8 ? "Intermediate" : "Low")

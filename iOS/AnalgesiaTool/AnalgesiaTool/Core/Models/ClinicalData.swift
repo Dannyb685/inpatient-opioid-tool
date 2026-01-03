@@ -143,6 +143,22 @@ struct WarningData: Identifiable {
     let desc: String
 }
 
+struct AdjuvantRecommendation: Identifiable, Codable {
+    var id: String
+    let category: String
+    let drug: String
+    let dose: String
+    let rationale: String
+    
+    init(category: String, drug: String, dose: String, rationale: String) {
+        self.id = UUID().uuidString
+        self.category = category
+        self.drug = drug
+        self.dose = dose
+        self.rationale = rationale
+    }
+}
+
 // MARK: - Clinical Data Store
 
 struct ClinicalData {

@@ -110,7 +110,6 @@ struct SBIRTModule: View {
                 // Existing DAST Logic
                 DASTView(store: store)
             } else if subTab == "assist" {
-            } else if subTab == "assist" {
                 AssistLyteView(store: store)
             }
         }

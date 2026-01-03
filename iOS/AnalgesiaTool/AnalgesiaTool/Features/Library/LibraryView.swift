@@ -1,57 +1,32 @@
 import SwiftUI
 
 struct LibraryView: View {
-    @State private var selectedTab = "screening" // screening, risk, ref
-    @EnvironmentObject var themeManager: ThemeManager
-    @StateObject private var screeningStore = ScreeningStore()
-    @StateObject private var toolkitStore = ToolkitStore()
-    
-
-    
-    // States for Library (v1.5.5 consolidation)
     @State private var refSearchText = ""
     @State private var refExpandedId: String? = nil
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
-                // Scrollable Segmented Picker
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        TabChip(title: "Screening", id: "screening", selected: $selectedTab)
-                        TabChip(title: "Risk Tools", id: "risk", selected: $selectedTab)
-                        TabChip(title: "Pharmacy", id: "ref", selected: $selectedTab)
-                    }
-                    .padding()
+                // Header
+                HStack {
+                    Text("Library")
+                        .font(.largeTitle).bold()
+                        .foregroundColor(ClinicalTheme.textPrimary)
+                        .padding()
+                    Spacer()
                 }
                 .background(ClinicalTheme.backgroundMain)
                 
                 // Content
-                Group {
-                    if selectedTab == "screening" {
-                        ScrollView {
-                            SBIRTModule(store: screeningStore)
-                                .padding()
-                                .padding(.bottom, 40)
-                        }
-                    } else if selectedTab == "risk" {
-                        ScrollView {
-                            RiskToolsModule(store: toolkitStore)
-                                .padding()
-                                .padding(.bottom, 40)
-                        }
-                    } else if selectedTab == "ref" {
-                        ReferenceContentView(searchText: $refSearchText, expandedId: $refExpandedId)
-                    }
-                }
-                .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
+                ReferenceContentView(searchText: $refSearchText, expandedId: $refExpandedId)
             }
-            .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
-            .navigationTitle("Clinical Library")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarHidden(true) 
+            .background(ClinicalTheme.backgroundMain)
         }
     }
 }
+
+// MARK: - Sub Views & Helper Components
 
 struct TabChip: View {
     let title: String
@@ -72,8 +47,6 @@ struct TabChip: View {
         }
     }
 }
-
-// MARK: - Sub Views
 
 struct FlowchartView: View {
     @State private var history: [String] = ["root"]
@@ -201,5 +174,3 @@ struct FlowchartView: View {
         }
     }
 }
-
-
