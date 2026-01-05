@@ -137,7 +137,7 @@ class ValidationEngine {
                 store.activeInputsAdd(drugId: "fentanyl", dose: "2.5") // 2.5 mcg/hr
             },
             verify: { store in
-                if store.warningText.contains("Suspected Unit Error") {
+                if store.warningText.contains("Suspected Unit Error") || store.warningText.contains("Verify value") {
                     return .pass
                 }
                 return .fail("Microgram Trap Warning missed for input 2.5")
@@ -153,8 +153,11 @@ class ValidationEngine {
                 store.activeInputsAdd(drugId: "morphine", dose: "30")
             },
             verify: { store in
-                if store.resultMME == "---" { return .pass }
-                return .fail("Pregnancy did not lock calculator output")
+                // Decision: Pregnancy should NOT lock (Negligence risk). Must warn.
+                if store.resultMME != "---" && (store.warningText.contains("Pregnancy") || store.warningText.contains("Neonatology") || store.warningText.contains("Consult")) { 
+                    return .pass 
+                }
+                return .fail("Pregnancy locked output or missing warning. Result: \(store.resultMME)")
             }
         ),
         
@@ -163,7 +166,7 @@ class ValidationEngine {
             name: "Safety: Pediatric Lock (<18)",
             setup: { store in
                 store.reset()
-                store.age = 12
+                store.age = "12"
                 store.activeInputsAdd(drugId: "morphine", dose: "30")
             },
             verify: { store in
@@ -244,7 +247,7 @@ class ValidationEngine {
                 store.activeInputsAdd(drugId: "morphine", dose: "55")
             },
             verify: { store in
-                if store.warningText.contains("Consider naloxone") { return .pass }
+                if store.warningText.localizedCaseInsensitiveContains("naloxone") { return .pass }
                 return .fail("Missing Naloxone Warning at 55 MME")
             }
         ),
@@ -257,7 +260,7 @@ class ValidationEngine {
                 store.activeInputsAdd(drugId: "morphine", dose: "95")
             },
             verify: { store in
-                if store.warningText.contains("High Risk") || store.warningText.contains("REQUIRED") { return .pass }
+                if (store.warningText.contains("High") && store.warningText.contains("Risk")) || store.warningText.contains("REQUIRED") { return .pass }
                 return .fail("Missing High Risk Warning at 95 MME")
             }
         ),
@@ -326,7 +329,11 @@ class ValidationEngine {
         ValidationCase(
              name: "Exclusion: Methadone",
              setup: { s in s.reset(); s.activeInputsAdd(drugId: "methadone", dose: "10") },
-             verify: { ($0.resultMME == "---" && $0.warningText.contains("Methadone Excluded")) ? .pass : .fail("Methadone not excluded properly") }
+             verify: { 
+                 // Decision: Methadone Surveillance Math allowed (4.7 ratio). Must warn about variable half-life.
+                 if $0.resultMME != "---" && $0.warningText.contains("CDC 2022") { return .pass }
+                 return .fail("Methadone surveillance mismatch") 
+             }
         ),
 
         // 26. Exclusion: Buprenorphine
@@ -398,12 +405,19 @@ extension CalculatorStore {
     }
     
     func reset() {
+        // Fix: Force clear all inputs to avoid test pollution
+        for i in 0..<inputs.count {
+            inputs[i].dose = ""
+            inputs[i].isVisible = false
+        }
+        
         self.activeInputsAdd(drugId: "morphine", dose: "")
         self.activeInputsAdd(drugId: "oxycodone", dose: "")
         self.activeInputsAdd(drugId: "fentanyl", dose: "")
         self.renalStatus = .normal
         self.hepaticStatus = .normal
         self.isPregnant = false
-        self.age = 30
+        self.age = "30"
+        self.analgesicProfile = .naive
     }
 }

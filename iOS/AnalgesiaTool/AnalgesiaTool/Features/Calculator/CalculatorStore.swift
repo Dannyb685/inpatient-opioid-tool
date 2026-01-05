@@ -10,6 +10,7 @@ struct CalculatorInput: Identifiable {
     var dose: String = ""
     var isVisible: Bool = false // Dynamic Visibility
     let routeType: DrugRouteType
+    var warningMessage: String? = nil // Inline Warning (v1.6)
 }
 
 struct TargetDose: Identifiable {
@@ -56,17 +57,78 @@ class CalculatorStore: ObservableObject {
     @Published var tolerance: ToleranceStatus = .tolerant
     @Published var context: ConversionContext = .rotation
     
+    // Sandbox Tracking
+    @Published var isSandboxMode: Bool = false
+    private var isSeeding: Bool = false // Flag to prevent dirty state during sync
+    
     // Stewardship Inputs
     @Published var giStatus: GIStatus = .intact { didSet { calculate() } }
-    @Published var renalStatus: RenalStatus = .normal { didSet { calculate() } }
-    @Published var hepaticStatus: HepaticStatus = .normal { didSet { calculate() } }
+    @Published var renalStatus: RenalStatus = .normal { 
+        didSet { 
+            if !isSeeding { isSandboxMode = true }
+            calculate() 
+        } 
+    }
+    @Published var hepaticStatus: HepaticStatus = .normal { 
+        didSet { 
+            if !isSeeding { isSandboxMode = true }
+            calculate() 
+        } 
+    }
 
-    @Published var painType: PainType = .nociceptive { didSet { calculate() } }
-    @Published var isPregnant: Bool = false { didSet { calculate() } }
-    @Published var age: Int = 30 { didSet { calculate() } }
+    @Published var painType: PainType = .nociceptive { 
+        didSet { 
+            if !isSeeding { isSandboxMode = true }
+            calculate() 
+        } 
+    }
+    @Published var isPregnant: Bool = false { 
+        didSet { 
+            if !isSeeding { isSandboxMode = true }
+            calculate() 
+        } 
+    }
+    @Published var age: String = "" { 
+        didSet { 
+            if !isSeeding { isSandboxMode = true }
+            calculate() 
+        } 
+    }
     @Published var matchesBenzos: Bool = false { didSet { calculate() } } // Synced from Risk
     @Published var sleepApnea: Bool = false { didSet { calculate() } } // Synced
     @Published var historyOverdose: Bool = false { didSet { calculate() } } // Synced
+    @Published var analgesicProfile: AnalgesicProfile = .naive { // Synced
+        didSet {
+            // Auto-update tolerance based on profile
+            switch analgesicProfile {
+            case .naive: self.tolerance = .naive
+            default: self.tolerance = .tolerant
+            }
+            calculate()
+        }
+    }
+    
+    // MARK: - Transactional Injection (Protocol Based)
+    func seed(from data: CalculatorInputs) {
+        // Prevent manual triggers from marking dirty
+        isSeeding = true
+        defer { isSeeding = false }
+        
+        // Reset Sandbox Mode (Clean State)
+        self.isSandboxMode = false
+        
+        self.renalStatus = data.renalFunction
+        self.hepaticStatus = data.hepaticFunction
+        self.painType = data.painType
+        self.isPregnant = data.isPregnant
+        self.age = data.age
+        self.matchesBenzos = data.benzos
+        self.sleepApnea = data.sleepApnea
+        self.historyOverdose = data.historyOverdose
+        self.analgesicProfile = data.analgesicProfile
+        
+        // Auto-Calculation happens via duplicate property didSet observers
+    }
     
     // Quick Mode Helpers (v1.5.5)
     @Published var routePreference: OpioidRoute = .po { didSet { calculate() } }
@@ -82,7 +144,10 @@ class CalculatorStore: ObservableObject {
     }
     
     var isPediatric: Bool {
-        return age < 18
+        // UX: Allow single digit typing ("1" -> "18") without triggering lock.
+        // Assumes users are not calculating MME for <10 year olds (Tool scope is Adult).
+        // If they enter "05", it will lock.
+        return (Int(age) ?? 30) < 18 && age.count > 1
     }
     
     // Outputs
@@ -140,6 +205,11 @@ class CalculatorStore: ObservableObject {
         self.inputs = newInputs.sorted { $0.name < $1.name }
     }
     
+    // Dirty State Helper
+    var hasActiveDrugs: Bool {
+        return inputs.contains { $0.isVisible && !$0.dose.isEmpty && (Double($0.dose) ?? 0) > 0 }
+    }
+    
     // Helpers for Taper Handoff
     var primaryDrugName: String {
         return inputs.first(where: { $0.isVisible && !$0.dose.isEmpty && Double($0.dose) ?? 0 > 0 })?.name.replacingOccurrences(of: " (PO)", with: "") ?? ""
@@ -168,13 +238,23 @@ class CalculatorStore: ObservableObject {
     func updateDose(for inputId: UUID, dose: String) {
         if let index = inputs.firstIndex(where: { $0.id == inputId }) {
             inputs[index].dose = dose
+            inputs[index].warningMessage = nil // Clear warning on edit
             calculate()
         }
     }
     
     func calculate() {
+        // SAFETY GATE: Pediatric Hard Stop
+        if isPediatric {
+            resultMME = "---"
+            targetDoses = []
+            warningText = "Pediatric Dosing Not Validated. Please use weight-based formulary."
+            return
+        }
+        
         var totalMME: Double = 0
         var activeWarnings: [String] = []
+        var shouldBlockTargets = false
         calculationReceipt = [] // Clear previous receipt
         
         // PEDIATRIC LOCK: Logic handled by View, but ensure safe defaults if called
@@ -184,21 +264,60 @@ class CalculatorStore: ObservableObject {
             return
         }
         
+        // PROFILE WARNINGS
+        switch analgesicProfile {
+        case .highPotency:
+             activeWarnings.append("• Note: Tolerance Unpredictable. Lipophilic storage prevents accurate MME calculation. Titrate by effect.")
+        case .buprenorphine:
+             activeWarnings.append("⚠️ BUPRENORPHINE BLOCKADE: High-affinity binding may block full agonists.")
+        case .methadone:
+             activeWarnings.append("NOTE: Baseline Methadone creates complex cross-tolerance.")
+        case .naltrexone:
+             activeWarnings.append("⛔️ OPIOID BLOCKADE (NALTREXONE): Agonists ineffective/Dangerous. Consult Expert.")
+             shouldBlockTargets = true
+        default: break
+        }
+        
+        if isPregnant {
+             activeWarnings.append("⚠️ PREGNANCY ALERT: Neonatology Consult Required. Risk of Neonatal Abstinence Syndrome.")
+        }
+        
         var hasExclusion = false
         
 
         
-        for input in inputs {
-            guard let val = Double(input.dose), val > 0 else { continue }
-            
-            // MICROGRAM TRAP: Safety check for Unit Confusion
-            if (input.routeType == .microgramIO || input.routeType == .patch) && val < 10 {
-                activeWarnings.append("⚠️ Suspected Unit Error for \(input.name): Input is <10. Verify value is in MICROGRAMS (mcg), not mg.")
-            }
-            
-            var factor = 0.0
-            
-            switch input.drugId {
+        // METHADONE CHECK
+        if inputs.contains(where: { $0.drugId == "methadone" && $0.isVisible }) {
+             activeWarnings.append("⚠️ METHADONE DETECTED: Standard MME calculation may not apply.")
+             activeWarnings.append("Use dedicated Methadone Conversion Tool for switching TO methadone.")
+        }
+        
+            for (idx, input) in inputs.enumerated() {
+                // Ensure index is valid & get fresh reference
+                guard let val = Double(input.dose), val > 0 else { continue }
+                
+                // MICROGRAM TRAP: Safety check for Unit Confusion
+                // Note: We modify inputs[idx] directly to set inline warnings
+                if (input.drugId == "sufentanil" || input.drugId == "alfentanil") && val < 1.0 {
+                     inputs[idx].warningMessage = "⚠️ CRITICAL: Doses <1mcg detected. Verify vs decimal error."
+                } else if (input.routeType == .microgramIO || input.routeType == .patch) && val < 10 {
+                    inputs[idx].warningMessage = "⚠️ Suspected Unit Error: Input <10. Verify MICROGRAMS (mcg), not mg."
+                }
+                
+                var factor = 0.0
+                
+                // EXTREME DOSE VERIFICATION (Safety Gates) -> INLINE WARNINGS (v1.6)
+                if input.drugId == "hydromorphone_iv" && val > 4.0 {
+                    inputs[idx].warningMessage = "⚠️ Unusually high single dose (>4mg). Verify."
+                } else if input.drugId == "morphine_iv" && val > 20.0 {
+                    inputs[idx].warningMessage = "⚠️ Unusually high single dose (>20mg). Verify."
+                } else if input.drugId == "fentanyl" && val > 200.0 {
+                    inputs[idx].warningMessage = "⚠️ Unusually high single dose (>200mcg). Verify."
+                } else if input.drugId == "oxycodone" && val > 120.0 {
+                    inputs[idx].warningMessage = "⚠️ Unusually high single dose (>120mg). Verify."
+                }
+                
+                switch input.drugId {
             // Standard Factors
             case "morphine":
                 factor = 1.0
@@ -207,7 +326,7 @@ class CalculatorStore: ObservableObject {
                 }
             case "morphine_iv": 
                 factor = 3.0
-                activeWarnings.append("NOTE: IV:PO Morphine 3:1 is standard for chronic dosing. Acute ratio may range to 1:6.")
+                activeWarnings.append("NOTE: Potency Ratio: Oral Morphine dose is ~3x IV dose (3:1 Standard). Acute ratio may range to 6:1 (Oral:IV).")
                 if renalStatus == .dialysis {
                     activeWarnings.append("AVOID MORPHINE IV: Active metabolites (M3G/M6G) accumulate in dialysis. Neurotoxicity risk.")
                 }
@@ -217,7 +336,9 @@ class CalculatorStore: ObservableObject {
                 if hepaticStatus == .failure {
                     activeWarnings.append("HEPATIC SHUNT: Oral Hydromorphone bioavailability increases ~4x in Liver Failure (Portosystemic shunts). MME calculation may SIGNIFICANTLY underestimate risk. Use extreme caution.")
                 }
-            case "hydromorphone_iv": factor = 20.0
+            case "hydromorphone_iv": 
+                factor = 11.5
+                if activeWarnings.isEmpty { activeWarnings.append("NOTE: IV Hydromorphone factor set to 11.5 (Evidence-Based Median) to avoid overestimating tolerance. Standard 20:1 is often unsafe for rotation.") }
             case "oxycodone": factor = 1.5
             case "hydrocodone": factor = 1.0
             case "oxymorphone": factor = 3.0
@@ -238,27 +359,48 @@ class CalculatorStore: ObservableObject {
                 
             // DRIPS (mg/hr -> mg/24h -> MME)
             case "morphine_iv_drip": factor = 24.0 * 3.0
-            case "hydromorphone_iv_drip": factor = 24.0 * 20.0
+            case "hydromorphone_iv_drip": factor = 24.0 * 11.5
                 
-            // SAFETY: IV Fentanyl (Micrograms -> Milligrams -> MME)
-            case "fentanyl", "sufentanil", "alfentanil":
-                factor = 300.0 / 1000.0 // 100mcg = 30MME -> 1mcg = 0.3MME
-                
-            case "fentanyl_patch":
-                factor = 2.4 // 25mcg/hr * 2.4 = 60 MME
-
-            // SAFETY: Exclusions
             case "methadone":
-                // PERINATAL LOCK: Even if recommended, Math is BLOCKED in pregnancy
                 if isPregnant {
                      factor = 0
                      hasExclusion = true
                      activeWarnings.append("Methadone Calculation Blocked in Perinatal Mode (CYP Induction). Consult Specialist.")
                 } else {
-                     factor = 0
-                     hasExclusion = true
-                     activeWarnings.append("Methadone Excluded: Non-linear kinetics.")
+                     factor = 4.7 // CDC 2022 surveillance only
+                     if activeWarnings.isEmpty || !activeWarnings.contains(where: { $0.contains("CDC 2022 fixed") }) {
+                         activeWarnings.append("⚠️ METHADONE MME CALCULATION: Using CDC 2022 fixed 4.7:1 ratio for surveillance ONLY.")
+                         activeWarnings.append("🚨 DO NOT USE THIS MME TO CONVERT FROM METHADONE TO OTHER OPIOIDS.")
+                         activeWarnings.append("Converting FROM methadone requires specialist consultation and different methodology.")
+                     }
                 }
+                
+            // SAFETY: IV Fentanyl (Micrograms -> Milligrams -> MME)
+            case "fentanyl":
+                factor = 0.3 // 1mcg = 0.3 MME (Based on NCCN Single Dose 100mcg:10mg MS IV)
+                if activeWarnings.isEmpty { 
+                     activeWarnings.append("NOTE: Fentanyl MME (0.3) based on NCCN Single-Dose. Chronic steady-state equivalence may be lower (0.12). Caution rotating FROM Fentanyl.")
+                }
+                
+            case "sufentanil":
+                factor = 1.0 // 1mcg = 1 MME (Conservative Extrapolation)
+                if activeWarnings.isEmpty {
+                     activeWarnings.append("⚠️ SUFENTANIL: Conversion factor extrapolated from anesthesia literature. NOT validated for chronic pain. Requires specialist consultation and ICU-level monitoring.")
+                     activeWarnings.append("NOTE: Theoretical potency 5-10x fentanyl, but clinical dosing patterns suggest lower ratios. Use extreme caution.")
+                }
+                
+            case "alfentanil":
+                factor = 0.1 // 1mcg = 0.1 MME (Approx 1/4 Fentanyl)
+                if activeWarnings.isEmpty {
+                    activeWarnings.append("⚠️ ALFENTANIL: Conversion factor based on anesthesia pharmacokinetics. NOT validated for chronic pain management.")
+                    activeWarnings.append("NOTE: Ultra-short duration (5-10 min). Primarily used for procedural sedation, not chronic analgesia.")
+                }
+                
+            case "fentanyl_patch":
+                factor = 2.4 // 25mcg/hr * 2.4 = 60 MME
+
+            // SAFETY: Exclusions
+
             case "sublingual_fentanyl":
                 factor = 0
                 hasExclusion = true
@@ -267,6 +409,7 @@ class CalculatorStore: ObservableObject {
                 factor = 0
                 hasExclusion = true
                 activeWarnings.append("Buprenorphine Excluded: Partial agonist.")
+                
                 
             default: factor = 0
             }
@@ -294,7 +437,6 @@ class CalculatorStore: ObservableObject {
         }
         
         // Finalize Warnings
-        // Finalize Warnings
         if totalMME > 90 {
             activeWarnings.append(">90 MME: High Overdose Risk. Naloxone indicated.")
         }
@@ -305,16 +447,22 @@ class CalculatorStore: ObservableObject {
         
         self.warningText = activeWarnings.joined(separator: "\n")
         
+        if shouldBlockTargets {
+            targetDoses = []
+            // Keep resultMME visible (input sum) but targets are blocked
+            return
+        }
+        
         // 2. Reduction
         let reducedMME = totalMME * (1.0 - (reduction / 100.0))
         
-        // Compliance Warning logic
+        // Compliance Warning logic (Rotation Specific)
         if reduction < 25 {
-            complianceWarning = "Aggressive Rotation (<25%). High risk of toxicity/overdose due to incomplete cross-tolerance. Only use if pain is severe and unmanaged."
-        } else if reduction <= 40 {
-            complianceWarning = "Standard / Reason for Rotation (25-40%). Routine rotation or standard safety margin (2025 Consensus)."
+            complianceWarning = "Aggressive Rotation (<25%). Valid for Poorly Controlled Pain, but carries high risk of toxicity due to incomplete cross-tolerance. Monitor closely."
+        } else if reduction <= 50 {
+            complianceWarning = "Standard Rotation (25-50%). Accounts for incomplete cross-tolerance (25-50% reduction recommended for Well-Controlled Pain)."
         } else {
-            complianceWarning = "Severe Adverse Effects (>40%). Patient experiencing sedation/delirium. Requires significant dose reduction. Mandatory for elderly/frail."
+            complianceWarning = "Conservative Rotation (>50%). Recommended for Frail/Elderly or patients with Significant Adverse Effects."
         }
         
         if reducedMME <= 0 {
@@ -327,21 +475,21 @@ class CalculatorStore: ObservableObject {
         
         // Target: Oxycodone PO (1.5:1)
         let oxyDaily = reducedMME / 1.5
-        targets.append(createTarget(drug: "Oxycodone", route: "PO", total: oxyDaily, ratio: "1.5 : 1"))
+        targets.append(createTarget(drug: "Oxycodone", route: "PO", routeType: .standardPO, total: oxyDaily, ratio: "1.5 : 1"))
         
         // Target: Hydromorphone PO (5:1) - Updated Audit
         let dilDaily = reducedMME / 5.0
-        targets.append(createTarget(drug: "Hydromorphone", route: "PO", total: dilDaily, ratio: "5 : 1"))
+        targets.append(createTarget(drug: "Hydromorphone", route: "PO", routeType: .standardPO, total: dilDaily, ratio: "5 : 1"))
         
         // Target: Morphine IV (3:1 vs PO)
         let morDaily = reducedMME / 3.0
-        targets.append(createTarget(drug: "Morphine", route: "IV", total: morDaily, ratio: "IV Ratio 3:1"))
+        targets.append(createTarget(drug: "Morphine", route: "IV", routeType: .ivPush, total: morDaily, ratio: "IV Ratio 3:1"))
         
         // Target: Fentanyl IV (Ratio 10:1 to Morphine IV)
         // MorIV (mg) * 10 = FentIV (mcg)
         // MME / 3.0 = MorIV. (MME/3)*10 = MME * 3.33
         let fentIV = reducedMME * 3.33
-        targets.append(createTarget(drug: "Fentanyl", route: "IV", total: fentIV, ratio: "10mg Mor : 100mcg Fent", unit: "mcg"))
+        targets.append(createTarget(drug: "Fentanyl", route: "IV", routeType: .microgramIO, total: fentIV, ratio: "10mg Mor : 100mcg Fent", unit: "mcg"))
         
         // Target: Fentanyl Patch (Ratio 1.5:1 to Morphine IV)
         // MorIV (mg) * 1.5 = Patch (mcg/hr)
@@ -423,7 +571,7 @@ class CalculatorStore: ObservableObject {
     
 
     
-    private func createTarget(drug: String, route: String, total: Double, ratio: String, unit: String) -> TargetDose {
+    private func createTarget(drug: String, route: String, routeType: DrugRouteType, total: Double, ratio: String, unit: String = "mg") -> TargetDose {
         var adjustedTotal = total
         var adjustmentNote = ratio
         var originalTotalString: String? = nil
@@ -434,7 +582,7 @@ class CalculatorStore: ObservableObject {
             let reductionFactor: Double = (renalStatus == .dialysis) ? 0.25 : 0.5
             
             // Store original before modifying
-            originalTotalString = String(format: "%.1f", total)
+            originalTotalString = total.toClinicalString(route: routeType, unit: unit)
             
             adjustedTotal = total * reductionFactor
             let percentage = Int((1.0 - reductionFactor) * 100)
@@ -453,12 +601,12 @@ class CalculatorStore: ObservableObject {
                     totalDaily: "AVOID",
                     breakthrough: "N/A",
                     unit: unit, ratioLabel: adjustmentNote,
-                    originalDaily: String(format: "%.1f", total)
+                    originalDaily: total.toClinicalString(route: routeType, unit: unit)
                 )
             } else {
                  // Impaired: 0.75 (25% reduction)
                 let reductionFactor: Double = 0.75
-                originalTotalString = String(format: "%.1f", total)
+                originalTotalString = total.toClinicalString(route: routeType, unit: unit)
                 adjustedTotal = total * reductionFactor
                 adjustmentNote = "\(ratio) | Renal: -25% (Metabolites)"
             }
@@ -485,19 +633,19 @@ class CalculatorStore: ObservableObject {
              adjustmentNote += " | Hepatic: -50% (Clearance)"
         }
 
-        let bt = adjustedTotal * 0.10
+        // 4. Final Formatting (Smart Rounding)
+        // If adjustedTotal was set to 0 by contraindication, show "AVOID".
+        let finalString = (adjustedTotal == 0 && adjustmentNote.contains("CONTRAINDICATED")) ? "AVOID" : adjustedTotal.toClinicalString(route: routeType, unit: unit)
         
         return TargetDose(
             drug: drug, route: route,
-            totalDaily: String(format: "%.1f", adjustedTotal),
-            breakthrough: String(format: "%.1f", bt),
-            unit: unit, ratioLabel: adjustmentNote,
+            totalDaily: finalString,
+            breakthrough: "PRN", // View Logic handles calc (10%)
+            unit: unit,
+            ratioLabel: adjustmentNote,
             originalDaily: originalTotalString
         )
     }
     
-    // Helper with default unit
-    private func createTarget(drug: String, route: String, total: Double, ratio: String) -> TargetDose {
-        return createTarget(drug: drug, route: route, total: total, ratio: ratio, unit: "mg")
-    }
+
 }

@@ -389,9 +389,48 @@ const ScaleCalculator = ({ title, data }: { title: string, data: ScaleItem[] }) 
 
     const interp = getInterpretation(totalScore);
 
+    const [recommendations, setRecommendations] = useState<string[]>([]);
+
+    // Auto-update recommendations based on scores
+    React.useEffect(() => {
+        if (!title.includes('COWS')) return;
+
+        const recs: string[] = [];
+        const s = scores;
+
+        // Autonomic (Clonidine)
+        if ((s['sweat'] || 0) > 0 || (s['restless'] || 0) > 0 || (s['tremor'] || 0) > 0 || (s['anxiety'] || 0) > 0 || (s['pulse'] || 0) > 0) {
+            recs.push("⚡ Autonomic (Anxiety/Sweats): Clonidine 0.1-0.2mg PO q6-8h PRN (Hold SBP<100)");
+        }
+
+        // Pain (NSAIDs)
+        if ((s['ache'] || 0) > 0) {
+            recs.push("🦴 Bone/Joint Pain: Acetaminophen 650mg q6h AND Ibuprofen 600mg q6h PRN");
+        }
+
+        // GI (Zofran/Imodium)
+        if ((s['gi'] || 0) > 0) {
+            recs.push("🤢 GI Upset: Ondansetron 4mg q6h PRN (Nausea) / Loperamide 2mg PRN (Diarrhea)");
+        }
+
+        // Insomnia / General (Vistaril)
+        if ((s['restless'] || 0) > 0 || (s['anxiety'] || 0) > 0) {
+            recs.push("😴 Insomnia/Agitation: Hydroxyzine 25-50mg PO q6h PRN");
+        }
+
+        setRecommendations(recs);
+    }, [scores, title]);
+
     const handleCopy = () => {
-        const txt = `${title} Score: ${totalScore}\ninterpretation: ${interp.text}\n\nBreakdown:\n${data.map(i => `- ${i.label}: ${scores[i.id] || 0}`).join('\n')}`;
+        let txt = `${title} Score: ${totalScore}\nInterpretation: ${interp.text}\n\n`;
+
+        if (recommendations.length > 0) {
+            txt += "Recommended Regimen:\n" + recommendations.join('\n') + "\n\n";
+        }
+
+        txt += `Breakdown:\n${data.map(i => `- ${i.label}: ${scores[i.id] || 0}`).join('\n')}`;
         navigator.clipboard.writeText(txt);
+        alert("Assessment & Regimen copied!");
     };
 
     return (
@@ -406,10 +445,26 @@ const ScaleCalculator = ({ title, data }: { title: string, data: ScaleItem[] }) 
                             Score: {totalScore} • {interp.text}
                         </div>
                     </div>
-                    <button onClick={handleCopy} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
-                        <Copy className="w-5 h-5" />
+                    <button onClick={handleCopy} className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 transition-colors">
+                        <Copy className="w-4 h-4" /> Copy Regimen
                     </button>
                 </div>
+
+                {/* Dynamic Recommendations Card */}
+                {recommendations.length > 0 && (
+                    <div className="mt-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-lg p-3 animate-fade-in">
+                        <h4 className="text-[10px] font-black text-indigo-500 uppercase mb-2 flex items-center gap-1">
+                            <Stethoscope className="w-3 h-3" /> Symptom-Triggered Orders
+                        </h4>
+                        <ul className="space-y-1.5">
+                            {recommendations.map((rec, i) => (
+                                <li key={i} className="text-xs font-medium text-slate-700 dark:text-slate-300 border-b border-indigo-100 dark:border-indigo-800/50 pb-1 last:border-0">
+                                    {rec}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

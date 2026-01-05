@@ -7,7 +7,7 @@
         "target": "ES6",
         "allowJs": true,
         "noImplicitAny": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "importHelpers": true,
         "jsx": "react",
         "allowSyntheticDefaultImports": true,
@@ -29,5 +29,11 @@
     "include": [
         "**/*.ts",
         "**/*.tsx"
+    ],
+    "exclude": [
+        "Web_Version",
+        "node_modules",
+        "web-dist",
+        "_Archive"
     ]
 }

@@ -9,18 +9,18 @@ struct DSMCriterion: Identifiable, Hashable {
     let isPhysiological: Bool // Flags Tolerance and Withdrawal for medical supervision logic
 }
 
-struct OUDReferenceItem: Identifiable {
+struct ClinicalReferenceItem: Identifiable {
     let id = UUID()
     let title: String
     let value: String
     let subtitle: String?
 }
 
-struct OUDReferenceCategory: Identifiable {
+struct ClinicalReferenceCategory: Identifiable {
     let id: String
     let title: String
     let icon: String
-    let items: [OUDReferenceItem]
+    let items: [ClinicalReferenceItem]
 }
 
 // MARK: - Static Data Repository
@@ -39,45 +39,38 @@ struct OUDStaticData {
         DSMCriterion(id: 11, text: "Withdrawal (syndrome or taking to relieve symptoms)", isPhysiological: true)
     ]
 
-    static let toolboxCategories: [OUDReferenceCategory] = [
-        OUDReferenceCategory(id: "street", title: "Street Pricing", icon: "dollarsign.circle", items: [
-            OUDReferenceItem(title: "Heroin/Fentanyl (Bag)", value: "$5 - $10", subtitle: "90-200+ MME (Service Unit)"),
-            OUDReferenceItem(title: "Bundle (10-14 Bags)", value: "$40 - $100", subtitle: "Philly Bundle = 14 Bags"),
-            OUDReferenceItem(title: "Brick (5 Bundles)", value: "$200 - $450", subtitle: "Wholesale vs Retail"),
-            OUDReferenceItem(title: "Counterfeit Pill (M30)", value: "$1 - $5", subtitle: "Fentanyl/Xylazine (No Oxy)"),
-            OUDReferenceItem(title: "Buprenorphine (8mg)", value: "$5 - $20", subtitle: "Survival Economy (No High)"),
-            OUDReferenceItem(title: "Gabapentin (Johnny)", value: "$0.50 - $3.00", subtitle: "Potentiator / Utility"),
-            OUDReferenceItem(title: "Xanax (Press)", value: "$3 - $5", subtitle: "Bromazolam / Fentanyl Risk")
+    static let toolboxCategories: [ClinicalReferenceCategory] = [
+        ClinicalReferenceCategory(id: "street", title: "Street Pricing", icon: "dollarsign.circle", items: [
+            ClinicalReferenceItem(title: "Heroin/Fentanyl (Bag)", value: "$5 - $10", subtitle: "90-200+ MME (Service Unit)"),
+            ClinicalReferenceItem(title: "Bundle (10-14 Bags)", value: "$40 - $100", subtitle: "Philly Bundle = 14 Bags"),
+            ClinicalReferenceItem(title: "Brick (5 Bundles)", value: "$200 - $450", subtitle: "Wholesale vs Retail"),
+            ClinicalReferenceItem(title: "Counterfeit Pill (M30)", value: "$1 - $5", subtitle: "Fentanyl/Xylazine (No Oxy)"),
+            ClinicalReferenceItem(title: "Buprenorphine (8mg)", value: "$5 - $20", subtitle: "Survival Economy (No High)"),
+            ClinicalReferenceItem(title: "Gabapentin (Johnny)", value: "$0.50 - $3.00", subtitle: "Potentiator / Utility"),
+            ClinicalReferenceItem(title: "Xanax (Press)", value: "$3 - $5", subtitle: "Bromazolam / Fentanyl Risk")
         ]),
-        OUDReferenceCategory(id: "tox", title: "Urine Toxicology", icon: "flask", items: [
-            OUDReferenceItem(title: "Heroin (6-MAM)", value: "6-8 hours", subtitle: "Rapid metabolism"),
-            OUDReferenceItem(title: "Morphine/Codeine", value: "2-3 days", subtitle: "Standard screen"),
-            OUDReferenceItem(title: "Fentanyl", value: "1-3 days", subtitle: "Requires specific assay"),
-            OUDReferenceItem(title: "Methadone", value: "3-14 days", subtitle: "Long elimination half-life")
+        ClinicalReferenceCategory(id: "tox", title: "Urine Toxicology", icon: "flask", items: [
+            ClinicalReferenceItem(title: "Heroin (6-MAM)", value: "6-8 hours", subtitle: "Rapid metabolism"),
+            ClinicalReferenceItem(title: "Morphine/Codeine", value: "2-3 days", subtitle: "Standard screen"),
+            ClinicalReferenceItem(title: "Fentanyl", value: "1-3 days", subtitle: "Requires specific assay"),
+            ClinicalReferenceItem(title: "Methadone", value: "3-14 days", subtitle: "Long elimination half-life")
         ]),
-        OUDReferenceCategory(id: "motivational_interviewing", title: "Motivational Interviewing (MI)", icon: "person.2.wave.2", items: [
-            OUDReferenceItem(title: "O.A.R.S.", value: "Core Skills", subtitle: "Open questions, Affirmations, Reflections, Summaries"),
-            OUDReferenceItem(title: "R.U.L.E.", value: "Principles", subtitle: "Resist righting reflex, Understand, Listen, Empower"),
-            OUDReferenceItem(title: "D.A.R.N. - C", value: "Change Talk", subtitle: "Desire, Ability, Reason, Need, Commitment")
+        ClinicalReferenceCategory(id: "counseling", title: "Counseling", icon: "person.2.wave.2", items: [
+            ClinicalReferenceItem(title: "O.A.R.S.", value: "Core Skills", subtitle: "Open questions, Affirmations, Reflections, Summaries"),
+            ClinicalReferenceItem(title: "R.U.L.E.", value: "Principles", subtitle: "Resist righting reflex, Understand, Listen, Empower"),
+            ClinicalReferenceItem(title: "D.A.R.N. - C", value: "Change Talk", subtitle: "Desire, Ability, Reason, Need, Commitment"),
+            ClinicalReferenceItem(title: "F.R.A.M.E.S.", value: "Intervention", subtitle: "Feedback, Responsibility, Advice, Menu, Empathy, Self-Efficacy")
         ]),
-        OUDReferenceCategory(id: "frames_model", title: "Brief Intervention (FRAMES)", icon: "brain.head.profile", items: [
-            OUDReferenceItem(title: "F - Feedback", value: "", subtitle: "Provide personalized feedback on the risks of their substance use"),
-            OUDReferenceItem(title: "R - Responsibility", value: "", subtitle: "Emphasize that change is their own responsibility and choice"),
-            OUDReferenceItem(title: "A - Advice", value: "", subtitle: "Give clear, non-judgmental advice to cut back or abstain"),
-            OUDReferenceItem(title: "M - Menu", value: "", subtitle: "Offer a menu of options for change (taper, treatment, counseling)"),
-            OUDReferenceItem(title: "E - Empathy", value: "", subtitle: "Use an empathetic, warm, reflective counseling style"),
-            OUDReferenceItem(title: "S - Self-Efficacy", value: "", subtitle: "Reinforce their ability (self-efficacy) to make changes")
+        ClinicalReferenceCategory(id: "palliative", title: "Palliative Conversion", icon: "cross.case", items: [
+            ClinicalReferenceItem(title: "Morphine PO : IV", value: "3:1", subtitle: "Standard starting ratio"),
+            ClinicalReferenceItem(title: "Hydromorphone PO : IV", value: "5:1", subtitle: "Approximate"),
+            ClinicalReferenceItem(title: "Morphine : Hydrocodone", value: "1:1", subtitle: "Oral equivalence")
         ]),
-        OUDReferenceCategory(id: "palliative", title: "Palliative Conversion", icon: "cross.case", items: [
-            OUDReferenceItem(title: "Morphine PO : IV", value: "3:1", subtitle: "Standard starting ratio"),
-            OUDReferenceItem(title: "Hydromorphone PO : IV", value: "5:1", subtitle: "Approximate"),
-            OUDReferenceItem(title: "Morphine : Hydrocodone", value: "1:1", subtitle: "Oral equivalence")
-        ]),
-        OUDReferenceCategory(id: "withdraw", title: "Withdrawal Scales", icon: "list.clipboard", items: [
-            OUDReferenceItem(title: "COWS Mild", value: "5 - 12", subtitle: "Symptomatic treatment"),
-            OUDReferenceItem(title: "COWS Moderate", value: "13 - 24", subtitle: "Consider induction"),
-            OUDReferenceItem(title: "COWS Severe", value: "25 - 36", subtitle: "Urgent management"),
-            OUDReferenceItem(title: "COWS Extreme", value: "> 36", subtitle: "High risk")
+        ClinicalReferenceCategory(id: "withdraw", title: "Withdrawal Scales", icon: "list.clipboard", items: [
+            ClinicalReferenceItem(title: "COWS Mild", value: "5 - 12", subtitle: "Symptomatic treatment"),
+            ClinicalReferenceItem(title: "COWS Moderate", value: "13 - 24", subtitle: "Consider induction"),
+            ClinicalReferenceItem(title: "COWS Severe", value: "25 - 36", subtitle: "Urgent management"),
+            ClinicalReferenceItem(title: "COWS Extreme", value: "> 36", subtitle: "High risk")
         ])
     ]
 }

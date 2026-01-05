@@ -282,6 +282,7 @@ struct OUDConsultView: View {
                             
                             if selectedTool == "counseling" {
                                 CounselingView()
+                                    .padding(.horizontal)
                             } else if selectedTool == "visuals" {
                                 VisualAidsView()
                             } else if selectedTool == "tox" {

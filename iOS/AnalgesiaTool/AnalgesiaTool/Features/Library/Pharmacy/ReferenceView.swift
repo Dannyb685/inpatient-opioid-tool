@@ -110,7 +110,8 @@ struct ReferenceContentView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @Binding var searchText: String
     @Binding var expandedId: String?
-    @State private var showComplexConversion = false
+    // State for Search
+
     
     var filteredDrugs: [DrugData] {
         if searchText.isEmpty {
@@ -161,10 +162,7 @@ struct ReferenceContentView: View {
                 
                 Divider().padding(.vertical, 8)
                 
-             // Complex Conversion Tool (Moved here, scrollable)
-            ComplexConversionCard(isExpanded: $showComplexConversion)
-                .padding(.horizontal)
-                .padding(.bottom, 12)
+
 
              Divider().padding(.vertical, 8)
                 
@@ -236,11 +234,71 @@ struct ReferenceCard: View {
     let onTap: () -> Void
     @EnvironmentObject var store: AssessmentStore
     
-    var body: some View {
-        let renalBadge = drug.getRenalBadge(patientRenal: store.renalFunction)
-        let hepaticBadge = drug.getHepaticBadge(patientHepatic: store.hepaticFunction)
+    // Computed property for badges to avoid imperative code in ViewBuilder
+    private var activeBadges: [(label: String, color: Color, icon: String, priority: Int)] {
+        var badges: [(label: String, color: Color, icon: String, priority: Int)] = [] // priority: 2=Red, 1=Amber, 0=Green
         
-        return VStack(spacing: 0) {
+        // Renal (Default)
+        let rBadge = drug.getRenalBadge(patientRenal: store.renalFunction)
+        let rPriority = rBadge.label.contains("Avoid") || rBadge.label.contains("Contraindicated") ? 2 : (rBadge.label.contains("Compatible") ? 0 : 1)
+        badges.append(("Renal: \(rBadge.label)", rBadge.color, rBadge.icon, rPriority))
+        
+        // Hepatic
+        let hBadge = drug.getHepaticBadge(patientHepatic: store.hepaticFunction)
+        if hBadge.label != "Compatible" {
+            let hPriority = hBadge.label.contains("Avoid") || hBadge.label.contains("Contraindicated") ? 2 : 1
+            badges.append(("Hepatic: \(hBadge.label)", hBadge.color, hBadge.icon, hPriority))
+        }
+        
+        // Hemodynamic (NEW)
+        if store.hemo == .unstable {
+            if drug.id == "morphine" || drug.id == "codeine" {
+                badges.append(("Hemo: Avoid (Histamine)", ClinicalTheme.rose500, "exclamationmark.triangle.fill", 2))
+            }
+        }
+        
+        // Naive Safety (Fentanyl Patch)
+        if store.analgesicProfile == .naive && drug.id == "fentanyl_patch" {
+            badges.append(("Contraindicated (Naive)", ClinicalTheme.rose500, "hand.raised.fill", 2))
+        }
+        
+        // Pregnancy Safety
+        if store.isPregnant && (drug.id == "codeine" || drug.id == "tramadol") {
+            badges.append(("Avoid (Pregnancy)", ClinicalTheme.rose500, "exclamationmark.triangle.fill", 2))
+        }
+        
+        // Naltrexone Blockade
+        if store.analgesicProfile == .naltrexone && (drug.type.contains("Agonist") || drug.type.contains("Phenylpiperidine")) {
+            badges.append(("Blocked / Ineffective", ClinicalTheme.rose500, "nosign", 2))
+        }
+        
+        // Meperidine (Elderly)
+        if drug.id == "meperidine" && (Int(store.age) ?? 0) >= 65 {
+            badges.append(("Avoid (Beers Criteria)", ClinicalTheme.rose500, "person.fill.xmark", 2))
+        }
+        
+        // Methadone (QTc)
+        if drug.id == "methadone" && store.qtcProlonged {
+            badges.append(("Contraindicated (QTc)", ClinicalTheme.rose500, "heart.slash.fill", 2))
+        }
+        
+        // Hydrocodone (Hepatic/APAP)
+        if drug.id == "hydrocodone" && store.hepaticFunction == .failure {
+            badges.append(("Avoid Combo (APAP)", ClinicalTheme.rose500, "exclamationmark.triangle.fill", 2))
+        }
+        
+        // 2. Suppression Logic (Red Trumps Green)
+        let hasRed = badges.contains { $0.priority == 2 }
+        if hasRed {
+            // Filter out "Compatible" (Priority 0)
+            badges.removeAll { $0.priority == 0 }
+        }
+        
+        return badges
+    }
+    
+    var body: some View {
+        VStack(spacing: 0) {
             // Header
             Button(action: onTap) {
                 HStack {
@@ -249,12 +307,13 @@ struct ReferenceCard: View {
                             Text(drug.name)
                                 .font(.headline)
                                 .foregroundColor(ClinicalTheme.textPrimary)
-                            
-
-                            // Dynamic Badges
-                            ReferenceBadgeView(label: renalBadge.label, color: renalBadge.color, icon: renalBadge.icon)
-                            if hepaticBadge.label != "Compatible" {
-                                ReferenceBadgeView(label: hepaticBadge.label, color: hepaticBadge.color, icon: hepaticBadge.icon)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        
+                        // Dynamic Badges (Consolidated Logic)
+                        HStack(spacing: 6) {
+                            ForEach(activeBadges, id: \.label) { b in
+                                ReferenceBadgeView(label: b.label, color: b.color, icon: b.icon)
                             }
                         }
                         Text(drug.type)
@@ -456,55 +515,7 @@ struct DisclaimerCard: View {
     }
 }
 
-// MARK: - Complex Conversion Card (Moved from Calculator)
-struct ComplexConversionCard: View {
-    @Binding var isExpanded: Bool
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            Button(action: { withAnimation { isExpanded.toggle() } }) {
-                HStack {
-                    Image(systemName: "exclamationmark.shield.fill")
-                    Text("Complex Conversions (Palliative)")
-                    Spacer()
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                }
-                .font(Font.caption.weight(.bold))
-                .foregroundColor(ClinicalTheme.amber500)
-                .padding()
-                .background(ClinicalTheme.amber500.opacity(0.1))
-            }
-            
-            if isExpanded {
-                VStack(alignment: .leading, spacing: 12) {
-                    // Patch
-                    HStack {
-                        Text("Fentanyl Patch").bold().foregroundColor(ClinicalTheme.textPrimary)
-                        Spacer()
-                        Text("Consult").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-                    }
-                    Text("WARNING: Patches take 12-24h to onset. Cover with short-acting during transition.")
-                        .font(.caption).foregroundColor(ClinicalTheme.amber500)
-                    
-                    Divider().background(ClinicalTheme.divider)
-                    
-                    // Methadone
-                    HStack {
-                        Text("Methadone").bold().foregroundColor(ClinicalTheme.textPrimary)
-                        Spacer()
-                        Text("Consult Pain Svc").font(.caption).bold().foregroundColor(ClinicalTheme.rose500)
-                    }
-                    Text("DO NOT ESTIMATE. Non-linear kinetics (Ratio 4:1 to 20:1). Risk of accumulation & overdose.")
-                        .font(.caption).foregroundColor(ClinicalTheme.rose500)
-                }
-                .padding()
-                .background(ClinicalTheme.backgroundCard)
-            }
-        }
-        .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.amber500.opacity(0.3), lineWidth: 1))
-    }
-}
+
 
 // MARK: - Workup Checkbox Component (Moved from OUDConsultView)
 

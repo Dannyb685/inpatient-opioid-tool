@@ -32,6 +32,9 @@ struct ScreeningContentView: View {
                         COWSView(store: toolkitStore)
                     } else if selectedTab == "tools" {
                         RiskToolsModule(store: toolkitStore)
+                    } else if selectedTab == "counseling" {
+                         CounselingView()
+                             .padding(.top) // Add some top padding for breathing room
                     }
                 }
                 .padding()
@@ -50,6 +53,9 @@ struct ScreeningContentView: View {
                     }
                     Button(action: { selectedTab = "tools" }) {
                         Label("Risk Tools", systemImage: "star.of.life")
+                    }
+                    Button(action: { selectedTab = "counseling" }) {
+                        Label("Counseling", systemImage: "person.2.wave.2")
                     }
                 } label: {
                     HStack(spacing: 4) {
@@ -74,6 +80,7 @@ struct ScreeningContentView: View {
         case "sbirt": return "SBIRT"
         case "cows": return "COWS"
         case "tools": return "Tools"
+        case "counseling": return "Counseling"
         default: return "Screening"
         }
     }

@@ -140,6 +140,31 @@ struct TaperScheduleView: View {
                         .cornerRadius(8)
                     }
                     
+                    // NEW: Analgesic Profile Warnings
+                    if assessmentStore.analgesicProfile == .buprenorphine || assessmentStore.analgesicProfile == .methadone {
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle.fill").foregroundColor(ClinicalTheme.amber500)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("MAT Taper Warning").font(.caption).bold().foregroundColor(ClinicalTheme.textPrimary)
+                                Text("Tapering Buprenorphine/Methadone requires specialized protocols not covered by standard CDC logic. Consult specialist.")
+                                    .font(.caption2).foregroundColor(ClinicalTheme.textSecondary)
+                            }
+                        }
+                        .padding(8).background(ClinicalTheme.amber500.opacity(0.1)).cornerRadius(8)
+                    }
+                    
+                    if assessmentStore.analgesicProfile == .highPotency {
+                        HStack(spacing: 8) {
+                            Image(systemName: "drop.triangle.fill").foregroundColor(ClinicalTheme.rose500)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Lipophilic Storage Warning").font(.caption).bold().foregroundColor(ClinicalTheme.textPrimary)
+                                Text("Fentanyl elimination is prolonged. Withdrawal may be delayed. Taper slowly.")
+                                    .font(.caption2).foregroundColor(ClinicalTheme.textSecondary)
+                            }
+                        }
+                        .padding(8).background(ClinicalTheme.rose500.opacity(0.1)).cornerRadius(8)
+                    }
+                    
                     Divider()
                     
                     // Medication Converter (Moved to Top)
@@ -316,7 +341,7 @@ struct TaperScheduleView: View {
                 .padding(.horizontal)
                 
                 // 2. GENERATED SCHEDULE
-                if let start = Double(startMME), start > 0, !assessmentStore.isPregnant {
+                if let start = Double(startMME), start > 0, !assessmentStore.isPregnant, assessmentStore.analgesicProfile != .naltrexone {
                     let factor = selectedTaperDrug.conversionFactor(assessment: assessmentStore)
                     
                     // BLOCK if Factor is 0 (Contraindicated)
@@ -434,12 +459,12 @@ struct TaperScheduleView: View {
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                     .padding(.horizontal)
                     
-                    // Clinical Note: Liquid Formulations
+                    // Clinical Note: Interval Strategy (Jump-Off Point)
                     HStack(alignment: .top, spacing: 12) {
-                        Image(systemName: "drop.fill").foregroundColor(ClinicalTheme.teal500)
+                        Image(systemName: "clock.arrow.circlepath").foregroundColor(ClinicalTheme.teal500)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Liquid Formulations (<10 MME Daily)").font(.caption).bold().foregroundColor(ClinicalTheme.textPrimary)
-                            Text("When tablets limit titration, use Oral Solution (e.g. Oxycodone 5mg/5mL or Morphine 10mg/5mL) to enable small decrements.")
+                            Text("Interval Strategy (<10 MME Daily)").font(.caption).bold().foregroundColor(ClinicalTheme.textPrimary)
+                            Text("When tapering below 10 MME is difficult with tablets, extend the dosing interval (e.g., Once Daily) before stopping completely. Do not use liquid micro-dosing.")
                                 .font(.caption2).foregroundColor(ClinicalTheme.textSecondary)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -467,6 +492,18 @@ struct TaperScheduleView: View {
                     .padding(.top, 8)
                     
                     }
+                } else if assessmentStore.analgesicProfile == .naltrexone {
+                     // Empty State for Naltrexone
+                    VStack(spacing: 12) {
+                        Image(systemName: "nosign")
+                            .font(.largeTitle)
+                            .foregroundColor(ClinicalTheme.rose500)
+                        Text("Opioid Blockade Active")
+                            .font(.headline).foregroundColor(ClinicalTheme.rose500)
+                        Text("Patient is on Naltrexone/Vivitrol. Taper calculator is not applicable.")
+                            .font(.caption).multilineTextAlignment(.center).foregroundColor(ClinicalTheme.textSecondary)
+                    }
+                    .padding(.vertical, 40)
                 } else if assessmentStore.isPregnant {
                      // Empty State for Pregnancy Block
                     VStack(spacing: 12) {
@@ -495,7 +532,7 @@ struct TaperScheduleView: View {
     // MARK: - Logic Models
     
     struct TaperStep {
-        let label: String
+        var label: String
         let dose: Double // MME
         let drugDose: Double // Converted Drug Dose
         let drugName: String // Selected Drug Name
@@ -523,84 +560,120 @@ struct TaperScheduleView: View {
         let factor = selectedTaperDrug.conversionFactor(assessment: assessmentStore)
         guard factor > 0 else { return [] } // Safety Gate
         
-        // CDC Short Term Logic
+        // CDC Short Term Logic Variables
         let threshold30 = start * 0.30
         let linearStep = start * rate
         
-        var week = 1
+        // Coalescing State
+        var pendingDose: Double? = nil
+        var pendingStartWeek = 1
+        var pendingInstruction = ""
+        var lastWeekProcessed = 0
+        
         var heldPreviousStep = false
         
+        // Helper to Flush Steps
+        func flushStep(endWeek: Int) {
+            guard let dose = pendingDose else { return }
+            
+            let labelUnit = useLongDuration ? "Month" : "Week"
+            let label: String
+            if endWeek > pendingStartWeek {
+                label = "\(labelUnit)s \(pendingStartWeek)-\(endWeek)"
+            } else {
+                label = "\(labelUnit) \(pendingStartWeek)"
+            }
+            
+            let drugNameRaw = selectedTaperDrug == .mmeOnly ? "" : selectedTaperDrug.rawValue.replacingOccurrences(of: " PO", with: "")
+            let derivedDrugDose = dose / factor
+            
+            // Override instruction for terminal step
+            let finalInstruction = (dose < 0.1 && pendingInstruction.isEmpty) ? "Discontinue" : pendingInstruction
+            
+            steps.append(TaperStep(
+                label: label,
+                dose: dose,
+                drugDose: derivedDrugDose,
+                drugName: drugNameRaw,
+                drugUnit: selectedTaperDrug.unit,
+                instruction: finalInstruction
+            ))
+        }
+        
         // Max 50 steps
-        for _ in 1...50 {
+        for week in 1...50 {
+            lastWeekProcessed = week
             var nextDose = 0.0
             var instruction = ""
             
+            // 1. Calculate Target
             if !useLongDuration && current > threshold30 {
-                 // Phase 1: Linear
                  nextDose = current - linearStep
             } else {
-                 // Phase 2 or Long Term: Exponential
                  nextDose = current * (1.0 - rate)
             }
             
-            // MINIMUM DECREMENT FLOOR (Prevent Micro-tapering)
-            // If the calculated drop is < 1 MME, hold the dose for a week to consolidate, 
-            // then drop by a clinically significant amount (= 2 MME or calculated amount) the next week.
+            // 2. Minimum Decrement Checks
             let proposedDrop = current - nextDose
             
+            // FIX: Prevent Hold on Week 1 (Always reduce from Start)
+            // If Week 1 drop is small, FORCE it instead of Holding.
             if proposedDrop < 1.0 && current > 5.0 {
-                if !heldPreviousStep {
+                if !heldPreviousStep && week > 1 {
                     // ACTION: HOLD DOSE
                     nextDose = current
-                    instruction = "Hold Dose (Consolidate Decrement)"
+                    instruction = "Hold Dose"
                     heldPreviousStep = true
                 } else {
                     // ACTION: FORCE STEP
-                    // Drop by at least 2.0 MME (or the rest if < 2)
                     let forcedDrop = 2.0
                     nextDose = max(0, current - forcedDrop)
-                    heldPreviousStep = false // Reset
+                    heldPreviousStep = false
                 }
             } else {
                 heldPreviousStep = false
             }
             
-            // LOW DOSE HANDLING (< 10 MME)
-            if nextDose < 10.0 && nextDose > 0.0 && !instruction.contains("Hold") {
-                instruction = "Consider liquid formulations for small decrements"
+            // 3. Jump-Off Logic
+            if nextDose < 5.0 {
+                nextDose = 0.0
+                instruction = "Discontinue (Jump-off)"
+            } else if nextDose < 10.0 {
+                instruction = "Extend Interval (e.g. Daily)"
             }
             
-            // Convert to Selected Drug
-            // Formula: MME / Factor = Drug Dose
-            // e.g. 90 MME / 1.5 (Oxy) = 60mg Oxy
-            // Factor already calculated safely above
-            let convertedDose = nextDose / factor
+            // 4. Coalescing Engine
+            if let pDose = pendingDose {
+                // Precision check to avoid floating point drift
+                if abs(nextDose - pDose) < 0.001 {
+                    // Same Dose: Accumulate (Do nothing, just don't flush)
+                } else {
+                    // Dose Changed: Flush Pending
+                    flushStep(endWeek: week - 1)
+                    
+                    // Start New
+                    pendingDose = nextDose
+                    pendingStartWeek = week
+                    pendingInstruction = instruction
+                }
+            } else {
+                // First Step
+                pendingDose = nextDose
+                pendingStartWeek = week
+                pendingInstruction = instruction
+            }
             
-            let drugNameRaw = selectedTaperDrug == .mmeOnly ? "" : selectedTaperDrug.rawValue.replacingOccurrences(of: " PO", with: "")
-            
-            if nextDose < 1.0 { // Terminate
-                steps.append(TaperStep(
-                    label: useLongDuration ? "Month \(week)" : "Week \(week)",
-                    dose: 0,
-                    drugDose: 0,
-                    drugName: drugNameRaw,
-                    drugUnit: selectedTaperDrug.unit,
-                    instruction: "Discontinue"
-                ))
+            // 5. Terminal Check
+            if nextDose < 0.1 {
                 break
             }
             
-            steps.append(TaperStep(
-                label: useLongDuration ? "Month \(week)" : "Week \(week)",
-                dose: nextDose,
-                drugDose: convertedDose,
-                drugName: drugNameRaw,
-                drugUnit: selectedTaperDrug.unit,
-                instruction: instruction
-            ))
-            
             current = nextDose
-            week += 1
+        }
+        
+        // Flush remaining
+        if pendingDose != nil {
+            flushStep(endWeek: lastWeekProcessed)
         }
         
         return steps
@@ -613,6 +686,7 @@ struct TaperScheduleView: View {
         Target Medication: \(selectedTaperDrug.rawValue)
         Mode: \(useLongDuration ? "Long Term (>1yr)" : "Short Term (<1yr)")
         Strategy: \(useLongDuration ? "Slow Taper (10% Monthly)" : "CDC 2-Phase Protocol")
+        Limit: 5 MME Jump-Off (Interval Extension)
         
         """
         
@@ -656,12 +730,12 @@ struct TaperChartVisualizer: View {
                     }
                 }
                 
-                // Liquid Threshold
-                RuleMark(y: .value("Liquid Threshold", 10))
+                // Interval Threshold
+                RuleMark(y: .value("Interval Threshold", 10))
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
                     .foregroundStyle(.gray.opacity(0.5))
                     .annotation(position: .top, alignment: .leading) {
-                        Text("Liquid Form. (<10)")
+                        Text("Extend Interval (<10)")
                             .font(.caption2)
                             .foregroundColor(.gray)
                     }

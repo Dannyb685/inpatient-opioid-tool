@@ -4,9 +4,11 @@ import {
     Calculator,
     Info,
     ShieldAlert,
-    Zap
+    Zap,
+    X
 } from 'lucide-react';
 import { ClinicalCard } from './Shared';
+import { MethadoneCalculator } from './MethadoneCalculator';
 
 export const CalculatorView = () => {
     const [ivMorphine, setIvMorphine] = useState<string | number>(10);
@@ -14,6 +16,7 @@ export const CalculatorView = () => {
     const [showInfusion, setShowInfusion] = useState(false);
     const [infusionRate, setInfusionRate] = useState<string | number>(0);
     const [showSafetyCheck, setShowSafetyCheck] = useState(false);
+    const [showMethadoneCalc, setShowMethadoneCalc] = useState(false);
 
     const convert = (factor: number) => {
         const val = typeof ivMorphine === 'string' ? parseFloat(ivMorphine) || 0 : ivMorphine;
@@ -315,17 +318,19 @@ export const CalculatorView = () => {
                                     </div>
                                 </div>
 
-                                {/* Methadone (No calc provided) */}
+                                {/* Methadone */}
                                 <div className="flex flex-col gap-2">
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between items-center">
                                         <h3 className="font-bold text-text-primary">Methadone</h3>
-                                        <div className="text-right">
-                                            <div className="text-xl font-bold text-text-primary">Consult Pain Svc</div>
-                                            <div className="text-[10px] text-text-tertiary mt-1">Non-linear kinetics</div>
-                                        </div>
+                                        <button
+                                            onClick={() => setShowMethadoneCalc(true)}
+                                            className="text-[10px] bg-action text-white px-2 py-1 rounded-lg font-bold hover:bg-action/90 transition-colors shadow-sm"
+                                        >
+                                            Open Calculator
+                                        </button>
                                     </div>
-                                    <div className="text-[10px] bg-danger-bg text-danger p-2 rounded-xl border border-danger/20 leading-relaxed">
-                                        <strong>DO NOT ESTIMATE:</strong> Methadone conversion varies by total MME (4:1 to 20:1). Accumulates over 5 days (t1/2 8-59h). Risk of QTc prolongation and overdose.
+                                    <div className="text-[10px] bg-action-bg text-action p-2 rounded-xl border border-action-border/20 leading-relaxed">
+                                        <strong>Advanced Tool:</strong> Use the dedicated calculator for NCCN/VA compliant starting doses and rotation schedules.
                                     </div>
                                 </div>
 
@@ -339,6 +344,24 @@ export const CalculatorView = () => {
                         )}
                     </div>
                 </div>
+
+                {/* Methadone Modal */}
+                {showMethadoneCalc && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+                        <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-surface-base rounded-2xl shadow-2xl relative">
+                            <button
+                                onClick={() => setShowMethadoneCalc(false)}
+                                className="absolute top-4 right-4 p-2 bg-surface-card rounded-full hover:bg-surface-highlight z-50 text-text-tertiary"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <MethadoneCalculator
+                                onClose={() => setShowMethadoneCalc(false)}
+                                initialMME={ivMorphine.toString()}
+                            />
+                        </div>
+                    </div>
+                )}
 
                 <div className="bg-action-bg p-3 rounded-xl border border-action-border/30 flex gap-2 text-action mt-2">
                     <Activity className="w-4 h-4 flex-none mt-0.5" />

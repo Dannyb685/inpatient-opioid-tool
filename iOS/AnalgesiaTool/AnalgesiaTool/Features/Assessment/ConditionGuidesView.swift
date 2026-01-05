@@ -2,17 +2,6 @@ import SwiftUI
 struct ConditionGuidesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("General Reference (Safety Logic Not Applied)")
-                .font(.caption)
-                .bold()
-                .foregroundColor(.orange)
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(ClinicalTheme.backgroundCard)
-            
-            Divider().background(ClinicalTheme.divider)
-            
             ForEach(Array(ProtocolData.conditionGuides.enumerated()), id: \.element.id) { index, guide in
                 DisclosureGroup(
                     content: {
@@ -44,6 +33,5 @@ struct ConditionGuidesView: View {
         .background(ClinicalTheme.backgroundCard)
         .cornerRadius(12)
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-        .padding(.horizontal)
     }
 }

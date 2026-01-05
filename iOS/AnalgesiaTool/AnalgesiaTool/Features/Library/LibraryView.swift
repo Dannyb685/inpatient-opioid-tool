@@ -3,6 +3,7 @@ import SwiftUI
 struct LibraryView: View {
     @State private var refSearchText = ""
     @State private var refExpandedId: String? = nil
+    @State private var showSettings = false
     
     var body: some View {
         NavigationStack {
@@ -13,7 +14,15 @@ struct LibraryView: View {
                         .font(.largeTitle).bold()
                         .foregroundColor(ClinicalTheme.textPrimary)
                         .padding()
+                    
                     Spacer()
+                    
+                    Button(action: { showSettings = true }) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title2)
+                            .foregroundColor(ClinicalTheme.teal500)
+                            .padding()
+                    }
                 }
                 .background(ClinicalTheme.backgroundMain)
                 
@@ -22,6 +31,9 @@ struct LibraryView: View {
             }
             .navigationBarHidden(true) 
             .background(ClinicalTheme.backgroundMain)
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
+            }
         }
     }
 }

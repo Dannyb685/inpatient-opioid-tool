@@ -17,9 +17,9 @@ struct AssistSubstance: Identifiable {
     
     var riskCategory: String {
 
-        // Logic varies by substance, simplified for MVP based on provided text:
+        // Logic verified against WHO ASSIST-Lite Standards:
         // Tobacco: 0=Low, 1-2=Mod, 3=High
-        // Alcohol: 0-1=Low, 2=Mod, 3-4=High (Wait, max score is 3 here? Let's check logic)
+        // Alcohol: 0-1=Low, 2=Mod, 3-4=High (Max possible score is 4)
         // User text says "count yes answers".
         // Tobacco: 1, 1a, 1b. (3 questions).
         // Alcohol: 2, 2a, 2b, 2c. (4 questions).
@@ -34,7 +34,7 @@ struct AssistSubstance: Identifiable {
         case "alcohol":
             let s = (usedInPast3Months ? 1 : 0) + (q1_Frequency ? 1 : 0) + (q3_Extra ? 1 : 0) + (q2_Concern ? 1 : 0)
             if s <= 1 { return "Low" }
-            if s == 2 { return "Moderate" }
+            if s <= 3 { return "Moderate" }
             return "High"
         default:
             let s = (usedInPast3Months ? 1 : 0) + (q1_Frequency ? 1 : 0) + (q2_Concern ? 1 : 0)

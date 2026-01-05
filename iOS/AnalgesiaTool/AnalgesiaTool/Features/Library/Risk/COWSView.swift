@@ -6,58 +6,17 @@ struct COWSView: View {
     @State private var showRecommendations = false
     
     // MARK: - Logic
+    // MARK: - Logic
     var recommendations: [AdjuvantRecommendation] {
-        var recs: [AdjuvantRecommendation] = []
-        
-        // Bone/Joint Aches
-        if store.cowsBoneAche > 0 {
-            recs.append(AdjuvantRecommendation(category: "Pain", drug: "Acetaminophen", dose: "650mg PO q6h", rationale: "Bone/Joint Pain"))
-            recs.append(AdjuvantRecommendation(category: "Pain", drug: "Ibuprofen", dose: "600mg PO q6h", rationale: "NSAID Option"))
-        }
-        
-        // GI Upset
-        if store.cowsGI > 0 {
-            recs.append(AdjuvantRecommendation(category: "Nausea", drug: "Ondansetron", dose: "4mg PO q6h prn", rationale: "Nausea/Vomiting"))
-            recs.append(AdjuvantRecommendation(category: "Diarrhea", drug: "Loperamide", dose: "2mg PO prn", rationale: "Loose Stool"))
-            if store.cowsGI == 1 { // Stomach cramps
-                recs.append(AdjuvantRecommendation(category: "Cramps", drug: "Dicyclomine", dose: "20mg q6h prn", rationale: "Abdominal Cramping"))
-            }
-        }
-
-        // Autonomic (Clonidine)
-        // Sweating, Pulse, Tremor, Anxiety, Runny Nose, Gooseflesh
-        let autonomicSum = store.cowsSweating + store.cowsPulse + store.cowsTremor + store.cowsAnxiety + store.cowsRunnyNose + store.cowsGooseflesh
-        if autonomicSum > 0 {
-             recs.append(AdjuvantRecommendation(category: "Autonomic", drug: "Clonidine", dose: "0.1mg PO q4h prn", rationale: "Sweating, Tremors, Anxiety. Hold SBP<100."))
-        }
-        
-        // Anxiety Specific
-        if store.cowsAnxiety > 0 || store.cowsRestlessness > 0 {
-             recs.append(AdjuvantRecommendation(category: "Anxiety", drug: "Hydroxyzine", dose: "25-50mg PO q6h prn", rationale: "Anxiety/Restlessness"))
-        }
-        
-        // Insomnia
-        if store.cowsYawning > 0 || store.cowsRestlessness > 0 {
-             recs.append(AdjuvantRecommendation(category: "Sleep", drug: "Trazodone", dose: "50-100mg PO qhs prn", rationale: "Insomnia"))
-        }
-        
-        // Deduplicate
-        var uniqueRecs: [AdjuvantRecommendation] = []
-        var seenDrugs: Set<String> = []
-        for r in recs {
-            if !seenDrugs.contains(r.drug) {
-                uniqueRecs.append(r)
-                seenDrugs.insert(r.drug)
-            }
-        }
-        return uniqueRecs
+        store.withdrawalRecommendations
     }
     
     var scoreColor: Color {
         if store.cowsScore > 36 { return ClinicalTheme.rose500 }
         if store.cowsScore > 24 { return .orange }
         if store.cowsScore > 12 { return ClinicalTheme.amber500 }
-        return ClinicalTheme.teal500
+        if store.cowsScore > 4 { return .yellow } // Mild (5-12)
+        return ClinicalTheme.teal500 // None/Minimal (0-4)
     }
     
     var body: some View {
@@ -200,8 +159,10 @@ struct COWSView: View {
                                         .padding(.top, 2)
                                     
                                     VStack(alignment: .leading, spacing: 1) {
-                                        Text(rec.drug).font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
-                                        + Text("  \(rec.dose)").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                            Text(rec.drug).font(.subheadline).bold().foregroundColor(ClinicalTheme.textPrimary)
+                                            Text(rec.dose).font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                                        }
                                         Text(rec.rationale).font(.caption2).italic().foregroundColor(ClinicalTheme.textMuted)
                                     }
                                 }

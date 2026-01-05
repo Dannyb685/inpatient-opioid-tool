@@ -21,15 +21,22 @@ struct SettingsView: View {
                                  .foregroundColor(ClinicalTheme.textPrimary)
                          }
                          
-                         Text("This application is intended solely as an educational aid for qualified healthcare professionals. It is NOT a substitute for clinical judgment or professional medical advice.")
+                         Text("This application is intended solely as an educational aid for qualified healthcare professionals. It is NOT a substitute for clinical judgment.")
                              .font(.subheadline)
                              .foregroundColor(ClinicalTheme.textPrimary)
                              .fixedSize(horizontal: false, vertical: true)
                          
-                         Text("The authors and developers assume no liability for any diagnosis, treatment, decision, or action taken in reliance upon information contained in this application. Always verify calculations and check official prescribing information.")
-                             .font(.caption)
-                             .foregroundColor(ClinicalTheme.textSecondary)
-                             .fixedSize(horizontal: false, vertical: true)
+                         NavigationLink(destination: LegalDisclaimerView()) {
+                             HStack {
+                                 Text("View Full Legal Disclaimers & Terms")
+                                     .font(.subheadline.bold())
+                                     .foregroundColor(ClinicalTheme.teal500)
+                                 Spacer()
+                                 Image(systemName: "chevron.right")
+                                     .foregroundColor(ClinicalTheme.teal500)
+                             }
+                             .padding(.top, 4)
+                         }
                      }
                      .clinicalCard()
                      .padding(.horizontal)
@@ -115,13 +122,26 @@ struct SettingsView: View {
                              .foregroundColor(ClinicalTheme.textMuted)
                          
                          // Developer Diagnostics
-                         Button("Run Clinical Validation Suite") {
-                             diagnosticLog = ValidationEngine.shared.runAll()
+                         Button("Run Clinical Validation Engine (Full Stress Test)") {
+                             diagnosticLog = ClinicalValidationEngine.shared.runStressTest()
                              showDiagnostics = true
                          }
                          .font(.caption2)
                          .foregroundColor(ClinicalTheme.teal500.opacity(0.5))
                          .padding(.top, 20)
+                         
+                         NavigationLink(destination: ValidationRunnerView()) {
+                             HStack {
+                                 Image(systemName: "testtube.2")
+                                 Text("Interactive Logic Runner")
+                             }
+                             .font(.caption2.bold())
+                             .foregroundColor(ClinicalTheme.teal500)
+                             .padding(.vertical, 8)
+                             .padding(.horizontal, 16)
+                             .background(ClinicalTheme.teal500.opacity(0.1))
+                             .cornerRadius(8)
+                         }
                      }
                      .frame(maxWidth: .infinity)
                      .padding(.bottom, 20)

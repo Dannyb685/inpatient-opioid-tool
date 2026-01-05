@@ -11,6 +11,17 @@ struct RiskAssessmentView: View {
     var accentColor: Color {
         return store.isPregnant ? ClinicalTheme.purple500 : ClinicalTheme.teal500
     }
+
+    var profileColor: Color {
+        switch store.analgesicProfile {
+        case .naive: return ClinicalTheme.teal500      // Safe / Standard
+        case .chronicRx: return ClinicalTheme.amber500 // Moderate Tolerance
+        case .highPotency: return ClinicalTheme.rose500 // Danger / Unknown
+        case .buprenorphine: return ClinicalTheme.purple500 // Blockade / High Affinity
+        case .methadone: return Color.indigo // QTc / Variable Half-life
+        case .naltrexone: return Color.gray            // Blocked
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -40,6 +51,9 @@ struct RiskAssessmentView: View {
                         additionalParametersSection
                         medicationHistorySection
                         riskFactorsSection
+                        
+                        AssessmentContextFlowCard()
+                            .padding(.horizontal)
                     }
                     .padding(.top)
                     .padding(.bottom, 100)
@@ -267,9 +281,26 @@ struct RiskAssessmentView: View {
                         case .intact: return ClinicalTheme.teal500
                         case .tube: return ClinicalTheme.amber500
                         case .npo: return ClinicalTheme.rose500
+
                         }
                     }
                 )
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+            
+            // 6. History of GI Bleed (Independent Question)
+            if !isQuickMode {
+                Toggle(isOn: $store.historyGIBleed) {
+                     VStack(alignment: .leading, spacing: 2) {
+                         Text("6. History of GI Bleed?").font(.subheadline).bold().foregroundColor(ClinicalTheme.rose500)
+                         Text("Prevents systemic NSAID recommendations").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                     }
+                }
+                .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.rose500))
+                .padding()
+                .background(ClinicalTheme.rose500.opacity(0.05))
+                .cornerRadius(8)
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.rose500.opacity(0.3), lineWidth: 1))
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
@@ -278,18 +309,18 @@ struct RiskAssessmentView: View {
     var additionalParametersSection: some View {
         Group {
             if !isQuickMode {
-                // 6. Clinical Indication
+                // 7. Clinical Indication
                 SelectionView(
-                    title: "6. Clinical Indication",
+                    title: "7. Clinical Indication",
                     options: ClinicalIndication.allCases,
                     selection: $store.indication
                 )
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
             
-            // 7. Pain Type (CRITICAL STEWARDSHIP GATE - ALWAYS SHOW)
+            // 8. Pain Type (CRITICAL STEWARDSHIP GATE - ALWAYS SHOW)
             SelectionView(
-                title: "7. Pain Type",
+                title: "8. Pain Type",
                 options: PainType.allCases,
                 selection: $store.painType
             )
@@ -297,13 +328,123 @@ struct RiskAssessmentView: View {
     }
     
     var medicationHistorySection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-             Text("Patient History").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
-             Toggle("Opioid Naive (No Home Opioids)", isOn: $store.naive)
-             Toggle("Home Buprenorphine (MAT)", isOn: $store.mat)
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Image(systemName: "pills.fill")
+                    .foregroundColor(ClinicalTheme.teal500)
+                Text("Substance Profile")
+                    .font(.headline)
+                    .foregroundColor(ClinicalTheme.textSecondary)
+            }
+            
+
+
+            // 1. ANALGESIC PROFILE PICKER
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Patient Baseline")
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .foregroundColor(ClinicalTheme.textSecondary)
+                    .textCase(.uppercase)
+                
+                Menu {
+                    Picker("Profile", selection: $store.analgesicProfile) {
+                        ForEach(AnalgesicProfile.allCases) { profile in
+                            Text(profile.rawValue).tag(profile)
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text(store.analgesicProfile.rawValue)
+                            .font(.body).bold()
+                            .foregroundColor(ClinicalTheme.textPrimary)
+                        Spacer()
+                        Image(systemName: "chevron.up.chevron.down")
+                            .font(.caption)
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                    }
+                    .padding()
+                    .background(ClinicalTheme.backgroundInput)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(profileColor.opacity(0.5), lineWidth: 1.5)
+                    )
+                }
+            }
+            
+            // 2. DYNAMIC PAIN MODIFIERS
+            Group {
+                // METHADONE CONTEXT
+                if store.analgesicProfile == .methadone {
+                    Divider()
+                    Toggle(isOn: $store.qtcProlonged) {
+                        VStack(alignment: .leading) {
+                            Text("QTc Prolongation (>450ms)")
+                                .font(.subheadline).bold()
+                            Text("Warning: Limit QT-prolonging adjuvants")
+                                .font(.caption).foregroundColor(ClinicalTheme.rose500)
+                        }
+                    }
+                    .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.rose500))
+                    
+                    Toggle(isOn: $store.splitDosing) {
+                        VStack(alignment: .leading) {
+                            Text("Already on Split Dosing?")
+                                .font(.subheadline).bold()
+                            Text(store.splitDosing ? "Good for analgesia" : "Recommendation: Split dose q8h")
+                                .font(.caption).foregroundColor(store.splitDosing ? ClinicalTheme.teal500 : ClinicalTheme.amber500)
+                        }
+                    }
+                    .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.teal500))
+                }
+                
+                // BUPRENORPHINE CONTEXT
+                if store.analgesicProfile == .buprenorphine {
+                    Divider()
+                    Toggle("Currently Split Dosing (q6-8h)?", isOn: $store.splitDosing)
+                        .font(.subheadline)
+                        .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.teal500))
+                }
+                
+                // HIGH POTENCY / FENTANYL
+                if store.analgesicProfile == .highPotency {
+                    Divider()
+                    HStack(alignment: .top) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(ClinicalTheme.rose500)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Note: Tolerance Unpredictable")
+                                .font(.subheadline).bold()
+                            Text("Lipophilic storage prevents accurate MME calculation. Titrate by effect.")
+                                .font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+                
+                // NALTREXONE
+                if store.analgesicProfile == .naltrexone {
+                    Divider()
+                    HStack(alignment: .top) {
+                        Image(systemName: "nosign")
+                            .foregroundColor(ClinicalTheme.rose500)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Receptor Blockade Active")
+                                .font(.subheadline).bold()
+                            Text("Opioids ineffective. Prioritize Ketamine/Regional.")
+                                .font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                        }
+                    }
+                }
+            }
+            .transition(.opacity.combined(with: .move(edge: .top)))
+            .animation(.easeInOut, value: store.analgesicProfile)
         }
-        .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.teal500))
-        .clinicalCard()
+        .padding()
+        .background(ClinicalTheme.backgroundCard)
+        .cornerRadius(12)
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
         .padding(.horizontal)
     }
 
@@ -346,6 +487,27 @@ struct RiskAssessmentView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
+                    
+                    // 0. PATIENT CONTEXT (Reverted to Styled One-Liner)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("PATIENT CONTEXT")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                        
+                        Text(LocalizedStringKey(store.generatedSummary))
+                            .font(.body) // System font (no serif)
+                            .foregroundColor(ClinicalTheme.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineSpacing(4)
+                    }
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(ClinicalTheme.backgroundCard) // White card
+                    .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                    .padding(.horizontal)
+
                     // 1. Monitoring Plan (High Priority)
                     if !store.monitoringPlan.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
@@ -422,17 +584,58 @@ struct RiskAssessmentView: View {
                 .padding(.vertical)
                 
                 // 5. Condition Guides (Moved from Library)
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Condition Guides").font(.title3).bold().foregroundColor(ClinicalTheme.textPrimary).padding(.horizontal)
-                    ConditionGuidesView()
+                VStack(alignment: .leading, spacing: 0) {
+                    DisclosureGroup(
+                        content: {
+                            VStack(alignment: .leading, spacing: 12) {
+                                // Explicit Warning as requested
+                                HStack(spacing: 8) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .foregroundColor(ClinicalTheme.amber500)
+                                    Text("General reference only. Does not account for patient-specific safety parameters.")
+                                        .font(.caption)
+                                        .foregroundColor(ClinicalTheme.textSecondary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                .padding()
+                                .background(ClinicalTheme.amber500.opacity(0.1))
+                                .cornerRadius(8)
+                                .padding(.bottom, 8)
+                                
+                                ConditionGuidesView()
+                            }
+                            .padding(.top, 12)
+                        },
+                        label: {
+                            Text("Pain Regimen By Condition")
+                                .font(.title3)
+                                .bold()
+                                .foregroundColor(ClinicalTheme.textPrimary)
+                        }
+                    )
+                    .padding()
+                    .background(ClinicalTheme.backgroundCard)
+                    .cornerRadius(12)
+                    .padding(.horizontal)
                 }
-                .padding(.bottom, 40)
+                .padding(.bottom, 20)
+                
+                // 6. Legal Footer
+                DisclaimerFooter()
             }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
-            .navigationTitle("Recommendations")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("RECOMMENDATIONS")
+                        .font(.footnote)
+                        .fontWeight(.heavy)
+                        .foregroundColor(ClinicalTheme.textPrimary)
+                        .tracking(1) // Letter spacing for clean look
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { showFullDetails = false }
+                        .font(.body.bold())
                 }
             }
         }
@@ -450,8 +653,74 @@ struct RiskAssessmentView: View {
 
 // Helper Components
 // RiskAssessmentView.swift - Removing InputSection as it is replaced by SelectionView
+
+struct AssessmentContextFlowCard: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "arrow.triangle.branch")
+                    .font(.title2)
+                    .foregroundColor(ClinicalTheme.teal500)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Clinical Data Flow")
+                        .font(.headline)
+                        .foregroundColor(ClinicalTheme.teal500)
+                    
+                    Text("Your inputs here drive downstream safety logic:")
+                        .font(.caption)
+                        .foregroundColor(ClinicalTheme.textSecondary)
+                }
+                Spacer()
+            }
+            
+            HStack(spacing: 8) {
+                FlowBadge(icon: "pills.fill", label: "Calculator")
+                Image(systemName: "arrow.right").font(.caption).foregroundColor(ClinicalTheme.textMuted)
+                FlowBadge(icon: "cross.case.fill", label: "OUD Consult")
+                Image(systemName: "arrow.right").font(.caption).foregroundColor(ClinicalTheme.textMuted)
+                FlowBadge(icon: "books.vertical.fill", label: "Library")
+            }
+            .frame(maxWidth: .infinity)
+            
+            HStack(spacing: 6) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(ClinicalTheme.amber500)
+                    .font(.caption2)
+                Text("Changes here require refresh in downstream tools.")
+                    .font(.caption2)
+                    .italic()
+                    .foregroundColor(ClinicalTheme.textSecondary)
+            }
+        }
+        .padding()
+        .background(ClinicalTheme.backgroundCard)
+        .cornerRadius(12)
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.teal500.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [5])))
+    }
+}
+
+struct FlowBadge: View {
+    let icon: String
+    let label: String
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Circle()
+                .fill(ClinicalTheme.teal500.opacity(0.1))
+                .frame(width: 32, height: 32)
+                .overlay(Image(systemName: icon).foregroundColor(ClinicalTheme.teal500).font(.caption))
+            
+            Text(label)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundColor(ClinicalTheme.textSecondary)
+        }
+    }
+}
+
 struct RecommendationCard: View {
     let rec: DrugRecommendation
+    @State private var showDetails = false
     var color: Color {
         switch rec.type {
         case .safe: return ClinicalTheme.teal500
@@ -462,48 +731,177 @@ struct RecommendationCard: View {
     @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top) {
-                Text(rec.name)
-                    .font(.headline) // Standardized Header
-                    .foregroundColor(ClinicalTheme.textPrimary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.9)
-                
-                Spacer()
-                
-                // Status Badge (Kept as requested)
-                Text(rec.type == .safe ? "Preferred" : "Monitor")
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(color.opacity(0.15))
-                    .foregroundColor(color)
-                    .cornerRadius(6)
-            }
-            
-            // Refined Text Block
-            // Merging Reason + Detail for cleaner reading flow
-            // Removed italics and muted colors for better legibility
-            VStack(alignment: .leading, spacing: 4) {
-                if !rec.reason.isEmpty && rec.reason != "Standard." && rec.reason != "Preferred." {
-                     Text(rec.reason)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(ClinicalTheme.textPrimary) // High contrast
+        Button(action: { withAnimation(.spring()) { showDetails.toggle() } }) {
+            VStack(alignment: .leading, spacing: 12) {
+                // Header Row
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(rec.name)
+                            .font(.headline)
+                            .foregroundColor(ClinicalTheme.textPrimary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.9)
+                        
+                        Text(rec.reason)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(ClinicalTheme.textPrimary)
+                    }
+                    
+                    Spacer()
+                    
+                    // Status Badge
+                    Text(rec.type == .safe ? "Preferred" : "Monitor")
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(color.opacity(0.15))
+                        .foregroundColor(color)
+                        .cornerRadius(6)
                 }
                 
+                // Detail Text
                 Text(rec.detail)
-                    .font(.subheadline) // Increased from caption
-                    .foregroundColor(ClinicalTheme.textSecondary) // Better readability than muted
-                    .fixedSize(horizontal: false, vertical: true) // multiline support
+                    .font(.subheadline)
+                    .foregroundColor(ClinicalTheme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.leading) // Ensure left alignment
+                
+                // EXPANDABLE CONTENT INDICATOR
+                if showDetails {
+                    Divider().background(ClinicalTheme.divider)
+                    
+                    // 1. Standard Orders (Integrated)
+                    if let orders = ClinicalData.getStandardOrders(for: rec.name), !orders.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Standard Orders", systemImage: "list.bullet.clipboard.fill")
+                                .font(.caption).fontWeight(.bold).foregroundColor(ClinicalTheme.teal500)
+                                .padding(.bottom, 2)
+                            
+                            ForEach(orders) { order in
+                                HStack(alignment: .top, spacing: 8) {
+                                    Circle().fill(ClinicalTheme.teal500).frame(width: 4, height: 4).padding(.top, 6)
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text(order.label)
+                                            .font(.caption).fontWeight(.medium)
+                                            .foregroundColor(ClinicalTheme.textPrimary)
+                                        if !order.note.isEmpty {
+                                            Text(order.note)
+                                                .font(.caption2)
+                                                .foregroundColor(ClinicalTheme.textSecondary)
+                                                .italic()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.bottom, 8)
+                    }
+
+                    // 2. Clinical Pharmacology
+                    if let drug = ClinicalData.drugData.first(where: { rec.name.localizedCaseInsensitiveContains($0.name) }) {
+                        VStack(alignment: .leading, spacing: 16) {
+                             Label("Clinical Pharmacology", systemImage: "flask.fill")
+                                .font(.caption).fontWeight(.bold).foregroundColor(ClinicalTheme.purple500)
+                            
+                            // PK Grid
+                            HStack(spacing: 12) {
+                                // IV Profile
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("IV Profile").font(.caption2).fontWeight(.black).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
+                                    Text("\(drug.ivOnset) onset").font(.caption).foregroundColor(ClinicalTheme.textPrimary)
+                                    Text("\(drug.ivDuration) duration").font(.caption).foregroundColor(ClinicalTheme.textPrimary)
+                                }
+                                .padding(10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(ClinicalTheme.backgroundMain)
+                                .cornerRadius(8)
+                                
+                                // Bioavailability
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Oral Bio").font(.caption2).fontWeight(.black).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
+                                    Text(drug.bioavailability > 0 ? "\(drug.bioavailability)%" : "N/A").font(.caption).bold().foregroundColor(ClinicalTheme.teal500)
+                                }
+                                .padding(10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(ClinicalTheme.backgroundMain)
+                                .cornerRadius(8)
+                            }
+                            
+                            // Nuance
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: "bolt.fill").foregroundColor(ClinicalTheme.amber500).font(.caption)
+                                Text(drug.clinicalNuance)
+                                    .font(.caption)
+                                    .foregroundColor(ClinicalTheme.textSecondary)
+                                    .lineSpacing(2)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                }
+                
+                // Chevron Footer (Always visible to indicate interactivity)
+                HStack {
+                    Spacer()
+                    Image(systemName: showDetails ? "chevron.up" : "chevron.down")
+                        .font(.caption)
+                        .foregroundColor(ClinicalTheme.textSecondary.opacity(0.5))
+                    Spacer()
+                }
+                .padding(.top, 4)
+            }
+            .padding(16)
+            .background(ClinicalTheme.backgroundCard)
+            .cornerRadius(12)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(showDetails ? color.opacity(0.5) : ClinicalTheme.cardBorder, lineWidth: showDetails ? 1.5 : 1))
+            .shadow(color: Color.black.opacity(showDetails ? 0.05 : 0), radius: 4, x: 0, y: 2)
+        }
+        .buttonStyle(PlainButtonStyle()) // Important for list/scrollview behavior
+        .padding(.horizontal)
+    }
+}
+
+struct DisclaimerFooter: View {
+    @State private var showLegal = false
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            Divider()
+            
+            Text("Legal & Safety Limitations")
+                .font(.caption).fontWeight(.bold)
+                .foregroundColor(ClinicalTheme.textSecondary)
+                .textCase(.uppercase)
+            
+            VStack(spacing: 4) {
+                Text("• EDUCATIONAL TOOL ONLY: Not medical advice.")
+                Text("• NOT VALIDATED for patients < 18 years.")
+                Text("• NO PROVIDER-PATIENT RELATIONSHIP established.")
+            }
+            .font(.caption2)
+            .foregroundColor(ClinicalTheme.textMuted)
+            .multilineTextAlignment(.center)
+            
+            Button("View Full Legal Disclaimers") {
+                showLegal = true
+            }
+            .font(.caption.bold())
+            .foregroundColor(ClinicalTheme.teal500)
+            .padding(.top, 4)
+        }
+        .padding(24)
+        .background(ClinicalTheme.backgroundMain)
+        .sheet(isPresented: $showLegal) {
+            NavigationView {
+                LegalDisclaimerView() // Assumes LegalDisclaimerView in Settings/LegalDisclaimerView.swift
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { showLegal = false }
+                        }
+                    }
             }
         }
-        .padding(16)
-        .background(ClinicalTheme.backgroundCard)
-        .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(color.opacity(0.3), lineWidth: 1))
-        .padding(.horizontal)
     }
 }

@@ -61,7 +61,11 @@ struct OUDRiskAssessmentView: View {
     
     var scoreColor: Color {
         switch store.cowsScore {
-        case 0...12: return .green; case 13...24: return .orange; default: return .red
+        case 0...4: return .green
+        case 5...12: return .yellow
+        case 13...24: return .orange
+        case 25...Int.max: return .red
+        default: return .gray
         }
     }
 }

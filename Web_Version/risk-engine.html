@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Engine | Opioid Precision</title>
+    <meta name="description"
+        content="Free online PRODIGY Risk Assessment Tool for inpatient opioid safety and respiratory depression stratification.">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        teal: {
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                        },
+                        rose: {
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Reduced hero glow for tool page */
+        .page-glow {
+            background: radial-gradient(circle at 50% 0%, rgba(13, 148, 136, 0.1) 0%, transparent 40%);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-slate-50 antialiased selection:bg-teal-500/30 min-h-screen flex flex-col">
+
+    <!-- Navigation (Simplified) -->
+    <nav class="fixed w-full z-50 glass-panel border-b-0 border-b-slate-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition">
+                    <img src="assets/app_icon_medical_precision.png" alt="Logo" class="w-8 h-8 rounded-lg shadow-lg">
+                    <span class="font-bold text-lg tracking-tight">Opioid Precision</span>
+                </a>
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="text-sm font-medium text-slate-400 hover:text-white transition">Exit to
+                        Home</a>
+                    <a href="https://apps.apple.com/us/app/opioid-precision" target="_blank"
+                        class="bg-white text-slate-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-100 transition shadow-lg shadow-white/5 hidden sm:block">
+                        Get App
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Tool Content -->
+    <main class="flex-grow pt-24 pb-12 relative overflow-hidden">
+        <div class="absolute inset-0 page-glow pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-10">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-bold uppercase tracking-wider mb-4">
+                    <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+                    Live Risk Engine
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">PRODIGY Risk Assessment</h1>
+                <p class="text-slate-400 text-sm">Validated score for predicting respiratory depression in patients
+                    receiving opioids.</p>
+            </div>
+
+            <!-- The Tool -->
+            <div class="glass-panel rounded-2xl p-1 shadow-2xl overflow-hidden border border-white/10">
+                <!-- Floating Header -->
+                <div class="bg-slate-900 p-6 flex items-center justify-between border-b border-white/5">
+                    <div>
+                        <h3 class="text-white font-bold">Patient Risk Profile</h3>
+                        <p class="text-xs text-slate-500 font-mono mt-1">PRODIGY SCORING PROTOCOL</p>
+                    </div>
+                    <div id="score-badge"
+                        class="bg-slate-800 border border-slate-700 px-6 py-3 rounded-lg flex flex-col items-center">
+                        <span class="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1">Score</span>
+                        <div class="flex items-baseline gap-1">
+                            <span id="score-value" class="text-3xl font-bold text-white">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <!-- Inputs -->
+                    <div class="space-y-6">
+                        <!-- Age -->
+                        <div class="space-y-3">
+                            <label class="text-sm font-medium text-slate-300">Patient Age</label>
+                            <input type="range" id="age" min="18" max="90" value="45"
+                                class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-500">
+                            <div class="flex justify-between text-xs text-slate-500 font-mono">
+                                <span>18</span>
+                                <span id="age-display" class="text-teal-400 font-bold">45 yo</span>
+                                <span>90+</span>
+                            </div>
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="space-y-3">
+                            <label class="text-sm font-medium text-slate-300">Biological Sex</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="setSex('male')" id="btn-male"
+                                    class="p-3 rounded-lg border border-slate-700 bg-slate-800/50 text-slate-400 hover:border-teal-500/50 transition">Male</button>
+                                <button onclick="setSex('female')" id="btn-female"
+                                    class="p-3 rounded-lg border-teal-500 bg-teal-500/10 text-white shadow-[0_0_15px_rgba(20,184,166,0.3)] transition">Female</button>
+                            </div>
+                            <p class="text-xs text-slate-600 italic">Males have higher baseline risk in PRODIGY (+8
+                                pts).</p>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="h-px bg-white/5 my-6"></div>
+
+                        <!-- Checkboxes -->
+                        <div class="space-y-3">
+                            <label
+                                class="flex items-center justify-between p-3 rounded-lg border border-slate-700/50 hover:bg-slate-800/50 cursor-pointer transition group">
+                                <span class="text-sm text-slate-300 group-hover:text-white">Opioid Naive</span>
+                                <input type="checkbox" id="check-naive"
+                                    class="w-5 h-5 rounded border-slate-600 text-teal-600 focus:ring-teal-500 focus:ring-offset-slate-900 bg-slate-800"
+                                    onchange="calculate()">
+                            </label>
+
+                            <label
+                                class="flex items-center justify-between p-3 rounded-lg border border-slate-700/50 hover:bg-slate-800/50 cursor-pointer transition group">
+                                <span class="text-sm text-slate-300 group-hover:text-white">Sleep Disorders /
+                                    Apnea</span>
+                                <input type="checkbox" id="check-sleep"
+                                    class="w-5 h-5 rounded border-slate-600 text-teal-600 focus:ring-teal-500 focus:ring-offset-slate-900 bg-slate-800"
+                                    onchange="calculate()">
+                            </label>
+
+                            <label
+                                class="flex items-center justify-between p-3 rounded-lg border border-slate-700/50 hover:bg-slate-800/50 cursor-pointer transition group">
+                                <span class="text-sm text-slate-300 group-hover:text-white">Depression</span>
+                                <input type="checkbox" id="check-depression"
+                                    class="w-5 h-5 rounded border-slate-600 text-teal-600 focus:ring-teal-500 focus:ring-offset-slate-900 bg-slate-800"
+                                    onchange="calculate()">
+                            </label>
+
+                            <label
+                                class="flex items-center justify-between p-3 rounded-lg border border-slate-700/50 hover:bg-slate-800/50 cursor-pointer transition group">
+                                <span class="text-sm text-slate-300 group-hover:text-white">Sedative / Psychotropic
+                                    Use</span>
+                                <input type="checkbox" id="check-sedative"
+                                    class="w-5 h-5 rounded border-slate-600 text-teal-600 focus:ring-teal-500 focus:ring-offset-slate-900 bg-slate-800"
+                                    onchange="calculate()">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Output Panel -->
+                    <div class="space-y-6">
+                        <div id="risk-panel"
+                            class="h-full bg-slate-950/50 rounded-xl border border-white/5 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                            <!-- Dynamic Risk Content -->
+                            <div id="risk-content" class="relative z-10">
+                                <!-- JS Injected Content -->
+                            </div>
+
+                            <!-- Background Glow -->
+                            <div id="risk-glow" class="absolute inset-0 bg-teal-600/5 blur-2xl"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-center text-slate-500 text-xs mt-8">
+                This tool is for educational purposes and clinical decision support only. It does not replace
+                professional medical judgment.
+            </p>
+        </div>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="py-8 border-t border-slate-800/50 bg-slate-950">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-600 text-sm">© 2024 Clinical Systems. Opioid Precision.</p>
+        </div>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        lucide.createIcons();
+
+        // State
+        let state = {
+            age: 45,
+            sex: 'female',
+            naive: false,
+            sleep: false,
+            depression: false,
+            sedative: false
+        };
+
+        // DOM Elements
+        const ageInput = document.getElementById('age');
+        const ageDisplay = document.getElementById('age-display');
+        const scoreValue = document.getElementById('score-value');
+        const riskPanel = document.getElementById('risk-panel');
+        const riskContent = document.getElementById('risk-content');
+        const riskGlow = document.getElementById('risk-glow');
+
+        // Event Listeners
+        ageInput.addEventListener('input', (e) => {
+            state.age = parseInt(e.target.value);
+            ageDisplay.textContent = state.age + ' yo';
+            calculate();
+        });
+
+        function setSex(sex) {
+            state.sex = sex;
+            // UI Toggle
+            if (sex === 'male') {
+                document.getElementById('btn-male').className = "p-3 rounded-lg border-teal-500 bg-teal-500/10 text-white shadow-[0_0_15px_rgba(20,184,166,0.3)] transition";
+                document.getElementById('btn-female').className = "p-3 rounded-lg border border-slate-700 bg-slate-800/50 text-slate-400 hover:border-teal-500/50 transition";
+            } else {
+                document.getElementById('btn-female').className = "p-3 rounded-lg border-teal-500 bg-teal-500/10 text-white shadow-[0_0_15px_rgba(20,184,166,0.3)] transition";
+                document.getElementById('btn-male').className = "p-3 rounded-lg border border-slate-700 bg-slate-800/50 text-slate-400 hover:border-teal-500/50 transition";
+            }
+            calculate();
+        }
+
+        // Checkbox listeners
+        ['naive', 'sleep', 'depression', 'sedative'].forEach(id => {
+            document.getElementById('check-' + id).addEventListener('change', (e) => {
+                state[id] = e.target.checked;
+                calculate();
+            });
+        });
+
+        // Calculation Logic
+        function calculate() {
+            let score = 0;
+
+            // 1. Age
+            if (state.age >= 60 && state.age <= 69) score += 6;
+            if (state.age >= 70 && state.age <= 79) score += 5;
+            if (state.age >= 80) score += 8;
+
+            // 2. Sex (Male = +8)
+            if (state.sex === 'male') score += 8;
+
+            // 3. Naive (Naive = +3)
+            if (state.naive) score += 3;
+
+            // 4. Sleep Disorders (+10)
+            if (state.sleep) score += 10;
+
+            // 5. Depression (+6)
+            if (state.depression) score += 6;
+
+            // 6. Sedative / Psychotropic (+4)
+            if (state.sedative) score += 4;
+
+            // Update UI
+            updateRiskUI(score);
+        }
+
+        function updateRiskUI(score) {
+            // Animate Score
+            scoreValue.textContent = score;
+
+            // Determine Risk Tier
+            let tier = 'Low';
+            let colorClass = 'teal';
+            let message = 'Standard Monitoring Protocol';
+            let recommendation = 'Continuous pulse oximetry not required unless clinically indicated. Routine vitals q4h.';
+            let icon = 'shield-check';
+
+            if (score >= 8 && score < 15) {
+                tier = 'Intermediate';
+                colorClass = 'yellow'; // Using amber/yellow visuals
+                message = 'Increased Monitoring Required';
+                recommendation = 'Consider continuous pulse oximetry. Increase vitals frequency to q2h for first 24h. Review current sedation regimen.';
+                icon = 'alert-triangle';
+            } else if (score >= 15) {
+                tier = 'High';
+                colorClass = 'rose'; // Using rose/red visuals
+                message = 'High Risk Protocol Active';
+                recommendation = 'Continuous pulse oximetry MANDATORY. Capnography recommended. Consider opioid-sparing alternatives immediately.';
+                icon = 'siren';
+            }
+
+            // Render Panel
+            let colorHex = colorClass === 'teal' ? '#2dd4bf' : (colorClass === 'yellow' ? '#fbbf24' : '#fb7185');
+            let bgGlow = colorClass === 'teal' ? 'bg-teal-600/5' : (colorClass === 'yellow' ? 'bg-yellow-600/5' : 'bg-rose-600/5');
+
+            riskContent.innerHTML = `
+                <div class="w-16 h-16 rounded-full bg-${colorClass}-500/20 flex items-center justify-center mx-auto mb-4 border border-${colorClass}-500/50 shadow-[0_0_30px_rgba(${colorClass === 'teal' ? '20,184,166' : (colorClass === 'yellow' ? '251,191,36' : '225,29,72')},0.2)]">
+                    <i data-lucide="${icon}" class="w-8 h-8 text-${colorClass}-400"></i>
+                </div>
+                <h4 class="text-xl font-bold text-white mb-2">${tier} Risk</h4>
+                <p class="text-sm text-slate-400 mb-6">${message}</p>
+                
+                <div class="bg-slate-800/50 rounded-lg p-4 text-left w-full border border-white/5 border-l-4 border-l-${colorClass}-500">
+                    <p class="text-xs text-slate-500 font-bold uppercase mb-2">Recommendation</p>
+                    <p class="text-sm text-slate-300">${recommendation}</p>
+                </div>
+            `;
+
+            // Update Glow
+            riskPanel.className = `h-full bg-slate-950/50 rounded-xl border border-${colorClass}-500/30 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden transition-all duration-500`;
+            riskGlow.className = `absolute inset-0 ${bgGlow} blur-2xl transition-all duration-500`;
+
+            // Re-init generic icons
+            lucide.createIcons();
+        }
+
+        // Init
+        calculate();
+
+    </script>
+</body>
+
+</html>

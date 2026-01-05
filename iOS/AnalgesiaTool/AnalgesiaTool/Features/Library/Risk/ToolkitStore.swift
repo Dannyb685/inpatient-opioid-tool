@@ -85,4 +85,49 @@ class ToolkitStore: ObservableObject {
     }
     
 
+
+    // MARK: - Clinical Logic (Refactored from View)
+    var withdrawalRecommendations: [AdjuvantRecommendation] {
+        var recs: [AdjuvantRecommendation] = []
+        
+        // Bone/Joint
+        if cowsBoneAche > 0 {
+            recs.append(contentsOf: ClinicalData.WithdrawalProtocol.bonePain)
+        }
+        
+        // GI
+        if cowsGI > 0 {
+            recs.append(contentsOf: ClinicalData.WithdrawalProtocol.giNausea)
+            if cowsGI == 1 {
+                recs.append(contentsOf: ClinicalData.WithdrawalProtocol.giCramps)
+            }
+        }
+        
+        // Autonomic
+        let autonomicSum = cowsSweating + cowsPulse + cowsTremor + cowsAnxiety + cowsRunnyNose + cowsGooseflesh
+        if autonomicSum > 0 {
+            recs.append(contentsOf: ClinicalData.WithdrawalProtocol.autonomic)
+        }
+        
+        // Anxiety
+        if cowsAnxiety > 0 || cowsRestlessness > 0 {
+            recs.append(contentsOf: ClinicalData.WithdrawalProtocol.anxiety)
+        }
+        
+        // Insomnia
+        if cowsYawning > 0 || cowsRestlessness > 0 {
+            recs.append(contentsOf: ClinicalData.WithdrawalProtocol.insomnia)
+        }
+        
+        // Deduplication
+        var uniqueRecs: [AdjuvantRecommendation] = []
+        var seenDrugs: Set<String> = []
+        for r in recs {
+            if !seenDrugs.contains(r.drug) {
+                uniqueRecs.append(r)
+                seenDrugs.insert(r.drug)
+            }
+        }
+        return uniqueRecs
+    }
 }

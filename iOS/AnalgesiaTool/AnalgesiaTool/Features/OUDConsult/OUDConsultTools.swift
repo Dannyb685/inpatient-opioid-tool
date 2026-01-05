@@ -44,11 +44,11 @@ struct CounselingView: View {
     var body: some View {
         VStack(spacing: 24) {
             
-                // 1. Motivational Interviewing (MI) Items - Each gets its own card
-            if let miCategory = OUDStaticData.toolboxCategories.first(where: { $0.id == "motivational_interviewing" }) {
+            // Unified Counseling Section (MI + FRAMES)
+            if let category = OUDStaticData.toolboxCategories.first(where: { $0.id == "counseling" }) {
                 // Section Header
                 HStack {
-                    Text(miCategory.title)
+                    Text(category.title)
                         .font(.headline)
                         .foregroundColor(ClinicalTheme.textSecondary)
                     Spacer()
@@ -56,7 +56,7 @@ struct CounselingView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
                 
-                ForEach(Array(miCategory.items.enumerated()), id: \.offset) { index, item in
+                ForEach(Array(category.items.enumerated()), id: \.offset) { index, item in
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(alignment: .top) {
                             Text(item.title)
@@ -90,54 +90,7 @@ struct CounselingView: View {
                     .background(ClinicalTheme.backgroundCard)
                     .cornerRadius(12)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                    .padding(.horizontal) // manual padding since we aren't using .clinicalCard() wrapper to avoid double padding if we loop
                 }
-            }
-            
-            // 2. FRAMES Model (Brief Intervention) - Gets its own card
-            if let framesCategory = OUDStaticData.toolboxCategories.first(where: { $0.id == "frames_model" }) {
-                 // Section Header
-                HStack {
-                    Text(framesCategory.title)
-                        .font(.headline)
-                        .foregroundColor(ClinicalTheme.textSecondary)
-                    Spacer()
-                }
-                .padding(.horizontal)
-                .padding(.top, 16)
-                
-                VStack(alignment: .leading, spacing: 12) {
-                    VStack(spacing: 0) {
-                        ForEach(Array(framesCategory.items.enumerated()), id: \.offset) { index, item in
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack(alignment: .top) {
-                                    Text(item.title)
-                                        .font(.headline)
-                                        .bold()
-                                        .foregroundColor(ClinicalTheme.teal500)
-                                    
-                                    Spacer()
-                                }
-                                
-                                if let subtitle = item.subtitle {
-                                    Text(subtitle)
-                                        .font(.subheadline)
-                                        .foregroundColor(ClinicalTheme.textPrimary)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                }
-                            }
-                            .padding()
-                            
-                            if index < framesCategory.items.count - 1 {
-                                Divider().background(ClinicalTheme.divider)
-                            }
-                        }
-                    }
-                    .background(ClinicalTheme.backgroundCard)
-                    .cornerRadius(12)
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                }
-                .padding(.horizontal) // Align with other cards
             }
         }
     }

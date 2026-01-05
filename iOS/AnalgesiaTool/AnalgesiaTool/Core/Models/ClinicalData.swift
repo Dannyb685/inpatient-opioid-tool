@@ -1,4 +1,4 @@
-import Foundation
+ import Foundation
 import SwiftUI
 
 // MARK: - Enums (Replicating React State Options)
@@ -27,6 +27,7 @@ enum GIStatus: String, CaseIterable, Identifiable, Codable {
     case intact = "Intact / Alert"
     case tube = "Tube / Dysphagia"
     case npo = "NPO / GI Failure / AMS"
+
     var id: String { self.rawValue }
 }
 
@@ -87,6 +88,7 @@ enum ClinicalIndication: String, CaseIterable, Identifiable, Codable {
     case standard = "General / Acute"
     case dyspnea = "Palliative Dyspnea"
     case cancer = "Cancer Pain"
+    case postoperative = "Post-Operative / Surgical"
     var id: String { self.rawValue }
 }
 
@@ -238,8 +240,8 @@ struct ClinicalData {
         if name.contains("po") || name.contains("oral") {
             if name.contains("morphine") {
                 return [
-                    StandardOrder(label: "Morphine IR 5mg PO q4h PRN", note: "Naive Start"),
-                    StandardOrder(label: "Morphine IR 15mg PO q4h PRN", note: "Standard"),
+                    StandardOrder(label: "Morphine 5mg PO q4h PRN", note: "Naive Start"),
+                    StandardOrder(label: "Morphine 15mg PO q4h PRN", note: "Standard"),
                     StandardOrder(label: "Morphine ER 15mg PO q12h", note: "Extended Release baseline")
                 ]
             }
@@ -280,5 +282,106 @@ struct ClinicalData {
         }
         
         return nil
+    }
+
+    
+    // MARK: - COWS / Withdrawal Protocol Data (Centralized)
+    struct WithdrawalProtocol {
+        static let bonePain = [
+            AdjuvantRecommendation(category: "Pain", drug: "Acetaminophen", dose: "650mg PO q6h", rationale: "Bone/Joint Pain"),
+            AdjuvantRecommendation(category: "Pain", drug: "Ibuprofen", dose: "600mg PO q6h", rationale: "NSAID Option")
+        ]
+        
+        static let giNausea = [
+            AdjuvantRecommendation(category: "Nausea", drug: "Ondansetron", dose: "4mg PO q6h prn", rationale: "Nausea/Vomiting"),
+            AdjuvantRecommendation(category: "Diarrhea", drug: "Loperamide", dose: "2mg PO prn", rationale: "Loose Stool")
+        ]
+        
+        static let giCramps = [
+            AdjuvantRecommendation(category: "Cramps", drug: "Dicyclomine", dose: "20mg q6h prn", rationale: "Abdominal Cramping")
+        ]
+        
+        static let autonomic = [
+            AdjuvantRecommendation(category: "Autonomic", drug: "Clonidine", dose: "0.1mg PO q4h prn", rationale: "Sweating, Tremors, Anxiety. Hold SBP<100.")
+        ]
+        
+        static let anxiety = [
+            AdjuvantRecommendation(category: "Anxiety", drug: "Hydroxyzine", dose: "25-50mg PO q6h prn", rationale: "Anxiety/Restlessness")
+        ]
+        
+        static let insomnia = [
+            AdjuvantRecommendation(category: "Sleep", drug: "Trazodone", dose: "50-100mg PO qhs prn", rationale: "Insomnia")
+        ]
+    }
+    
+    // MARK: - MME Conversion Rules (Centralized)
+    struct MMEConversionRules {
+        struct RationRule {
+            let minMME: Double
+            let maxMME: Double
+            let ratio: Double
+            let reduction: Double // Cross-Tolerance Reduction (e.g., 0.15 = 15%)
+            let maxDose: Double? // Absolute max daily dose cap
+            let warning: String?
+        }
+        
+        static let methadoneRatios: [RationRule] = [
+            RationRule(minMME: 0, maxMME: 30, ratio: 2.0, reduction: 0.0, maxDose: nil, warning: "Low baseline MME: Consider fixed starting dose of 2.5mg TID per APS guidelines."),
+            RationRule(minMME: 30, maxMME: 60, ratio: 4.0, reduction: 0.0, maxDose: nil, warning: "NCCN recommends fixed dose range 2-7.5mg/day for <60mg baseline morphine."),
+            RationRule(minMME: 60, maxMME: 100, ratio: 10.0, reduction: 0.0, maxDose: nil, warning: nil),
+            RationRule(minMME: 100, maxMME: 200, ratio: 10.0, reduction: 0.0, maxDose: nil, warning: nil),
+            RationRule(minMME: 200, maxMME: 300, ratio: 20.0, reduction: 0.0, maxDose: 45.0, warning: "Consult Pain Specialist."),
+            RationRule(minMME: 300, maxMME: 500, ratio: 12.0, reduction: 0.0, maxDose: 45.0, warning: "VA/DoD conservative ratio."), // Verify ordering overlap logic in consumer
+            RationRule(minMME: 500, maxMME: 1000, ratio: 15.0, reduction: 0.0, maxDose: 45.0, warning: nil),
+            RationRule(minMME: 1000, maxMME: Double.infinity, ratio: 20.0, reduction: 0.0, maxDose: 40.0, warning: "APS Maximum Limit.")
+        ]
+        
+        // Elderly Adjustment (>65y)
+        static func getRatio(for mme: Double, age: Int) -> RationRule? {
+             // Logic will be consumed by MethadoneView, data lives here
+             // This method can abstract the selection logic if desired, or we just expose the data
+             return methadoneRatios.first { mme >= $0.minMME && mme < $0.maxMME }
+        }
+    }
+    
+    // MARK: - OUD Protocol Logic (Centralized)
+    struct OUDProtocolRules {
+        enum ProtocolAction: String {
+            case standardBup = "Standard Induction"
+            case highDoseBup = "Macrodosing (ER)"
+            case microInduction = "Micro-Induction (Bernese)"
+            case fullAgonist = "Full Agonist Rotation"
+            case symptomManagement = "Symptom Management (Wait)"
+        }
+        
+        static func determineProtocol(
+            cowsScore: Int,
+            substance: String,
+            isER: Bool,
+            contraindications: [String] // "Liver Failure", "Acute Pain"
+        ) -> ProtocolAction {
+            
+            // 1. Contraindications (Highest Priority)
+            if contraindications.contains("Liver Failure") || contraindications.contains("Acute Pain") {
+                return .fullAgonist
+            }
+            
+            // 2. Substance Logic
+            if substance == "Fentanyl" || substance == "Methadone" {
+                return .microInduction // Safety First for high lipophilicity
+            }
+            
+            // 3. COWS Thresholds
+            let inductionThreshold = isER ? 8 : 12
+            
+            if cowsScore >= inductionThreshold {
+                return isER ? .highDoseBup : .standardBup
+            } else if cowsScore >= 8 {
+                // Grey Zone (8-11)
+                return .microInduction // Safer than risking precipitated
+            } else {
+                return .symptomManagement
+            }
+        }
     }
 }

@@ -77,28 +77,23 @@ class OUDConsultStore: ObservableObject {
     
     // MARK: - Phase 4: Action Logic (The Brain)
     var recommendedProtocol: ProtocolType {
-        // 1. Absolute Contraindications for Naltrexone/Bup
-        if hasLiverFailure || hasAcutePain {
-            return .fullAgonist // Methadone or Full Agonist rotation
-        }
+        var contraindications: [String] = []
+        if hasLiverFailure { contraindications.append("Liver Failure") }
+        if hasAcutePain { contraindications.append("Acute Pain") }
         
-        // 2. Fentanyl / Long-Acting Opioids -> Micro-Induction is safer
-        // Precipitated withdrawal risk is high with standard induction
-        if substanceType == "Fentanyl" || substanceType == "Methadone" {
-            return .microInduction
-        }
+        let action = ClinicalData.OUDProtocolRules.determineProtocol(
+            cowsScore: cowsScore,
+            substance: substanceType,
+            isER: erSetting,
+            contraindications: contraindications
+        )
         
-        // 3. Short Acting Opioids (Heroin, Oxycodone)
-        let threshold = erSetting ? 8 : 12 // ER can induce more aggressively
-        
-        if cowsScore >= threshold {
-            return erSetting ? .highDoseBup : .standardBup
-        } else if cowsScore >= 8 {
-            // Grey area: Clinical judgment, Micro is safer option if unsure
-            return .microInduction
-        } else {
-            // COWS < 8: Too early for Standard Induction
-            return .symptomManagement 
+        switch action {
+        case .standardBup: return .standardBup
+        case .highDoseBup: return .highDoseBup
+        case .microInduction: return .microInduction
+        case .fullAgonist: return .fullAgonist
+        case .symptomManagement: return .symptomManagement
         }
     }
     
@@ -110,7 +105,7 @@ class OUDConsultStore: ObservableObject {
     var dischargeChecklist: [String] {
         var list = ["Referral to outpatient addiction medicine"]
         if recommendedProtocol != .fullAgonist {
-            list.append("Prescribe \(medicationName) bridge script")
+            list.append("Prescribe \(medicationName) Bridge Script")
         }
         if dsmCount >= 6 || cowsScore > 12 || substanceType == "Fentanyl" {
             list.append("Prescribe Naloxone (Overdose Risk)")
@@ -128,6 +123,7 @@ class OUDConsultStore: ObservableObject {
         nidaScreenPositive = false
         // Reset toggles
         substanceType = "Short Acting"
+        erSetting = false
         isPregnant = false; hasLiverFailure = false; hasAcutePain = false; hasSedativeUse = false
     }
 }

@@ -26,9 +26,11 @@ struct ClinicalTheme {
     static var cardBorder: Color { Color(UIColor.opaqueSeparator) }
     
     // Accents
-    static var teal500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.08, green: 0.75, blue: 0.72) : Color(red: 0.00, green: 0.55, blue: 0.55) }
-    static var amber500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.96, green: 0.64, blue: 0.15) : Color(red: 0.85, green: 0.55, blue: 0.00) }
-    static var rose500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.94, green: 0.25, blue: 0.33) : Color(red: 0.85, green: 0.15, blue: 0.25) }
+    // Accents - Matched to Web Clinical Design (Tailwind)
+    // For Dark Mode, we lighten them slightly for legibility, but keep the core brand hue.
+    static var teal500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.16, green: 0.82, blue: 0.76) : Color(red: 0.05, green: 0.58, blue: 0.53) } // #0d9488 (Teal 600)
+    static var amber500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.99, green: 0.85, blue: 0.38) : Color(red: 0.85, green: 0.55, blue: 0.00) } // #d97706 (Amber 600)
+    static var rose500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.98, green: 0.44, blue: 0.52) : Color(red: 0.88, green: 0.11, blue: 0.28) } // #e11d48 (Rose 600)
     static var purple500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.70, green: 0.45, blue: 0.95) : Color(red: 0.55, green: 0.20, blue: 0.80) }
     static var blue500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.26, green: 0.67, blue: 0.96) : Color(red: 0.00, green: 0.48, blue: 1.00) }
     
