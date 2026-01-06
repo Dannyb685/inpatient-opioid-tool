@@ -1,15 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Inpatient Opioid Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analgesia Tool | Inpatient Opioid Management</title>
+    <meta name="description" content="The next generation of Inpatient Opioid Management. A specialized Clinical Decision Support System (CDSS) for high-acuity settings.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+    </style>
 </head>
+<body class="bg-slate-50 text-slate-900 selection:bg-blue-100">
 
-<body>
-    <div id="root"></div>
-    <script type="module" src="/src/web.tsx"></script>
+    <section class="relative pt-32 pb-20 px-6 max-w-5xl mx-auto text-center">
+        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full mb-2">Medical Device / SaaS</span>
+        <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-slate-900">
+            Analgesia Tool
+        </h1>
+        <p class="text-xl md:text-2xl text-slate-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+            The next generation of Inpatient Opioid Management. A specialized Clinical Decision Support System (CDSS) for high-acuity settings.
+        </p>
+        <div class="flex justify-center gap-4 flex-col sm:flex-row">
+            <a href="https://testflight.apple.com/join/YOUR_LINK_HERE" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                View iOS Prototype <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <button class="bg-white text-slate-700 border border-slate-300 px-8 py-3 rounded-lg font-medium hover:bg-slate-50 transition">
+                Contact Founder
+            </button>
+        </div>
+    </section>
+
+    <section class="py-16 px-6 bg-white border-y border-slate-200">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-2">Executive Summary</h2>
+            <p class="text-2xl leading-relaxed text-slate-800 font-light">
+                Analgesia Tool is designed to mitigate high-risk opioid prescribing errors and standardize complex OUD management workflows. By embedding clinical logic directly into the workflow, we provide a distinct, accountable, and high-value alternative to general calculators.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 max-w-5xl mx-auto">
+        <div class="flex flex-col md:flex-row gap-12 items-start">
+            <div class="md:w-1/3">
+                <h2 class="text-3xl font-bold mb-4">The Problem</h2>
+                <p class="text-slate-600">Clinical errors and workflow inefficiencies in opioid management lead to preventable harm and waste precious clinician time.</p>
+            </div>
+            <div class="md:w-2/3 grid gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-red-500">
+                    <div class="flex items-start gap-4">
+                        <i data-lucide="alert-triangle" class="text-red-500 shrink-0"></i>
+                        <div>
+                            <h3 class="font-bold text-lg">Medication Errors</h3>
+                            <p class="text-slate-600 text-sm mt-1">High risk of mathematical mistakes during opioid rotation, conversion (MME), and dose tapering.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-orange-500">
+                    <div class="flex items-start gap-4">
+                        <i data-lucide="shield-check" class="text-orange-500 shrink-0"></i>
+                        <div>
+                            <h3 class="font-bold text-lg">Safety Gaps</h3>
+                            <p class="text-slate-600 text-sm mt-1">Failure to consistently apply safety checks (e.g., renal/hepatic impairment) before prescribing.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-slate-500">
+                    <div class="flex items-start gap-4">
+                        <i data-lucide="layers" class="text-slate-500 shrink-0"></i>
+                        <div>
+                            <h3 class="font-bold text-lg">Fragmented Workflows</h3>
+                            <p class="text-slate-600 text-sm mt-1">Clinicians must use multiple scores, calculators, and external references to manage complex scenarios.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 bg-slate-900 text-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">The Solution: 5-Tab Architecture</h2>
+                <p class="text-slate-400">Integrated safety-conscious clinical aid.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mb-4 font-bold">1</div>
+                    <h3 class="text-xl font-bold mb-2">Assessment</h3>
+                    <p class="text-sm text-slate-400 mb-4">Patient Risk Stratification</p>
+                    <ul class="text-xs text-slate-300 space-y-2">
+                        <li>• Inputs: Demographics, Organ Function</li>
+                        <li>• Calculates: PRODIGY Risk Score</li>
+                        <li>• Output: Sets global safety locks</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mb-4 font-bold">2</div>
+                    <h3 class="text-xl font-bold mb-2">Protocols</h3>
+                    <p class="text-sm text-slate-400 mb-4">Action Engine</p>
+                    <ul class="text-xs text-slate-300 space-y-2">
+                        <li>• Bernese Method (Micro-Induction)</li>
+                        <li>• Standard Induction</li>
+                        <li>• Withdrawal Management</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mb-4 font-bold">3</div>
+                    <h3 class="text-xl font-bold mb-2">MME Calculator</h3>
+                    <p class="text-sm text-slate-400 mb-4">Dose Conversion & Rotation</p>
+                    <ul class="text-xs text-slate-300 space-y-2">
+                        <li>• Total 24h MME Calculation</li>
+                        <li>• Auto-reduction (default 30%)</li>
+                        <li>• "Trauma Mode" Toggle</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 max-w-5xl mx-auto">
+        <h2 class="text-3xl font-bold mb-12 text-center">Competitive Advantage</h2>
+        <div class="overflow-hidden rounded-xl border border-slate-200">
+            <table class="w-full text-left bg-white">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="p-4 text-sm font-semibold text-slate-500 uppercase">Feature</th>
+                        <th class="p-4 text-sm font-bold text-blue-600 uppercase bg-blue-50">Analgesia Tool</th>
+                        <th class="p-4 text-sm font-semibold text-slate-400 uppercase">General Tools</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr>
+                        <td class="p-4 font-medium text-slate-700">Opioid Safety</td>
+                        <td class="p-4 bg-blue-50 text-slate-900">Embedded Logic (Renal/Hepatic)</td>
+                        <td class="p-4 text-slate-500">Manual verification required</td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 font-medium text-slate-700">Workflow Focus</td>
+                        <td class="p-4 bg-blue-50 text-slate-900">End-to-End Cohesive Interface</td>
+                        <td class="p-4 text-slate-500">Fragmented / Multiple calculators</td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 font-medium text-slate-700">Protocols</td>
+                        <td class="p-4 bg-blue-50 text-slate-900">Step-by-step guidance (Bernese)</td>
+                        <td class="p-4 text-slate-500">Raw scores only</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 bg-slate-50 border-t border-slate-200">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-12">B2B Financial Strategy</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <i data-lucide="database" class="w-10 h-10 text-blue-600 mx-auto mb-4"></i>
+                    <h3 class="font-bold text-lg mb-2">EMR Integration</h3>
+                    <p class="text-sm text-slate-600">Annual System License Fee. Scalable, high-margin enterprise adoption.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <i data-lucide="users" class="w-10 h-10 text-blue-600 mx-auto mb-4"></i>
+                    <h3 class="font-bold text-lg mb-2">Institutional Sub.</h3>
+                    <p class="text-sm text-slate-600">Per-Facility Fee for smaller institutions without full EMR integration.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <i data-lucide="activity" class="w-10 h-10 text-blue-600 mx-auto mb-4"></i>
+                    <h3 class="font-bold text-lg mb-2">Data Licensing</h3>
+                    <p class="text-sm text-slate-600">De-identified clinical data for research & analytics (HIPAA Compliant).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row gap-12">
+            <div class="md:w-1/2">
+                <h2 class="text-3xl font-bold mb-6">Technical Architecture</h2>
+                <p class="text-slate-600 mb-6">
+                    Built on a modular architecture, ready for enterprise-scale deployment. 
+                    Currently entering Phase 1 (Stabilization) with a clear roadmap to Phase 3 (EMR API Integration).
+                </p>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 text-sm">
+                        <i data-lucide="check-circle-2" class="text-green-600 w-5 h-5"></i>
+                        <span>CDC 2022 Guideline Compliance</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm">
+                        <i data-lucide="check-circle-2" class="text-green-600 w-5 h-5"></i>
+                        <span>ValidationEngine.swift implemented</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm">
+                        <i data-lucide="check-circle-2" class="text-green-600 w-5 h-5"></i>
+                        <span>PrivacyInfo.xcprivacy ready</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="md:w-1/2 bg-slate-900 rounded-xl p-6 shadow-2xl overflow-hidden font-mono text-xs md:text-sm text-slate-300">
+                <div class="flex items-center gap-2 border-b border-slate-700 pb-4 mb-4 text-slate-400">
+                    <i data-lucide="file-code" size="16"></i>
+                    <span>Project Structure (Current)</span>
+                </div>
+                <div class="space-y-1 h-64 overflow-y-auto pr-2">
+                    <p class="text-blue-400">iOS/AnalgesiaTool/</p>
+                    <p class="pl-4">AnalgesiaToolApp.swift</p>
+                    <p class="text-blue-400 mt-2">Core/Models/</p>
+                    <p class="pl-4">ClinicalData.swift</p>
+                    <p class="pl-4">OUDDataModels.swift</p>
+                    <p class="text-blue-400 mt-2">Core/Utils/</p>
+                    <p class="pl-4 text-green-400">ClinicalValidationEngine.swift</p>
+                    <p class="pl-4">ValidationEngine.swift</p>
+                    <p class="text-blue-400 mt-2">Features/Calculator/</p>
+                    <p class="pl-4">MergedAlgorithmTransparency.swift</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 bg-blue-900 text-white text-center">
+        <h2 class="text-3xl font-bold mb-6">Ready for Enterprise Integration</h2>
+        <p class="text-blue-200 mb-8 max-w-2xl mx-auto">
+            The immediate next step is to finalize the EMR Integration API/SDK to begin executing the high-value licensing revenue model.
+        </p>
+        <div class="flex justify-center gap-4">
+            <button class="bg-white text-blue-900 px-10 py-4 rounded-full font-bold hover:bg-blue-50 transition">
+                Request Investor Deck
+            </button>
+        </div>
+    </section>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
-
 </html>
