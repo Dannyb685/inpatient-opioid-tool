@@ -30,7 +30,14 @@
 </head>
 <body class="bg-slate-50 text-slate-900 selection:bg-teal-100 font-sans">
 
-    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+    <div class="bg-slate-800 text-slate-200 px-4 py-3 text-sm text-center relative z-50 border-b border-slate-700">
+        <div class="flex items-center justify-center gap-2">
+            <i data-lucide="info" class="w-4 h-4 text-clinical-teal"></i>
+            <span><strong>Funding Notice:</strong> This technology qualifies for the <span class="text-white font-semibold">$651M Acute Care Hospital Settlement</span> (Filing Window Open).</span>
+        </div>
+    </div>
+
+    <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-clinical-teal rounded-lg flex items-center justify-center text-white font-bold">
@@ -39,8 +46,8 @@
                 <span class="font-bold text-slate-800 tracking-tight">Opioid Precision</span>
             </div>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
-                <a href="#impact" class="hover:text-clinical-teal transition">The $95B Problem</a>
-                <a href="#solution" class="hover:text-clinical-teal transition">Integration Engine</a>
+                <a href="#impact" class="hover:text-clinical-teal transition">The $95B Liability</a>
+                <a href="#solution" class="hover:text-clinical-teal transition">Logic Engine</a>
                 <a href="#benchmarks" class="hover:text-clinical-teal transition">Strategic Benchmarks</a>
             </div>
             <div class="flex gap-3">
@@ -51,7 +58,7 @@
         </div>
     </nav>
 
-    <section class="relative pt-24 pb-20 px-6 max-w-6xl mx-auto text-center">
+    <section class="relative pt-20 pb-20 px-6 max-w-6xl mx-auto text-center">
         <div class="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 border border-teal-100 text-clinical-teal text-xs font-bold rounded-full mb-6 uppercase tracking-wider">
             <span class="w-2 h-2 rounded-full bg-clinical-teal animate-pulse"></span>
             Solving the Iatrogenic Paradox
@@ -77,7 +84,7 @@
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-4 text-slate-900">The $95 Billion Blind Spot</h2>
-                <p class="text-slate-600 max-w-2xl mx-auto">Opioid complications are primary drivers of hospital expenditure and legal risk.</p>
+                <p class="text-slate-600 max-w-2xl mx-auto">Opioid complications are no longer just clinical errors; they are existential legal and financial threats.</p>
             </div>
             
             <div class="grid md:grid-cols-3 gap-8">
@@ -96,21 +103,21 @@
                     <div class="w-12 h-12 bg-clinical-amber/10 rounded-xl flex items-center justify-center text-clinical-amber mb-6">
                         <i data-lucide="eye-off" class="w-6 h-6"></i>
                     </div>
-                    <h3 class="text-4xl font-extrabold text-slate-900 mb-2">31.5 Days</h3>
-                    <p class="text-sm font-bold text-clinical-amber uppercase tracking-wide mb-4">Iatrogenic Withdrawal (IWS)</p>
+                    <h3 class="text-4xl font-extrabold text-slate-900 mb-2">46%</h3>
+                    <p class="text-sm font-bold text-clinical-amber uppercase tracking-wide mb-4">Undetected Risk</p>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        IWS drives mean LOS to <strong>31.5 days</strong> (vs. unmedicated baseline), consuming over <strong>$3,000/day</strong> in excess ICU resources.
+                        The <strong>PRODIGY Trial</strong> revealed 46% of floor patients experience respiratory depression. Manual nursing checks miss the vast majority of these events.
                     </p>
                 </div>
 
                 <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200 hover:border-clinical-teal transition group">
                     <div class="w-12 h-12 bg-clinical-teal/10 rounded-xl flex items-center justify-center text-clinical-teal mb-6">
-                        <i data-lucide="scale" class="w-6 h-6"></i>
+                        <i data-lucide="gavel" class="w-6 h-6"></i>
                     </div>
-                    <h3 class="text-4xl font-extrabold text-slate-900 mb-2">Liability</h3>
+                    <h3 class="text-3xl font-extrabold text-slate-900 mb-3">$303 Million</h3>
                     <p class="text-sm font-bold text-clinical-teal uppercase tracking-wide mb-4">Corporate Negligence</p>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        Legal focus has shifted to <strong>"Failure to Monitor"</strong>. Systems are liable for failing to heed "red flags," as seen in the $300M Walgreens settlement.
+                        Shift from malpractice to systemic liability. Recent verdicts (e.g., <strong>Asante Rogue</strong>) prove that "Failure to Monitor" is now a nine-figure threat.
                     </p>
                 </div>
             </div>
@@ -128,7 +135,7 @@
                 <div class="max-w-2xl">
                     <h2 class="text-3xl md:text-5xl font-bold mb-6">The Integration Engine</h2>
                     <p class="text-slate-400 text-lg">
-                        A proprietary Clinical Validation Engine designed to sit between the clinician and the prescription via <strong>CDS Hooks</strong>. It runs 50+ concurrent safety checks in milliseconds.
+                        A proprietary Clinical Validation Engine designed to sit between the clinician and the prescription via <strong>CDS Hooks</strong>. It eliminates "Alert Fatigue" by gating unsafe orders.
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -142,13 +149,13 @@
             </div>
             
             <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-2xl hover:border-clinical-teal transition group">
-                    <div class="w-12 h-12 bg-clinical-teal/20 rounded-xl flex items-center justify-center text-clinical-teal mb-6 group-hover:scale-110 transition">
-                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-2xl hover:border-clinical-rose transition group">
+                    <div class="w-12 h-12 bg-clinical-rose/20 rounded-xl flex items-center justify-center text-clinical-rose mb-6 group-hover:scale-110 transition">
+                        <i data-lucide="hand-metal" class="w-6 h-6"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-3">Renal Gating</h3>
+                    <h3 class="text-xl font-bold mb-3">Renal Gating (Hard Stop)</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Detects GFR < 30. Hard-blocks active metabolites (Morphine) to prevent neurotoxicity. Addresses the PRODIGY risk factors directly.
+                        Passive alerts are ignored 90% of the time. Our engine <strong>hard-blocks</strong> active metabolites (e.g., Morphine) when GFR < 30, requiring clinical justification to proceed.
                     </p>
                 </div>
                 <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-2xl hover:border-clinical-amber transition group">
@@ -157,16 +164,16 @@
                     </div>
                     <h3 class="text-xl font-bold mb-3">Hepatic Shunt Logic</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Identifies Child-Pugh Class C. Adjusts bioavailability calculations for Hydromorphone (4x increase in liver failure) to prevent overdose.
+                        Identifies Child-Pugh Class C. Automatically adjusts bioavailability calculations for Hydromorphone (4x increase in liver failure) to prevent accidental overdose.
                     </p>
                 </div>
-                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-2xl hover:border-purple-500 transition group">
-                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-purple-400 mb-6 group-hover:scale-110 transition">
-                        <i data-lucide="git-merge" class="w-6 h-6"></i>
+                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-2xl hover:border-clinical-teal transition group">
+                    <div class="w-12 h-12 bg-clinical-teal/20 rounded-xl flex items-center justify-center text-clinical-teal mb-6 group-hover:scale-110 transition">
+                        <i data-lucide="shield" class="w-6 h-6"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-3">Methadone Guardrails</h3>
+                    <h3 class="text-xl font-bold mb-3">Conflict De-escalation</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Replaces dangerous static conversion tables with non-linear pharmacokinetic modeling. Accounts for variable half-life to prevent accumulation toxicity.
+                        Protects staff by externalizing the denial. The algorithm becomes the "Bad Guy," reducing point-of-care conflict and mitigating workplace violence against nursing staff.
                     </p>
                 </div>
             </div>
@@ -177,11 +184,11 @@
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-12">
                 <div class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full mb-4 uppercase">
-                    Data-Driven Defense
+                    Settlement-Ready Data
                 </div>
-                <h2 class="text-3xl font-bold mb-4 text-slate-900">Table 1: Key Metrics for Hospital Opioid Safety</h2>
+                <h2 class="text-3xl font-bold mb-4 text-slate-900">Table 1: Key Metrics for Abatement</h2>
                 <p class="text-slate-600 max-w-2xl mx-auto">
-                    Evidence-based targets to reduce liability and prevent "Never Events".
+                    Evidence-based targets to substantiate claims for Opioid Abatement Settlement funds.
                 </p>
             </div>
 
@@ -197,10 +204,10 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         <tr class="hover:bg-slate-50 transition">
-                            <td class="p-4 font-semibold text-clinical-teal">Regulatory</td>
-                            <td class="p-4 text-slate-900 font-medium">Concurrent Prescribing</td>
-                            <td class="p-4">0% overlapping Opioid + Benzo discharge orders</td>
-                            <td class="p-4 text-xs text-slate-400">TJC 8</td>
+                            <td class="p-4 font-semibold text-clinical-teal">Equity</td>
+                            <td class="p-4 text-slate-900 font-medium">Racial Disparities (Black Pts)</td>
+                            <td class="p-4">Close the Gap (Current OR 0.83 vs White Pts)</td>
+                            <td class="p-4 text-xs text-slate-400">2024 Meta-Analysis</td>
                         </tr>
                         <tr class="hover:bg-slate-50 transition">
                             <td class="p-4 font-semibold text-clinical-teal">Clinical Safety</td>
@@ -236,7 +243,7 @@
         <div class="max-w-6xl mx-auto">
              <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-4 text-slate-900">Strategic Recommendations</h2>
-                <p class="text-slate-600 max-w-2xl mx-auto">A roadmap for hospital leadership to mitigate risk and improve quality.</p>
+                <p class="text-slate-600 max-w-2xl mx-auto">A roadmap for hospital leadership to mitigate risk and utilize settlement funds.</p>
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div class="p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-clinical-teal transition">
