@@ -315,6 +315,14 @@ struct OUDConsultView: View {
                             .padding(.horizontal)
                             .padding(.top, 20)
                         }
+                        // Footer
+                        VStack(spacing: 4) {
+                            Text("Powered by Lifeline Medical Technologies")
+                                .font(.system(size: 10))
+                                .foregroundColor(ClinicalTheme.teal500.opacity(0.6))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 20)
                     }
                     .padding(.bottom, 20)
                 }

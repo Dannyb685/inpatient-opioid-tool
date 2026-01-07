@@ -91,6 +91,14 @@ struct CalculatorView: View {
                                 toolsSection
 
                                 infoSection
+                                
+                                VStack(spacing: 4) {
+                                    Text("Powered by Lifeline Medical Technologies")
+                                        .font(.system(size: 10))
+                                        .foregroundColor(ClinicalTheme.teal500.opacity(0.6))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.top, 12)
                             }
                             .padding(.bottom, 100)
                         }
@@ -140,6 +148,7 @@ struct CalculatorView: View {
                 MethadoneView(
                     isPresented: $showMethadoneSheet,
                     initialMME: store.resultMME,
+                    initialAge: Int(store.age), // Auto-Seed Age (User Request)
                     isPregnant: store.isPregnant,
                     isNaltrexone: store.analgesicProfile == .naltrexone
                 )
@@ -509,6 +518,7 @@ struct InfoAccordion: View {
 struct InfoContent {
     static let instructions = """
     • For combination drugs (e.g. Percocet), enter only the opioid component (e.g., 5mg).
+    • ER and IR formulations (e.g. OxyContin) differ in duration, NOT MME potency. Enter the Total Daily Dose (e.g. 30mg BID = 60mg Total).
     • Do NOT use for pediatric patients.
     • Buprenorphine is excluded due to partial agonism.
     """
@@ -624,19 +634,22 @@ struct TargetDoseCard: View {
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(dose.originalDaily != nil ? ClinicalTheme.amber500 : ClinicalTheme.teal500)
-                        Text(dose.unit + (dose.unit.contains("/hr") ? "" : "/24h"))
+                        Text(dose.unit.contains("/hr") ? "" : "/24h")
                             .font(.caption)
                             .scaleEffect(0.8)
                             .foregroundColor(ClinicalTheme.textSecondary)
                     }
-                    Text("PRN: \(dose.breakthrough) \(dose.unit) q2-4h")
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(ClinicalTheme.teal500.opacity(0.15))
-                        .foregroundColor(ClinicalTheme.teal500)
-                        .cornerRadius(4)
+                    
+                    if dose.breakthrough != "N/A" {
+                        Text("PRN: \(dose.breakthrough) q2-4h")
+                            .font(.caption2)
+                            .fontWeight(.bold)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(ClinicalTheme.teal500.opacity(0.15))
+                            .foregroundColor(ClinicalTheme.teal500)
+                            .cornerRadius(4)
+                    }
                 }
             }
         }

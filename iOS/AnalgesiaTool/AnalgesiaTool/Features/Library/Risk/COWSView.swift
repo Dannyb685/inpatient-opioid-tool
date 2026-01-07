@@ -85,6 +85,14 @@ struct COWSView: View {
                     .padding(.top)
                 }
                 .padding()
+                .padding()
+                
+                VStack(spacing: 4) {
+                    Text("Powered by Lifeline Medical Technologies")
+                        .font(.system(size: 10))
+                        .foregroundColor(ClinicalTheme.teal500.opacity(0.6))
+                }
+                .frame(maxWidth: .infinity)
                 .padding(.bottom, 40)
             }
         }

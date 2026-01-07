@@ -1357,12 +1357,7 @@ class ClinicalValidationEngine {
                 // Should explicitly suggest Regional Anesthesia / Nerve Blocks
                 // Logic check: "Regional Anesthesia" in Recs or Warnings?
                 // Logic: "Consult Anesthesia for nerve blocks" in warnings or recs?
-                // Actually Logic in Store: if hemo == .unstable addRec("Regional..."). 
-                // Let's check if it suggests it for general surgery too.
-                // If not, we might fail this test (gap detection).
-                // Existing logic: only adds Regional if Hemo is unstable.
-                // Let's adjust verify to expect what IS there, or update logic if we want it.
-                // For now, let's test if Ketamine is present.
+                // Check if Ketamine is recommended for Naltrexone patients undergoing surgery.
                 let hasKetamine = s.recommendations.contains { $0.name.contains("Ketamine") }
                 if hasKetamine { return .pass }
                 return .fail("Ketamine missing for Naltrexone surgery.")
@@ -1692,6 +1687,130 @@ class ClinicalValidationEngine {
                 
                 if referral && naloxone { return .pass }
                 return .fail("High Dose checks failed. Referral: \(referral), Naloxone: \(naloxone)")
+            }
+        )
+        // 80. Neuropathic Pain (Atypical Logic)
+        AssessmentTestCase(
+            name: "80. Neuropathic Pain (Atypical Logic)",
+            setup: { s in
+                s.reset()
+                s.painType = .neuropathic
+                s.analgesicProfile = .chronicRx // Chronic allows Methadone consideration
+            },
+            verify: { s in
+                // Expect preference for Atypical Opioids (Methadone, Buprenorphine, Tapentadol)
+                // due to NMDA/NRI activity.
+                
+                let hasMethadone = s.recommendations.contains { $0.name.contains("Methadone") }
+                let hasBup = s.recommendations.contains { $0.name.contains("Buprenorphine") }
+                let hasTapentadol = s.recommendations.contains { $0.name.contains("Tapentadol") }
+                
+                // At least one should be suggested with specific rationale
+                if hasMethadone || hasBup || hasTapentadol {
+                     return .pass
+                }
+                
+                return .fail("Neuropathic pain did not trigger Atypical Opioid recommendation (Methadone/Bup/Tapentadol).")
+            }
+        ),
+        
+        // 81. Hepatic Failure + IV Bioavailability Check
+        AssessmentTestCase(
+            name: "81. Hepatic Failure (IV Bioavailability Fix)",
+            setup: { s in
+                s.reset()
+                s.hepaticFunction = .failure
+                s.route = .iv
+                s.analgesicProfile = .naive // Ensures Hydro IV is added normally then modified
+            },
+            verify: { s in
+                // Find Hydromorphone IV
+                guard let hydro = s.recommendations.first(where: { $0.name.contains("Hydromorphone") }) else {
+                    return .fail("Hydromorphone IV missing in Hepatic Failure.")
+                }
+                
+                // Verify text does NOT say "Bioavailability" for IV
+                if hydro.detail.contains("Bioavailability") {
+                    return .fail("IV recommendation incorrectly mentions Bioavailability.")
+                }
+                
+                // Verify it mentions Clearance
+                if hydro.detail.contains("clearance") {
+                    return .pass
+                }
+                
+                return .fail("IV recommendation detail mismatch. Got: \(hydro.detail)")
+            }
+        ),
+        
+        // 82. Neuropathic + Elderly (TCA Caution/Beers)
+        AssessmentTestCase(
+            name: "82. Neuropathic + Elderly (TCA Caution)",
+            setup: { s in
+                s.reset()
+                s.painType = .neuropathic
+                s.age = "75" // Elderly -> Beers Criteria for TCAs
+            },
+            verify: { s in
+                // TCAs (Nortriptyline/Amitriptyline) should be cautioned or avoided.
+                // Gabapentin/Pregabalin preferred.
+                
+                let hasTCA = s.recommendations.contains { $0.name.contains("Nortriptyline") || $0.name.contains("Amitriptyline") }
+                
+                if !hasTCA { return .pass } // Safe if removed
+                
+                // If present, must have warning
+                if let tca = s.recommendations.first(where: { $0.name.contains("Nortriptyline") }) {
+                    if tca.type == .caution || tca.type == .unsafe { return .pass }
+                    if tca.detail.contains("Beers") || tca.detail.contains("Anticholinergic") { return .pass }
+                }
+                
+                return .fail("TCA recommended for Elderly Neuropathic without Beers warning.")
+            }
+        ),
+        
+        // 83. Neuropathic + Renal Impairment (Gabapentin Adj)
+        AssessmentTestCase(
+            name: "83. Neuropathic + Renal (Gabapentin Adj)",
+            setup: { s in
+                s.reset()
+                s.painType = .neuropathic
+                s.renalFunction = .impaired // eGFR < 60
+            },
+            verify: { s in
+                // Gabapentinoids require dose adjustment.
+                guard let gaba = s.recommendations.first(where: { $0.name.contains("Gabapentin") || $0.name.contains("Pregabalin") }) else {
+                    return .fail("Gabapentinoids missing for Neuropathic pain.")
+                }
+                
+                if gaba.detail.contains("Renal") || gaba.detail.contains("Adjust") || gaba.detail.contains("Reduce") {
+                    return .pass
+                }
+                
+                return .fail("Gabapentinoid renal adjustment warning missing.")
+            }
+        ),
+
+        // 84. Neuropathic + Hepatic Failure (Duloxetine Avoid)
+        AssessmentTestCase(
+            name: "84. Neuropathic + Hepatic (Duloxetine Avoid)",
+            setup: { s in
+                s.reset()
+                s.painType = .neuropathic
+                s.hepaticFunction = .failure
+            },
+            verify: { s in
+                // Duloxetine is hepatotoxic/contraindicated in liver failure.
+                let hasDuloxetine = s.recommendations.contains { $0.name.contains("Duloxetine") }
+                
+                if !hasDuloxetine { return .pass }
+                
+                // If present, must be strictly marked unsafe
+                if let dulox = s.recommendations.first(where: { $0.name.contains("Duloxetine") }) {
+                    if dulox.type == .unsafe { return .pass }
+                }
+                
+                return .fail("Duloxetine recommended in Hepatic Failure.")
             }
         )
     ]

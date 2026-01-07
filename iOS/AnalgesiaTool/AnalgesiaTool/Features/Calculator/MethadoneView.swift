@@ -10,6 +10,8 @@ struct MethadoneConversionResult {
     let warnings: [String]
     let isContraindicatedForCalculator: Bool
     let transitionSchedule: [MethadoneScheduleStep]?
+    let ratioUsed: Double // Added for note context
+    let reductionApplied: Double // Added for note context
 }
 
 struct MethadoneScheduleStep: Hashable {
@@ -49,31 +51,19 @@ func calculateMethadoneConversion(totalMME: Double, patientAge: Int, method: Con
             dosingSchedule: "Consult Pain Specialist",
             warnings: warnings,
             isContraindicatedForCalculator: true,
-            transitionSchedule: nil
+            transitionSchedule: nil,
+            ratioUsed: 0,
+            reductionApplied: 0
         )
     }
     
     // Apply logic from rule
-    // For min/max MME rules < 60, we might have fixed logic, but the struct handles ratio.
-    // However, ClinicalData's RatioRule defines the ratio.
-    // We need to handle the "Conservative" override if age > 65 and the rule doesn't explicitly separate it (ClinicalData rules 3 & 4 have duplicate MME ranges for ratio 10 vs 20? No, let's re-read ClinicalData I just wrote).
-    // Wait, ClinicalData struct implementation I wrote:
-    // RationRule(minMME: 60, maxMME: 100, ratio: 10.0 ...
-    // RationRule(minMME: 100, maxMME: 200, ratio: 10.0 ...
-    // UseConservativeRatio logic was: "ratio = useConservativeRatio ? 20.0 : 10.0".
-    // My ClinicalData implementation didn't strictly capture the "Elderly = 20" logic within the struct unless I update the struct or logic here.
-    // Implementation Plan Phase 1 said: "Use MMEConversionRules".
-    // I should strictly follow the data model. If the data model I wrote (which I should check in context) doesn't have the "Elderly" flag, I need to implement the logic here using the data model's base, OR override it.
-    // The previous code had: `ratio = useConservativeRatio ? 20.0 : 10.0` for 60-200.
-    // The new ClinicalData struct has `ratio: 10.0` for 60-200.
-    // I need to apply the elderly override here if the rule allows.
-    
     ratio = rule.ratio
+    
+    // Override for Elderly Patients (>65y) per NCCN Guidelines
+    // Use conservative ratio (20:1) for moderate doses (60-200 MME)
     if useConservativeRatio && (totalMME >= 60 && totalMME < 200) {
-        ratio = 20.0 
-        // This effectively overrides the 10.0 from the struct for elderly.
-        // Ideally the struct would be `func getRatio(age...)` returning the correct rule, but my implemented `getRatio` just filters by MME.
-        // I will keep this specific override here to maintain clinical safety until I update `ClinicalData` to be more robust for Age.
+        ratio = 20.0
     }
     
     crossToleranceReduction = rule.reduction
@@ -171,7 +161,9 @@ func calculateMethadoneConversion(totalMME: Double, patientAge: Int, method: Con
         dosingSchedule: "Every 8 hours (TID)",
         warnings: warnings,
         isContraindicatedForCalculator: false,
-        transitionSchedule: schedule
+        transitionSchedule: schedule,
+        ratioUsed: ratio,
+        reductionApplied: crossToleranceReduction
     )
 }
 
@@ -182,7 +174,11 @@ struct MethadoneView: View {
     @EnvironmentObject var themeManager: ThemeManager // Needed for color scheme
     @State private var currentTotalMME: String = ""
     @State private var conversionResult: MethadoneConversionResult?
+    @State private var currentTotalMME: String = ""
+    @State private var conversionResult: MethadoneConversionResult?
     @State private var patientAge: Int = 50
+    // NEW: Allow auto-seeding
+    var initialAge: Int?
     @State private var hasQTcProlongation: Bool = false
     @State private var showAlgorithmNote: Bool = false
     @State private var showChart: Bool = false
@@ -200,9 +196,10 @@ struct MethadoneView: View {
         Text(LocalizedStringKey(text))
     }
     
-    init(isPresented: Binding<Bool>, initialMME: String? = nil, isPregnant: Bool = false, isNaltrexone: Bool = false) {
+    init(isPresented: Binding<Bool>, initialMME: String? = nil, initialAge: Int? = nil, isPregnant: Bool = false, isNaltrexone: Bool = false) {
         self._isPresented = isPresented
         self.initialMME = initialMME
+        self.initialAge = initialAge
         self.isPregnant = isPregnant
         self.isNaltrexone = isNaltrexone
     }
@@ -232,6 +229,7 @@ struct MethadoneView: View {
                     .cornerRadius(12)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.rose500.opacity(0.3), lineWidth: 1))
                     .padding(.horizontal)
+                    .addKeyboardDoneButton() // Add Done Button (User Request)
                     
                     // 2. INPUT CARD
                     VStack(alignment: .leading, spacing: 16) {
@@ -252,6 +250,10 @@ struct MethadoneView: View {
                                     .onAppear {
                                         if let initial = initialMME, currentTotalMME.isEmpty {
                                             currentTotalMME = initial
+                                        }
+                                        // Auto-Seed Age if provided
+                                        if let age = initialAge, patientAge == 50 { // Only overwrite default
+                                            patientAge = age
                                         }
                                     }
                                 
@@ -365,6 +367,9 @@ struct MethadoneView: View {
                         // Standard Calculator Flow
                     }
                     
+                    // KEYBOARD DONE BUTTON
+                    Spacer(minLength: 0)
+                    
                     if !isNaltrexone && !isPregnant {
                         // CALCULATE BUTTON
                         Button(action: performConversion) {
@@ -385,35 +390,74 @@ struct MethadoneView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             SectionHeader(icon: "pills.fill", title: "Recommended Protocol")
                             
-                            HStack(alignment: .center) {
-                                VStack(alignment: .leading) {
-                                    Text("Scheduled Dose")
-                                        .font(.caption)
-                                        .foregroundColor(ClinicalTheme.textSecondary)
-                                    Text("\(String(format: "%g", result.individualDose)) mg")
-                                        .font(.system(size: 32, weight: .bold)) // Prominent
-                                        .foregroundColor(ClinicalTheme.teal500)
-                                    Text("TID (Every 8 hours)")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(ClinicalTheme.teal500)
+                            // HIDE RAPID DISPLAY IF STEPWISE (User Request)
+                            if conversionMethod == .rapid {
+                                HStack(alignment: .center) {
+                                    VStack(alignment: .leading) {
+                                        Text("Scheduled Dose")
+                                            .font(.caption)
+                                            .foregroundColor(ClinicalTheme.textSecondary)
+                                        Text("\(String(format: "%g", result.individualDose)) mg")
+                                            .font(.system(size: 32, weight: .bold)) // Prominent
+                                            .foregroundColor(ClinicalTheme.teal500)
+                                        Text("TID (Every 8 hours)")
+                                            .font(.headline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(ClinicalTheme.teal500)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    VStack(alignment: .trailing) {
+                                        Text("Total Daily")
+                                            .font(.caption)
+                                            .foregroundColor(ClinicalTheme.textSecondary)
+                                        Text("\(String(format: "%.1f", result.totalDailyDose)) mg")
+                                            .font(.title3)
+                                            .bold()
+                                            .foregroundColor(ClinicalTheme.textPrimary)
+                                    }
+                                }
+                                .padding()
+                                .background(ClinicalTheme.backgroundInput)
+                                .cornerRadius(8)
+                            }
+                            
+                            // COPY ACTIONS
+                            HStack(spacing: 12) {
+                                Button(action: {
+                                    copyClinicalNote()
+                                    // Optional: Show alert/feedback
+                                }) {
+                                    HStack {
+                                        Image(systemName: "doc.text.fill")
+                                        Text("Copy Note")
+                                    }
+                                    .font(.caption).bold()
+                                    .padding(.vertical, 8)
+                                    .frame(maxWidth: .infinity)
+                                    .background(ClinicalTheme.teal500.opacity(0.1))
+                                    .foregroundColor(ClinicalTheme.teal500)
+                                    .cornerRadius(8)
                                 }
                                 
-                                Spacer()
-                                
-                                VStack(alignment: .trailing) {
-                                    Text("Total Daily")
-                                        .font(.caption)
-                                        .foregroundColor(ClinicalTheme.textSecondary)
-                                    Text("\(String(format: "%.1f", result.totalDailyDose)) mg")
-                                        .font(.title3)
-                                        .bold()
-                                        .foregroundColor(ClinicalTheme.textPrimary)
+                                Button(action: {
+                                    copyPatientInstructions()
+                                    // Optional: Show alert/feedback
+                                }) {
+                                    HStack {
+                                        Image(systemName: "person.text.rectangle")
+                                        Text("Patient Instr.")
+                                    }
+                                    .font(.caption).bold()
+                                    .padding(.vertical, 8)
+                                    .frame(maxWidth: .infinity)
+                                    .background(ClinicalTheme.amber500.opacity(0.1))
+                                    .foregroundColor(ClinicalTheme.amber500)
+                                    .cornerRadius(8)
                                 }
                             }
-                            .padding()
-                            .background(ClinicalTheme.backgroundInput)
-                            .cornerRadius(8)
+                            .padding(.top, 4)
                             
                             // SHOW SCHEDULE IF STEPWISE
                             if let schedule = result.transitionSchedule {
@@ -566,6 +610,14 @@ struct MethadoneView: View {
             // Transparency Card (Bottom)
             MethadoneTransparencyCard(isExpanded: $showAlgorithmNote)
                 .padding()
+                
+            VStack(spacing: 4) {
+                Text("Powered by Lifeline Medical Technologies")
+                    .font(.system(size: 10))
+                    .foregroundColor(ClinicalTheme.teal500.opacity(0.6))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.bottom, 20)
         }
             .navigationTitle("Methadone Calculator")
             .navigationBarTitleDisplayMode(.inline)
@@ -581,23 +633,57 @@ struct MethadoneView: View {
 
     
     // Copy Action
-    func copyStepwiseSchedule(schedule: [MethadoneScheduleStep]) {
+    // Unified Copy Action
+    func copyClinicalNote() {
+        guard let result = conversionResult else { return }
+        
+        let text = """
+        Methadone Conversion Note
+        Input: \(currentTotalMME) MME (Age: \(patientAge))
+        Ratio Used: ~1:\(Int(result.ratioUsed)) (NCCN Guidelines)
+        Reduction: \(Int(result.reductionApplied * 100))% for cross-tolerance
+        
+        Plan: Methadone \(String(format: "%g", result.individualDose)) mg TID
+        Total Daily: \(String(format: "%.1f", result.totalDailyDose)) mg
+        
+        Safety:
+        - ECG monitoring required (Baseline, Day 30)
+        - Naloxone kit prescribed
+        - Titrate no faster than q5-7 days
+        """
+        UIPasteboard.general.string = text
+    }
+    
+    func copyPatientInstructions() {
+        guard let result = conversionResult else { return }
+        
         var text = """
-        Methadone Stepwise Induction Plan
-        Strategy: 3-Step Rotation (33% increments)
-        Target Dose: \(String(format: "%.1f", conversionResult?.totalDailyDose ?? 0)) mg/day (\(String(format: "%.1f", conversionResult?.individualDose ?? 0)) mg TID)
+        Your Methadone Schedule
+        Start Date: _____________
+        
+        Dose: Take \(String(format: "%g", result.individualDose)) mg every 8 hours.
+        (Example: 8:00 AM, 4:00 PM, 12:00 AM)
+        
+        IMPORTANT SAFETY:
+        1. Methadone builds up slowly. Do NOT take extra doses.
+        2. If you feel very sleepy, SKIP your next dose and call the clinic.
+        3. Do not mix with alcohol or sedatives.
         
         """
         
-        for step in schedule {
-            text += "\(step.dayLabel):\n"
-            text += " - Previous Opioid: \(step.prevMME) MME (\(Int(step.prevOpioidPercentVal))%)\n"
-            text += " - Methadone: \(step.methadoneDose)\n"
-            text += " - Note: \(step.instructions)\n\n"
+        if let schedule = result.transitionSchedule {
+            text += "\nTRANSITION SCHEDULE:\n"
+            for step in schedule {
+                text += "[ ] \(step.dayLabel): Take Methadone \(step.methadoneDose). \(step.instructions)\n"
+            }
         }
         
-        text += "WARNING: Pause taper if profound sedation or respiratory issues occur."
         UIPasteboard.general.string = text
+    }
+    
+    // Legacy Stepwise Helper (kept but unused if button removed, or reused)
+    func copyStepwiseSchedule(schedule: [MethadoneScheduleStep]) {
+        copyPatientInstructions() // Redirect to new format
     }
     
     // Action

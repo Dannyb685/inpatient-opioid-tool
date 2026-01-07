@@ -114,9 +114,9 @@ struct SettingsView: View {
                      
                      // Footer
                      VStack(spacing: 8) {
-                         Text("Designed with 🤍 for Patient Safety")
+                         Text("Powered by Lifeline Medical Technologies")
                              .font(.caption2)
-                             .foregroundColor(ClinicalTheme.textMuted)
+                             .foregroundColor(ClinicalTheme.teal500.opacity(0.7))
                          Text("© 2025 Inpatient Opioid Tool")
                              .font(.caption2)
                              .foregroundColor(ClinicalTheme.textMuted)
