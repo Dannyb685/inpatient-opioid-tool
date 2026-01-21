@@ -2,10 +2,13 @@ import SwiftUI
 
 struct DrugMonographView: View {
     // The Single Source of Truth
-    let drug: DrugPharmacology
+    let drug: DrugData
+    var patientContext: AssessmentStore? // Optional if not always used, or @ObservedObject if needed. ReferenceView passes it.
     
     // Environment to dismiss
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.citationService) var citationService
     
     var body: some View {
         NavigationView {
@@ -36,9 +39,29 @@ struct DrugMonographView: View {
                                 .font(.title3)
                                 .foregroundColor(.secondary)
                         }
+                        
+                        // Type Badge
+                        Text(drug.type)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 2)
                     }
                     
-                    // MARK: 2. PK Grid (Dynamic)
+                    // MARK: 2. Clinical Nuance (NEW)
+                    VStack(alignment: .leading, spacing: 12) {
+                        MonographSectionHeader(icon: "brain.head.profile", title: "Clinical Pharmacodynamics")
+                        
+                        Text(drug.clinicalNuance)
+                            .font(.body)
+                            .foregroundColor(.primary)
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.blue.opacity(0.05))
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.blue.opacity(0.2), lineWidth: 1))
+                    }
+                    
+                    // MARK: 3. PK Grid (Dynamic)
                     if let pk = drug.pkProfile {
                         VStack(alignment: .leading, spacing: 12) {
                             MonographSectionHeader(icon: "timer", title: "Pharmacokinetics")
@@ -55,14 +78,20 @@ struct DrugMonographView: View {
                             }
                             
                             // LOGIC GATE: Only show Bioavailability if it exists (e.g. Oral)
-                            // This prevents "Oral Bioavailability" showing up on Fentanyl IV cards
                             if let bio = pk.bioavailability {
                                 PKStatBox(label: "Oral Bioavailability", value: bio, isBar: true)
                             }
+                            
+                            // Pharmacokinetics Text (NEW)
+                            // Display the detailed PK string from DrugData
+                             Text(drug.pharmacokinetics)
+                                 .font(.subheadline)
+                                 .foregroundColor(.secondary)
+                                 .padding(.top, 4)
                         }
                     }
                     
-                    // MARK: 3. Safety Profile
+                    // MARK: 4. Safety Profile
                     if let safety = drug.safetyProfile {
                         VStack(alignment: .leading, spacing: 12) {
                             MonographSectionHeader(icon: "cross.case.fill", title: "Safety Profile")
@@ -71,19 +100,19 @@ struct DrugMonographView: View {
                             if let renal = safety.renalNote {
                                 HStack(alignment: .top) {
                                     Image(systemName: "drop.triangle")
-                                        .foregroundColor(.orange)
+                                        .foregroundColor(drug.renalSafety == "Unsafe" ? .red : .orange)
                                     Text(renal)
                                         .font(.body)
                                         .fixedSize(horizontal: false, vertical: true)
                                 }
                                 .padding()
-                                .background(Color.orange.opacity(0.05))
+                                .background(drug.renalSafety == "Unsafe" ? Color.red.opacity(0.05) : Color.orange.opacity(0.05))
                                 .cornerRadius(12)
                             }
                         }
                     }
                     
-                    // MARK: 4. Boxed Warning (Moved to Bottom as requested)
+                    // MARK: 5. Boxed Warning
                     if let warning = drug.safetyProfile?.boxedWarning {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
@@ -106,9 +135,17 @@ struct DrugMonographView: View {
                         )
                     }
                     
-                    // MARK: 5. Sources Footer
-                    if let citations = drug.citations {
-                        SourcesFooterView(citations: citations)
+                    // MARK: 6. Detailed Warnings (NEW)
+                    // Currently using blackBoxWarnings array if available, or just generic detailed warnings
+                    // For now, let's just stick to what DrugData has.
+                    // The user prompted textual updates were put into 'clinicalNuance' and 'pharmacokinetics'.
+                    // We can also check detailedWarnings if any were added.
+                    
+                    
+                    // MARK: 7. Sources Footer
+                    if !drug.citations.isEmpty {
+                        // Resolve using the service
+                        CitationFooter(citations: citationService.resolveOrLegacy(drug.citations))
                     }
                 }
                 .padding()

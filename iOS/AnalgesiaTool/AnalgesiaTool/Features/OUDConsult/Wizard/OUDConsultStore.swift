@@ -201,7 +201,9 @@ class OUDConsultStore: ObservableObject {
         DISCLAIMER: This calculation is for informational purposes. Individual patient physiology varies. Clinical decisions should be individualized. (Lifeline Medical Technologies)
         """
         
+        #if canImport(UIKit)
         UIPasteboard.general.string = text
+        #endif
     }
     
     // MARK: - Actions

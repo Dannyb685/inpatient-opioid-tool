@@ -104,7 +104,8 @@ struct DripConfig: Equatable, Codable {
     var computedMME: Double {
         // UNIFIED LOGIC: Use centralized ConversionService
         let routeKey: String
-        let targetId = drugId.lowercased()
+        var targetId = drugId.lowercased()
+        if targetId == "morphine" { targetId = "morphine_iv" }
         
         switch drugId {
         case "Fentanyl":
@@ -117,13 +118,12 @@ struct DripConfig: Equatable, Codable {
         }
         
         // Fetch Factor
-        do {
-            let factorData = try ConversionService.shared.getFactor(drugId: targetId, route: routeKey)
-            return dailyTotal * factorData.factor
-        } catch {
-             print("DripConfig MME Error: \(error)")
+        // Fetch Factor
+        guard let factorData = ConversionService.shared.getFactor(drugId: targetId, route: routeKey) else {
+             print("DripConfig MME Error: Factor not found for \(targetId)")
              return 0.0
         }
+        return dailyTotal * factorData.factor
     }
     
     // Evidence Quality Logic
@@ -138,17 +138,16 @@ struct DripConfig: Equatable, Codable {
             routeKey = "iv"
         }
         
-        do {
-            let factorData = try ConversionService.shared.getFactor(drugId: targetId, route: routeKey)
-            // Map String from JSON to Enum
-            switch factorData.evidenceQuality.lowercased() {
-            case "high": return .high
-            case "moderate": return .moderate
-            case "low": return .low
-            default: return .low
-            }
-        } catch {
+        guard let factorData = ConversionService.shared.getFactor(drugId: targetId, route: routeKey) else {
              return .low // Default to low quality on lookup error
+        }
+        
+        // Map String from JSON to Enum
+        switch factorData.evidenceQuality.lowercased() {
+        case "high": return .high
+        case "moderate": return .moderate
+        case "low": return .low
+        default: return .low
         }
     }
     

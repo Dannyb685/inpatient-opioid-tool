@@ -1,4 +1,6 @@
-// File: AnalgesiaTool/Core/Extensions/ViewExtensions.swift
+
+// MARK: - File: AnalgesiaTool/Core/Extensions/ViewExtensions.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 extension View {
@@ -35,7 +37,8 @@ extension UIApplication {
 }
 
 
-// File: AnalgesiaTool/Core/Models/CalculatorInputs.swift
+// MARK: - File: AnalgesiaTool/Core/Models/CalculatorInputs.swift
+// ----------------------------------------------------------------
 
 import Foundation
 
@@ -64,7 +67,8 @@ protocol CalculatorInputs {
 }
 
 
-// File: AnalgesiaTool/Core/Models/CitationRegistry.swift
+// MARK: - File: AnalgesiaTool/Core/Models/CitationRegistry.swift
+// ----------------------------------------------------------------
 import Foundation
 
 enum CitationType: String, Codable {
@@ -299,7 +303,8 @@ class CitationRegistry {
 }
 
 
-// File: AnalgesiaTool/Core/Models/ClinicalData.swift
+// MARK: - File: AnalgesiaTool/Core/Models/ClinicalData.swift
+// ----------------------------------------------------------------
  import Foundation
 import SwiftUI
 
@@ -471,6 +476,7 @@ struct DrugRecommendation: Identifiable {
     let detail: String
     let type: RecommendationType
     let durationProfile: DurationProfile?
+    let molecule: OpioidMolecule
 }
 
 // MARK: - Data Models
@@ -519,6 +525,145 @@ struct DrugData: Identifiable {
     // Transparent Sourcing
     var bioavailabilitySource: String? = nil
     var dosingSource: String? = nil
+    
+    // Taxonomy
+    let molecule: OpioidMolecule
+    
+    // Custom Coding Keys to allow decoding legacy JSON safely
+    enum CodingKeys: String, CodingKey {
+        case id, familyId, name, subtitle, type, route, mmeFactor
+        case durationProfile, ivOnset, ivDuration, poOnset, poDuration
+        case renalSafety, hepaticSafety, clinicalNuance, pharmacokinetics, tags, bioavailability
+        case pregnancyCategory, ivStart, poStart
+        case pkProfile, safetyProfile, fdaLabelURL, blackBoxWarnings, contraindications, detailedWarnings
+        case safetyWarnings, commonAdverseReactions, citations
+        case bioavailabilitySource, dosingSource
+        case molecule
+    }
+    
+    // Memberwise Init
+    init(id: String, familyId: String? = nil, name: String, subtitle: String? = nil, type: String, route: String? = nil, mmeFactor: Double?, durationProfile: DurationProfile, ivOnset: String, ivDuration: String, poOnset: String, poDuration: String, renalSafety: String, hepaticSafety: String, clinicalNuance: String, pharmacokinetics: String, tags: [String], bioavailability: Int, pregnancyCategory: String?, ivStart: String, poStart: String, pkProfile: PKProfile? = nil, safetyProfile: SafetyProfile? = nil, fdaLabelURL: String? = nil, blackBoxWarnings: [BlackBoxWarning]? = nil, contraindications: [Contraindication]? = nil, detailedWarnings: [Warning]? = nil, citations: [String], bioavailabilitySource: String? = nil, dosingSource: String? = nil, molecule: OpioidMolecule? = nil) {
+        self.id = id
+        self.familyId = familyId
+        self.name = name
+        self.subtitle = subtitle
+        self.type = type
+        self.route = route
+        self.mmeFactor = mmeFactor
+        self.durationProfile = durationProfile
+        self.ivOnset = ivOnset
+        self.ivDuration = ivDuration
+        self.poOnset = poOnset
+        self.poDuration = poDuration
+        self.renalSafety = renalSafety
+        self.hepaticSafety = hepaticSafety
+        self.clinicalNuance = clinicalNuance
+        self.pharmacokinetics = pharmacokinetics
+        self.tags = tags
+        self.bioavailability = bioavailability
+        self.pregnancyCategory = pregnancyCategory
+        self.ivStart = ivStart
+        self.poStart = poStart
+        self.pkProfile = pkProfile
+        self.safetyProfile = safetyProfile
+        self.fdaLabelURL = fdaLabelURL
+        self.blackBoxWarnings = blackBoxWarnings
+        self.contraindications = contraindications
+        self.detailedWarnings = detailedWarnings
+        self.citations = citations
+        self.bioavailabilitySource = bioavailabilitySource
+        self.dosingSource = dosingSource
+        
+        // Auto-Detect Taxonomy if nil (for static data convenience)
+        if let explicit = molecule {
+            self.molecule = explicit
+        } else {
+            // Inference Logic
+            let lowerName = name.lowercased()
+            if lowerName.contains("morphine") { self.molecule = .morphine }
+            else if lowerName.contains("hydromorphone") { self.molecule = .hydromorphone }
+            else if lowerName.contains("oxycodone") { self.molecule = .oxycodone }
+            else if lowerName.contains("methadone") { self.molecule = .methadone }
+            else if lowerName.contains("buprenorphine") { self.molecule = .buprenorphine }
+            else if lowerName.contains("fentanyl") { self.molecule = .fentanyl }
+            else if lowerName.contains("tapentadol") { self.molecule = .tapentadol }
+            else if lowerName.contains("levorphanol") { self.molecule = .levorphanol }
+            else if lowerName.contains("suzetrigine") { self.molecule = .suzetrigine }
+            else if lowerName.contains("meperidine") { self.molecule = .meperidine }
+            else if lowerName.contains("sufentanil") { self.molecule = .sufentanil }
+            else if lowerName.contains("alfentanil") { self.molecule = .alfentanil }
+            else if lowerName.contains("codeine") { self.molecule = .codeine }
+            else if lowerName.contains("tramadol") { self.molecule = .tramadol }
+            else { self.molecule = .other }
+        }
+    }
+    
+    // Custom Decoder for Backward Compatibility
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // Standard Decoding
+        id = try container.decode(String.self, forKey: .id)
+        familyId = try container.decodeIfPresent(String.self, forKey: .familyId)
+        name = try container.decode(String.self, forKey: .name)
+        subtitle = try container.decodeIfPresent(String.self, forKey: .subtitle)
+        type = try container.decode(String.self, forKey: .type)
+        route = try container.decodeIfPresent(String.self, forKey: .route)
+        mmeFactor = try container.decodeIfPresent(Double.self, forKey: .mmeFactor)
+        durationProfile = try container.decode(DurationProfile.self, forKey: .durationProfile)
+        ivOnset = try container.decode(String.self, forKey: .ivOnset)
+        ivDuration = try container.decode(String.self, forKey: .ivDuration)
+        poOnset = try container.decode(String.self, forKey: .poOnset)
+        poDuration = try container.decode(String.self, forKey: .poDuration)
+        renalSafety = try container.decode(String.self, forKey: .renalSafety)
+        hepaticSafety = try container.decode(String.self, forKey: .hepaticSafety)
+        clinicalNuance = try container.decode(String.self, forKey: .clinicalNuance)
+        pharmacokinetics = try container.decode(String.self, forKey: .pharmacokinetics)
+        tags = try container.decode([String].self, forKey: .tags)
+        bioavailability = try container.decode(Int.self, forKey: .bioavailability)
+        pregnancyCategory = try container.decodeIfPresent(String.self, forKey: .pregnancyCategory)
+        ivStart = try container.decode(String.self, forKey: .ivStart)
+        poStart = try container.decode(String.self, forKey: .poStart)
+        
+        // Sidecars
+        pkProfile = try container.decodeIfPresent(PKProfile.self, forKey: .pkProfile)
+        safetyProfile = try container.decodeIfPresent(SafetyProfile.self, forKey: .safetyProfile)
+        
+        // Safety
+        fdaLabelURL = try container.decodeIfPresent(String.self, forKey: .fdaLabelURL)
+        blackBoxWarnings = try container.decodeIfPresent([BlackBoxWarning].self, forKey: .blackBoxWarnings)
+        contraindications = try container.decodeIfPresent([Contraindication].self, forKey: .contraindications)
+        detailedWarnings = try container.decodeIfPresent([Warning].self, forKey: .detailedWarnings)
+        safetyWarnings = try container.decodeIfPresent([String].self, forKey: .safetyWarnings)
+        commonAdverseReactions = try container.decodeIfPresent([AdverseReaction].self, forKey: .commonAdverseReactions)
+        citations = try container.decode([String].self, forKey: .citations)
+        
+        bioavailabilitySource = try container.decodeIfPresent(String.self, forKey: .bioavailabilitySource)
+        dosingSource = try container.decodeIfPresent(String.self, forKey: .dosingSource)
+        
+        // MOLECULE LOGIC (The Key Fix)
+        if let mol = try container.decodeIfPresent(OpioidMolecule.self, forKey: .molecule) {
+            self.molecule = mol
+        } else {
+            // Fallback: Infer from name (backward compatibility)
+            let lowerName = name.lowercased()
+            if lowerName.contains("morphine") { self.molecule = .morphine }
+            else if lowerName.contains("hydromorphone") { self.molecule = .hydromorphone }
+            else if lowerName.contains("oxycodone") { self.molecule = .oxycodone }
+            else if lowerName.contains("methadone") { self.molecule = .methadone }
+            else if lowerName.contains("buprenorphine") { self.molecule = .buprenorphine }
+            else if lowerName.contains("fentanyl") { self.molecule = .fentanyl }
+            else if lowerName.contains("tapentadol") { self.molecule = .tapentadol }
+            else if lowerName.contains("levorphanol") { self.molecule = .levorphanol }
+            else if lowerName.contains("suzetrigine") { self.molecule = .suzetrigine }
+            else if lowerName.contains("meperidine") { self.molecule = .meperidine }
+            else if lowerName.contains("sufentanil") { self.molecule = .sufentanil }
+            else if lowerName.contains("alfentanil") { self.molecule = .alfentanil }
+            else if lowerName.contains("codeine") { self.molecule = .codeine }
+            else if lowerName.contains("tramadol") { self.molecule = .tramadol }
+            else { self.molecule = .other }
+        }
+    }
 }
 
 extension DrugData {
@@ -635,6 +780,21 @@ struct WarningData: Identifiable {
     let name: String
     let risk: String
     let desc: String
+}
+
+// MARK: - Safety Alert System (v2.0)
+enum SafetySeverity: String, CaseIterable, Codable {
+    case critical = "Critical" // Red, Forced Open
+    case warning = "Warning"   // Amber, Collapsible
+    case info = "Info"         // Green/Gray, Collapsed
+}
+
+struct SafetyAlert: Identifiable, Codable {
+    let id = UUID()
+    let title: String
+    let description: String
+    let severity: SafetySeverity
+    let source: String? // e.g. "Renal Gate"
 }
 
 struct AdjuvantRecommendation: Identifiable, Codable {
@@ -943,7 +1103,61 @@ struct ClinicalData {
 }
 
 
-// File: AnalgesiaTool/Core/Models/InfusionModels.swift
+// MARK: - File: AnalgesiaTool/Core/Models/ClinicalTaxonomy.swift
+// ----------------------------------------------------------------
+import Foundation
+
+public enum OpioidMolecule: String, CaseIterable, Codable, Identifiable {
+    case morphine
+    case hydromorphone
+    case oxycodone
+    case hydrocodone
+    case codeine
+    case fentanyl
+    case methadone
+    case buprenorphine
+    case tramadol
+    case tapentadol
+    case levorphanol
+    case meperidine
+    case suzetrigine
+    case sufentanil
+    case alfentanil
+    case remifentanil
+    case naloxone
+    case naltrexone
+    case other
+    
+    public var id: String { self.rawValue }
+    
+    public var displayName: String {
+        switch self {
+        case .morphine: return "Morphine"
+        case .hydromorphone: return "Hydromorphone"
+        case .oxycodone: return "Oxycodone"
+        case .hydrocodone: return "Hydrocodone"
+        case .codeine: return "Codeine"
+        case .fentanyl: return "Fentanyl"
+        case .methadone: return "Methadone"
+        case .buprenorphine: return "Buprenorphine"
+        case .tramadol: return "Tramadol"
+        case .tapentadol: return "Tapentadol"
+        case .levorphanol: return "Levorphanol"
+        case .meperidine: return "Meperidine"
+        case .suzetrigine: return "Suzetrigine"
+        case .sufentanil: return "Sufentanil"
+        case .alfentanil: return "Alfentanil"
+        case .remifentanil: return "Remifentanil"
+        case .naloxone: return "Naloxone"
+        case .naltrexone: return "Naltrexone"
+        case .other: return "Other"
+        }
+    }
+}
+
+
+// MARK: - File: AnalgesiaTool/Core/Models/InfusionModels.swift
+// ----------------------------------------------------------------
 import Foundation
 
 // MARK: - PCA Settings
@@ -1156,7 +1370,8 @@ struct DripConfig: Equatable, Codable {
 }
 
 
-// File: AnalgesiaTool/Core/Models/OUDDataModels.swift
+// MARK: - File: AnalgesiaTool/Core/Models/OUDDataModels.swift
+// ----------------------------------------------------------------
 import Foundation
 import SwiftUI
 
@@ -1282,7 +1497,8 @@ struct OUDStaticData {
 }
 
 
-// File: AnalgesiaTool/Core/Models/ProtocolData.swift
+// MARK: - File: AnalgesiaTool/Core/Models/ProtocolData.swift
+// ----------------------------------------------------------------
 import Foundation
 
 // MARK: - Models
@@ -1527,7 +1743,8 @@ struct ProtocolData {
     
 
 
-// File: AnalgesiaTool/Core/Models/ToolkitData.swift
+// MARK: - File: AnalgesiaTool/Core/Models/ToolkitData.swift
+// ----------------------------------------------------------------
 import Foundation
 
 struct ToolkitData {
@@ -1554,7 +1771,8 @@ struct ToolkitData {
 }
 
 
-// File: AnalgesiaTool/Core/Services/BadgeService.swift
+// MARK: - File: AnalgesiaTool/Core/Services/BadgeService.swift
+// ----------------------------------------------------------------
 import Foundation
 import SwiftUI
 
@@ -1635,7 +1853,479 @@ class BadgeService {
 }
 
 
-// File: AnalgesiaTool/Core/Services/ClinicalValidationEngine+Tests.swift
+// MARK: - File: AnalgesiaTool/Core/Services/ClinicalValidationEngine.swift
+// ----------------------------------------------------------------
+import Foundation
+import SwiftUI
+
+// MARK: - Clinical Validation Types
+
+/// Represents the outcome of a clinical logic test
+enum ClinicalValidationResult {
+    case pass
+    case fail(String)
+}
+
+/// Structure for defining a clinical scenario and its expected outcome
+struct AssessmentTestCase {
+    let name: String
+    let setup: @MainActor (AssessmentStore) -> Void
+    let verify: @MainActor (AssessmentStore) -> ClinicalValidationResult
+}
+
+/// Structure for defining a calculator logic test
+struct CalculatorTestCase {
+    let name: String
+    let setup: @MainActor (CalculatorStore) -> Void
+    let verify: @MainActor (CalculatorStore) -> ClinicalValidationResult
+}
+
+struct MethadoneTestCase {
+    let name: String
+    let mme: Double
+    let age: Int
+    let method: ConversionMethod
+    // New Safety Parameters (Optional for backward compatibility in tests)
+    var hepaticStatus: HepaticStatus = .normal
+    var renalStatus: RenalStatus = .normal
+    var isPregnant: Bool = false
+    var isBreastfeeding: Bool = false
+    var benzos: Bool = false
+    var isOUD: Bool = false
+    var qtcProlonged: Bool = false
+    var manualReduction: Double? = nil
+    
+    let verify: (MethadoneConversionResult) -> ClinicalValidationResult
+}
+
+struct OUDTestCase {
+    let name: String
+    let setup: @MainActor (OUDConsultStore) -> Void
+    let verify: @MainActor (OUDConsultStore) -> ClinicalValidationResult
+}
+
+struct OUDComplexTestCase {
+    let name: String
+    let entries: [SubstanceEntry]
+    let cows: Int
+    let hasUlcers: Bool
+    let verify: (ClinicalPlan) -> ClinicalValidationResult
+}
+
+struct InfusionTestCase {
+    let name: String
+    let test: () -> ClinicalValidationResult
+}
+
+struct CitationTestCase {
+    let name: String
+    let test: () -> ClinicalValidationResult
+}
+
+struct TransparencyTestCase {
+    let name: String
+    let setup: @MainActor (CalculatorStore) -> Void
+    let verify: @MainActor (CalculatorStore) -> ClinicalValidationResult
+}
+
+// MARK: - Clinical Validation Engine
+// Stress tests the AssessmentStore logic against complex clinical scenarios.
+
+class ClinicalValidationEngine {
+    static let shared = ClinicalValidationEngine()
+    
+    @MainActor
+    func runStressTest() -> String {
+        var log = "CLINICAL VALIDATION SUITE REPORT\n"
+        log += "Timestamp: \(Date())\n"
+        log += "Engine Version: 6.12.7 (Authorized)\n"
+        log += "------------------------------------------------\n\n"
+        
+        // 0. Safety Hardening Checks
+        log += runConversionServiceTests()
+        log += "\n"
+        
+        // 1. ASSESSMENT LOGIC
+        log += "SECTION 1: ASSESSMENT LOGIC (Global State)\n"
+        log += "Objective: Verify complex clinical scenarios against Red Hat safety protocols.\n"
+        log += "------------------------------------------------\n"
+        
+        var passed = 0
+        let store = AssessmentStore()
+        
+        for test in testCases {
+            // Setup
+            test.setup(store)
+            store.calculate()
+            
+            log += "TEST: \(test.name)\n"
+            log += "   -> Inputs: Age=\(store.age), Renal=\(store.renalFunction.rawValue), Hepatic=\(store.hepaticFunction.rawValue)\n"
+            
+            switch test.verify(store) {
+            case .pass:
+                log += "   -> Result: PASS (Logic Verified)\n"
+                passed += 1
+            case .fail(let msg):
+                log += "   -> Result: FAIL\n"
+                log += "   -> Error: \(msg)\n"
+            }
+            log += "\n"
+        }
+        log += "Summary: \(passed)/\(testCases.count) Assessment Tests Passed.\n\n"
+        
+        // 2. CALCULATOR ACCURACY
+        log += "SECTION 2: MME CALCULATOR ACCURACY\n"
+        log += "Objective: Validate Equianalgesic conversions against 2025 Standards.\n"
+        log += "------------------------------------------------\n"
+        
+        var calcPassed = 0
+        let calcStore = CalculatorStore()
+        
+        for test in calculatorTestCases {
+            test.setup(calcStore)
+            calcStore.calculate()
+            
+            log += "TEST: \(test.name)\n"
+            // Capture active inputs for transparency
+            let active = calcStore.inputs.filter { $0.isVisible && !$0.dose.isEmpty }
+            let inputStr = active.map { "\($0.drugId)=\($0.dose)" }.joined(separator: ", ")
+            log += "   -> Inputs: \(inputStr)\n"
+            
+            switch test.verify(calcStore) {
+            case .pass:
+                log += "   -> Result: PASS (MME Verified)\n"
+                calcPassed += 1
+            case .fail(let msg):
+                 log += "   -> Result: FAIL\n"
+                 log += "   -> Error: \(msg) (Got: \(calcStore.resultMME))\n"
+            }
+            log += "\n"
+        }
+        log += "Summary: \(calcPassed)/\(calculatorTestCases.count) MME Tests Passed.\n\n"
+        
+        // 3. TAPER LOGIC
+        log += "SECTION 3: TAPER & ROTATION SAFETY\n"
+        log += "Objective: Validate reduction schedules and rotation limits.\n"
+        log += "------------------------------------------------\n"
+        
+        var taperPassed = 0
+        for test in taperTestCases {
+             test.setup(calcStore)
+             calcStore.calculate()
+             
+             log += "TEST: \(test.name)\n"
+             switch test.verify(calcStore) {
+             case .pass:
+                 log += "   -> Result: PASS\n"
+                 taperPassed += 1
+             case .fail(let msg):
+                 log += "   -> Result: FAIL\n"
+                 log += "   -> Error: \(msg)\n"
+             }
+             log += "\n"
+        }
+        log += "Summary: \(taperPassed)/\(taperTestCases.count) Taper Tests Passed.\n\n"
+        
+        // 4. METHADONE LOGIC
+        log += "SECTION 4: METHADONE SAFETY ENGINE\n"
+        log += "Objective: Validate stateless Methadone calculations and safety gates.\n"
+        log += "------------------------------------------------\n"
+        
+        var methadonePassed = 0
+        for test in methadoneTestCases {
+            log += "TEST: \(test.name)\n"
+            log += "   -> Inputs: MME=\(test.mme), Age=\(test.age), Method=\(test.method)\n"
+            if test.qtcProlonged { log += "   -> Risk: QTc Prolonged\n" }
+            
+            let result = MethadoneCalculator.calculate(
+                totalMME: test.mme, 
+                patientAge: test.age, 
+                method: test.method,
+                hepaticStatus: test.hepaticStatus,
+                renalStatus: test.renalStatus,
+                isPregnant: test.isPregnant,
+                isBreastfeeding: test.isBreastfeeding,
+                benzos: test.benzos,
+                isOUD: test.isOUD,
+                qtcProlonged: test.qtcProlonged,
+                manualReduction: test.manualReduction
+            )
+            switch test.verify(result) {
+            case .pass:
+                 log += "   -> Result: PASS\n"
+                 methadonePassed += 1
+            case .fail(let msg):
+                 log += "   -> Result: FAIL\n"
+                 log += "   -> Error: \(msg)\n"
+            }
+            log += "\n"
+        }
+        log += "Summary: \(methadonePassed)/\(methadoneTestCases.count) Methadone Tests Passed.\n\n"
+        
+        // 4b. METHADONE SAFETY GATES (Restored)
+        log += "SECTION 4b: METHADONE SAFETY GATES\n"
+        log += "Objective: Validate Clinical Safety Gates (QTc, Hepatic, OUD).\n"
+        log += "------------------------------------------------\n"
+        
+        var methadoneSafetyPassed = 0
+        // Accessing the static property
+        let safetyTests = ClinicalValidationEngine.methadoneSafetyTests 
+        
+        for test in safetyTests {
+            log += "TEST: \(test.name)\n"
+            let result = MethadoneCalculator.calculate(
+                totalMME: test.mme,
+                patientAge: test.age,
+                method: test.method,
+                hepaticStatus: test.hepaticStatus,
+                renalStatus: test.renalStatus,
+                isPregnant: test.isPregnant,
+                isBreastfeeding: test.isBreastfeeding,
+                benzos: test.benzos,
+                isOUD: test.isOUD,
+                qtcProlonged: test.qtcProlonged,
+                manualReduction: test.manualReduction
+            )
+            
+            switch test.verify(result) {
+            case .pass:
+                 log += "   -> Result: PASS\n"
+                 methadoneSafetyPassed += 1
+            case .fail(let msg):
+                 log += "   -> Result: FAIL\n"
+                 log += "   -> Error: \(msg)\n"
+            }
+            log += "\n"
+        }
+        log += "Summary: \(methadoneSafetyPassed)/\(safetyTests.count) Methadone Safety Tests Passed.\n\n"
+        
+        // 5. OUD CONSULT (Protocols)
+        log += "SECTION 5: OUD PROTOCOLS (New v6.12.7)\n"
+        log += "Objective: Validate Protocol selection based on COWS and Profile.\n"
+        log += "------------------------------------------------\n"
+        
+        var oudPassed = 0
+        let oudStore = OUDConsultStore()
+        for test in oudTestCases {
+            test.setup(oudStore)
+            oudStore.generateClinicalPlan()
+            
+            log += "TEST: \(test.name)\n"
+            log += "   -> Computed Selection: \(oudStore.recommendedProtocol?.rawValue ?? "None")\n"
+            
+            switch test.verify(oudStore) {
+            case .pass:
+                log += "   -> Result: PASS\n"
+                oudPassed += 1
+            case .fail(let msg):
+                log += "   -> Result: FAIL\n"
+                log += "   -> Error: \(msg)\n"
+            }
+            log += "\n"
+        }
+        log += "Summary: \(oudPassed)/\(oudTestCases.count) OUD Protocols Passed.\n\n"
+        
+        // 6. OUD INTELLIGENCE (Logic)
+        log += "SECTION 6: OUD INTELLIGENCE ENGINE\n"
+        log += "Objective: Validate complex substance-driven decision logic.\n"
+        log += "------------------------------------------------\n"
+        
+        var logicPassed = 0
+        for test in ClinicalValidationEngine.oudLogicTests {
+            let physiology = OUDCalculator.assess(entries: test.entries, hasUlcers: test.hasUlcers, isPregnant: false, isBreastfeeding: false, hasLiverFailure: false, hasAcutePain: false)
+            let plan = ProtocolGenerator.generate(profile: physiology, cows: test.cows, isERSetting: false)
+            
+            log += "TEST: \(test.name)\n"
+            let substanceStr = test.entries.map { "\($0.type)" }.joined(separator: "+")
+            log += "   -> Context: \(substanceStr) (COWS \(test.cows))\n"
+            
+            switch test.verify(plan) {
+            case .pass:
+                 log += "   -> Result: PASS\n"
+                 logicPassed += 1
+            case .fail(let msg):
+                 log += "   -> Result: FAIL\n"
+                 log += "   -> Error: \(msg)\n"
+            }
+            log += "\n"
+        }
+        log += "Summary: \(logicPassed)/\(ClinicalValidationEngine.oudLogicTests.count) Logic Tests Passed.\n\n"
+
+        // 7. TRANSPARENCY AUDIT (Glass Box Math & Evidence)
+        log += "SECTION 7: TRANSPARENCY & GLASS BOX AUDIT\n"
+        log += "Objective: Verify mathematical traceability and citation integrity.\n"
+        log += "------------------------------------------------\n"
+        
+        var transPassed = 0
+        for test in ClinicalValidationEngine.transparencyTestCases {
+            test.setup(calcStore)
+            calcStore.calculate()
+            
+            log += "TEST: \(test.name)\n"
+            switch test.verify(calcStore) {
+            case .pass:
+                log += "   -> Result: PASS (Audit Verified)\n"
+                transPassed += 1
+            case .fail(let msg):
+                log += "   -> Result: FAIL\n"
+                log += "   -> Error: \(msg)\n"
+            }
+            log += "\n"
+        }
+        log += "Summary: \(transPassed)/\(ClinicalValidationEngine.transparencyTestCases.count) Transparency Tests Passed.\n\n"
+
+        // 8. MISC INTEGRITY
+        log += "SECTION 8: INFUSION & CITATION INTEGRITY\n"
+        log += "------------------------------------------------\n"
+        var miscPassed = 0
+        for test in ClinicalValidationEngine.infusionTestCases { if case .pass = test.test() { miscPassed += 1 } }
+        for test in ClinicalValidationEngine.citationTestCases { if case .pass = test.test() { miscPassed += 1 } }
+        log += "Summary: \(miscPassed) Miscellaneous Integrity Tests Passed.\n"
+        
+        log += "\n[END OF REPORT]"
+        return log
+    }
+    
+    // Safety Extension: Stress the hardended ConversionService
+    func runConversionServiceTests() -> String {
+        var log = "CONVERSION SERVICE HARDENING\n"
+        var passed = 0
+        
+        // 1. Valid Lookup
+        do {
+            _ = try ConversionService.shared.getFactor(drugId: "morphine", route: "po")
+            log += "[PASS] Valid Lookup (Morphine PO)\n"
+            passed += 1
+        } catch {
+            log += "[FAIL] Valid Lookup: \(error.localizedDescription)\n"
+        }
+        
+        // 2. Invalid Drug
+        do {
+            _ = try ConversionService.shared.getFactor(drugId: "fake_drug", route: "po")
+            log += "[FAIL] Missing Drug did NOT throw error\n"
+        } catch ConversionError.drugNotFound {
+             log += "[PASS] Missing Drug -> Caught .drugNotFound\n"
+             passed += 1
+        } catch {
+             log += "[WARN] Unexpected Error for Missing Drug: \(error)\n"
+        }
+        
+        return log
+    }
+}
+
+
+// MARK: - New Methadone Logic Tests
+extension ClinicalValidationEngine {
+    static var methadoneSafetyTests: [MethadoneTestCase] {
+        return [
+            // 1. Hepatorenal Syndrome (Double Hit) -> Should Warn strongly
+            MethadoneTestCase(
+                name: "M-Safety-1: Hepatorenal Syndrome",
+                mme: 100,
+                age: 50,
+                method: .rapid,
+                hepaticStatus: .failure,
+                renalStatus: .impaired
+            ) { res in
+                if res.warnings.contains(where: { $0.contains("HEPATORENAL SYNDROME") }) { return .pass }
+                return .fail("Missing Hepatorenal warning")
+            },
+            
+            // 2. Pregnancy -> Warning + Specialist Consult
+            MethadoneTestCase(
+                name: "M-Safety-2: Pregnancy Context",
+                mme: 60,
+                age: 25,
+                method: .rapid,
+                isPregnant: true
+            ) { res in
+                if res.warnings.contains(where: { $0.contains("PREGNANCY") }) { return .pass }
+                return .fail("Missing Pregnancy warning")
+            },
+            
+            // 2b. Lactation -> Infant Monitoring
+            MethadoneTestCase(
+                name: "M-Safety-2b: Lactation Context",
+                mme: 30,
+                age: 30,
+                method: .rapid,
+                isBreastfeeding: true
+            ) { res in
+                if res.warnings.contains(where: { $0.contains("LACTATION") }) { return .pass }
+                return .fail("Missing Breastfeeding warning")
+            },
+            
+            // 3. Benzos -> Black Box Warning
+            MethadoneTestCase(
+                name: "M-Safety-3: Benzo Co-prescription",
+                mme: 50,
+                age: 40,
+                method: .rapid,
+                benzos: true
+            ) { res in
+                if res.warnings.contains(where: { $0.contains("BLACK BOX WARNING") }) { return .pass }
+                return .fail("Missing Black Box warning for Benzos")
+            },
+            
+            // 4. OUD Context -> Disclaimer
+            MethadoneTestCase(
+                name: "M-Safety-4: OUD Context",
+                mme: 80,
+                age: 35,
+                method: .rapid,
+                isOUD: true
+            ) { res in
+                if res.warnings.contains(where: { $0.contains("OUD CONTEXT") }) { return .pass }
+                return .fail("Missing OUD context warning")
+            },
+            
+            // 5. Hepatic Failure Only -> 50% Dose Reduction
+            MethadoneTestCase(
+                name: "M-Safety-5: Hepatic Failure Dose Reduction",
+                mme: 100, // Ratio ~15 (assuming <65y) -> 6.6mg
+                age: 50,
+                method: .rapid,
+                hepaticStatus: .failure
+            ) { res in
+                // Check if warning present and dose is roughly half of expected
+                if res.warnings.contains(where: { $0.contains("HEPATIC FAILURE") }) { return .pass }
+                return .fail("Missing Hepatic Failure reduction/warning")
+            },
+            
+            // 6. QTc Prolongation Gate
+            MethadoneTestCase(
+                name: "M-Safety-6: QTc Prolongation (>500ms)",
+                mme: 100,
+                age: 50,
+                method: .rapid,
+                qtcProlonged: true
+            ) { res in
+                // Expectation: Result should be contraindicated (0 dose) and have warning
+                if res.isContraindicatedForCalculator && res.warnings.contains(where: { $0.contains("QTc PROLONGATION") }) { return .pass }
+                return .fail("QTc Prolongation did not trigger Hard Stop/Contraindication")
+            },
+            
+            // 7. Manual Cross-Tolerance Reduction (v1.9)
+            MethadoneTestCase(
+                name: "M-Safety-7: Manual 50% Reduction",
+                mme: 100, // Standard 10:1 -> 10mg. 50% reduction -> 5mg.
+                age: 50,
+                method: .rapid,
+                manualReduction: 50.0
+            ) { res in
+                if abs(res.totalDailyDose - 7.5) < 1.0 { return .pass }
+                return .fail("Manual reduction failed. Expected 7.5mg (Floor Logic), Got \(res.totalDailyDose)")
+            }
+        ]
+    }
+}
+
+
+
+// MARK: - File: AnalgesiaTool/Core/Services/ClinicalValidationEngine+Tests.swift
+// ----------------------------------------------------------------
 import Foundation
 import SwiftUI
 
@@ -4408,477 +5098,8 @@ extension ClinicalValidationEngine {
 }
 
 
-// File: AnalgesiaTool/Core/Services/ClinicalValidationEngine.swift
-import Foundation
-import SwiftUI
-
-// MARK: - Clinical Validation Types
-
-/// Represents the outcome of a clinical logic test
-enum ClinicalValidationResult {
-    case pass
-    case fail(String)
-}
-
-/// Structure for defining a clinical scenario and its expected outcome
-struct AssessmentTestCase {
-    let name: String
-    let setup: @MainActor (AssessmentStore) -> Void
-    let verify: @MainActor (AssessmentStore) -> ClinicalValidationResult
-}
-
-/// Structure for defining a calculator logic test
-struct CalculatorTestCase {
-    let name: String
-    let setup: @MainActor (CalculatorStore) -> Void
-    let verify: @MainActor (CalculatorStore) -> ClinicalValidationResult
-}
-
-struct MethadoneTestCase {
-    let name: String
-    let mme: Double
-    let age: Int
-    let method: ConversionMethod
-    // New Safety Parameters (Optional for backward compatibility in tests)
-    var hepaticStatus: HepaticStatus = .normal
-    var renalStatus: RenalStatus = .normal
-    var isPregnant: Bool = false
-    var isBreastfeeding: Bool = false
-    var benzos: Bool = false
-    var isOUD: Bool = false
-    var qtcProlonged: Bool = false
-    var manualReduction: Double? = nil
-    
-    let verify: (MethadoneConversionResult) -> ClinicalValidationResult
-}
-
-struct OUDTestCase {
-    let name: String
-    let setup: @MainActor (OUDConsultStore) -> Void
-    let verify: @MainActor (OUDConsultStore) -> ClinicalValidationResult
-}
-
-struct OUDComplexTestCase {
-    let name: String
-    let entries: [SubstanceEntry]
-    let cows: Int
-    let hasUlcers: Bool
-    let verify: (ClinicalPlan) -> ClinicalValidationResult
-}
-
-struct InfusionTestCase {
-    let name: String
-    let test: () -> ClinicalValidationResult
-}
-
-struct CitationTestCase {
-    let name: String
-    let test: () -> ClinicalValidationResult
-}
-
-struct TransparencyTestCase {
-    let name: String
-    let setup: @MainActor (CalculatorStore) -> Void
-    let verify: @MainActor (CalculatorStore) -> ClinicalValidationResult
-}
-
-// MARK: - Clinical Validation Engine
-// Stress tests the AssessmentStore logic against complex clinical scenarios.
-
-class ClinicalValidationEngine {
-    static let shared = ClinicalValidationEngine()
-    
-    @MainActor
-    func runStressTest() -> String {
-        var log = "CLINICAL VALIDATION SUITE REPORT\n"
-        log += "Timestamp: \(Date())\n"
-        log += "Engine Version: 6.12.7 (Authorized)\n"
-        log += "------------------------------------------------\n\n"
-        
-        // 0. Safety Hardening Checks
-        log += runConversionServiceTests()
-        log += "\n"
-        
-        // 1. ASSESSMENT LOGIC
-        log += "SECTION 1: ASSESSMENT LOGIC (Global State)\n"
-        log += "Objective: Verify complex clinical scenarios against Red Hat safety protocols.\n"
-        log += "------------------------------------------------\n"
-        
-        var passed = 0
-        let store = AssessmentStore()
-        
-        for test in testCases {
-            // Setup
-            test.setup(store)
-            store.calculate()
-            
-            log += "TEST: \(test.name)\n"
-            log += "   -> Inputs: Age=\(store.age), Renal=\(store.renalFunction.rawValue), Hepatic=\(store.hepaticFunction.rawValue)\n"
-            
-            switch test.verify(store) {
-            case .pass:
-                log += "   -> Result: PASS (Logic Verified)\n"
-                passed += 1
-            case .fail(let msg):
-                log += "   -> Result: FAIL\n"
-                log += "   -> Error: \(msg)\n"
-            }
-            log += "\n"
-        }
-        log += "Summary: \(passed)/\(testCases.count) Assessment Tests Passed.\n\n"
-        
-        // 2. CALCULATOR ACCURACY
-        log += "SECTION 2: MME CALCULATOR ACCURACY\n"
-        log += "Objective: Validate Equianalgesic conversions against 2025 Standards.\n"
-        log += "------------------------------------------------\n"
-        
-        var calcPassed = 0
-        let calcStore = CalculatorStore()
-        
-        for test in calculatorTestCases {
-            test.setup(calcStore)
-            calcStore.calculate()
-            
-            log += "TEST: \(test.name)\n"
-            // Capture active inputs for transparency
-            let active = calcStore.inputs.filter { $0.isVisible && !$0.dose.isEmpty }
-            let inputStr = active.map { "\($0.drugId)=\($0.dose)" }.joined(separator: ", ")
-            log += "   -> Inputs: \(inputStr)\n"
-            
-            switch test.verify(calcStore) {
-            case .pass:
-                log += "   -> Result: PASS (MME Verified)\n"
-                calcPassed += 1
-            case .fail(let msg):
-                 log += "   -> Result: FAIL\n"
-                 log += "   -> Error: \(msg) (Got: \(calcStore.resultMME))\n"
-            }
-            log += "\n"
-        }
-        log += "Summary: \(calcPassed)/\(calculatorTestCases.count) MME Tests Passed.\n\n"
-        
-        // 3. TAPER LOGIC
-        log += "SECTION 3: TAPER & ROTATION SAFETY\n"
-        log += "Objective: Validate reduction schedules and rotation limits.\n"
-        log += "------------------------------------------------\n"
-        
-        var taperPassed = 0
-        for test in taperTestCases {
-             test.setup(calcStore)
-             calcStore.calculate()
-             
-             log += "TEST: \(test.name)\n"
-             switch test.verify(calcStore) {
-             case .pass:
-                 log += "   -> Result: PASS\n"
-                 taperPassed += 1
-             case .fail(let msg):
-                 log += "   -> Result: FAIL\n"
-                 log += "   -> Error: \(msg)\n"
-             }
-             log += "\n"
-        }
-        log += "Summary: \(taperPassed)/\(taperTestCases.count) Taper Tests Passed.\n\n"
-        
-        // 4. METHADONE LOGIC
-        log += "SECTION 4: METHADONE SAFETY ENGINE\n"
-        log += "Objective: Validate stateless Methadone calculations and safety gates.\n"
-        log += "------------------------------------------------\n"
-        
-        var methadonePassed = 0
-        for test in methadoneTestCases {
-            log += "TEST: \(test.name)\n"
-            log += "   -> Inputs: MME=\(test.mme), Age=\(test.age), Method=\(test.method)\n"
-            if test.qtcProlonged { log += "   -> Risk: QTc Prolonged\n" }
-            
-            let result = MethadoneCalculator.calculate(
-                totalMME: test.mme, 
-                patientAge: test.age, 
-                method: test.method,
-                hepaticStatus: test.hepaticStatus,
-                renalStatus: test.renalStatus,
-                isPregnant: test.isPregnant,
-                isBreastfeeding: test.isBreastfeeding,
-                benzos: test.benzos,
-                isOUD: test.isOUD,
-                qtcProlonged: test.qtcProlonged,
-                manualReduction: test.manualReduction
-            )
-            switch test.verify(result) {
-            case .pass:
-                 log += "   -> Result: PASS\n"
-                 methadonePassed += 1
-            case .fail(let msg):
-                 log += "   -> Result: FAIL\n"
-                 log += "   -> Error: \(msg)\n"
-            }
-            log += "\n"
-        }
-        log += "Summary: \(methadonePassed)/\(methadoneTestCases.count) Methadone Tests Passed.\n\n"
-        
-        // 4b. METHADONE SAFETY GATES (Restored)
-        log += "SECTION 4b: METHADONE SAFETY GATES\n"
-        log += "Objective: Validate Clinical Safety Gates (QTc, Hepatic, OUD).\n"
-        log += "------------------------------------------------\n"
-        
-        var methadoneSafetyPassed = 0
-        // Accessing the static property
-        let safetyTests = ClinicalValidationEngine.methadoneSafetyTests 
-        
-        for test in safetyTests {
-            log += "TEST: \(test.name)\n"
-            let result = MethadoneCalculator.calculate(
-                totalMME: test.mme,
-                patientAge: test.age,
-                method: test.method,
-                hepaticStatus: test.hepaticStatus,
-                renalStatus: test.renalStatus,
-                isPregnant: test.isPregnant,
-                isBreastfeeding: test.isBreastfeeding,
-                benzos: test.benzos,
-                isOUD: test.isOUD,
-                qtcProlonged: test.qtcProlonged,
-                manualReduction: test.manualReduction
-            )
-            
-            switch test.verify(result) {
-            case .pass:
-                 log += "   -> Result: PASS\n"
-                 methadoneSafetyPassed += 1
-            case .fail(let msg):
-                 log += "   -> Result: FAIL\n"
-                 log += "   -> Error: \(msg)\n"
-            }
-            log += "\n"
-        }
-        log += "Summary: \(methadoneSafetyPassed)/\(safetyTests.count) Methadone Safety Tests Passed.\n\n"
-        
-        // 5. OUD CONSULT (Protocols)
-        log += "SECTION 5: OUD PROTOCOLS (New v6.12.7)\n"
-        log += "Objective: Validate Protocol selection based on COWS and Profile.\n"
-        log += "------------------------------------------------\n"
-        
-        var oudPassed = 0
-        let oudStore = OUDConsultStore()
-        for test in oudTestCases {
-            test.setup(oudStore)
-            oudStore.generateClinicalPlan()
-            
-            log += "TEST: \(test.name)\n"
-            log += "   -> Computed Selection: \(oudStore.recommendedProtocol?.rawValue ?? "None")\n"
-            
-            switch test.verify(oudStore) {
-            case .pass:
-                log += "   -> Result: PASS\n"
-                oudPassed += 1
-            case .fail(let msg):
-                log += "   -> Result: FAIL\n"
-                log += "   -> Error: \(msg)\n"
-            }
-            log += "\n"
-        }
-        log += "Summary: \(oudPassed)/\(oudTestCases.count) OUD Protocols Passed.\n\n"
-        
-        // 6. OUD INTELLIGENCE (Logic)
-        log += "SECTION 6: OUD INTELLIGENCE ENGINE\n"
-        log += "Objective: Validate complex substance-driven decision logic.\n"
-        log += "------------------------------------------------\n"
-        
-        var logicPassed = 0
-        for test in ClinicalValidationEngine.oudLogicTests {
-            let physiology = OUDCalculator.assess(entries: test.entries, hasUlcers: test.hasUlcers, isPregnant: false, isBreastfeeding: false, hasLiverFailure: false, hasAcutePain: false)
-            let plan = ProtocolGenerator.generate(profile: physiology, cows: test.cows, isERSetting: false)
-            
-            log += "TEST: \(test.name)\n"
-            let substanceStr = test.entries.map { "\($0.type)" }.joined(separator: "+")
-            log += "   -> Context: \(substanceStr) (COWS \(test.cows))\n"
-            
-            switch test.verify(plan) {
-            case .pass:
-                 log += "   -> Result: PASS\n"
-                 logicPassed += 1
-            case .fail(let msg):
-                 log += "   -> Result: FAIL\n"
-                 log += "   -> Error: \(msg)\n"
-            }
-            log += "\n"
-        }
-        log += "Summary: \(logicPassed)/\(ClinicalValidationEngine.oudLogicTests.count) Logic Tests Passed.\n\n"
-
-        // 7. TRANSPARENCY AUDIT (Glass Box Math & Evidence)
-        log += "SECTION 7: TRANSPARENCY & GLASS BOX AUDIT\n"
-        log += "Objective: Verify mathematical traceability and citation integrity.\n"
-        log += "------------------------------------------------\n"
-        
-        var transPassed = 0
-        for test in ClinicalValidationEngine.transparencyTestCases {
-            test.setup(calcStore)
-            calcStore.calculate()
-            
-            log += "TEST: \(test.name)\n"
-            switch test.verify(calcStore) {
-            case .pass:
-                log += "   -> Result: PASS (Audit Verified)\n"
-                transPassed += 1
-            case .fail(let msg):
-                log += "   -> Result: FAIL\n"
-                log += "   -> Error: \(msg)\n"
-            }
-            log += "\n"
-        }
-        log += "Summary: \(transPassed)/\(ClinicalValidationEngine.transparencyTestCases.count) Transparency Tests Passed.\n\n"
-
-        // 8. MISC INTEGRITY
-        log += "SECTION 8: INFUSION & CITATION INTEGRITY\n"
-        log += "------------------------------------------------\n"
-        var miscPassed = 0
-        for test in ClinicalValidationEngine.infusionTestCases { if case .pass = test.test() { miscPassed += 1 } }
-        for test in ClinicalValidationEngine.citationTestCases { if case .pass = test.test() { miscPassed += 1 } }
-        log += "Summary: \(miscPassed) Miscellaneous Integrity Tests Passed.\n"
-        
-        log += "\n[END OF REPORT]"
-        return log
-    }
-    
-    // Safety Extension: Stress the hardended ConversionService
-    func runConversionServiceTests() -> String {
-        var log = "CONVERSION SERVICE HARDENING\n"
-        var passed = 0
-        
-        // 1. Valid Lookup
-        do {
-            _ = try ConversionService.shared.getFactor(drugId: "morphine", route: "po")
-            log += "[PASS] Valid Lookup (Morphine PO)\n"
-            passed += 1
-        } catch {
-            log += "[FAIL] Valid Lookup: \(error.localizedDescription)\n"
-        }
-        
-        // 2. Invalid Drug
-        do {
-            _ = try ConversionService.shared.getFactor(drugId: "fake_drug", route: "po")
-            log += "[FAIL] Missing Drug did NOT throw error\n"
-        } catch ConversionError.drugNotFound {
-             log += "[PASS] Missing Drug -> Caught .drugNotFound\n"
-             passed += 1
-        } catch {
-             log += "[WARN] Unexpected Error for Missing Drug: \(error)\n"
-        }
-        
-        return log
-    }
-}
-
-
-// MARK: - New Methadone Logic Tests
-extension ClinicalValidationEngine {
-    static var methadoneSafetyTests: [MethadoneTestCase] {
-        return [
-            // 1. Hepatorenal Syndrome (Double Hit) -> Should Warn strongly
-            MethadoneTestCase(
-                name: "M-Safety-1: Hepatorenal Syndrome",
-                mme: 100,
-                age: 50,
-                method: .rapid,
-                hepaticStatus: .failure,
-                renalStatus: .impaired
-            ) { res in
-                if res.warnings.contains(where: { $0.contains("HEPATORENAL SYNDROME") }) { return .pass }
-                return .fail("Missing Hepatorenal warning")
-            },
-            
-            // 2. Pregnancy -> Warning + Specialist Consult
-            MethadoneTestCase(
-                name: "M-Safety-2: Pregnancy Context",
-                mme: 60,
-                age: 25,
-                method: .rapid,
-                isPregnant: true
-            ) { res in
-                if res.warnings.contains(where: { $0.contains("PREGNANCY") }) { return .pass }
-                return .fail("Missing Pregnancy warning")
-            },
-            
-            // 2b. Lactation -> Infant Monitoring
-            MethadoneTestCase(
-                name: "M-Safety-2b: Lactation Context",
-                mme: 30,
-                age: 30,
-                method: .rapid,
-                isBreastfeeding: true
-            ) { res in
-                if res.warnings.contains(where: { $0.contains("LACTATION") }) { return .pass }
-                return .fail("Missing Breastfeeding warning")
-            },
-            
-            // 3. Benzos -> Black Box Warning
-            MethadoneTestCase(
-                name: "M-Safety-3: Benzo Co-prescription",
-                mme: 50,
-                age: 40,
-                method: .rapid,
-                benzos: true
-            ) { res in
-                if res.warnings.contains(where: { $0.contains("BLACK BOX WARNING") }) { return .pass }
-                return .fail("Missing Black Box warning for Benzos")
-            },
-            
-            // 4. OUD Context -> Disclaimer
-            MethadoneTestCase(
-                name: "M-Safety-4: OUD Context",
-                mme: 80,
-                age: 35,
-                method: .rapid,
-                isOUD: true
-            ) { res in
-                if res.warnings.contains(where: { $0.contains("OUD CONTEXT") }) { return .pass }
-                return .fail("Missing OUD context warning")
-            },
-            
-            // 5. Hepatic Failure Only -> 50% Dose Reduction
-            MethadoneTestCase(
-                name: "M-Safety-5: Hepatic Failure Dose Reduction",
-                mme: 100, // Ratio ~15 (assuming <65y) -> 6.6mg
-                age: 50,
-                method: .rapid,
-                hepaticStatus: .failure
-            ) { res in
-                // Check if warning present and dose is roughly half of expected
-                if res.warnings.contains(where: { $0.contains("HEPATIC FAILURE") }) { return .pass }
-                return .fail("Missing Hepatic Failure reduction/warning")
-            },
-            
-            // 6. QTc Prolongation Gate
-            MethadoneTestCase(
-                name: "M-Safety-6: QTc Prolongation (>500ms)",
-                mme: 100,
-                age: 50,
-                method: .rapid,
-                qtcProlonged: true
-            ) { res in
-                // Expectation: Result should be contraindicated (0 dose) and have warning
-                if res.isContraindicatedForCalculator && res.warnings.contains(where: { $0.contains("QTc PROLONGATION") }) { return .pass }
-                return .fail("QTc Prolongation did not trigger Hard Stop/Contraindication")
-            },
-            
-            // 7. Manual Cross-Tolerance Reduction (v1.9)
-            MethadoneTestCase(
-                name: "M-Safety-7: Manual 50% Reduction",
-                mme: 100, // Standard 10:1 -> 10mg. 50% reduction -> 5mg.
-                age: 50,
-                method: .rapid,
-                manualReduction: 50.0
-            ) { res in
-                if abs(res.totalDailyDose - 7.5) < 1.0 { return .pass }
-                return .fail("Manual reduction failed. Expected 7.5mg (Floor Logic), Got \(res.totalDailyDose)")
-            }
-        ]
-    }
-}
-
-
-
-// File: AnalgesiaTool/Core/Services/ConversionService.swift
+// MARK: - File: AnalgesiaTool/Core/Services/ConversionService.swift
+// ----------------------------------------------------------------
 import Foundation
 
 // MARK: - 1. The Data Models
@@ -5099,7 +5320,8 @@ class ConversionService {
 }
 
 
-// File: AnalgesiaTool/Core/Services/MethadoneCalculator.swift
+// MARK: - File: AnalgesiaTool/Core/Services/MethadoneCalculator.swift
+// ----------------------------------------------------------------
 import Foundation
 
 // MARK: - Methadone Data Models
@@ -5352,7 +5574,8 @@ class MethadoneCalculator {
 }
 
 
-// File: AnalgesiaTool/Core/Services/NoteGenerator.swift
+// MARK: - File: AnalgesiaTool/Core/Services/NoteGenerator.swift
+// ----------------------------------------------------------------
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -5453,7 +5676,8 @@ class NoteGenerator {
 }
 
 
-// File: AnalgesiaTool/Core/Services/SafetyAdvisoryService.swift
+// MARK: - File: AnalgesiaTool/Core/Services/SafetyAdvisoryService.swift
+// ----------------------------------------------------------------
 import Foundation
 import SwiftUI
 
@@ -5469,6 +5693,33 @@ struct SafetyAdvice {
     var adjuvants: [AdjuvantRecommendation] = []
     var warnings: [String] = []
     var monitoring: [String] = []
+}
+
+struct AssessmentSnapshot: CalculatorInputs {
+    // Inputs required for CalculatorInputs
+    let renalFunction: RenalStatus
+    let hepaticFunction: HepaticStatus
+    let painType: PainType
+    let isPregnant: Bool
+    let isBreastfeeding: Bool
+    let age: String
+    let benzos: Bool
+    let sleepApnea: Bool
+    let historyOverdose: Bool
+    let analgesicProfile: AnalgesicProfile
+    let sex: Sex
+    let chf: Bool
+    let copd: Bool
+    let psychHistory: Bool
+    let currentMME: String
+    
+    // Additional Context needed for Validation
+    let qtcProlonged: Bool // Required for Methadone Gate
+    let historyGIBleed: Bool
+    let hasAscites: Bool
+    let encephalopathyGrade: EncephalopathyGrade
+    let adjuvantList: [AdjuvantRecommendation] // Snapshot of current adjuvants
+    let recList: [DrugRecommendation] // Snapshot of current recommendations
 }
 
 class SafetyAdvisoryService {
@@ -5654,10 +5905,185 @@ class SafetyAdvisoryService {
 
         return advice
     }
-}
+    
+    // MARK: - Validation API (Stateless)
+    
+    func validateHepaticRenalCombination(snapshot: AssessmentSnapshot) -> [String] {
+        var warnings: [String] = []
+        
+        // Hepatorenal Syndrome Risk
+        if snapshot.hepaticFunction == .failure && snapshot.renalFunction.isImpaired {
+            warnings.append("CRITICAL: Hepatorenal Syndrome Risk. Combined hepatic failure + renal impairment increases mortality >50%. Avoid Morphine/Codeine/Hydrocodone. Prefer Fentanyl (Redistribution/Inactive Metabolites) or Remifentanil (Plasma Esterase - if ICU).")
+            
+            // MELD Score Estimation (if age available)
+            if Int(snapshot.age) != nil {
+                 // Simplified MELD estimation based on dual organ failure
+                 warnings.append("VALIDATION: Estimated MELD ≥15 (hepatic failure + renal impairment). Consider hepatology consult for medication review.")
+            }
+        }
+        return warnings
+    }
+
+    func validateHepaticCoagulopathy(snapshot: AssessmentSnapshot) -> [String] {
+        var warnings: [String] = []
+        
+        if snapshot.hepaticFunction == .failure {
+             // NSAID warning (even topical)
+             if snapshot.adjuvantList.contains(where: { $0.drug.contains("NSAID") || $0.drug.contains("Diclofenac") || $0.drug.contains("Ibuprofen") }) {
+                 warnings.append("BLEEDING RISK: NSAIDs (including topical) increase bleeding risk in hepatic failure with coagulopathy. Use acetaminophen (max 2g/day) instead.")
+             }
+             
+             // Antiplatelet/anticoagulant interaction
+             if snapshot.benzos {
+                 warnings.append("HEPATIC ENCEPHALOPATHY RISK: Benzodiazepines + opioids in hepatic failure dramatically increase encephalopathy risk. Avoid if possible.")
+             }
+        }
+        return warnings
+    }
+    
+    func validateAscitesImpact(snapshot: AssessmentSnapshot) -> [String] {
+        var warnings: [String] = []
+        
+        if snapshot.hepaticFunction == .failure && snapshot.hasAscites {
+            warnings.append("ASCITES: Volume of distribution altered for hydrophilic drugs. Morphine/hydromorphone loading doses may need reduction, but maintenance doses may be unchanged.")
+            
+            // Gabapentin adjustment
+            if snapshot.adjuvantList.contains(where: { $0.drug.contains("Gabapentin") }) {
+                warnings.append("Gabapentin: Ascites increases Vd. Monitor for delayed onset and prolonged effect.")
+            }
+        }
+        return warnings
+    }
+    
+    func validateEncephalopathyRisk(snapshot: AssessmentSnapshot) -> [String] {
+        var warnings: [String] = []
+        
+        if snapshot.hepaticFunction == .failure {
+            if snapshot.encephalopathyGrade.isCerebralFailure {
+                warnings.append("CEREBRAL ORGAN FAILURE: HE Grade 3-4. Opioids are relatively contraindicated. Consider regional anesthesia or non-opioid alternatives.")
+            }
+        }
+        return warnings
+    }
+    
+    func validateStateConsistency(snapshot: AssessmentSnapshot) -> [String] {
+        var warnings: [String] = []
+        
+        // 1. Pregnancy/Breastfeeding + Male
+        if snapshot.sex == .male {
+            if snapshot.isPregnant { warnings.append("DATA ERROR: Pregnancy selected for male patient.") }
+            if snapshot.isBreastfeeding { warnings.append("DATA ERROR: Breastfeeding selected for male patient.") }
+        }
+        
+        // 2. Naive + High MME
+        if snapshot.analgesicProfile == .naive {
+            let mmeVal = Double(snapshot.currentMME.filter("0123456789.".contains)) ?? 0
+            if mmeVal > 50 {
+                warnings.append("INCONSISTENCY: Patient marked 'Opioid Naive' but current MME is \(Int(mmeVal)). Naive patients should have MME = 0. Consider changing profile to 'Chronic Rx'.")
+            }
+        }
+        
+        return warnings
+    }
+    
+    // Returns (errors, IDs needed to be removed)
+    func validateSafetyGates(snapshot: AssessmentSnapshot) -> ([String], Set<UUID>) {
+        var errors: [String] = []
+        var removalIDs = Set<UUID>()
+        
+        let recs = snapshot.recList
+        let adjuvants = snapshot.adjuvantList
+        
+        // 1. Renal Safety Gate Validation
+        if snapshot.renalFunction.isImpaired {
+            let contraindicated: Set<OpioidMolecule> = [.morphine, .codeine, .meperidine]
+            for rec in recs {
+                if contraindicated.contains(rec.molecule) {
+                    errors.append("SAFETY GATE FAILURE: \(rec.molecule.displayName) recommended despite renal impairment (eGFR < 60). Removing Recommendation.")
+                    removalIDs.insert(rec.id)
+                }
+            }
+        }
+        
+        // 2. Hepatic Safety Gate Validation
+        if snapshot.hepaticFunction == .failure {
+             let contraindicated: Set<OpioidMolecule> = [.morphine, .codeine, .tramadol, .oxycodone, .methadone]
+             
+             for rec in recs {
+                 if contraindicated.contains(rec.molecule) {
+                      if snapshot.renalFunction.isImpaired || snapshot.encephalopathyGrade.isCerebralFailure {
+                          errors.append("SAFETY GATE FAILURE: \(rec.molecule.displayName) prohibited in Decompensated Hepatic Failure (Hepatorenal/HE). Removing Recommendation.")
+                          removalIDs.insert(rec.id)
+                      }
+                 }
+             }
+            
+            // 2b. Explicit Methadone "Double Hit" Gate
+            if snapshot.renalFunction.isImpaired {
+                for rec in recs {
+                    if rec.molecule == .methadone {
+                         errors.append("SAFETY GATE FAILURE: Methadone prohibited in multi-organ dysfunction (Hepatic Failure + Renal Impairment). Consult Specialist.")
+                         removalIDs.insert(rec.id)
+                    }
+                }
+            }
+        }
+        
+        // 3. Pregnancy Safety Gate
+        if snapshot.isPregnant {
+             let contraindicated: Set<OpioidMolecule> = [.codeine, .tramadol]
+             for rec in recs {
+                 if contraindicated.contains(rec.molecule) {
+                      errors.append("PREGNANCY GATE: \(rec.molecule.displayName) contraindicated. Removing.")
+                      removalIDs.insert(rec.id)
+                 }
+             }
+        }
+        
+        // 4. Pediatric Safety Gate
+        if (Int(snapshot.age.filter("0123456789".contains)) ?? 20) < 18 { // Helper logic inside snapshot or verify logic
+             let contraindicated: Set<OpioidMolecule> = [.codeine, .tramadol]
+             for rec in recs {
+                 if contraindicated.contains(rec.molecule) {
+                     errors.append("PEDIATRIC GATE: \(rec.molecule.displayName) contraindicated (FDA Black Box). Removing.")
+                     removalIDs.insert(rec.id)
+                 }
+             }
+        }
+        
+        // 5. Methadone Safety Gates
+        for rec in recs where rec.molecule == .methadone {
+            // A. QTc Gate (>450ms)
+            if snapshot.qtcProlonged {
+                errors.append("CRITICAL: Methadone Risk (QTc Prolonged). High risk of Torsades. Contraindicated for new starts; use extreme caution if rotating OFF.")
+                removalIDs.insert(rec.id)
+            }
+            // B. OUD/Overdose Gate (Logic from AssessmentStore)
+            // if historyOverdose && !analgesicProfile.isChronic ...
+            // Wait, we need to make sure we replicate the exact logic.
+            // AssessmentStore Line 457: if historyOverdose && !analgesicProfile.isChronic
+            if snapshot.historyOverdose && !snapshot.analgesicProfile.isChronic {
+                 errors.append("CRITICAL: Methadone in Naive/High-Risk Patient. Extreme risk of accumulation & respiratory depression. Specialist use only.")
+            }
+        }
+        
+        // 6. Breastfeeding
+        if snapshot.isBreastfeeding {
+             let contraindicated: Set<OpioidMolecule> = [.codeine, .tramadol]
+             for rec in recs {
+                 if contraindicated.contains(rec.molecule) {
+                      errors.append("BREASTFEEDING GATE: \(rec.molecule.displayName) contraindicated (FDA Black Box). Removing.")
+                      removalIDs.insert(rec.id)
+                 }
+             }
+        }
+        
+        return (errors, removalIDs)
+    }
 
 
-// File: AnalgesiaTool/Core/Services/SafetyLogger.swift
+// MARK: - File: AnalgesiaTool/Core/Services/SafetyLogger.swift
+// ----------------------------------------------------------------
 import Foundation
 
 enum SafetyEvent {
@@ -5697,7 +6123,8 @@ class SafetyLogger {
 }
 
 
-// File: AnalgesiaTool/Core/Utils/SmartRounding.swift
+// MARK: - File: AnalgesiaTool/Core/Utils/SmartRounding.swift
+// ----------------------------------------------------------------
 
 import Foundation
 

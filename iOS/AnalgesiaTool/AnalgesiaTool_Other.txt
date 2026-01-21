@@ -1,4 +1,6 @@
-// File: AnalgesiaTool/UI/Common/CitationFooter.swift
+
+// MARK: - File: AnalgesiaTool/UI/Common/CitationFooter.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct CitationFooter: View {
@@ -153,7 +155,8 @@ struct CitationRow: View {
 }
 
 
-// File: AnalgesiaTool/UI/Common/FlowLayout.swift
+// MARK: - File: AnalgesiaTool/UI/Common/FlowLayout.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 /// A container that arranges its subviews in a horizontal flow, wrapping to the next line when necessary.
@@ -233,7 +236,8 @@ struct FlowLayout: Layout {
 }
 
 
-// File: AnalgesiaTool/UI/Common/ScoreResultCard.swift
+// MARK: - File: AnalgesiaTool/UI/Common/ScoreResultCard.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct ScoreResultCard: View {
@@ -312,7 +316,8 @@ struct ScoreResultCard: View {
 }
 
 
-// File: AnalgesiaTool/UI/Common/SegmentedButton.swift
+// MARK: - File: AnalgesiaTool/UI/Common/SegmentedButton.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct SegmentedButton<T: Hashable>: View {
@@ -361,7 +366,8 @@ struct SegmentedButton<T: Hashable>: View {
 }
 
 
-// File: AnalgesiaTool/UI/Components/ClinicalComponents.swift
+// MARK: - File: AnalgesiaTool/UI/Components/ClinicalComponents.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct ClinicalCard<Content: View>: View {
@@ -408,7 +414,8 @@ struct ClinicalCard<Content: View>: View {
 }
 
 
-// File: AnalgesiaTool/UI/Components/InformedConsentView.swift
+// MARK: - File: AnalgesiaTool/UI/Components/InformedConsentView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct InformedConsentView: View {
@@ -504,7 +511,8 @@ struct InformedConsentView_Previews: PreviewProvider {
 }
 
 
-// File: AnalgesiaTool/UI/DesignSystem/Theme.swift
+// MARK: - File: AnalgesiaTool/UI/DesignSystem/Theme.swift
+// ----------------------------------------------------------------
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -582,7 +590,8 @@ extension View {
 }
 
 
-// File: AnalgesiaTool/UI/Navigation/MainTabView.swift
+// MARK: - File: AnalgesiaTool/UI/Navigation/MainTabView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct MainTabView: View {
@@ -719,7 +728,8 @@ struct MainTabView: View {
 }
 
 
-// File: AnalgesiaTool/TestRunner.swift
+// MARK: - File: AnalgesiaTool/TestRunner.swift
+// ----------------------------------------------------------------
 #if CLI
 import Foundation
 import SwiftUI

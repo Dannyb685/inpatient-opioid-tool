@@ -335,23 +335,21 @@ class ClinicalValidationEngine {
         var passed = 0
         
         // 1. Valid Lookup
-        do {
-            _ = try ConversionService.shared.getFactor(drugId: "morphine", route: "po")
+        // 1. Valid Lookup
+        if let _ = ConversionService.shared.getFactor(drugId: "morphine", route: "po") {
             log += "[PASS] Valid Lookup (Morphine PO)\n"
             passed += 1
-        } catch {
-            log += "[FAIL] Valid Lookup: \(error.localizedDescription)\n"
+        } else {
+            log += "[FAIL] Valid Lookup: Returned nil\n"
         }
         
         // 2. Invalid Drug
-        do {
-            _ = try ConversionService.shared.getFactor(drugId: "fake_drug", route: "po")
-            log += "[FAIL] Missing Drug did NOT throw error\n"
-        } catch ConversionError.drugNotFound {
-             log += "[PASS] Missing Drug -> Caught .drugNotFound\n"
+        // 2. Invalid Drug
+        if ConversionService.shared.getFactor(drugId: "fake_drug", route: "po") == nil {
+             log += "[PASS] Missing Drug -> Returned nil\n"
              passed += 1
-        } catch {
-             log += "[WARN] Unexpected Error for Missing Drug: \(error)\n"
+        } else {
+             log += "[FAIL] Missing Drug returned value (Should be nil)\n"
         }
         
         return log

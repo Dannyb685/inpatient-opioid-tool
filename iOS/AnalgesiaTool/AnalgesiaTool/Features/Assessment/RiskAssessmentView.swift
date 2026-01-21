@@ -79,7 +79,7 @@ struct RiskAssessmentView: View {
             }
             .sheet(item: $activeMonographDrug) { drug in
                 NavigationView {
-                    DrugMonographView(drug: drug, patientContext: store)
+                    DrugMonographView(drug: drug)
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarTrailing) {
@@ -340,6 +340,10 @@ struct RiskAssessmentView: View {
             .cornerRadius(8)
             .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.rose500.opacity(0.3), lineWidth: 1))
             .padding(.horizontal)
+            
+            // PAIN ASSESSMENT MODULE
+            PainAssessmentView()
+                .padding(.horizontal)
         }
     }
     

@@ -160,6 +160,11 @@ class SafetyAdvisoryService {
         if inputs.sleepApnea { respRisks.append("OSA") }
         if (Int(inputs.age) ?? 0) >= 70 { respRisks.append("Age ≥70") }
         
+        // MME Threshold Warning
+        if (Double(inputs.currentMME) ?? 0) >= 50 {
+            advice.warnings.append("Prescriptions ≥ 50 MME/day are unlikely to improve pain and also increase the risk of adverse effects of opioids.")
+        }
+        
         let hasTripleThreat = inputs.benzos && (inputs.copd || inputs.sleepApnea)
         
         if hasTripleThreat {
@@ -375,7 +380,7 @@ class SafetyAdvisoryService {
         for rec in recs where rec.molecule == .methadone {
             // A. QTc Gate (>450ms)
             if snapshot.qtcProlonged {
-                errors.append("CRITICAL: Methadone Risk (QTc Prolonged). High risk of Torsades. Contraindicated for new starts; use extreme caution if rotating OFF.")
+                errors.append("SAFETY GATE FAILURE: Methadone Risk (QTc Prolonged). High risk of Torsades. Contraindicated for new starts; use extreme caution if rotating OFF.")
                 removalIDs.insert(rec.id)
             }
             // B. OUD/Overdose Gate (Logic from AssessmentStore)
@@ -400,3 +405,4 @@ class SafetyAdvisoryService {
         
         return (errors, removalIDs)
     }
+}

@@ -20,13 +20,17 @@ struct Citation: Identifiable, Codable {
     let labelRevisionDate: String? // "yyyy-MM-dd"
 }
 
-class CitationRegistry {
-    static let shared = CitationRegistry()
+protocol CitationService {
+    func resolve(_ ids: [String]) -> [Citation]
+    func resolveOrLegacy(_ inputs: [String]) -> [Citation]
+}
+
+class CitationRegistry: CitationService, ObservableObject {
+    // Singleton removed in favor of DI, but kept for convenience if needed during migration
+    // static let shared = CitationRegistry() 
     
-    // Example date for verified status
-    // Any date older than 1 year from now should be flagged.
-    
-    static let definitions: [String: Citation] = [
+    // Instance-based definitions (Static Lazy)
+    private static let definitions: [String: Citation] = [
         
         // MARK: - FDA Labels
         "fda_morphine_2025": Citation(
@@ -66,7 +70,57 @@ class CitationRegistry {
             labelRevisionDate: nil
         ),
         
+        "fda_duragesic_2023": Citation(
+             id: "fda_duragesic_2023",
+             type: .fdaLabel,
+             source: "FDA Label: Duragesic",
+             section: nil,
+             title: "Fentanyl Transdermal System Prescribing Information",
+             year: "2023",
+             url: "https://www.accessdata.fda.gov/drugsatfda_docs/label/2005/19813s039lbl.pdf",
+             excerpt: "Revised label for Fentanyl Transdermal System.",
+             lastVerified: "2026-01-01",
+             labelRevisionDate: nil
+         ),
+         
         // MARK: - Guidelines
+        "va_dod_cpg_2022": Citation(
+            id: "va_dod_cpg_2022",
+            type: .guideline,
+            source: "Dept of Veterans Affairs",
+            section: nil,
+            title: "VA/DoD Clinical Practice Guideline for Opioids in Chronic Pain",
+            year: "2022",
+            url: "https://www.healthquality.va.gov/guidelines/Pain/cot/",
+            excerpt: "Comprehensive guideline for opioid therapy in chronic pain management.",
+            lastVerified: "2026-01-01",
+            labelRevisionDate: nil
+        ),
+        "ags_beers_2023": Citation(
+             id: "ags_beers_2023",
+             type: .guideline,
+             source: "J Am Geriatr Soc",
+             section: nil,
+             title: "American Geriatrics Society 2023 Updated AGS Beers Criteria®",
+             year: "2023",
+             url: "https://doi.org/10.1111/jgs.18372",
+             excerpt: "Potentially inappropriate medications in older adults.",
+             lastVerified: "2026-01-01",
+             labelRevisionDate: nil
+         ),
+         "aasm_2025": Citation(
+             id: "aasm_2025",
+             type: .guideline,
+             source: "American Academy of Sleep Medicine",
+             section: nil,
+             title: "Postoperative Monitoring of Patients with OSA",
+             year: "2025",
+             url: nil,
+             excerpt: "While physiologic monitoring shows promise, evidence remains limited. Adjunctive strategies enhance safety.",
+             lastVerified: "2026-01-01",
+             labelRevisionDate: nil
+         ),
+
         "cdc_opioids_2022": Citation(
             id: "cdc_opioids_2022",
             type: .guideline,
@@ -150,8 +204,8 @@ class CitationRegistry {
              year: "2021",
              url: "https://store.samhsa.gov/product/TIP-63-Medications-for-Opioid-Use-Disorder/PEP21-02-01-002",
              excerpt: "Overview of Methadone, Buprenorphine, and Naltrexone for OUD.",
-            lastVerified: "2026-01-01",
-            labelRevisionDate: nil
+             lastVerified: "2026-01-01",
+             labelRevisionDate: nil
         ),
         "prodigy_2020": Citation(
             id: "prodigy_2020",
@@ -200,18 +254,56 @@ class CitationRegistry {
              excerpt: "Serious respiratory difficulties may occur in patients using gabapentinoids who have respiratory risk factors.",
              lastVerified: "2026-01-01",
              labelRevisionDate: nil
+        ),
+        
+        // MARK: - Monitoring Protocols (Synthesized)
+        "monitoring_high_risk_pca": Citation(
+             id: "monitoring_high_risk_pca",
+             type: .expertConsensus,
+             source: "ASA / PRODIGY",
+             section: nil,
+             title: "High-Risk PCA Monitoring",
+             year: "2025",
+             url: nil,
+             excerpt: "Continuous pulse oximetry and capnography recommended for high-risk patients (Obesity, OSA).",
+             lastVerified: "2026-01-01",
+             labelRevisionDate: nil
+        ),
+        "sedation_poss": Citation(
+             id: "sedation_poss",
+             type: .expertConsensus,
+             source: "NCCN / APS",
+             section: nil,
+             title: "Sedation Assessment (POSS)",
+             year: "2024",
+             url: nil,
+             excerpt: "Sedation typically precedes respiratory depression. Oversedation is OIVI until proven otherwise.",
+             lastVerified: "2026-01-01",
+             labelRevisionDate: nil
+        ),
+        "risk_strat_prodigy": Citation(
+             id: "risk_strat_prodigy",
+             type: .expertConsensus,
+             source: "PRODIGY Study",
+             section: nil,
+             title: "Risk Stratification (PRODIGY)",
+             year: "2020",
+             url: nil,
+             excerpt: "Risk factors: Age ≥60, Male, Opioid Naivety, Sleep Disorders, CHF.",
+             lastVerified: "2026-01-01",
+             labelRevisionDate: nil
         )
     ]
     
     // Resolve IDs to Citation objects
-    static func resolve(_ ids: [String]) -> [Citation] {
-        return ids.compactMap { definitions[$0] }
+    func resolve(_ ids: [String]) -> [Citation] {
+        return ids.compactMap { CitationRegistry.definitions[$0] }
     }
     
     // Resolve ID if exists, otherwise create Legacy wrapper
-    static func resolveOrLegacy(_ inputs: [String]) -> [Citation] {
+    func resolveOrLegacy(_ inputs: [String]) -> [Citation] {
         return inputs.map { input in
-            if let found = definitions[input] {
+            if let found = CitationRegistry.definitions[input] {
                 return found
             } else {
                 return Citation(
@@ -228,5 +320,19 @@ class CitationRegistry {
                 )
             }
         }
+    }
+}
+
+// MARK: - SwiftUI Environment Injection
+import SwiftUI
+
+struct CitationServiceKey: EnvironmentKey {
+    static let defaultValue: CitationService = CitationRegistry()
+}
+
+extension EnvironmentValues {
+    var citationService: CitationService {
+        get { self[CitationServiceKey.self] }
+        set { self[CitationServiceKey.self] = newValue }
     }
 }

@@ -381,20 +381,18 @@ class CalculatorStore: ObservableObject {
             if input.drugId == "methadone_iv" { lookupRoute = "iv" }
             if input.drugId == "sufentanil" || input.drugId == "alfentanil" { lookupRoute = "iv" }
             
-            do {
-                // ID Cleaning Logic (Refactored for Split Formulations)
-                var cleanId = input.drugId.replacingOccurrences(of: "_drip", with: "")
-                
-                // For Split Formulations (Morphine), keep the full ID (e.g. morphine_iv).
-                // For Legacy (Hydro, etc.), strip the suffix to find the master entry.
-                if !cleanId.starts(with: "morphine_") {
-                     cleanId = cleanId.replacingOccurrences(of: "_iv", with: "").replacingOccurrences(of: "_patch", with: "")
-                }
-                
-                print("DEBUG: Lookup Factor -> Drug: \(cleanId), Route: \(lookupRoute)")
-                
-                let evidence = try ConversionService.shared.getFactor(drugId: cleanId, route: lookupRoute)
-                
+            // ID Cleaning Logic (Refactored for Split Formulations)
+            var cleanId = input.drugId.replacingOccurrences(of: "_drip", with: "")
+            
+            // For Split Formulations (Morphine), keep the full ID (e.g. morphine_iv).
+            // For Legacy (Hydro, etc.), strip the suffix to find the master entry.
+            if !cleanId.starts(with: "morphine_") {
+                 cleanId = cleanId.replacingOccurrences(of: "_iv", with: "").replacingOccurrences(of: "_patch", with: "")
+            }
+            
+            print("DEBUG: Lookup Factor -> Drug: \(cleanId), Route: \(lookupRoute)")
+            
+            if let evidence = ConversionService.shared.getFactor(drugId: cleanId, route: lookupRoute) {
                 factor = evidence.factor
                 print("DEBUG: Factor Found: \(factor)")
                 
@@ -418,8 +416,8 @@ class CalculatorStore: ObservableObject {
                 if input.routeType == .ivDrip && input.drugId.contains("fentanyl") {
                     if localActiveWarnings.isEmpty { localActiveWarnings.append("Using Continuous Infusion Factor (0.12). For acute/bolus, use IV Push (0.3).") }
                 }
-            } catch {
-                 print("DEBUG: Factor Lookup Failed: \(error)")
+            } else {
+                 print("DEBUG: Factor Lookup Failed (Returned nil)")
                  switch input.drugId {
                     case "sublingual_fentanyl":
                         factor = 0; hasExclusion = true; localActiveWarnings.append("Sublingual Fentanyl Excluded: Bioavailability varies.")
@@ -428,7 +426,7 @@ class CalculatorStore: ObservableObject {
                     default:
                         factor = 0
                         if !localActiveWarnings.contains(where: { $0.contains("Lookup Failed") }) {
-                            localActiveWarnings.append("Data Error: \(error.localizedDescription)")
+                            localActiveWarnings.append("Data Error: Factor not found for \(cleanId) \(lookupRoute)")
                         }
                 }
             }
@@ -475,6 +473,10 @@ class CalculatorStore: ObservableObject {
             localActiveWarnings.append("RECOMMENDATION: Prescribe Naloxone (High Overdose Risk per CDC criteria).")
         }
         
+        if totalMME > 50 {
+            localActiveWarnings.append("Caution (>50 MME/day): Risk of harm increases without additional analgesic benefit. Consider taper or specialist review.")
+        }
+        
         if isPregnant { localActiveWarnings.append("PERINATAL CONTEXT: Patient is Pregnant. NSAIDs contraindicated (3rd Tri). Prefer Tylenol/Prednisone.") }
         if isBreastfeeding { localActiveWarnings.append("LACTATION CONTEXT: Monitor infant for sedation and respiratory distress.") }
         
@@ -512,11 +514,11 @@ class CalculatorStore: ObservableObject {
                 }
                 
                 // Fetch Dynamic Factors (Single Source of Truth)
-                let oxyFactor = (try? ConversionService.shared.getFactor(drugId: "oxycodone", route: "po").factor) ?? 1.5
-                let hydroFactor = (try? ConversionService.shared.getFactor(drugId: "hydromorphone", route: "po").factor) ?? 4.0
-                let morIVFactor = (try? ConversionService.shared.getFactor(drugId: "morphine_iv", route: "iv").factor) ?? 3.0
-                let hydIVFactor = (try? ConversionService.shared.getFactor(drugId: "hydromorphone", route: "iv").factor) ?? 20.0 
-                let fentIVFactor = (try? ConversionService.shared.getFactor(drugId: "fentanyl", route: "iv_acute").factor) ?? 0.3 // Use Acute for Targets
+                let oxyFactor = (ConversionService.shared.getFactor(drugId: "oxycodone", route: "po")?.factor) ?? 1.5
+                let hydroFactor = (ConversionService.shared.getFactor(drugId: "hydromorphone", route: "po")?.factor) ?? 4.0
+                let morIVFactor = (ConversionService.shared.getFactor(drugId: "morphine_iv", route: "iv")?.factor) ?? 3.0
+                let hydIVFactor = (ConversionService.shared.getFactor(drugId: "hydromorphone", route: "iv")?.factor) ?? 20.0 
+                let fentIVFactor = (ConversionService.shared.getFactor(drugId: "fentanyl", route: "iv_acute")?.factor) ?? 0.3 // Use Acute for Targets
                 
                 // Targets
                 let oxyStandard = reducedMME / oxyFactor
@@ -729,7 +731,9 @@ class CalculatorStore: ObservableObject {
         
         log += "\nValues generated by PrecisionAnalgesia (v7.2.4). Not a medical record until verified."
         
+        #if canImport(UIKit)
         UIPasteboard.general.string = log
+        #endif
     }
 
     // MARK: - External Interaction Helpers

@@ -154,6 +154,42 @@ enum Sex: String, CaseIterable, Identifiable, Codable {
     var id: String { self.rawValue }
 }
 
+// MARK: - Pain Assessment Enums
+
+enum CognitiveStatus: String, CaseIterable, Identifiable, Codable {
+    case baseline = "Baseline / Intact"
+    case mildImpairment = "Mild Impairment / Delirium"
+    case advancedDementia = "Advanced Dementia"
+    var id: String { self.rawValue }
+}
+
+enum CommunicationAbility: String, CaseIterable, Identifiable, Codable {
+    case verbal = "Verbal"
+    case nonVerbalInteractive = "Non-Verbal (Interactive)"
+    case nonCommunicative = "Non-Communicative / Sedated"
+    var id: String { self.rawValue }
+}
+
+enum IntubationStatus: String, CaseIterable, Identifiable, Codable {
+    case none = "Spontaneous / Extubated"
+    case intubated = "Intubated / Trach"
+    var id: String { self.rawValue }
+}
+
+enum PainScaleType: String, CaseIterable, Identifiable, Codable {
+    case nrs = "Numeric Rating Scale (NRS)"
+    case vas = "Visual Analog Scale (VAS)"
+    case vds = "Verbal Descriptor Scale (VDS)"
+    case peg = "PEG (Pain, Enjoyment, General)"
+    case bps = "Behavioral Pain Scale (BPS)"
+    case bpsNi = "BPS-Non Intubated"
+    case cpot = "CPOT"
+    case painad = "PAINAD"
+    case unable = "Unable to Assess"
+    
+    var id: String { self.rawValue }
+}
+
 // MARK: - Data Models
 
 enum RecommendationType {
@@ -483,7 +519,7 @@ enum SafetySeverity: String, CaseIterable, Codable {
 }
 
 struct SafetyAlert: Identifiable, Codable {
-    let id = UUID()
+    var id = UUID()
     let title: String
     let description: String
     let severity: SafetySeverity
@@ -531,7 +567,7 @@ struct ClinicalData {
         DrugData(id: "morphine_po_ir", familyId: "morphine_generic", name: "Morphine (PO)", subtitle: "Oral Tablet (IR)", type: "Full Agonist", route: "PO", mmeFactor: 1.0, durationProfile: .short, ivOnset: "N/A", ivDuration: "N/A", poOnset: "30-60 min", poDuration: "3-6 hrs", renalSafety: "Unsafe", hepaticSafety: "Caution", clinicalNuance: "Gold standard opioid but AVOID in renal impairment (M6G accumulation).", pharmacokinetics: "Glucuronidation (UGT2B7). High first-pass metabolism (PO Bioavail ~30%).", tags: ["Standard", "Histamine Release"], bioavailability: 30, pregnancyCategory: "Benefit>Risk",
                  ivStart: "", poStart: "15 mg PO q4h (naive)",
                  pkProfile: PKProfile(onset: "30-60 min", peak: "60 min", duration: "4 hrs", bioavailability: "20-40%"),
-                 safetyProfile: SafetyProfile(renalNote: "Accumulation of M6G", boxedWarning: "Risk of Misuse"),
+                 safetyProfile: SafetyProfile(renalNote: "Accumulation of M6G. Avoid in eGFR <30.", boxedWarning: "Risk of Misuse"),
                  fdaLabelURL: "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=6d8c2b3b-8b3e-4f4a-9b0e-3c8f8e8c8c8c", blackBoxWarnings: [
                     BlackBoxWarning(riskDescription: "Life-threatening respiratory depression^[3]", affectedPopulation: "Opioid-naive, elderly", severity: "Life-threatening", monitoringRequired: "Pulse Oximetry", dateAdded: nil),
                     BlackBoxWarning(riskDescription: "Concomitant use with benzodiazepines^[3]", affectedPopulation: "All patients", severity: "Fatal overdose", monitoringRequired: "Minimize duration", dateAdded: "2016", isIncremental: true)
@@ -545,7 +581,7 @@ struct ClinicalData {
             "fda_morphine_2025"
         ], bioavailabilitySource: "Orel et al. via CDC 2022", dosingSource: "CDC 2022 / FDA Label"),
         
-        DrugData(id: "hydromorphone", name: "Hydromorphone", type: "Full Agonist", durationProfile: .short, ivOnset: "5 min", ivDuration: "2-3 hrs", poOnset: "15-30 min", poDuration: "3-4 hrs", renalSafety: "Caution", hepaticSafety: "Caution", clinicalNuance: "H3G metabolite is solely neuroexcitatory. In renal failure, accumulation causes allodynia and agitation. 5-7x potency of morphine.", pharmacokinetics: "Glucuronidation. No CYP interactions. Cleaner than morphine but not risk-free.", tags: ["Potent", "Low Volume", "Neuroexcitation Risk"], bioavailability: 24, pregnancyCategory: "Benefit>Risk",
+        DrugData(id: "hydromorphone", name: "Hydromorphone", type: "Full Agonist", mmeFactor: nil, durationProfile: .short, ivOnset: "5 min", ivDuration: "2-3 hrs", poOnset: "15-30 min", poDuration: "3-4 hrs", renalSafety: "Caution", hepaticSafety: "Caution", clinicalNuance: "H3G metabolite is solely neuroexcitatory. In renal failure, accumulation causes allodynia and agitation. 5-7x potency of morphine.", pharmacokinetics: "Glucuronidation. No CYP interactions. Cleaner than morphine but not risk-free.", tags: ["Potent", "Low Volume", "Neuroexcitation Risk"], bioavailability: 24, pregnancyCategory: "Benefit>Risk",
                  ivStart: "0.2-0.5 mg IV q2-3h", poStart: "2-4 mg PO q3-4h",
                  fdaLabelURL: "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=3832ede8-d3fc-455d-ecab-3b77be5869f5", blackBoxWarnings: [
                     BlackBoxWarning(riskDescription: "Life-threatening respiratory depression^[2]", affectedPopulation: "All patients", severity: "Life-threatening", monitoringRequired: "Respiratory Monitoring", dateAdded: nil)
@@ -557,28 +593,28 @@ struct ClinicalData {
             "fda_hydromorphone_2025"
         ], bioavailabilitySource: "Reddy et al. 2017 / NCCN", dosingSource: "NCCN 2025 (Conservative)"),
         
-        DrugData(id: "oxycodone", name: "Oxycodone", type: "Full Agonist", durationProfile: .short, ivOnset: "N/A", ivDuration: "3-4 hrs", poOnset: "10-15 min", poDuration: "3-6 hrs", renalSafety: "Caution", hepaticSafety: "Caution", clinicalNuance: "Interaction Alert: Strong CYP3A4 inhibitors (Voriconazole, Posaconazole, Ritonavir) significantly increase AUC.", pharmacokinetics: "High oral bioavailability (60-87%). Dual metabolism (3A4 > 2D6).", tags: ["Oral Standard", "CYP3A4 Interaction"], bioavailability: 75, pregnancyCategory: "Benefit>Risk",
+        DrugData(id: "oxycodone", name: "Oxycodone", type: "Full Agonist", mmeFactor: nil, durationProfile: .short, ivOnset: "N/A", ivDuration: "3-4 hrs", poOnset: "10-15 min", poDuration: "3-6 hrs", renalSafety: "Caution", hepaticSafety: "Caution", clinicalNuance: "Interaction Alert: Strong CYP3A4 inhibitors (Voriconazole, Posaconazole, Ritonavir) significantly increase AUC.", pharmacokinetics: "High oral bioavailability (60-87%). Dual metabolism (3A4 > 2D6).", tags: ["Oral Standard", "CYP3A4 Interaction"], bioavailability: 75, pregnancyCategory: "Benefit>Risk",
                  ivStart: "", poStart: "5-10 mg PO q4-6h",
                  fdaLabelURL: "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f8e8e8e8-8e8e-8e8e-8e8e-8e8e8e8e8e8e", blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: [], bioavailabilitySource: "FDA Label (Percocet)", dosingSource: "CDC 2022"),
         
-        DrugData(id: "methadone", name: "Methadone", type: "Complex Agonist", durationProfile: .long, ivOnset: "Variable", ivDuration: "6-8 hrs (Analgesia)", poOnset: "30-60 min", poDuration: "8-12 hrs (Analgesia)", renalSafety: "Safe", hepaticSafety: "Caution", clinicalNuance: "Non-Linear Kinetics. 'Stacking' toxicity on Day 3-5. QT Prolongation risk.", pharmacokinetics: "CYP3A4/2B6/2D6. Auto-induction occurs.", tags: ["Neuropathic", "Stacking Risk", "QT Prolongation"], bioavailability: 80, pregnancyCategory: "Benefit>Risk",
+        DrugData(id: "methadone", name: "Methadone", type: "Complex Agonist", mmeFactor: nil, durationProfile: .long, ivOnset: "Variable", ivDuration: "6-8 hrs (Analgesia)", poOnset: "30-60 min", poDuration: "8-12 hrs (Analgesia)", renalSafety: "Safe", hepaticSafety: "Caution", clinicalNuance: "Nonlinear Dose-Response. NMDA Antagonist. Peak respiratory depression occurs LATER and lasts LONGER than analgesia ('Stacking Risk'). CDC advises against using calculated MME for conversion.", pharmacokinetics: "Long/Variable Half-Life (15-120h). Auto-induction of CYP3A4. Accumulates unpredictably.", tags: ["Neuropathic", "Stacking Risk", "QT Prolongation"], bioavailability: 80, pregnancyCategory: "Benefit>Risk",
                  ivStart: "2.5-10 mg IV q8-12h (Load)", poStart: "2.5-5 mg PO q8h",
                  fdaLabelURL: "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=b8b8b8b8-8b8b-8b8b-8b8b-8b8b8b8b8b8b", blackBoxWarnings: [
                     BlackBoxWarning(riskDescription: "QT Prolongation / Torsades de Pointes", affectedPopulation: "High dose, cardiac risk", severity: "Life-threatening arrhythmia", monitoringRequired: "ECG", dateAdded: nil),
                     BlackBoxWarning(riskDescription: "Respiratory Depression (Late Onset)", affectedPopulation: "All patients", severity: "Life-threatening", monitoringRequired: "Peak effect delayed", dateAdded: nil)
                  ], contraindications: nil, detailedWarnings: nil, citations: [], bioavailabilitySource: "APS Guidelines / FDA", dosingSource: "Manufacturer Label / ASAM"),
         
-        DrugData(id: "buprenorphine", name: "Buprenorphine", type: "Partial Agonist", durationProfile: .long, ivOnset: "10-15 min", ivDuration: "6-8 hrs", poOnset: "30-60 min (SL)", poDuration: "6-8 hrs", renalSafety: "Safe", hepaticSafety: "Safe", clinicalNuance: "High Affinity. Ceiling effect on respiratory depression.", pharmacokinetics: "CYP3A4. Dissociates slowly.", tags: ["High Affinity", "Split Dosing", "Ceiling Effect"], bioavailability: 30, pregnancyCategory: "Safe Option",
+        DrugData(id: "buprenorphine", name: "Buprenorphine", type: "Partial Agonist", mmeFactor: nil, durationProfile: .long, ivOnset: "10-15 min", ivDuration: "6-8 hrs", poOnset: "30-60 min (SL)", poDuration: "6-8 hrs", renalSafety: "Safe", hepaticSafety: "Safe", clinicalNuance: "High Affinity / Slow Dissociation. Ceiling effect for analgesia and respiratory depression. Can displace full agonists and precipitate withdrawal. Excluded from CDC MME calculations due to nonlinear kinetics.", pharmacokinetics: "CYP3A4. 30x potency of morphine (IM). Ceiling effect limits MME linearity.", tags: ["High Affinity", "Split Dosing", "Ceiling Effect"], bioavailability: 30, pregnancyCategory: "Safe Option",
                  ivStart: "0.15-0.3 mg IV", poStart: "2-4 mg SL",
                  fdaLabelURL: "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=a1a1a1a1-1a1a-1a1a-1a1a-1a1a1a1a1a1a", blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
         
-        DrugData(id: "fentanyl_patch", name: "Fentanyl (Transdermal)", type: "Phenylpiperidine", durationProfile: .long, ivOnset: "12-24 hrs", ivDuration: "72 hrs", poOnset: "12-24 hrs", poDuration: "72 hrs", renalSafety: "Safe", hepaticSafety: "Safe", clinicalNuance: "Heat Sensitivity: Fever increases absorption 30%+. Do not use in opioid-naive.", pharmacokinetics: "Depot Effect.", tags: ["Chronic Pain Only", "Heat Sensitive", "Depot Effect"], bioavailability: 92, pregnancyCategory: "Avoid (Withdrawal Risk)",
+        DrugData(id: "fentanyl_patch", name: "Fentanyl (Transdermal)", type: "Phenylpiperidine", mmeFactor: nil, durationProfile: .long, ivOnset: "12-24 hrs", ivDuration: "72 hrs", poOnset: "12-24 hrs", poDuration: "72 hrs", renalSafety: "Safe", hepaticSafety: "Safe", clinicalNuance: "Heat Sensitivity: Fever increases absorption 30%+. Do not use in opioid-naive.", pharmacokinetics: "Depot Effect.", tags: ["Chronic Pain Only", "Heat Sensitive", "Depot Effect"], bioavailability: 92, pregnancyCategory: "Avoid (Withdrawal Risk)",
                  ivStart: "", poStart: "12-25 mcg/hr Patch q72h",
                  fdaLabelURL: "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=6bb82d9f-9f3f-4e8e-b8e8-8e8e8e8e8e8e", blackBoxWarnings: [
                     BlackBoxWarning(riskDescription: "Fatal Respiratory Depression in Opioid Naive", affectedPopulation: "Opioid Naive", severity: "Fatal", monitoringRequired: nil, dateAdded: nil)
                  ], contraindications: nil, detailedWarnings: nil, citations: [], bioavailabilitySource: "Clausen et al.", dosingSource: "FDA Label (Duragesic)"),
         
-        DrugData(id: "fentanyl", name: "Fentanyl", type: "Phenylpiperidine", durationProfile: .rapid, ivOnset: "1-2 min", ivDuration: "30-60 min", poOnset: "N/A", poDuration: "N/A", renalSafety: "Safe", hepaticSafety: "Safe", clinicalNuance: "Context-Sensitive Half-Life. Chest wall rigidity with rapid push.", pharmacokinetics: "CYP3A4 substrate. Highly lipophilic.", tags: ["Renal Safe", "Cardio Stable", "Lipid Storage"], bioavailability: 100, pregnancyCategory: "Safe Option",
+        DrugData(id: "fentanyl", name: "Fentanyl", type: "Phenylpiperidine", mmeFactor: nil, durationProfile: .rapid, ivOnset: "1-2 min", ivDuration: "30-60 min", poOnset: "N/A", poDuration: "N/A", renalSafety: "Safe", hepaticSafety: "Safe", clinicalNuance: "Context-Sensitive Half-Life. Chest wall rigidity with rapid push.", pharmacokinetics: "CYP3A4 substrate. Highly lipophilic.", tags: ["Renal Safe", "Cardio Stable", "Lipid Storage"], bioavailability: 100, pregnancyCategory: "Safe Option",
                  ivStart: "25-50 mcg IV q1-2h", poStart: "",
                  fdaLabelURL: "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f3c7c3c7-3c7c-3c7c-3c7c-3c7c3c7c3c7c", blackBoxWarnings: [
                     BlackBoxWarning(riskDescription: "Life-threatening respiratory depression^[1]", affectedPopulation: "COPD, Opioid Naive", severity: "Life-threatening", monitoringRequired: "Continuous monitoring", dateAdded: "2016"),
@@ -590,35 +626,66 @@ struct ClinicalData {
             "fda_fentanyl_2025"
         ], bioavailabilitySource: "N/A (IV Only)", dosingSource: "Anesthesia Guidelines"),
         
-        DrugData(id: "tapentadol", name: "Tapentadol", type: "MOR-NRI", durationProfile: .short, ivOnset: "N/A", ivDuration: "4-6 hrs", poOnset: "30 min", poDuration: "4-6 hrs", renalSafety: "Caution", hepaticSafety: "Caution", clinicalNuance: "Dual Mechanism. Less GI side effects. Serotonin Syndrome risk low.", pharmacokinetics: "Glucuronidation. No CYP interactions.", tags: ["Neuropathic", "Lower GI Risk"], bioavailability: 32, pregnancyCategory: "Benefit>Risk",
+        DrugData(id: "tapentadol", name: "Tapentadol", type: "MOR-NRI", mmeFactor: nil, durationProfile: .short, ivOnset: "N/A", ivDuration: "4-6 hrs", poOnset: "30 min", poDuration: "4-6 hrs", renalSafety: "Caution", hepaticSafety: "Caution", clinicalNuance: "Dual Mechanism: Mu-agonist + Norepinephrine Reuptake Inhibitor (NRI). CDC MME (0.4) is uncertain due to non-opiate contribution. Lower GI side effect profile.", pharmacokinetics: "Glucuronidation. No CYP interactions (cleaner than Tramadol).", tags: ["Neuropathic", "Lower GI Risk"], bioavailability: 32, pregnancyCategory: "Benefit>Risk",
                  ivStart: "", poStart: "50-75 mg PO q4-6h",
                  fdaLabelURL: "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d5d5d5d5-5d5d-5d5d-5d5d-5d5d5d5d5d5d", blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
         
-        DrugData(id: "levorphanol", name: "Levorphanol", type: "Full Agonist", durationProfile: .long, ivOnset: "N/A", ivDuration: "6-8 hrs", poOnset: "30-60 min", poDuration: "6-8 hrs", renalSafety: "Safe", hepaticSafety: "Safe", clinicalNuance: "NMDA Antagonist + SNRI. Potent. Long half-life.", pharmacokinetics: "Glucuronidation.", tags: ["Neuropathic", "Long Acting", "NMDA"], bioavailability: 70, pregnancyCategory: "Benefit>Risk",
+        DrugData(id: "levorphanol", name: "Levorphanol", type: "Full Agonist", mmeFactor: nil, durationProfile: .long, ivOnset: "N/A", ivDuration: "6-8 hrs", poOnset: "30-60 min", poDuration: "6-8 hrs", renalSafety: "Safe", hepaticSafety: "Safe", clinicalNuance: "NMDA Antagonist + SNRI. Potent. Long half-life.", pharmacokinetics: "Glucuronidation.", tags: ["Neuropathic", "Long Acting", "NMDA"], bioavailability: 70, pregnancyCategory: "Benefit>Risk",
                  ivStart: "", poStart: "2 mg PO q6-8h",
                  fdaLabelURL: nil, blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
         
-        DrugData(id: "suzetrigine", name: "Suzetrigine", type: "NAV1.8 Inhibitor", durationProfile: .short, ivOnset: "N/A", ivDuration: "6-12 hrs", poOnset: "Variable", poDuration: "6-12 hrs", renalSafety: "Unsafe", hepaticSafety: "Caution", clinicalNuance: "First-in-class non-opioid. No respiratory depression.", pharmacokinetics: "CYP2D6/3A4.", tags: ["Non-Opioid", "NAV1.8"], bioavailability: 80, pregnancyCategory: "Avoid (Unknown)",
+        DrugData(id: "suzetrigine", name: "Suzetrigine", type: "NAV1.8 Inhibitor", mmeFactor: nil, durationProfile: .short, ivOnset: "N/A", ivDuration: "6-12 hrs", poOnset: "Variable", poDuration: "6-12 hrs", renalSafety: "Unsafe", hepaticSafety: "Caution", clinicalNuance: "First-in-class non-opioid. No respiratory depression.", pharmacokinetics: "CYP2D6/3A4.", tags: ["Non-Opioid", "NAV1.8"], bioavailability: 80, pregnancyCategory: "Avoid (Unknown)",
                  ivStart: "", poStart: "Study Dose Only",
                  fdaLabelURL: nil, blackBoxWarnings: nil,
                  contraindications: [Contraindication(condition: "Severe Hepatic Impairment", reason: "Safety Unknown", type: "absolute", alternativeRecommendation: nil)], detailedWarnings: nil, citations: []),
         
-        DrugData(id: "meperidine", name: "Meperidine", type: "Phenylpiperidine", durationProfile: .short, ivOnset: "5 min", ivDuration: "2-3 hrs", poOnset: "30-60 min", poDuration: "2-4 hrs", renalSafety: "Unsafe", hepaticSafety: "Caution", clinicalNuance: "CONTRAINDICATED in Renal Failure/Elderly. Toxic metabolite (Normeperidine) causes tremors/seizures. High interaction risk (MAOIs). Historic use only.", pharmacokinetics: "Hepatic -> Normeperidine (Neurotoxic, long T1/2).", tags: ["Neurotoxic", "Do Not Use", "Seizure Risk"], bioavailability: 50, pregnancyCategory: "Avoid (Neurotoxic)",
+        DrugData(id: "meperidine", name: "Meperidine", type: "Phenylpiperidine", mmeFactor: nil, durationProfile: .short, ivOnset: "5 min", ivDuration: "2-3 hrs", poOnset: "30-60 min", poDuration: "2-4 hrs", renalSafety: "Unsafe", hepaticSafety: "Caution", clinicalNuance: "CONTRAINDICATED in Renal Failure/Elderly. Toxic metabolite (Normeperidine) causes tremors/seizures. High interaction risk (MAOIs). Historic use only.", pharmacokinetics: "Hepatic -> Normeperidine (Neurotoxic, long T1/2).", tags: ["Neurotoxic", "Do Not Use", "Seizure Risk"], bioavailability: 50, pregnancyCategory: "Avoid (Neurotoxic)",
                  ivStart: "Avoid Use", poStart: "Avoid Use",
                  fdaLabelURL: nil, blackBoxWarnings: nil,
                  contraindications: [Contraindication(condition: "MAOI Use", reason: "Serotonin Syndrome", type: "absolute", alternativeRecommendation: nil)], detailedWarnings: nil, citations: []),
         
-        DrugData(id: "sufentanil", name: "Sufentanil", type: "Phenylpiperidine", durationProfile: .rapid, ivOnset: "1-3 min", ivDuration: "20-45 min", poOnset: "N/A", poDuration: "N/A", renalSafety: "Safe", hepaticSafety: "Safe", clinicalNuance: "ICU/Anesthesia Only. 5-10x potency of Fentanyl. Rapid equilibration.", pharmacokinetics: "High lipid solubility. High protein binding.", tags: ["ICU Only", "Ultra Potent"], bioavailability: 100, pregnancyCategory: "Safe Option",
+        DrugData(id: "sufentanil", name: "Sufentanil", type: "Phenylpiperidine", mmeFactor: nil, durationProfile: .rapid, ivOnset: "1-3 min", ivDuration: "20-45 min", poOnset: "N/A", poDuration: "N/A", renalSafety: "Safe", hepaticSafety: "Safe", clinicalNuance: "Ultra-Potent (500-1000x Morphine). Context-sensitive half-life dominates kinetics. Accumulates in fat/muscle with prolonged infusion. Anesthesia use only.", pharmacokinetics: "High lipid solubility. High protein binding. Prolonged elimination with infusions.", tags: ["ICU Only", "Ultra Potent"], bioavailability: 100, pregnancyCategory: "Safe Option",
                  ivStart: "0.1-0.2 mcg/kg (Anesthesia)", poStart: "N/A",
                  fdaLabelURL: nil, blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
         
-        DrugData(id: "alfentanil", name: "Alfentanil", type: "Phenylpiperidine", durationProfile: .rapid, ivOnset: "<1 min", ivDuration: "10-15 min", poOnset: "N/A", poDuration: "N/A", renalSafety: "Safe", hepaticSafety: "Var", clinicalNuance: "Fastest onset (low pKa allows rapid BBB crossing). Very short duration. Context-sensitive half-life is favorable.", pharmacokinetics: "CYP3A4. Lower lipid solubility than Fentanyl = less distribution volume.", tags: ["ICU Only", "Rapid Onset"], bioavailability: 100, pregnancyCategory: "Safe Option",
+        DrugData(id: "alfentanil", name: "Alfentanil", type: "Phenylpiperidine", mmeFactor: nil, durationProfile: .rapid, ivOnset: "<1 min", ivDuration: "10-15 min", poOnset: "N/A", poDuration: "N/A", renalSafety: "Safe", hepaticSafety: "Var", clinicalNuance: "Ultra-Potent (10-20x Morphine). Rapid onset, short duration. Pharmacokinetics dominated by context-sensitive half-times. Anesthesia use only.", pharmacokinetics: "CYP3A4. Lower lipid solubility than Fentanyl = smaller volume of distribution.", tags: ["ICU Only", "Rapid Onset"], bioavailability: 100, pregnancyCategory: "Safe Option",
                  ivStart: "3-5 mcg/kg (Anesthesia)", poStart: "N/A",
-                 fdaLabelURL: nil, blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: [])
+                 fdaLabelURL: nil, blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
+
+        DrugData(id: "butorphanol", name: "Butorphanol", type: "Mixed Agonist/Antagonist", mmeFactor: nil, durationProfile: .short, ivOnset: "1-5 min", ivDuration: "2-4 hrs", poOnset: "N/A", poDuration: "N/A", renalSafety: "Caution", hepaticSafety: "Caution", clinicalNuance: "Kappa agonist/Mu antagonist (3.5-7x Potency). Ceiling effect for analgesia/resp depression. Increases cardiac workload (Avoid in MI/CHF). Precipitates withdrawal in agonist-dependent patients.", pharmacokinetics: "Hepatic metabolism. Nonlinear dose-response.", tags: ["Labor Pain", "Migraine", "Ceiling Effect"], bioavailability: 0, pregnancyCategory: "Benefit>Risk",
+                 ivStart: "0.5-2 mg IV q3-4h", poStart: "N/A",
+                 fdaLabelURL: nil, blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
+
+        DrugData(id: "nalbuphine", name: "Nalbuphine", type: "Mixed Agonist/Antagonist", mmeFactor: nil, durationProfile: .short, ivOnset: "2-3 min", ivDuration: "3-6 hrs", poOnset: "N/A", poDuration: "N/A", renalSafety: "Caution", hepaticSafety: "Caution", clinicalNuance: "Kappa agonist/Mu antagonist (<1x Potency). Ceiling effect. NOT recommended for cancer pain. Precipitates withdrawal in agonist-dependent patients.", pharmacokinetics: "Hepatic. Nonlinear dose-response.", tags: ["Labor Pain", "Procedural"], bioavailability: 0, pregnancyCategory: "Benefit>Risk",
+                 ivStart: "10 mg IV q3-6h", poStart: "N/A",
+                 fdaLabelURL: nil, blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
+
+        DrugData(id: "pentazocine", name: "Pentazocine", type: "Mixed Agonist/Antagonist", mmeFactor: nil, durationProfile: .short, ivOnset: "15-20 min", ivDuration: "3 hrs", poOnset: "15-30 min", poDuration: "3 hrs", renalSafety: "Unsafe", hepaticSafety: "Unsafe", clinicalNuance: "Kappa agonist. High risk of hallucinations (psychotomimetic). Can precipitate withdrawal.", pharmacokinetics: "Hepatic.", tags: ["Historic", "Hallucination Risk"], bioavailability: 20, pregnancyCategory: "Avoid",
+                 ivStart: "30 mg IV", poStart: "50 mg PO",
+                 fdaLabelURL: nil, blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
+        
+        DrugData(id: "loperamide", name: "Loperamide", type: "Peripheral", mmeFactor: nil, durationProfile: .long, ivOnset: "N/A", ivDuration: "N/A", poOnset: "1-3 hrs", poDuration: "Variable", renalSafety: "Safe", hepaticSafety: "Caution", clinicalNuance: "Peripheral Mu-agonist. P-glycoprotein efflux prevents CNS penetration at therapeutic doses (2-8mg). No MME value.", pharmacokinetics: "P-gp substrate (Blood Brain Barrier). Massive doses overwhelm pump -> CNS toxicity.", tags: ["Anti-Diarrheal", "Peripheral"], bioavailability: 0, pregnancyCategory: "Safe Option",
+                 ivStart: "N/A", poStart: "4mg Load then 2mg",
+                 fdaLabelURL: nil, blackBoxWarnings: [BlackBoxWarning(riskDescription: "Torsades de Pointes / Sudden Death", affectedPopulation: "High Doses", severity: "Fatality Risk", monitoringRequired: "ECG", dateAdded: "2016")], contraindications: nil, detailedWarnings: nil, citations: []),
+        
+        DrugData(id: "diphenoxylate", name: "Diphenoxylate", type: "Peripheral", mmeFactor: nil, durationProfile: .short, ivOnset: "N/A", ivDuration: "N/A", poOnset: "45-60 min", poDuration: "3-4 hrs", renalSafety: "Caution", hepaticSafety: "Unsafe", clinicalNuance: "Peripheral Mu-agonist. Co-formulated with Atropine to discourage abuse. P-glycoprotein restricted. No MME value.", pharmacokinetics: "Hepatic. Active metabolite (difenoxin).", tags: ["Anti-Diarrheal", "Atropine Added"], bioavailability: 90, pregnancyCategory: "Caution",
+                 ivStart: "N/A", poStart: "5 mg PO qid",
+                 fdaLabelURL: nil, blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
+        DrugData(id: "oxymorphone_iv", name: "Oxymorphone (IV)", type: "Full Agonist", mmeFactor: 3.0, durationProfile: .short, ivOnset: "5-10 min", ivDuration: "3-4 hrs", poOnset: "N/A", poDuration: "N/A", renalSafety: "Unsafe", hepaticSafety: "Caution", clinicalNuance: "Potent Mu-Agonist. Active metabolite is 6-OH-oxymorphone. Excrete caution in renal impairment.", pharmacokinetics: "Glucuronidation. Half-life 7-9 hours.", tags: ["High Potency", "Renal Risk"], bioavailability: 100, pregnancyCategory: "Benefit>Risk",
+                 ivStart: "0.5 mg IV q4-6h", poStart: "N/A",
+                 fdaLabelURL: nil, blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
+
+        DrugData(id: "oxymorphone_po", name: "Oxymorphone (PO)", type: "Full Agonist", mmeFactor: 3.0, durationProfile: .short, ivOnset: "N/A", ivDuration: "N/A", poOnset: "30 min", poDuration: "4-6 hrs", renalSafety: "Unsafe", hepaticSafety: "Caution", clinicalNuance: "Approx 3x potency of Oral Morphine. Food increases bioavailability significantly (up to 50%).", pharmacokinetics: "Low oral bioavailability (10-40%) without food.", tags: ["Food Effect", "Potent"], bioavailability: 10, pregnancyCategory: "Benefit>Risk",
+                 ivStart: "N/A", poStart: "5-10 mg PO q4-6h",
+                 fdaLabelURL: nil, blackBoxWarnings: nil, contraindications: nil, detailedWarnings: nil, citations: []),
+
+        DrugData(id: "hydrocodone_po", name: "Hydrocodone", type: "Full Agonist", mmeFactor: 1.0, durationProfile: .short, ivOnset: "N/A", ivDuration: "N/A", poOnset: "30-60 min", poDuration: "4-6 hrs", renalSafety: "Caution", hepaticSafety: "Unsafe", clinicalNuance: "Available only in combination with Acetaminophen (APAP) or Ibuprofen. Limit APAP < 4000mg/day. CYP2D6 substrate (minor).", pharmacokinetics: "Metabolized to Hydromorphone (minor) via CYP2D6.", tags: ["Combination Only", "APAP Risk"], bioavailability: 80, pregnancyCategory: "Benefit>Risk",
+                 ivStart: "N/A", poStart: "5-10 mg PO q4-6h",
+                 fdaLabelURL: nil, blackBoxWarnings: [BlackBoxWarning(riskDescription: "Hepatotoxicity", affectedPopulation: "All", severity: "Life Threatening", monitoringRequired: "Liver Function Tests", dateAdded: "2011")], contraindications: nil, detailedWarnings: nil, citations: [])
     ]
     
     static let warningData: [WarningData] = [
-        WarningData(id: "tramadol", name: "Tramadol", risk: "Serotonin Syndrome / Seizure", desc: "Low efficacy but high toxicity. Significant risk with Linezolid (MAOI activity) or SSRIs. Hypoglycemia risk in elderly. 30% of analgesia is non-opioid (SNRI)."),
+        WarningData(id: "tramadol", name: "Tramadol", risk: "Serotonin Syndrome / Seizure", desc: "Dual Mechanism (Mu-Agonist + SNRI). Seizure risk >400mg/day. Risk with SSRIs/MAOIs. Genetic variability (CYP2D6) affects efficacy. Unquantifiable MME."),
         WarningData(id: "combo", name: "Combination (APAP)", risk: "Hepatotoxicity Masking", desc: "Inpatients often receive IV Acetaminophen (Ofirmev). Adding Percocet/Norco creates invisible APAP overdose. Always uncouple."),
         WarningData(id: "codeine", name: "Codeine", risk: "Genetic Lottery", desc: "10% of Caucasians lack CYP2D6 (no effect). 30% of Ethiopians/Saudis are Ultra-Rapid Metabolizers (morphine overdose). Clinically indefensible to use.")
     ]

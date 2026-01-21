@@ -1,4 +1,6 @@
-// File: AnalgesiaTool/Features/Assessment/AdjuvantRow.swift
+
+// MARK: - File: AnalgesiaTool/Features/Assessment/AdjuvantRow.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct AdjuvantRow: View {
@@ -73,7 +75,8 @@ struct AdjuvantRow: View {
 }
 
 
-// File: AnalgesiaTool/Features/Assessment/AssessmentStore.swift
+// MARK: - File: AnalgesiaTool/Features/Assessment/AssessmentStore.swift
+// ----------------------------------------------------------------
 import Foundation
 import Combine
 #if canImport(UIKit)
@@ -354,208 +357,37 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
         .store(in: &cancellables)
     }
     
-    // MARK: - VALIDATION LOGIC
-    func validateStateConsistency() -> [String] {
-        var warnings: [String] = []
-        
-        // 1. Pregnancy/Breastfeeding + Male
-        if sex == .male {
-            if isPregnant { warnings.append("DATA ERROR: Pregnancy selected for male patient.") }
-            if isBreastfeeding { warnings.append("DATA ERROR: Breastfeeding selected for male patient.") }
-        }
-        
-        // 2. Naive + High MME
-        if analgesicProfile == .naive {
-            let mmeVal = Double(currentMME.filter("0123456789.".contains)) ?? 0
-            if mmeVal > 50 {
-                warnings.append("INCONSISTENCY: Patient marked 'Opioid Naive' but current MME is \(Int(mmeVal)). Naive patients should have MME = 0. Consider changing profile to 'Chronic Rx'.")
-            }
-        }
-        
-        // 3. Dialysis + Young Age (flag for review)
-        if renalFunction == .dialysis {
-            if let ageInt = Int(age), ageInt < 30 && !historyGIBleed { // Simple heuristic
-                 // Not an error, just rare. Omit for now to avoid noise.
-            }
-        }
-        
-        return warnings
-    }
-    
-    func validateHepaticRenalCombination() -> [String] {
-        var warnings: [String] = []
-        
-        // Hepatorenal Syndrome Risk
-        if hepaticFunction == .failure && isRenalImpaired {
-            warnings.append("CRITICAL: Hepatorenal Syndrome Risk. Combined hepatic failure + renal impairment increases mortality >50%. Avoid Morphine/Codeine/Hydrocodone. Prefer Fentanyl (Redistribution/Inactive Metabolites) or Remifentanil (Plasma Esterase - if ICU).")
-            
-            // MELD Score Estimation (if age available)
-            if Int(age) != nil {
-                 // Simplified MELD estimation based on dual organ failure
-                 warnings.append("VALIDATION: Estimated MELD ≥15 (hepatic failure + renal impairment). Consider hepatology consult for medication review.")
-            }
-            
-            // Monitoring requirement
-            monitoringPlan.append("Hepatorenal Syndrome: Daily monitoring of renal function required. Continuous pulse oximetry + capnography mandatory.")
-        }
-        
-        return warnings
+    // MARK: - SNAPSHOT HELPER
+    func snapshot(recs: [DrugRecommendation] = [], adjs: [AdjuvantRecommendation] = []) -> AssessmentSnapshot {
+        return AssessmentSnapshot(
+            renalFunction: renalFunction,
+            hepaticFunction: hepaticFunction,
+            painType: painType,
+            isPregnant: isPregnant,
+            isBreastfeeding: isBreastfeeding,
+            age: age,
+            benzos: benzos,
+            sleepApnea: sleepApnea,
+            historyOverdose: historyOverdose,
+            analgesicProfile: analgesicProfile,
+            sex: sex,
+            chf: chf,
+            copd: copd,
+            psychHistory: psychHistory,
+            currentMME: currentMME,
+            qtcProlonged: qtcProlonged,
+            historyGIBleed: historyGIBleed,
+            hasAscites: hasAscites,
+            encephalopathyGrade: encephalopathyGrade,
+            adjuvantList: adjs,
+            recList: recs
+        )
     }
 
-    func validateHepaticCoagulopathy() -> [String] {
-        var warnings: [String] = []
-        
-        if hepaticFunction == .failure {
-             // Assume coagulopathy in hepatic failure (INR typically >1.5)
-             
-             // NSAID warning (even topical)
-             if adjuvants.contains(where: { $0.drug.contains("NSAID") || $0.drug.contains("Diclofenac") || $0.drug.contains("Ibuprofen") }) {
-                 warnings.append("BLEEDING RISK: NSAIDs (including topical) increase bleeding risk in hepatic failure with coagulopathy. Use acetaminophen (max 2g/day) instead.")
-             }
-             
-             // Antiplatelet/anticoagulant interaction
-             if benzos {
-                 // Benzos are often used in hepatic encephalopathy, but this is a proxy check
-                 warnings.append("HEPATIC ENCEPHALOPATHY RISK: Benzodiazepines + opioids in hepatic failure dramatically increase encephalopathy risk. Avoid if possible.")
-             }
-        }
-        
-        return warnings
-    }
+    // MARK: - VALIDATION LOGIC (Refactored to SafetyAdvisoryService)
+    // Legacy methods removed.
     
-    func validateAscitesImpact() -> [String] {
-        var warnings: [String] = []
-        
-        if hepaticFunction == .failure && hasAscites {
-            warnings.append("ASCITES: Volume of distribution altered for hydrophilic drugs. Morphine/hydromorphone loading doses may need reduction, but maintenance doses may be unchanged.")
-            
-            // Gabapentin adjustment
-            if adjuvants.contains(where: { $0.drug.contains("Gabapentin") }) {
-                warnings.append("Gabapentin: Ascites increases Vd. Monitor for delayed onset and prolonged effect.")
-            }
-            
-            // Fentanyl preference
-            if !recommendations.contains(where: { $0.name.contains("Fentanyl") }) {
-                 // Info only check
-            }
-        }
-        
-        return warnings
-    }
-    
-    func validateEncephalopathyRisk() -> [String] {
-        var warnings: [String] = []
-        
-        if hepaticFunction == .failure {
-            if encephalopathyGrade.isCerebralFailure {
-                warnings.append("CEREBRAL ORGAN FAILURE: HE Grade 3-4. Opioids are relatively contraindicated. Consider regional anesthesia or non-opioid alternatives.")
-            }
-        }
-        
-        return warnings
-    }
-    
-    func validateSafetyGates() -> [String] {
-        var errors: [String] = []
-        
-        // 1. Renal Safety Gate Validation
-        if isRenalImpaired {
-            let contraindicated = ["Morphine", "Codeine", "Meperidine"]
-            for drug in contraindicated {
-                if recommendations.contains(where: { $0.name.contains(drug) }) {
-                    errors.append("SAFETY GATE FAILURE: \(drug) recommended despite renal impairment (eGFR < 60). Removing Recommendation.")
-                    recommendations.removeAll { $0.name.contains(drug) }
-                }
-            }
-        }
-        
-        // 2. Hepatic Safety Gate Validation
-        if hepaticFunction == .failure {
-             // Hepatorenal Logic handled in dedicated function, this is the hard block for the list
-             let contraindicated = ["Morphine", "Codeine", "Tramadol", "Oxycodone", "Methadone"]
-             for drug in contraindicated {
-                 if recommendations.contains(where: { $0.name.contains(drug) }) {
-                      // Only block if Hepatorenal or Encephalopathy present?
-                      // User feedback said "Avoid all hepatically metabolized" for Hepatorenal.
-                      // Let's enforce strict block if Hepatorenal or HE Grade 3/4
-                      if isRenalImpaired || encephalopathyGrade.isCerebralFailure {
-                          errors.append("SAFETY GATE FAILURE: \(drug) prohibited in Decompensated Hepatic Failure (Hepatorenal/HE). Removing Recommendation.")
-                          recommendations.removeAll { $0.name.contains(drug) }
-                      }
-                 }
-             }
-            
-            // 2b. Explicit Methadone "Double Hit" Gate (Hepatic C + Renal Impairment)
-            // Even if not strictly caught above, ensure Methadone is purged.
-            if isRenalImpaired && recommendations.contains(where: { $0.name.contains("Methadone") }) {
-                 errors.append("SAFETY GATE FAILURE: Methadone prohibited in multi-organ dysfunction (Hepatic Failure + Renal Impairment). Consult Specialist.")
-                 recommendations.removeAll { $0.name.contains("Methadone") }
-            }
-        }
-        
-        // 3. Pregnancy Safety Gate Validation (Cap Case 46)
-        if isPregnant {
-             // Existing code handles block, but this is a redundant safety check
-             let contraindicated = ["Codeine", "Tramadol"] // NSAIDs handled in Adjuvants
-             for drug in contraindicated {
-                 if recommendations.contains(where: { $0.name.contains(drug) }) {
-                      errors.append("PREGNANCY GATE: \(drug) contraindicated. Removing.")
-                      recommendations.removeAll { $0.name.contains(drug) }
-                 }
-             }
-        }
-        
-        // 4. Pediatric Safety Gate Validation
-        if isPediatric {
-             let contraindicated = ["Codeine", "Tramadol"]
-             for drug in contraindicated {
-                 if recommendations.contains(where: { $0.name.contains(drug) }) {
-                     errors.append("PEDIATRIC GATE: \(drug) contraindicated (FDA Black Box). Removing.")
-                     recommendations.removeAll { $0.name.contains(drug) }
-                 }
-             }
-        }
-        
-        // 5. Methadone Safety Gates (Contextual)
-        // User Requirement: Strict "Pain-Specific" exclusion gates.
-        // 5. Methadone Safety Gates (Contextual)
-        // User Requirement: Warn, Do Not Block (Fixes "Methadone Trap")
-        if recommendations.contains(where: { $0.name.contains("Methadone") }) {
-            // A. QTc Gate (>450ms)
-            if qtcProlonged {
-                errors.append("CRITICAL: Methadone Risk (QTc Prolonged). High risk of Torsades. Contraindicated for new starts; use extreme caution if rotating OFF.")
-                // recommendations.removeAll ... // BLOCKED: Kept visible for rotation calculations.
-            }
-            
-            // B. OUD/Overdose Gate
-            if historyOverdose && !analgesicProfile.isChronic {
-                errors.append("CRITICAL: Methadone in Naive/High-Risk Patient. Extreme risk of accumulation & respiratory depression. Specialist use only.")
-                // recommendations.removeAll ... // BLOCKED: Kept visible for reference.
-            } 
-        }
-        
-        // 6. Breastfeeding Safety Gate
-        if isBreastfeeding {
-             let contraindicated = ["Codeine", "Tramadol"]
-             for drug in contraindicated {
-                 if recommendations.contains(where: { $0.name.contains(drug) }) {
-                      errors.append("BREASTFEEDING GATE: \(drug) contraindicated (FDA Black Box). Removing.")
-                      recommendations.removeAll { $0.name.contains(drug) }
-                 }
-             }
-        }
-        
-        // 7. Hepatic NSAID Gate (Coagulopathy Risk) - User Request
-        if hepaticFunction == .failure {
-             let nsaids = ["NSAID", "Ibuprofen", "Naproxen", "Ketorolac", "Indomethacin", "Diclofenac", "Aspirin"]
-             if adjuvants.contains(where: { adj in nsaids.contains(where: { adj.drug.contains($0) || adj.category.contains($0) }) }) {
-                 errors.append("HEPATIC SAFETY: NSAIDs Contraindicated (Coagulopathy/Bleeding Risk). Removing.")
-                 adjuvants.removeAll { adj in nsaids.contains(where: { adj.drug.contains($0) || adj.category.contains($0) }) }
-             }
-        }
-        
-        return errors
-    }
+
     func calculate() {
         // Reset Outputs
         var recs: [DrugRecommendation] = []
@@ -682,8 +514,30 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
             return ClinicalData.drugData.first { name.localizedCaseInsensitiveContains($0.name) }?.durationProfile
         }
 
+        func getMolecule(for name: String) -> OpioidMolecule {
+            // Priority: Lookup in Data
+            if let match = ClinicalData.drugData.first(where: { name.localizedCaseInsensitiveContains($0.name) }) {
+                return match.molecule
+            }
+            // Fallback: Infer from name (for ad-hoc strings like "Codeine" if not in DB)
+            let lower = name.lowercased()
+            if lower.contains("morphine") { return .morphine }
+            if lower.contains("hydromorphone") { return .hydromorphone }
+            if lower.contains("oxycodone") { return .oxycodone }
+            if lower.contains("methadone") { return .methadone }
+            if lower.contains("fentanyl") { return .fentanyl }
+            if lower.contains("buprenorphine") { return .buprenorphine }
+            if lower.contains("tramadol") { return .tramadol }
+            if lower.contains("codeine") { return .codeine }
+            if lower.contains("meperidine") { return .meperidine }
+            if lower.contains("tapentadol") { return .tapentadol }
+            if lower.contains("levorphanol") { return .levorphanol }
+            if lower.contains("suzetrigine") { return .suzetrigine }
+            return .other
+        }
+
         func addRec(_ name: String, _ type: RecommendationType, _ reason: String, _ detail: String) {
-            recs.append(DrugRecommendation(name: name, reason: reason, detail: detail, type: type, durationProfile: getProfile(for: name)))
+            recs.append(DrugRecommendation(name: name, reason: reason, detail: detail, type: type, durationProfile: getProfile(for: name), molecule: getMolecule(for: name)))
         }
 
         // 3. ANALGESIC PROFILE LOGIC
@@ -920,11 +774,11 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
         if isRenalImpaired {
             // "Renal Cliff" Fix: Only hard block for Dialysis (<30), Caution for Impaired (30-60).
             if renalFunction == .dialysis {
-                recs.removeAll { $0.name.contains("Morphine") }
+                recs.removeAll { $0.molecule == .morphine }
             } else {
                  // Impaired: Convert Morphine to Caution
                  for i in 0..<recs.count {
-                     if recs[i].name.contains("Morphine") {
+                     if recs[i].molecule == .morphine {
                          recs[i] = DrugRecommendation(
                             name: recs[i].name,
                             reason: "Renal Caution (eGFR 30-60)",
@@ -936,7 +790,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
                  }
             }
             
-            if let idx = recs.firstIndex(where: { $0.name.contains("Hydromorphone") }) {
+            if let idx = recs.firstIndex(where: { $0.molecule == .hydromorphone }) {
                 let d = recs[idx]
                 let warning = renalFunction == .dialysis ? "Strict Caution (Dialysis)." : "Renal Caution."
                 let detail = renalFunction == .dialysis ? "Accumulates between sessions. Reduce dose 50% (Metabolite Risk)." : "Reduce dose 50% (Metabolite Accumulation)."
@@ -945,12 +799,12 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
             }
             
             // Oxycodone Renal Caution
-            if let idx = recs.firstIndex(where: { $0.name.contains("Oxycodone") }) {
+            if let idx = recs.firstIndex(where: { $0.molecule == .oxycodone }) {
                 let d = recs[idx]
                 recs[idx] = DrugRecommendation(name: d.name, reason: "Renal Caution", detail: "Metabolites accumulate in eGFR < 60. Start with lower doses (2.5mg PO) and monitor for sedation.", type: .caution, durationProfile: d.durationProfile)
             }
             
-            if !recs.contains(where: { $0.name.contains("Fentanyl") }) && (route == .iv || route == .both) {
+            if !recs.contains(where: { $0.molecule == .fentanyl }) && (route == .iv || route == .both) {
                  if renalFunction == .dialysis {
                      // Dialysis: Fentanyl is Top Priority
                      recs.insert(DrugRecommendation(name: "Fentanyl IV", reason: "Renal Safe", detail: "No active metabolites. Safest option in dialysis. Consider Specialist Guidance.", type: .safe, durationProfile: .rapid), at: 0)
@@ -964,7 +818,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
         // Dyspnea + Renal Specific Warning (Case 37)
         if indication == .dyspnea && isRenalImpaired {
             warns.append("Dyspnea/Renal: Avoid Morphine due to Metabolites. Consider Hydromorphone or Fentanyl (off-label).")
-            if !recs.contains(where: { $0.name.contains("Hydromorphone") }) {
+            if !recs.contains(where: { $0.molecule == .hydromorphone }) {
                  // Ensure alternative exists
                  addRec("Hydromorphone IV", .caution, "Alternative", "Renal adjusted. 0.2mg IV.")
             }
@@ -977,18 +831,18 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
         // 802 placeholder just to ensure file sync
         if isHepaticFailure {
             warns.append("LIVER FAILURE: Avoid Morphine, Codeine, Tramadol, Oxycodone.")
-            let toxic = ["Morphine", "Codeine", "Tramadol", "Oxycodone", "Methadone", "Meperidine"]
+            let toxic: Set<OpioidMolecule> = [.morphine, .codeine, .tramadol, .oxycodone, .methadone, .meperidine]
 
-            recs.removeAll { r in toxic.contains { t in r.name.contains(t) } }
+            recs.removeAll { toxic.contains($0.molecule) }
             
             // Acetaminophen Max 2g Warning removed (Redundant with Adjuvant Rec 2g limit)
 
-            if !recs.contains(where: { $0.name.contains("Fentanyl") }) && (route == .iv || route == .both) {
+            if !recs.contains(where: { $0.molecule == .fentanyl }) && (route == .iv || route == .both) {
                 addRec("Fentanyl IV", .safe, "Preferred", "Safest hepatic profile. Consider Specialist Guidance.")
             }
             
             // Split logic for IV vs PO Hydromorphone
-            if let idx = recs.firstIndex(where: { $0.name.contains("Hydromorphone") }) {
+            if let idx = recs.firstIndex(where: { $0.molecule == .hydromorphone }) {
                  let isPO = recs[idx].name.contains("PO")
                  let detail = isPO 
                     ? "Bioavailability increases 4x (Shunting bypasses First-Pass). Start 1mg PO." 
@@ -1018,12 +872,12 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
             warns.append("HEMODYNAMIC INSTABILITY: Avoid Morphine (Histamine Release). Fentanyl preferred.")
             
             // Remove Morphine/Codeine (Histamine release)
-            recs.removeAll { $0.name.contains("Morphine") || $0.name.contains("Codeine") }
+            recs.removeAll { $0.molecule == .morphine || $0.molecule == .codeine }
             
             // Prioritize Fentanyl
-            if !recs.contains(where: { $0.name.contains("Fentanyl") }) && (route == .iv || route == .both) {
-                recs.insert(DrugRecommendation(name: "Fentanyl IV", reason: "Preferred", detail: "Cardiostable. Start 25-50mcg. Titrate carefully. Consider Specialist Guidance.", type: .safe, durationProfile: .rapid), at: 0)
-            } else if let idx = recs.firstIndex(where: { $0.name.contains("Fentanyl") }) {
+            if !recs.contains(where: { $0.molecule == .fentanyl }) && (route == .iv || route == .both) {
+                recs.insert(DrugRecommendation(name: "Fentanyl IV", reason: "Preferred", detail: "Cardiostable. Start 25-50mcg. Titrate carefully. Consider Specialist Guidance.", type: .safe, durationProfile: .rapid, molecule: .fentanyl), at: 0)
+            } else if let idx = recs.firstIndex(where: { $0.molecule == .fentanyl }) {
                 // Ensure it's marked SAFE/PREFERRED
                 let old = recs[idx]
                 recs[idx] = DrugRecommendation(name: old.name, reason: "Preferred (Stable)", detail: old.detail, type: .safe, durationProfile: old.durationProfile)
@@ -1044,12 +898,12 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
         // 7. PREGNANCY LOGIC
         if isPregnant {
             warns.append("Pregnancy: Avoid Codeine/Tramadol. Neonatology consult recommended.")
-            recs.removeAll { $0.name.contains("Codeine") || $0.name.contains("Tramadol") }
+            recs.removeAll { $0.molecule == .codeine || $0.molecule == .tramadol }
         }
         
         // Pediatric Block (Case 53)
         if isPediatric {
-             recs.removeAll { $0.name.contains("Codeine") || $0.name.contains("Tramadol") }
+             recs.removeAll { $0.molecule == .codeine || $0.molecule == .tramadol }
         }
 
         // 8. ADJUVANT LOGIC
@@ -1215,10 +1069,10 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
                 // In mild impairment, standard agents (Hydromorphone/Oxycodone) are preferred despite "Caution" tag
                 // over Fentanyl ("Safe") due to pharmacokinetics and ease of use, as accumulation risk is manageable.
                 if self.renalFunction == .impaired { // .impaired = Mild/Mod. .dialysis is separate.
-                    let aStandard = a.name.contains("Hydromorphone") || a.name.contains("Oxycodone")
-                    let bStandard = b.name.contains("Hydromorphone") || b.name.contains("Oxycodone")
-                    let aFent = a.name.contains("Fentanyl")
-                    let bFent = b.name.contains("Fentanyl")
+                    let aStandard = a.molecule == .hydromorphone || a.molecule == .oxycodone
+                    let bStandard = b.molecule == .hydromorphone || b.molecule == .oxycodone
+                    let aFent = a.molecule == .fentanyl
+                    let bFent = b.molecule == .fentanyl
                     
                     // Case: Comparing Standard (Caution) vs Fentanyl (Safe)
                     // We want Standard to Win (return true if A is Standard)
@@ -1232,8 +1086,8 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
             // 2. Clinical Context Priority (Organ Failure Tie-Breaker)
             // Fentanyl Wins in Severe Organ Failure (Dialysis, Hepatic Failure, Shock)
             if self.renalFunction == .dialysis || self.isHepaticFailure || self.hemo == .unstable {
-                let aFent = a.name.contains("Fentanyl")
-                let bFent = b.name.contains("Fentanyl")
+                let aFent = a.molecule == .fentanyl
+                let bFent = b.molecule == .fentanyl
                 if aFent != bFent { return aFent }
             }
             
@@ -1248,23 +1102,27 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
 
         // MARK: - FINAL SAFETY VALIDATIONS (HARDENING)
         
+        // Create Snapshot
+        let snap = snapshot(recs: recs, adjs: adjs)
+        
         // 1. State Consistency
-        warns.insert(contentsOf: validateStateConsistency(), at: 0)
+        warns.insert(contentsOf: SafetyAdvisoryService.shared.validateStateConsistency(snapshot: snap), at: 0)
         
         // 2. Organ Specific Validation (Hepatic Focus)
         if hepaticFunction != .normal {
-            warns.append(contentsOf: validateHepaticRenalCombination())
-            warns.append(contentsOf: validateHepaticCoagulopathy())
-            warns.append(contentsOf: validateAscitesImpact())
-            warns.append(contentsOf: validateEncephalopathyRisk())
+            warns.append(contentsOf: SafetyAdvisoryService.shared.validateHepaticRenalCombination(snapshot: snap))
+            warns.append(contentsOf: SafetyAdvisoryService.shared.validateHepaticCoagulopathy(snapshot: snap))
+            warns.append(contentsOf: SafetyAdvisoryService.shared.validateAscitesImpact(snapshot: snap))
+            warns.append(contentsOf: SafetyAdvisoryService.shared.validateEncephalopathyRisk(snapshot: snap))
         }
         
         // 3. Safety Gates (May remove recs)
-        let gateErrors = validateSafetyGates()
+        let (gateErrors, removalIDs) = SafetyAdvisoryService.shared.validateSafetyGates(snapshot: snap)
         if !gateErrors.isEmpty {
-            self.warnings.insert(contentsOf: gateErrors, at: 0)
+            warns.insert(contentsOf: gateErrors, at: 0) // Fixed bug: use 'warns', not 'self.warnings'
             SafetyLogger.shared.log(.safetyGateFailure(errors: gateErrors))
         }
+        recs.removeAll { removalIDs.contains($0.id) }
         
         // 4. Suzetrigine (VX-548) Logic
         // Indication: Moderate-to-severe acute pain.
@@ -1295,10 +1153,10 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
         // But the previous code had it at the end. I will restore the order in my replacement.
         
         // Suzetrigine Renal Gate (eGFR < 15 / Dialysis)
-        if recs.contains(where: { $0.name.contains("Suzetrigine") }) {
+        if recs.contains(where: { $0.molecule == .suzetrigine }) {
             if renalFunction == .dialysis { // eGFR < 15 proxy
                 warns.append("RENAL ALERT: Suzetrigine Contraindicated in Severe Renal Impairment (eGFR < 15). Removing.")
-                recs.removeAll { $0.name.contains("Suzetrigine") }
+                recs.removeAll { $0.molecule == .suzetrigine }
             }
         }
         
@@ -1361,7 +1219,8 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
 }
 
 
-// File: AnalgesiaTool/Features/Assessment/ConditionGuidesView.swift
+// MARK: - File: AnalgesiaTool/Features/Assessment/ConditionGuidesView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 struct ConditionGuidesView: View {
     var body: some View {
@@ -1401,7 +1260,8 @@ struct ConditionGuidesView: View {
 }
 
 
-// File: AnalgesiaTool/Features/Assessment/ContextBadge.swift
+// MARK: - File: AnalgesiaTool/Features/Assessment/ContextBadge.swift
+// ----------------------------------------------------------------
 
 //
 //  ContextBadge.swift
@@ -1429,7 +1289,8 @@ struct ContextBadge: View {
 }
 
 
-// File: AnalgesiaTool/Features/Assessment/PatientSharedDecisionView.swift
+// MARK: - File: AnalgesiaTool/Features/Assessment/PatientSharedDecisionView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct PatientSharedDecisionView: View {
@@ -1549,7 +1410,8 @@ struct PlanRow: View {
 }
 
 
-// File: AnalgesiaTool/Features/Assessment/RiskAssessmentView.swift
+// MARK: - File: AnalgesiaTool/Features/Assessment/RiskAssessmentView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 import UIKit // For Haptics
 
@@ -2766,7 +2628,41 @@ struct DisclaimerFooter: View {
 }
 
 
-// File: AnalgesiaTool/Features/Assessment/SelectionView.swift
+// MARK: - File: AnalgesiaTool/Features/Assessment/SafetyAlertsView.swift
+// ----------------------------------------------------------------
+import SwiftUI
+
+struct SafetyAlertsView: View {
+    let alerts: [SafetyAlert]
+    
+    // Sort logic: Critical -> Warning -> Info
+    var sortedAlerts: [SafetyAlert] {
+        alerts.sorted {
+            priority(for: $0.severity) > priority(for: $1.severity)
+        }
+    }
+    
+    private func priority(for severity: SafetySeverity) -> Int {
+        switch severity {
+        case .critical: return 3
+        case .warning: return 2
+        case .info: return 1
+        }
+    }
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            ForEach(sortedAlerts) { alert in
+                CollapsibleWarningCard(alert: alert)
+                    .transition(.opacity.animation(.easeInOut))
+            }
+        }
+    }
+}
+
+
+// MARK: - File: AnalgesiaTool/Features/Assessment/SelectionView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 // MARK: - Layout Options
@@ -2982,7 +2878,8 @@ struct CardModifier: ViewModifier {
 // MARK: - FlowLayout is defined in UI/Common/FlowLayout.swift
 
 
-// File: AnalgesiaTool/Features/Calculator/CalculatorStore.swift
+// MARK: - File: AnalgesiaTool/Features/Calculator/CalculatorStore.swift
+// ----------------------------------------------------------------
 import Foundation
 import Combine
 #if canImport(UIKit)
@@ -3758,7 +3655,8 @@ class CalculatorStore: ObservableObject {
 }
 
 
-// File: AnalgesiaTool/Features/Calculator/CalculatorView.swift
+// MARK: - File: AnalgesiaTool/Features/Calculator/CalculatorView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 import UIKit
 
@@ -4867,7 +4765,9 @@ extension CalculatorView {
             
             // Stewardship Warning (Pinned Below Card)
             if !store.warningText.isEmpty {
-                CollapsibleWarningCard(text: store.warningText)
+                // On-the-fly Alert Creation (Legacy Bridging)
+                let alert = SafetyAlert(title: "Safety Alert", description: store.warningText, severity: .warning, source: "Calculator")
+                CollapsibleWarningCard(alert: alert)
                     .padding(.horizontal)
                     .transition(.opacity.animation(.easeInOut(duration: 0.2)))
             }
@@ -4932,20 +4832,42 @@ struct ComplexConversionCard: View {
 
 // MARK: - Collapsible Warning Card (v1.6)
 struct CollapsibleWarningCard: View {
-    let text: String
-    @State private var isExpanded: Bool = false
+    let alert: SafetyAlert
+    @State private var isExpanded: Bool = true
     
-    // Safety: If it's a "High Risk" warning, maybe default open?
-    // User requested "Warning" with a chevron.
+    // Severity Logic
+    var alertColor: Color {
+        switch alert.severity {
+        case .critical: return ClinicalTheme.rose500
+        case .warning: return ClinicalTheme.amber500
+        case .info: return ClinicalTheme.teal500
+        }
+    }
+    
+    var iconName: String {
+        switch alert.severity {
+        case .critical: return "exclamationmark.octagon.fill"
+        case .warning: return "exclamationmark.triangle.fill"
+        case .info: return "info.circle.fill"
+        }
+    }
+    
+    var isCollapsible: Bool {
+        return alert.severity != .critical
+    }
     
     var body: some View {
         VStack(spacing: 0) {
-            Button(action: { withAnimation { isExpanded.toggle() } }) {
+            Button(action: {
+                if isCollapsible {
+                    withAnimation { isExpanded.toggle() }
+                }
+            }) {
                 HStack {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(ClinicalTheme.amber500)
+                    Image(systemName: iconName)
+                        .foregroundColor(alertColor)
                     
-                    Text("Safety Alerts")
+                    Text(alert.title)
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(ClinicalTheme.textPrimary)
@@ -4958,19 +4880,22 @@ struct CollapsibleWarningCard: View {
                     
                     Spacer()
                     
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.caption)
-                        .foregroundColor(ClinicalTheme.textSecondary)
+                    if isCollapsible {
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .font(.caption)
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                    }
                 }
                 .padding(12)
-                .background(ClinicalTheme.amber500.opacity(0.1))
+                .background(alertColor.opacity(0.1))
             }
+            .disabled(!isCollapsible) // Disable interaction if Critical
             
-            if isExpanded {
-                Divider().background(ClinicalTheme.amber500.opacity(0.3))
+            if isExpanded || !isCollapsible {
+                Divider().background(alertColor.opacity(0.3))
                 
                 HStack(alignment: .top, spacing: 8) {
-                    Text(text)
+                    Text(alert.description)
                         .font(.caption)
                         .fontWeight(.medium)
                         .foregroundColor(ClinicalTheme.textPrimary)
@@ -4983,7 +4908,17 @@ struct CollapsibleWarningCard: View {
 
         }
         .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.amber500.opacity(0.3), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(alertColor.opacity(0.3), lineWidth: 1))
+        .onAppear {
+            // Force Open if Critical
+            if alert.severity == .critical {
+                isExpanded = true
+            } else if alert.severity == .info {
+                isExpanded = false
+            } else {
+                isExpanded = true // Warning defaults open
+            }
+        }
     }
 }
 
@@ -5079,7 +5014,8 @@ struct EphemeralStatusBanner: View {
 }
 
 
-// File: AnalgesiaTool/Features/Calculator/InfusionView.swift
+// MARK: - File: AnalgesiaTool/Features/Calculator/InfusionView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct InfusionView: View {
@@ -5565,7 +5501,8 @@ struct DripView: View {
 }
 
 
-// File: AnalgesiaTool/Features/Calculator/MergedAlgorithmTransparency.swift
+// MARK: - File: AnalgesiaTool/Features/Calculator/MergedAlgorithmTransparency.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 // MARK: - MERGED TRANSPARENCY ACCORDION (Logix + Visuals)
@@ -5650,7 +5587,8 @@ struct MergedAlgorithmTransparencyAccordion: View {
 }
 
 
-// File: AnalgesiaTool/Features/Calculator/MethadoneView.swift
+// MARK: - File: AnalgesiaTool/Features/Calculator/MethadoneView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 import Charts
 
@@ -6478,7 +6416,8 @@ struct SectionHeader: View {
 }
 
 
-// File: AnalgesiaTool/Features/Calculator/SharedClinicalContextView.swift
+// MARK: - File: AnalgesiaTool/Features/Calculator/SharedClinicalContextView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct SharedClinicalContextView: View {
@@ -6766,7 +6705,8 @@ struct SharedClinicalContextView: View {
 
 
 
-// File: AnalgesiaTool/Features/Calculator/TaperScheduleView.swift
+// MARK: - File: AnalgesiaTool/Features/Calculator/TaperScheduleView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 import Combine
 import Charts
@@ -7598,7 +7538,8 @@ struct TaperChartVisualizer: View {
 }
 
 
-// File: AnalgesiaTool/Features/Calculator/TargetMathView.swift
+// MARK: - File: AnalgesiaTool/Features/Calculator/TargetMathView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct TargetMathView: View {
@@ -7770,7 +7711,114 @@ struct MathRow: View {
 }
 
 
-// File: AnalgesiaTool/Features/Library/LibraryView.swift
+// MARK: - File: AnalgesiaTool/Features/Library/Components/CitationChip.swift
+// ----------------------------------------------------------------
+import SwiftUI
+
+struct CitationChip: View {
+    let label: String
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "text.book.closed.fill")
+                .font(.system(size: 8))
+            Text(label)
+                .font(.system(size: 10, weight: .bold))
+        }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 3)
+        .background(Color.blue.opacity(0.1))
+        .foregroundColor(.blue)
+        .cornerRadius(6)
+    }
+}
+
+
+// MARK: - File: AnalgesiaTool/Features/Library/Components/PKStatBox.swift
+// ----------------------------------------------------------------
+import SwiftUI
+
+struct PKStatBox: View {
+    let label: String
+    let value: String
+    var isBar: Bool = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label.uppercased())
+                .font(.system(size: 10, weight: .bold))
+                .foregroundColor(.secondary)
+            
+            if isBar {
+                // Simple visual bar for Bioavailability
+                HStack {
+                    Capsule()
+                        .fill(Color.teal)
+                        .frame(width: 40, height: 6)
+                    Text(value)
+                        .font(.subheadline.weight(.semibold))
+                }
+            } else {
+                Text(value)
+                    .font(.subheadline.weight(.semibold))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
+    }
+}
+
+
+// MARK: - File: AnalgesiaTool/Features/Library/Components/SourcesFooterView.swift
+// ----------------------------------------------------------------
+import SwiftUI
+
+struct SourcesFooterView: View {
+    let citations: [String]
+    @State private var isExpanded = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Divider()
+            Button(action: { withAnimation { isExpanded.toggle() }}) {
+                HStack {
+                    Text("References & Sources")
+                        .font(.footnote.weight(.medium))
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                }
+                .padding(.vertical, 16)
+            }
+            
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(citations, id: \.self) { source in
+                        HStack(alignment: .top, spacing: 8) {
+                            Text("•")
+                                .foregroundColor(.secondary)
+                            Text(source)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+                .padding(.bottom, 24)
+            }
+        }
+    }
+}
+
+
+// MARK: - File: AnalgesiaTool/Features/Library/LibraryView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct LibraryView: View {
@@ -7961,133 +8009,8 @@ struct FlowchartView: View {
 }
 
 
-// File: AnalgesiaTool/Features/Library/ProtocolDetailView.swift
-import SwiftUI
-
-struct ProtocolDetailView: View {
-    let title: String
-    let content: String
-    
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(content)
-                    .foregroundColor(ClinicalTheme.textPrimary)
-                    .lineSpacing(6)
-            }
-            .clinicalCard()
-            .padding()
-        }
-        .slateBackground()
-        .navigationTitle(title)
-    }
-}
-
-
-// File: AnalgesiaTool/Features/Library/Components/CitationChip.swift
-import SwiftUI
-
-struct CitationChip: View {
-    let label: String
-    
-    var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "text.book.closed.fill")
-                .font(.system(size: 8))
-            Text(label)
-                .font(.system(size: 10, weight: .bold))
-        }
-        .padding(.horizontal, 6)
-        .padding(.vertical, 3)
-        .background(Color.blue.opacity(0.1))
-        .foregroundColor(.blue)
-        .cornerRadius(6)
-    }
-}
-
-
-// File: AnalgesiaTool/Features/Library/Components/PKStatBox.swift
-import SwiftUI
-
-struct PKStatBox: View {
-    let label: String
-    let value: String
-    var isBar: Bool = false
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(label.uppercased())
-                .font(.system(size: 10, weight: .bold))
-                .foregroundColor(.secondary)
-            
-            if isBar {
-                // Simple visual bar for Bioavailability
-                HStack {
-                    Capsule()
-                        .fill(Color.teal)
-                        .frame(width: 40, height: 6)
-                    Text(value)
-                        .font(.subheadline.weight(.semibold))
-                }
-            } else {
-                Text(value)
-                    .font(.subheadline.weight(.semibold))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
-    }
-}
-
-
-// File: AnalgesiaTool/Features/Library/Components/SourcesFooterView.swift
-import SwiftUI
-
-struct SourcesFooterView: View {
-    let citations: [String]
-    @State private var isExpanded = false
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Divider()
-            Button(action: { withAnimation { isExpanded.toggle() }}) {
-                HStack {
-                    Text("References & Sources")
-                        .font(.footnote.weight(.medium))
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
-                }
-                .padding(.vertical, 16)
-            }
-            
-            if isExpanded {
-                VStack(alignment: .leading, spacing: 12) {
-                    ForEach(citations, id: \.self) { source in
-                        HStack(alignment: .top, spacing: 8) {
-                            Text("•")
-                                .foregroundColor(.secondary)
-                            Text(source)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }
-                }
-                .padding(.bottom, 24)
-            }
-        }
-    }
-}
-
-
-// File: AnalgesiaTool/Features/Library/Neuropathy/NeuropathicMatrixView.swift
+// MARK: - File: AnalgesiaTool/Features/Library/Neuropathy/NeuropathicMatrixView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct NeuropathicMatrixView: View {
@@ -8220,7 +8143,8 @@ struct NeuropathicMatrixView_Previews: PreviewProvider {
 }
 
 
-// File: AnalgesiaTool/Features/Library/Pharmacy/ClinicalMethodologyView.swift
+// MARK: - File: AnalgesiaTool/Features/Library/Pharmacy/ClinicalMethodologyView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct ClinicalMethodologyView: View {
@@ -8401,7 +8325,8 @@ Please refer to *Babu et al. (NEJM 2019)* for the detailed breakdown of the RIOS
 }
 
 
-// File: AnalgesiaTool/Features/Library/Pharmacy/DrugMonographView.swift
+// MARK: - File: AnalgesiaTool/Features/Library/Pharmacy/DrugMonographView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct DrugMonographView: View {
@@ -8547,7 +8472,8 @@ struct MonographSectionHeader: View {
 }
 
 
-// File: AnalgesiaTool/Features/Library/Pharmacy/ReferenceView.swift
+// MARK: - File: AnalgesiaTool/Features/Library/Pharmacy/ReferenceView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 
@@ -9027,7 +8953,32 @@ struct DisclaimerCard: View {
 // MARK: - Workup Checkbox Component (Moved from OUDConsultView)
 
 
-// File: AnalgesiaTool/Features/Library/Risk/COWSView.swift
+// MARK: - File: AnalgesiaTool/Features/Library/ProtocolDetailView.swift
+// ----------------------------------------------------------------
+import SwiftUI
+
+struct ProtocolDetailView: View {
+    let title: String
+    let content: String
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text(content)
+                    .foregroundColor(ClinicalTheme.textPrimary)
+                    .lineSpacing(6)
+            }
+            .clinicalCard()
+            .padding()
+        }
+        .slateBackground()
+        .navigationTitle(title)
+    }
+}
+
+
+// MARK: - File: AnalgesiaTool/Features/Library/Risk/COWSView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct COWSView: View {
@@ -9260,7 +9211,8 @@ struct CowsItem: View {
 }
 
 
-// File: AnalgesiaTool/Features/Library/Risk/ToolkitStore.swift
+// MARK: - File: AnalgesiaTool/Features/Library/Risk/ToolkitStore.swift
+// ----------------------------------------------------------------
 import Foundation
 import Combine
 
@@ -9396,7 +9348,8 @@ class ToolkitStore: ObservableObject {
 }
 
 
-// File: AnalgesiaTool/Features/Library/Screening/ScreeningStore.swift
+// MARK: - File: AnalgesiaTool/Features/Library/Screening/ScreeningStore.swift
+// ----------------------------------------------------------------
 import Foundation
 import Combine
 
@@ -9486,7 +9439,8 @@ class ScreeningStore: ObservableObject {
 }
 
 
-// File: AnalgesiaTool/Features/Library/Screening/ScreeningView.swift
+// MARK: - File: AnalgesiaTool/Features/Library/Screening/ScreeningView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct ScreeningView: View {
@@ -9884,7 +9838,143 @@ struct PEGView: View {
 }
 
 
-// File: AnalgesiaTool/Features/OUDConsult/AberrantBehaviorView.swift
+// MARK: - File: AnalgesiaTool/Features/Onboarding/OnboardingView.swift
+// ----------------------------------------------------------------
+import SwiftUI
+
+struct OnboardingView: View {
+    @Binding var isPresented: Bool
+    @AppStorage("hasAcceptedLiability_v1") private var hasAccepted: Bool = false
+    
+    @State private var isToggleOn: Bool = false
+    @State private var opacity: Double = 0
+    
+    var body: some View {
+        ZStack {
+            // Background
+            Color(UIColor.systemBackground)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 24) {
+                
+                // Icon
+                Image(systemName: "cross.case.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 60, height: 60)
+                    .foregroundColor(.red)
+                    .padding(.top, 40)
+                    .shadow(color: .red.opacity(0.3), radius: 10, x: 0, y: 5)
+                
+                // Header
+                VStack(spacing: 12) {
+                    Text("Clinical Decision Support")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                    
+                    Text("Opioid Precision Tool")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Divider()
+                    .padding(.horizontal)
+                
+                // Legal Text Scroll
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        disclaimerPoint(icon: "stethoscope", title: "Licensed Provider Use Only", text: "By using this Application, you represent and warrant that you are a validly licensed healthcare professional in good standing in your jurisdiction. This Application is NOT intended for use by patients or the general public.")
+                        
+                        disclaimerPoint(icon: "exclamationmark.triangle", title: "No Medical Advice", text: "THIS APPLICATION IS AN EDUCATIONAL TOOL ONLY. It does NOT provide medical advice, diagnosis, or treatment. It is not a substitute for the independent professional judgment of a healthcare provider.")
+                        
+                        disclaimerPoint(icon: "hand.raised.fill", title: "Clinical Variability", text: "Algorithms used in this Application do NOT account for individual patient history, comorbidities, polypharmacy, genetics, or risk of misuse. Outputs may be inappropriate for specific clinical scenarios.")
+                        
+                        Text("By continuing, you acknowledge that you have independently verified all inputs and outputs.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 8)
+                    }
+                    .padding()
+                }
+                .background(Color(UIColor.secondarySystemBackground))
+                .cornerRadius(12)
+                .padding(.horizontal)
+                
+                Spacer()
+                
+                // Agreement
+                HStack {
+                    Toggle("", isOn: $isToggleOn)
+                        .labelsHidden()
+                        .toggleStyle(SwitchToggleStyle(tint: .red))
+                    
+                    Text("I am a licensed clinician and I accept full responsibility for patient care.")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                }
+                .padding(.horizontal, 24)
+                
+                // Button
+                Button(action: {
+                    withAnimation {
+                        hasAccepted = true
+                        isPresented = false
+                    }
+                }) {
+                    Text("Agree & Continue")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(isToggleOn ? Color.blue : Color.gray.opacity(0.5))
+                        .cornerRadius(14)
+                }
+                .disabled(!isToggleOn)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 20)
+            }
+            .opacity(opacity)
+            .onAppear {
+                withAnimation(.easeIn(duration: 0.5)) {
+                    opacity = 1.0
+                }
+            }
+        }
+    }
+    
+    func disclaimerPoint(icon: String, title: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .foregroundColor(.blue)
+                .font(.body)
+                .frame(width: 24)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Text(text)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
+// MARK: - Preview
+struct OnboardingView_Previews: PreviewProvider {
+    static var previews: some View {
+        OnboardingView(isPresented: .constant(true))
+    }
+}
+
+
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/AberrantBehaviorView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct AberrantBehaviorView: View {
@@ -10131,7 +10221,8 @@ struct ActionCard: View {
 }
 
 
-// File: AnalgesiaTool/Features/OUDConsult/OUDConsultTools.swift
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/OUDConsultTools.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 // MARK: - Urine Toxicology View
@@ -10333,7 +10424,8 @@ struct VisualAidsView: View {
 
 
 
-// File: AnalgesiaTool/Features/OUDConsult/OUDConsultView.swift
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/OUDConsultView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct OUDConsultView: View {
@@ -10772,7 +10864,8 @@ private struct ScreenerRow: View {
 }
 
 
-// File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDActionView.swift
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDActionView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct OUDActionView: View {
@@ -10939,7 +11032,8 @@ struct OUDActionView: View {
 }
 
 
-// File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDConsultStore.swift
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDConsultStore.swift
+// ----------------------------------------------------------------
 import Combine
 #if canImport(UIKit)
 import UIKit
@@ -11197,7 +11291,8 @@ class OUDConsultStore: ObservableObject {
 }
 
 
-// File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDConsultWizardView.swift
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDConsultWizardView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct OUDConsultWizardView: View {
@@ -11330,7 +11425,8 @@ struct ContextMismatchBanner: View {
 }
 
 
-// File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDDiagnosisView.swift
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDDiagnosisView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct OUDDiagnosisView: View {
@@ -11400,7 +11496,8 @@ struct OUDDiagnosisView: View {
 }
 
 
-// File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDFollowUpView.swift
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDFollowUpView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct OUDFollowUpView: View {
@@ -11458,7 +11555,8 @@ struct OUDFollowUpView: View {
 }
 
 
-// File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDRiskAssessmentView.swift
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDRiskAssessmentView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct OUDRiskAssessmentView: View {
@@ -11653,7 +11751,8 @@ struct QuickAddButton: View {
 }
 
 
-// File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDScreeningView.swift
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/Wizard/OUDScreeningView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct OUDScreeningView: View {
@@ -11719,7 +11818,8 @@ struct OUDScreeningView: View {
 }
 
 
-// File: AnalgesiaTool/Features/OUDConsult/Wizard/SubstanceLogic.swift
+// MARK: - File: AnalgesiaTool/Features/OUDConsult/Wizard/SubstanceLogic.swift
+// ----------------------------------------------------------------
 import Foundation
 
 // MARK: - 1. Input Models (The "Checkboxes")
@@ -12077,141 +12177,8 @@ class ProtocolGenerator {
 }
 
 
-// File: AnalgesiaTool/Features/Onboarding/OnboardingView.swift
-import SwiftUI
-
-struct OnboardingView: View {
-    @Binding var isPresented: Bool
-    @AppStorage("hasAcceptedLiability_v1") private var hasAccepted: Bool = false
-    
-    @State private var isToggleOn: Bool = false
-    @State private var opacity: Double = 0
-    
-    var body: some View {
-        ZStack {
-            // Background
-            Color(UIColor.systemBackground)
-                .ignoresSafeArea()
-            
-            VStack(spacing: 24) {
-                
-                // Icon
-                Image(systemName: "cross.case.fill")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 60, height: 60)
-                    .foregroundColor(.red)
-                    .padding(.top, 40)
-                    .shadow(color: .red.opacity(0.3), radius: 10, x: 0, y: 5)
-                
-                // Header
-                VStack(spacing: 12) {
-                    Text("Clinical Decision Support")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.center)
-                    
-                    Text("Opioid Precision Tool")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                }
-                
-                Divider()
-                    .padding(.horizontal)
-                
-                // Legal Text Scroll
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        disclaimerPoint(icon: "stethoscope", title: "Licensed Provider Use Only", text: "By using this Application, you represent and warrant that you are a validly licensed healthcare professional in good standing in your jurisdiction. This Application is NOT intended for use by patients or the general public.")
-                        
-                        disclaimerPoint(icon: "exclamationmark.triangle", title: "No Medical Advice", text: "THIS APPLICATION IS AN EDUCATIONAL TOOL ONLY. It does NOT provide medical advice, diagnosis, or treatment. It is not a substitute for the independent professional judgment of a healthcare provider.")
-                        
-                        disclaimerPoint(icon: "hand.raised.fill", title: "Clinical Variability", text: "Algorithms used in this Application do NOT account for individual patient history, comorbidities, polypharmacy, genetics, or risk of misuse. Outputs may be inappropriate for specific clinical scenarios.")
-                        
-                        Text("By continuing, you acknowledge that you have independently verified all inputs and outputs.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .padding(.top, 8)
-                    }
-                    .padding()
-                }
-                .background(Color(UIColor.secondarySystemBackground))
-                .cornerRadius(12)
-                .padding(.horizontal)
-                
-                Spacer()
-                
-                // Agreement
-                HStack {
-                    Toggle("", isOn: $isToggleOn)
-                        .labelsHidden()
-                        .toggleStyle(SwitchToggleStyle(tint: .red))
-                    
-                    Text("I am a licensed clinician and I accept full responsibility for patient care.")
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundColor(.primary)
-                }
-                .padding(.horizontal, 24)
-                
-                // Button
-                Button(action: {
-                    withAnimation {
-                        hasAccepted = true
-                        isPresented = false
-                    }
-                }) {
-                    Text("Agree & Continue")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(isToggleOn ? Color.blue : Color.gray.opacity(0.5))
-                        .cornerRadius(14)
-                }
-                .disabled(!isToggleOn)
-                .padding(.horizontal, 24)
-                .padding(.bottom, 20)
-            }
-            .opacity(opacity)
-            .onAppear {
-                withAnimation(.easeIn(duration: 0.5)) {
-                    opacity = 1.0
-                }
-            }
-        }
-    }
-    
-    func disclaimerPoint(icon: String, title: String, text: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: icon)
-                .foregroundColor(.blue)
-                .font(.body)
-                .frame(width: 24)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                Text(text)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-    }
-}
-
-// MARK: - Preview
-struct OnboardingView_Previews: PreviewProvider {
-    static var previews: some View {
-        OnboardingView(isPresented: .constant(true))
-    }
-}
-
-
-// File: AnalgesiaTool/Features/Settings/LegalDisclaimerView.swift
+// MARK: - File: AnalgesiaTool/Features/Settings/LegalDisclaimerView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct LegalDisclaimerView: View {
@@ -12325,7 +12292,8 @@ struct DisclaimerSection: View {
 }
 
 
-// File: AnalgesiaTool/Features/Settings/SettingsView.swift
+// MARK: - File: AnalgesiaTool/Features/Settings/SettingsView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct SettingsView: View {
@@ -12515,7 +12483,8 @@ struct SettingsView: View {
 }
 
 
-// File: AnalgesiaTool/Features/Settings/ValidationRunnerView.swift
+// MARK: - File: AnalgesiaTool/Features/Settings/ValidationRunnerView.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 struct ValidationRunnerView: View {

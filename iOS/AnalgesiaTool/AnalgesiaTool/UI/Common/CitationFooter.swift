@@ -4,21 +4,9 @@ struct CitationFooter: View {
     let citations: [Citation]
     @State private var isExpanded: Bool = false
     
-    // Initializer for Registry IDs
-    init(citationIDs: [String]) {
-        self.citations = CitationRegistry.resolve(citationIDs)
-    }
-    
     // Initializer for Direct structured citations
     init(citations: [Citation]) {
         self.citations = citations
-    }
-    
-    // Legacy Initializer (converts strings to dummy citations for backward compatibility)
-    init(legacyCitations: [String]) {
-        self.citations = legacyCitations.map {
-            Citation(id: UUID().uuidString, type: .guideline, source: "Reference", section: nil, title: $0, year: "", url: nil, excerpt: nil, lastVerified: "", labelRevisionDate: nil)
-        }
     }
     
     var body: some View {
@@ -67,20 +55,7 @@ struct CitationRow: View {
     let index: Int
     let citation: Citation
     
-    var isOutdated: Bool {
-        // Simple check: if year is not current year (2025) or previous (2024), considering it "older than 12 months" approximation for now,
-        // or properly parse ISO date.
-        // User said: "flag citations older than 12 months" based on "Last Verified".
-        // Using "lastVerified" string.
-        guard !citation.lastVerified.isEmpty else { return false }
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
-        if let date = formatter.date(from: citation.lastVerified) {
-            let oneYearAgo = Calendar.current.date(byAdding: .year, value: -1, to: Date())!
-            return date < oneYearAgo
-        }
-        return false
-    }
+
     
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
@@ -128,18 +103,9 @@ struct CitationRow: View {
                     
                     if !citation.lastVerified.isEmpty {
                         Spacer()
-                        if isOutdated {
-                             HStack(spacing: 4) {
-                                Image(systemName: "exclamationmark.arrow.triangle.2.circlepath")
-                                Text("Review Needed")
-                             }
-                             .font(.caption2)
-                             .foregroundColor(.orange)
-                        } else {
-                            Text("Verified: \(citation.lastVerified)")
-                                .font(.caption2)
-                                .foregroundColor(ClinicalTheme.textMuted)
-                        }
+                        Text("Verified: \(citation.lastVerified)")
+                            .font(.caption2)
+                            .foregroundColor(ClinicalTheme.textMuted)
                     }
                 }
                 .padding(.top, 2)

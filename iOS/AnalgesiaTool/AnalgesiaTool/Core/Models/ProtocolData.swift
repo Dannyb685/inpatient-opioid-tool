@@ -114,6 +114,25 @@ struct ProtocolData {
     ]
     
     // --- Condition Guides ---
+    static let generalPrinciples: [ConditionGuide] = [
+        ConditionGuide(title: "Opioids Likely Required", recommendations: [
+            "Major trauma",
+            "Crush injuries",
+            "Burns",
+            "Major surgery",
+            "Severe pain PLUS Contraindications to NSAIDs OR NSAIDs unlikely to be effective"
+        ]),
+        ConditionGuide(title: "Non-Opioids Likely Effective", recommendations: [
+            "Lower back pain",
+            "Neck pain",
+            "Soft tissue injuries (e.g., sprain, bursitis)",
+            "Minor surgery",
+            "Odontalgia",
+            "Renal colic",
+            "Headaches (including migraine)"
+        ])
+    ]
+
     static let conditionGuides: [ConditionGuide] = [
         
         ConditionGuide(title: "Abdominal Pain (Non-Traumatic)", recommendations: [

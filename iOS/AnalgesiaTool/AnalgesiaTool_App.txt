@@ -1,4 +1,6 @@
-// File: AnalgesiaTool/App/AnalgesiaToolApp.swift
+
+// MARK: - File: AnalgesiaTool/App/AnalgesiaToolApp.swift
+// ----------------------------------------------------------------
 import SwiftUI
 
 @main

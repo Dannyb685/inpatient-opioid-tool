@@ -530,6 +530,18 @@ struct TaperScheduleView: View {
                         .padding()
                         .background(ClinicalTheme.amber500.opacity(0.1))
                     }
+                    
+                    // Loss of Tolerance Warning Footer
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill").foregroundColor(ClinicalTheme.rose500)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Loss of Tolerance Alert").font(.caption).bold().foregroundColor(ClinicalTheme.textPrimary)
+                            Text("Patients are at increased risk for overdose during and shortly after tapering due to decreased tolerance. Return to previous dose could be fatal.")
+                                .font(.caption2).foregroundColor(ClinicalTheme.textSecondary)
+                        }
+                    }
+                    .padding()
+                    .background(ClinicalTheme.rose500.opacity(0.1))
                 }
                 .cornerRadius(12)
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))

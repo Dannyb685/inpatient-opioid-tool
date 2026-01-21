@@ -24,7 +24,7 @@ struct DrugSchema: Codable {
 // Rich UI Schema (The "Master Card")
 struct DrugPharmacology: Codable, Identifiable {
     // We explicitly set the ID after loading from the dictionary key
-    var id: String = UUID().uuidString 
+    var id: String? = UUID().uuidString 
     
     let familyId: String?     // e.g. "morphine_generic"
     let name: String
@@ -98,6 +98,27 @@ class ConversionService {
                 targetURL = url
                 break
             }
+        }
+        
+        if targetURL == nil {
+             // Fallback for CLI Validation Runner
+             let cwd = FileManager.default.currentDirectoryPath
+             print("DEBUG: Fallback CWD: \(cwd)")
+             let possiblePaths = [
+                 "Resources/drug_database.json",
+                 "AnalgesiaTool/Resources/drug_database.json",
+                 "drug_database.json"
+             ]
+             
+             for path in possiblePaths {
+                 let fallbackURL = URL(fileURLWithPath: cwd).appendingPathComponent(path)
+                 print("DEBUG: Checking path: \(fallbackURL.path)")
+                 if FileManager.default.fileExists(atPath: fallbackURL.path) {
+                     targetURL = fallbackURL
+                     print("⚠️ ConversionService: Using local resource fallback: \(path)")
+                     break
+                 }
+             }
         }
         
         if targetURL == nil {
@@ -200,15 +221,28 @@ class ConversionService {
             "buprenorphine",
             "butrans",
             "sublingual_fentanyl",
-            "suzetrigine"
+            "suzetrigine",
+            "tramadol",
+            "tapentadol",
+            "butorphanol",
+            "nalbuphine",
+            "pentazocine",
+            "loperamide",
+            "diphenoxylate",
+            "sufentanil",
+            "alfentanil"
         ]
         
         if permittedContexts.contains(drugId) { return true }
+        if permittedContexts.contains(drugId) { return true }
         if drugId.contains("buprenorphine") { return true }
+        // Explicitly handle spaces/variants just in case
+        if drugId == "buprenorphine transdermal" { return true }
+        if drugId.contains("transdermal") && drugId.contains("buprenorphine") { return true }
         
         // Check Clinical Data Type if available (Fallback)
         if let drug = ClinicalData.drugData.first(where: { $0.id == drugId }) {
-            if drug.type == "Partial Agonist" || drug.type == "NAV1.8 Inhibitor" {
+            if drug.type == "Partial Agonist" || drug.type == "NAV1.8 Inhibitor" || drug.type == "Mixed Agonist/Antagonist" || drug.type == "Peripheral" || drug.type == "MOR-NRI" {
                 return true
             }
         }

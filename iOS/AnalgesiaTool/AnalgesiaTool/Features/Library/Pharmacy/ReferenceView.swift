@@ -4,69 +4,36 @@ import SwiftUI
 
 
 // MARK: - Data Models (References)
-struct ReferenceItem: Identifiable {
-    let id = UUID()
-    let title: String
-    let citation: String
-    let urlString: String
-}
-
 struct ReferenceCategory: Identifiable {
     let id = UUID()
     let name: String
     let icon: String
-    let items: [ReferenceItem]
+    let citationIDs: [String]
 }
 
 struct ReferenceLibrary {
     static let categories: [ReferenceCategory] = [
-        ReferenceCategory(name: "Core Guidelines", icon: "text.book.closed.fill", items: [
-            ReferenceItem(
-                title: "CDC Clinical Practice Guideline (2022)",
-                citation: "Dowell D, et al. MMWR Recomm Rep. 2022;71(3):1–95.",
-                urlString: "https://doi.org/10.15585/mmwr.rr7103a1"
-            ),
-            ReferenceItem(
-                title: "VA/DoD Clinical Practice Guideline",
-                citation: "VA/DoD CPG for Opioids in Chronic Pain. Dept of Veterans Affairs; 2022.",
-                urlString: "https://www.healthquality.va.gov/guidelines/Pain/cot/"
-            )
+        ReferenceCategory(name: "Core Guidelines", icon: "text.book.closed.fill", citationIDs: [
+            "cdc_opioids_2022",
+            "va_dod_cpg_2022",
+            "cms_conversion_2016",
+            "cms_mme_2024"
         ]),
-        ReferenceCategory(name: "Special Populations", icon: "person.2.circle.fill", items: [
-            ReferenceItem(
-                title: "AGS Beers Criteria® (2023)",
-                citation: "AGS Expert Panel. J Am Geriatr Soc. 2023;71(7):2052-2081.",
-                urlString: "https://doi.org/10.1111/jgs.18372"
-            )
+        ReferenceCategory(name: "Special Populations", icon: "person.2.circle.fill", citationIDs: [
+            "ags_beers_2023",
+            "fda_gabapentin_2019"
         ]),
-        ReferenceCategory(name: "Pharmacology & Labels", icon: "pills.fill", items: [
-            ReferenceItem(
-                title: "Fentanyl Patch (Duragesic)",
-                citation: "FDA. Duragesic (Fentanyl Transdermal System). Revised 2023.",
-                urlString: "https://www.accessdata.fda.gov/drugsatfda_docs/label/2005/19813s039lbl.pdf"
-            )
+        ReferenceCategory(name: "Pharmacology & Labels", icon: "pills.fill", citationIDs: [
+            "fda_fentanyl_2025",
+            "fda_duragesic_2023",
+            "fda_morphine_2025",
+            "fda_hydromorphone_2025"
         ]),
-        ReferenceCategory(name: "Monitoring Protocols", icon: "waveform.path.ecg.rectangle.fill", items: [
-            ReferenceItem(
-                title: "High-Risk PCA Monitoring",
-                citation: "Evidence-based monitoring for high-risk PCA patients with obesity or OSA should include continuous pulse oximetry and, when available, capnography, combined with frequent sedation assessment using validated scales. The American Society of Anesthesiologists recommends increased monitoring intensity and duration for patients at increased risk of respiratory depression, specifically identifying obesity and obstructive sleep apnea as high-risk conditions requiring enhanced surveillance.[1] Continuous pulse oximetry is strongly recommended for all patients at increased perioperative risk from OSA until they can maintain baseline oxygen saturation on room air.[2]\n\nHowever, pulse oximetry alone has significant limitations—hypoxemia may be a very late sign of hypoventilation, especially in patients receiving supplemental oxygen.[3] Capnography provides earlier detection of respiratory compromise than pulse oximetry alone by identifying hypercarbia before hypoxemia develops.[3-4] The PRODIGY study demonstrated that continuous capnography and oximetry monitoring detected respiratory depression episodes in 46% of general care floor patients receiving parenteral opioids, with affected patients experiencing hospital stays 3 days longer than those without respiratory depression.[5]",
-                urlString: ""
-            ),
-            ReferenceItem(
-                title: "Sedation Assessment (POSS)",
-                citation: "Sedation monitoring is critical and may be more reliable than respiratory rate alone. The National Comprehensive Cancer Network recommends using validated tools such as the Pasero Opioid-Induced Sedation Scale (POSS), noting that sedation typically precedes respiratory depression.[4] Respiratory rates below 8-10 breaths per minute are commonly used thresholds, but this measure is unreliable—some patients maintain normal respiratory rates even with severe OIVI, while carbon dioxide concentrations correlate better with sedation level than with respiratory rate.[3] Oversedation in any patient receiving opioids should be considered OIVI until proven otherwise, regardless of respiratory rate or oxygen saturation.[3]",
-                urlString: ""
-            ),
-            ReferenceItem(
-                title: "Risk Stratification (PRODIGY)",
-                citation: "Risk stratification using the PRODIGY score can guide monitoring intensity. The validated prediction tool identifies five independent risk factors: age ≥60 years, male sex, opioid naivety, sleep disorders, and chronic heart failure, with an odds ratio of 6.07 between high- and low-risk groups.[5] Implementation of this score to determine need for continuous monitoring may reduce the incidence and consequences of respiratory compromise. Continuous monitoring should be maintained as long as patients remain at increased risk and may be provided in critical care units, stepdown units, telemetry on hospital wards, or by dedicated trained observers.[2]",
-                urlString: ""
-            ),
-            ReferenceItem(
-                title: "AASM Guidelines (2025)",
-                citation: "Adjunctive strategies enhance safety beyond monitoring alone. Supplemental oxygen should be administered continuously until patients maintain baseline saturation on room air.[2] Patients using CPAP or noninvasive positive pressure ventilation preoperatively should continue these therapies postoperatively unless contraindicated.[2] For PCA specifically, continuous background infusions should be avoided or used with extreme caution in OSA patients.[2] The American Academy of Sleep Medicine's 2025 guideline notes that while physiologic monitoring shows promise, evidence remains limited, and implementation challenges include sensor displacement and alarm fatigue.",
-                urlString: ""
-            )
+        ReferenceCategory(name: "Monitoring Protocols", icon: "waveform.path.ecg.rectangle.fill", citationIDs: [
+            "monitoring_high_risk_pca",
+            "sedation_poss",
+            "risk_strat_prodigy",
+            "aasm_2025"
         ])
     ]
 }
@@ -130,6 +97,7 @@ struct ReferenceContentView: View {
     // Inject OUD Store for Workup persistence if needed, or use local state for checklist
  
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.citationService) var citationService
     @Binding var searchText: String
     @Binding var expandedId: String? // Kept for API compatibility, though unused now due to Sheet migration
     @State private var selectedMonograph: DrugData? = nil
@@ -247,8 +215,8 @@ struct ReferenceContentView: View {
                             .padding(.horizontal)
                             
                             VStack(spacing: 0) {
-                                ForEach(category.items) { item in
-                                    if let url = URL(string: item.urlString) {
+                                ForEach(citationService.resolve(category.citationIDs)) { item in
+                                    if let urlString = item.url, let url = URL(string: urlString) {
                                         Link(destination: url) {
                                             ReferenceRow(item: item)
                                         }
@@ -257,7 +225,7 @@ struct ReferenceContentView: View {
                                         ReferenceRow(item: item)
                                     }
                                     
-                                    if item.id != category.items.last?.id {
+                                    if item.id != category.citationIDs.last {
                                         Divider()
                                     }
                                 }
@@ -394,7 +362,7 @@ struct ReferenceBadgeView: View {
 // MARK: - Reference Subviews (ReferenceRow & DisclaimerCard)
 
 struct ReferenceRow: View {
-    let item: ReferenceItem
+    let item: Citation
     
     var body: some View {
         HStack(alignment: .top) {
@@ -404,16 +372,27 @@ struct ReferenceRow: View {
                     .fontWeight(.semibold)
                     .foregroundColor(ClinicalTheme.textPrimary)
                 
-                Text(item.citation)
+                Text(item.source + " (\(item.year))")
                     .font(.caption)
                     .foregroundColor(ClinicalTheme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
+                
+                if let excerpt = item.excerpt {
+                    Text("\"\(excerpt)\"")
+                        .font(.caption2)
+                        .italic()
+                        .foregroundColor(ClinicalTheme.textMuted)
+                        .padding(.top, 2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             Spacer()
-            Image(systemName: "arrow.up.right.square")
-                .font(.caption)
-                .foregroundColor(ClinicalTheme.teal500)
-                .padding(.top, 2)
+            if item.url != nil {
+                Image(systemName: "arrow.up.right.square")
+                    .font(.caption)
+                    .foregroundColor(ClinicalTheme.teal500)
+                    .padding(.top, 2)
+            }
         }
         .padding()
     }

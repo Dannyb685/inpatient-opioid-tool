@@ -388,16 +388,18 @@
             "routes": [
                 {
                     "route": "po",
-                    "factor": 0.2,
+                    "factor": 0.0,
                     "unit": "mg/day",
-                    "evidenceQuality": "moderate",
-                    "source": "CDC 2022",
-                    "citation": "100mg Tramadol ≈ 20 MME",
+                    "evidenceQuality": "high",
+                    "source": "Clinical Consensus",
+                    "citation": "Excluded from MME due to dual mechanism & metabolic variability.",
                     "warnings": [
+                        "Dual Mechanism: Mu-opioid + SNRI activity makes MME unreliable",
+                        "Metabolic Variability: CYP2D6 dependence causes variable potency",
                         "Seizure risk >400mg/day",
                         "Serotonin Syndrome risk"
                     ],
-                    "clinicalContext": "Dual mechanism (Mu-opioid + SNRI). Factor 0.1-0.2 used variably; CDC 2022 uses 0.2."
+                    "clinicalContext": "Excluded from MME. Traditionally 0.1-0.2, but nonlinear."
                 }
             ]
         },
@@ -418,12 +420,16 @@
             "routes": [
                 {
                     "route": "po",
-                    "factor": 0.4,
+                    "factor": 0.0,
                     "unit": "mg/day",
-                    "evidenceQuality": "moderate",
-                    "source": "Manufacturer / CDC",
-                    "citation": "100mg Tapentadol ≈ 40 MME",
-                    "clinicalContext": "Dual mechanism (Mu-opioid + NRI). Lower GI side effect profile."
+                    "evidenceQuality": "high",
+                    "source": "Clinical Consensus",
+                    "citation": "Excluded from MME due to dual mechanism (MOR-NRI).",
+                    "warnings": [
+                        "Dual Mechanism: Mu-opioid + NRI activity makes MME unreliable",
+                        "Lower GI side effect profile vs pure agonists"
+                    ],
+                    "clinicalContext": "Excluded from MME. Traditionally ~0.4, but nonlinear."
                 }
             ]
         },
@@ -539,13 +545,14 @@
             "routes": [
                 {
                     "route": "iv",
-                    "factor": 1.0,
+                    "factor": 0.0,
                     "unit": "mcg",
                     "evidenceQuality": "low",
                     "source": "Anesthesia Textbooks",
-                    "citation": "500-1000x potency of morphine. (1 mcg Suf = 1 mg Morphine)",
+                    "citation": "Excluded from MME. Anesthesia/ICU use only.",
                     "warnings": [
-                        "Potent Anesthetic",
+                        "Standard conversion not applicable to outpatient settings",
+                        "Potent Anesthetic (500-1000x Morphine)",
                         "ICU/OR Setting Only"
                     ],
                     "clinicalContext": "Extreme potency. Not for general ward use."
@@ -556,16 +563,105 @@
             "routes": [
                 {
                     "route": "iv",
-                    "factor": 0.02,
+                    "factor": 0.0,
                     "unit": "mcg",
                     "evidenceQuality": "low",
                     "source": "Anesthesia Textbooks",
-                    "citation": "10-20x potency of morphine (1 mcg Alf = 0.02 mg Morphine)",
+                    "citation": "Excluded from MME. Anesthesia/ICU use only.",
                     "warnings": [
+                        "Standard conversion not applicable to outpatient settings",
                         "Short duration",
                         "ICU/OR Setting Only"
                     ],
                     "clinicalContext": "Rapid onset/offset. Factor derived from 15x Morphine potency."
+                }
+            ]
+        },
+        "butorphanol": {
+            "routes": [
+                {
+                    "route": "iv",
+                    "factor": 0.0,
+                    "unit": "mg",
+                    "evidenceQuality": "high",
+                    "source": "Clinical Consensus",
+                    "citation": "Excluded from MME due to mixed agonist/antagonist activity.",
+                    "warnings": [
+                        "Mixed Agonist/Antagonist: Nonlinear equivalency",
+                        "May precipitate withdrawal in patients on full agonists",
+                        "Psychotomimetic effects (Kappa agonism)"
+                    ],
+                    "clinicalContext": "Used in labor/migraine. Not interchangeable with pure agonists."
+                }
+            ]
+        },
+        "nalbuphine": {
+            "routes": [
+                {
+                    "route": "iv",
+                    "factor": 0.0,
+                    "unit": "mg",
+                    "evidenceQuality": "high",
+                    "source": "Clinical Consensus",
+                    "citation": "Excluded from MME due to mixed agonist/antagonist activity.",
+                    "warnings": [
+                        "Mixed Agonist/Antagonist: Nonlinear equivalency",
+                        "Ceiling effect on respiratory depression",
+                        "May precipitate withdrawal in patients on full agonists"
+                    ],
+                    "clinicalContext": "Used in procedural sedation/labor."
+                }
+            ]
+        },
+        "pentazocine": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 0.0,
+                    "unit": "mg",
+                    "evidenceQuality": "high",
+                    "source": "Clinical Consensus",
+                    "citation": "Excluded from MME due to mixed agonist/antagonist activity.",
+                    "warnings": [
+                        "Mixed Agonist/Antagonist: Nonlinear equivalency",
+                        "May precipitate withdrawal in patients on full agonists",
+                        "High risk of psychotomimetic effects (hallucinations/dysphoria)"
+                    ],
+                    "clinicalContext": "Historic use. Generally avoided."
+                }
+            ]
+        },
+        "loperamide": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 0.0,
+                    "unit": "mg",
+                    "evidenceQuality": "high",
+                    "source": "Clinical Consensus",
+                    "citation": "Excluded from MME. Peripheral action only.",
+                    "warnings": [
+                        "Peripheral Only: No central analgesia at therapeutic doses",
+                        "High doses required for CNS effect cause cardiotoxicity (QRS widening)"
+                    ],
+                    "clinicalContext": "Antidiarrheal."
+                }
+            ]
+        },
+        "diphenoxylate": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 0.0,
+                    "unit": "mg",
+                    "evidenceQuality": "high",
+                    "source": "Clinical Consensus",
+                    "citation": "Excluded from MME. Peripheral action only.",
+                    "warnings": [
+                        "Peripheral Only: No central analgesia",
+                        "Contains Atropine to discourage abuse"
+                    ],
+                    "clinicalContext": "Antidiarrheal."
                 }
             ]
         }

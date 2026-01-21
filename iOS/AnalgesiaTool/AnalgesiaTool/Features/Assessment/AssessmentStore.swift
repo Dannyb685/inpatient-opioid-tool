@@ -115,6 +115,67 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
     @Published var multipleProviders: Bool = false // PDMP Integration
     @Published var historyGIBleed: Bool = false // Question 6
     @Published var isPregnant: Bool = false 
+    
+    // Pain Assessment Module
+    @Published var cognitiveStatus: CognitiveStatus = .baseline
+    @Published var communication: CommunicationAbility = .verbal
+    @Published var intubation: IntubationStatus = .none
+    @Published var rass: Double = 0 // Range -5 to +4
+    @Published var customPainScore: Double? = nil // Validated Score
+    @Published var manualScaleOverride: PainScaleType? = nil // User Override
+    
+    // PEG Scale State
+    @Published var pegPain: Double = 0
+    @Published var pegEnjoyment: Double = 0
+    // PEG Scale State
+    @Published var pegPain: Double = 0
+    @Published var pegEnjoyment: Double = 0
+    @Published var pegActivity: Double = 0
+    
+    // Other Scales State
+    @Published var nrsScore: Int = 0
+    @Published var vasMillimeters: Double = 0
+    @Published var vdsSelection: String = "No pain" // Or Index
+    @Published var cpotScore: Int = 0
+    @Published var bpsScore: Int = 0
+    @Published var painadScore: Int = 0
+    
+    var recommendedScale: PainScaleType {
+        // 0. Manual Override (Reviewer Request)
+        if let override = manualScaleOverride {
+            return override
+        }
+    
+        // Pathway C: Advanced Dementia
+        if cognitiveStatus == .advancedDementia {
+            return .painad
+        }
+        
+        // Pathway B: Non-Communicative / Critical Care
+        if communication != .verbal {
+            // RASS Check: If Deeply Sedated (-4/-5), Assessment "Unable" usually, but tool assumes we want scale.
+            // Branch by Intubation
+            if intubation == .intubated {
+                return .cpot // User Pref: CPOT vs BPS. Defaulting to CPOT for now.
+            } else {
+                return .bpsNi // BPS-NI or CPOT.
+            }
+        }
+        
+        // Pathway A: Communicative Adults
+        // 1. Chronic Pain -> PEG
+        if analgesicProfile.isChronic {
+            return .peg
+        }
+        
+        // 2. Geriatric / Mild Impairment -> VDS
+        if isElderly || cognitiveStatus == .mildImpairment {
+            return .vds
+        }
+        
+        // 3. Default -> NRS
+        return .nrs
+    } 
 
     @Published var nonPharmRecs: [NonPharmRecommendation] = []
 
@@ -217,7 +278,9 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
     func copySummary() {
         // Strip markdown stars for clipboard
         let plainText = generatedSummary.replacingOccurrences(of: "**", with: "")
+        #if canImport(UIKit)
         UIPasteboard.general.string = plainText
+        #endif
     }
     
     @Published var recommendations: [DrugRecommendation] = []
@@ -239,6 +302,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
     }
     
     func setupPipeline() {
+        #if !CLI
         // Merge all publishers to throttle Input -> Calculation
         Publishers.MergeMany(
             $age.map { _ in }.eraseToAnyPublisher(),
@@ -276,6 +340,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
             self?.calculate()
         }
         .store(in: &cancellables)
+        #endif
     }
     
     // MARK: - SNAPSHOT HELPER
@@ -426,7 +491,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
             case ("Fentanyl", "IV"): return isElderly ? "Start 12.5mcg" : "Start 25-50mcg"
             case ("Hydromorphone", "IV"): return isElderly ? "Start 0.2mg" : "Start 0.2-0.5mg"
             case ("Morphine", "IV"): return isElderly ? "Start 1-2mg" : "Start 2-4mg"
-            case ("Oxycodone", "PO"): return isElderly ? "Start 2.5-5mg" : "Start 5-10mg"
+            case ("Oxycodone", "PO"): return isElderly ? "Start 2.5mg" : "Start 2.5-5mg (approx 4-7.5 MME)"
             default: return "Standard starting dose"
             }
         }
@@ -464,6 +529,9 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
         // 3. ANALGESIC PROFILE LOGIC
         switch analgesicProfile {
         case .naive:
+            // Explicit Naive Guidance (Lowest Effective Dose)
+            warns.append("New Start Guidance: Start lowest effective dose (5–10 MME/dose). Max 20–30 MME/day.")
+            
             if route == .iv || route == .both {
                 addRec("Hydromorphone IV", .safe, "Standard", "Potent. \(getStartingDose(drug: "Hydromorphone", route: "IV"))")
                 addRec("Morphine (IV)", .safe, "Standard", "First line. \(getStartingDose(drug: "Morphine", route: "IV"))")
@@ -488,6 +556,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
             }
 
         case .chronicRx:
+            warns.append("There is a paucity of evidence supporting > 12 months of opioid therapy for chronic pain management.")
             warns.append("Tolerant Patient: Baseline dose + 20% for acute pain.")
             addRec("Continue Home Meds", .safe, "Prevent Withdrawal", "Maintain baseline. Add short-acting agonist (10-20% daily dose) q3h.")
             
@@ -609,7 +678,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
             for i in 0..<recs.count {
                 if ["Morphine", "Fentanyl", "Oxycodone"].contains(where: { recs[i].name.contains($0) }) {
                    if !recs[i].detail.contains("Poor Efficacy") {
-                       recs[i] = DrugRecommendation(name: recs[i].name, reason: "Poor Efficacy", detail: "Pure Agonist: Poor coverage for neuropathic pain. \(recs[i].detail)", type: .caution, durationProfile: recs[i].durationProfile)
+                       recs[i] = DrugRecommendation(name: recs[i].name, reason: "Poor Efficacy", detail: "Pure Agonist: Poor coverage for neuropathic pain. \(recs[i].detail)", type: .caution, durationProfile: recs[i].durationProfile, molecule: recs[i].molecule)
                    }
                 }
             }
@@ -705,7 +774,8 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
                             reason: "Renal Caution (eGFR 30-60)",
                             detail: "Reduce dose 25-50%. Diligence required (Active Metabolites). \(recs[i].detail)",
                             type: .caution,
-                            durationProfile: recs[i].durationProfile
+                            durationProfile: recs[i].durationProfile,
+                            molecule: recs[i].molecule
                          )
                      }
                  }
@@ -716,19 +786,19 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
                 let warning = renalFunction == .dialysis ? "Strict Caution (Dialysis)." : "Renal Caution."
                 let detail = renalFunction == .dialysis ? "Accumulates between sessions. Reduce dose 50% (Metabolite Risk)." : "Reduce dose 50% (Metabolite Accumulation)."
                 // Since d is a let constant in the struct, we must create a new one.
-                recs[idx] = DrugRecommendation(name: d.name, reason: warning, detail: detail, type: .caution, durationProfile: d.durationProfile)
+                recs[idx] = DrugRecommendation(name: d.name, reason: warning, detail: detail, type: .caution, durationProfile: d.durationProfile, molecule: d.molecule)
             }
             
             // Oxycodone Renal Caution
             if let idx = recs.firstIndex(where: { $0.molecule == .oxycodone }) {
                 let d = recs[idx]
-                recs[idx] = DrugRecommendation(name: d.name, reason: "Renal Caution", detail: "Metabolites accumulate in eGFR < 60. Start with lower doses (2.5mg PO) and monitor for sedation.", type: .caution, durationProfile: d.durationProfile)
+                recs[idx] = DrugRecommendation(name: d.name, reason: "Renal Caution", detail: "Metabolites accumulate in eGFR < 60. Start with lower doses (2.5mg PO) and monitor for sedation.", type: .caution, durationProfile: d.durationProfile, molecule: d.molecule)
             }
             
             if !recs.contains(where: { $0.molecule == .fentanyl }) && (route == .iv || route == .both) {
                  if renalFunction == .dialysis {
                      // Dialysis: Fentanyl is Top Priority
-                     recs.insert(DrugRecommendation(name: "Fentanyl IV", reason: "Renal Safe", detail: "No active metabolites. Safest option in dialysis. Consider Specialist Guidance.", type: .safe, durationProfile: .rapid), at: 0)
+                     recs.insert(DrugRecommendation(name: "Fentanyl IV", reason: "Renal Safe", detail: "No active metabolites. Safest option in dialysis. Consider Specialist Guidance.", type: .safe, durationProfile: .rapid, molecule: .fentanyl), at: 0)
                  } else {
                      // Moderate Impairment: Fentanyl is an option, but Hydromorphone (Reduced) is often standard.
                      // Add as "Safe Alternative" but do not prepend.
@@ -774,7 +844,8 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
                     reason: "Caution (Shunting)", 
                     detail: detail, 
                     type: .caution,
-                    durationProfile: recs[idx].durationProfile
+                    durationProfile: recs[idx].durationProfile,
+                    molecule: recs[idx].molecule
                  )
             } else if (route == .po || route == .both) && gi != .npo {
                  // Fallback: If Naive, Hydromorphone PO wasn't added initially, but it is the preferred oral option here (vs Morphine/Oxy).
@@ -801,7 +872,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
             } else if let idx = recs.firstIndex(where: { $0.molecule == .fentanyl }) {
                 // Ensure it's marked SAFE/PREFERRED
                 let old = recs[idx]
-                recs[idx] = DrugRecommendation(name: old.name, reason: "Preferred (Stable)", detail: old.detail, type: .safe, durationProfile: old.durationProfile)
+                recs[idx] = DrugRecommendation(name: old.name, reason: "Preferred (Stable)", detail: old.detail, type: .safe, durationProfile: old.durationProfile, molecule: old.molecule)
             }
         }
         
@@ -940,7 +1011,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
         // 9. REFERRAL TRIGGERS
         // Physical Therapy (Nociceptive)
         if painType == .nociceptive {
-             recs.append(DrugRecommendation(name: "Physical Therapy", reason: "First Line", detail: "Multimodal functional restoration.", type: .safe, durationProfile: .long))
+             recs.append(DrugRecommendation(name: "Physical Therapy", reason: "First Line", detail: "Multimodal functional restoration.", type: .safe, durationProfile: .long, molecule: .other))
         }
 
         // Pain Management (>90 MME)
@@ -1052,7 +1123,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
         if (analgesicProfile == .naive || analgesicProfile == .chronicRx) && (painType == .nociceptive || painType == .inflammatory || indication == .postoperative) {
              // Only add if not contraindicated
              if renalFunction != .dialysis { // Assuming dialysis ≈ eGFR < 15 for this heuristic
-                 let suzRec = DrugRecommendation(name: "Suzetrigine (VX-548)", reason: "Novel Non-Opioid", detail: "Selective NaV1.8 Inhibitor. 0 MME. Opioid-sparing efficacy.", type: .safe, durationProfile: .medium)
+                 let suzRec = DrugRecommendation(name: "Suzetrigine (VX-548)", reason: "Novel Non-Opioid", detail: "Selective NaV1.8 Inhibitor. 0 MME. Opioid-sparing efficacy.", type: .safe, durationProfile: .long, molecule: .suzetrigine)
                  // Insert after first line? Or as alternative?
                  // Let's add it to the end of recommendations or near top if sparing needed.
                  recs.append(suzRec)
@@ -1062,7 +1133,7 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
                  // Let's add it, then let validateSafetyGates check it?
                  // No, validateSafetyGates creates "errors" list.
                  // Better pattern: Add it, then block it in validateSafetyGates.
-                 recs.append(DrugRecommendation(name: "Suzetrigine (VX-548)", reason: "Novel Non-Opioid", detail: "Selective NaV1.8 Inhibitor.", type: .safe, durationProfile: .medium))
+                 recs.append(DrugRecommendation(name: "Suzetrigine (VX-548)", reason: "Novel Non-Opioid", detail: "Selective NaV1.8 Inhibitor.", type: .safe, durationProfile: .long, molecule: .suzetrigine))
              }
         }
         
@@ -1137,4 +1208,58 @@ class AssessmentStore: ObservableObject, CalculatorInputs {
         if let ageInt = Int(age), ageInt > 60 { return false }
         return true
     }
+    
+    // MARK: - Pain Assessment Export
+    struct PainAssessmentResult: Codable {
+        let methodUsed: String
+        let rawScore: Double
+        let severityCategory: String
+        let timestamp: Date
+        let patientContext: String
+    }
+    
+    func exportPainData() -> String {
+        let scale = recommendedScale.rawValue
+        let score = customPainScore ?? 0.0
+        
+        // Severity Logic (Generic)
+        var severity = "Unknown"
+        if scale.contains("NRS") {
+            if score == 0 { severity = "None" }
+            else if score <= 3 { severity = "Mild" }
+            else if score <= 6 { severity = "Moderate" }
+            else { severity = "Severe" }
+        } else if scale.contains("VAS") {
+            // ≤3.4 cm (Mild), 3.5 to 7.4 cm (Moderate), ≥7.5 cm (Severe)
+            if score <= 3.4 { severity = "Mild" }
+            else if score <= 7.4 { severity = "Moderate" }
+            else { severity = "Severe" }
+        } else if scale.contains("CPOT") {
+            if score >= 3 { severity = "Significant Pain" }
+            else { severity = "Controlled" }
+        } else if scale.contains("BPS") {
+             if score > 5 { severity = "Significant Pain" }
+             else { severity = "Controlled" }
+        }
+        
+        // Default severity for others (VDS, PEG, PAINAD) can be added here
+        
+        let result = PainAssessmentResult(
+            methodUsed: scale,
+            rawScore: score,
+            severityCategory: severity,
+            timestamp: Date(),
+            patientContext: generatedSummary
+        )
+        
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        encoder.dateEncodingStrategy = .iso8601
+        
+        if let data = try? encoder.encode(result), let json = String(data: data, encoding: .utf8) {
+            return json
+        }
+        return "{}"
+    }
+
 }
