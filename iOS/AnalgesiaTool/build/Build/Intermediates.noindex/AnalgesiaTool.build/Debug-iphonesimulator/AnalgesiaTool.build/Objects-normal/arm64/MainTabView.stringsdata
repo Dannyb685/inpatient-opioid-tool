@@ -1,0 +1,96 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/UI/Navigation/MainTabView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Assessment",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 24
+        }
+      },
+      {
+        "comment": "",
+        "key": "MME Calc",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 32
+        }
+      },
+      {
+        "comment": "",
+        "key": "OUD Consult",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 40
+        }
+      },
+      {
+        "comment": "",
+        "key": "Library",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 48
+        }
+      },
+      {
+        "comment": "",
+        "key": "Patient Context Changed",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 97
+        }
+      },
+      {
+        "comment": "",
+        "key": "Assessment data is different from the current Calculator session.\n\nUpdate Calculator context? This will NOT clear your drug list, but may change safety factors.",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 98
+        }
+      },
+      {
+        "comment": "",
+        "key": "Update",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 99
+        }
+      },
+      {
+        "comment": "",
+        "key": "Keep Current",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 102
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clinical Disclaimer",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 106
+        }
+      },
+      {
+        "comment": "",
+        "key": "This tool is intended for ADULT patients (18+) only. It is NOT validated for pediatric use.\n\nCalculations are estimates. Clinical judgment is mandatory.",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 107
+        }
+      },
+      {
+        "comment": "",
+        "key": "I Understand",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 108
+        }
+      }
+    ]
+  },
+  "version": 1
+}

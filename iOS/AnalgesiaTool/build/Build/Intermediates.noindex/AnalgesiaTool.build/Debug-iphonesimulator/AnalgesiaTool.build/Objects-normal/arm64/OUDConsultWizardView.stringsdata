@@ -1,0 +1,56 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/Features/OUDConsult/Wizard/OUDConsultWizardView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Reset",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 38
+        }
+      },
+      {
+        "comment": "",
+        "key": "Safety Critical Context Mismatch",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 83
+        }
+      },
+      {
+        "comment": "",
+        "key": "Assessment Tab data differs from this isolated module:",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 89
+        }
+      },
+      {
+        "comment": "",
+        "key": "• Assessment: PREGNANT | OUD: Not Pregnant",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 94
+        }
+      },
+      {
+        "comment": "",
+        "key": "• Assessment: LIVER FAILURE | OUD: Intact",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 100
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sync",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 114
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -6,6 +6,7 @@ struct OUDConsultView: View {
     @State private var showArchivedWizard = false
     
     // Protocol Stores
+    @ObservedObject var sharedStore: OUDConsultStore // Injected from MainTabView
     @StateObject private var screeningStore = ScreeningStore()
     @StateObject private var toolkitStore = ToolkitStore()
     
@@ -32,25 +33,32 @@ struct OUDConsultView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 OUDProtocolHeader(title: "Clinical Screeners")
                                 
-                                VStack(spacing: 12) {
-                                    // DAST-10
-                                    NavigationLink(destination: ScrollView { DASTView(store: screeningStore).padding() }
-                                        .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
-                                        .navigationTitle("DAST-10")
-                                    ) {
-                                        ScreenerRow(icon: "list.clipboard", title: "DAST-10", subtitle: "Drug Abuse Screening Test", color: ClinicalTheme.blue500)
+                                    // Screeners Group
+                                    VStack(spacing: 0) {
+                                        // DAST-10
+                                        NavigationLink(destination: ScrollView { DASTView(store: screeningStore).padding() }
+                                            .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
+                                            .navigationTitle("DAST-10")
+                                        ) {
+                                            ScreenerRow(icon: "list.clipboard", title: "DAST-10", subtitle: "Drug Abuse Screening Test", color: ClinicalTheme.blue500)
+                                        }
+                                        
+                                        Divider().background(ClinicalTheme.divider)
+                                        
+                                        // ASSIST-Lite
+                                        NavigationLink(destination: ScrollView { AssistLyteView(store: screeningStore).padding() }
+                                            .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
+                                            .navigationTitle("ASSIST-Lite")
+                                        ) {
+                                            ScreenerRow(icon: "person.fill.questionmark", title: "ASSIST-Lite", subtitle: "WHO Substance Involvement", color: ClinicalTheme.teal500)
+                                        }
                                     }
-                                    
-                                    // ASSIST-Lite
-                                    NavigationLink(destination: ScrollView { AssistLyteView(store: screeningStore).padding() }
-                                        .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
-                                        .navigationTitle("ASSIST-Lite")
-                                    ) {
-                                        ScreenerRow(icon: "person.fill.questionmark", title: "ASSIST-Lite", subtitle: "WHO Substance Involvement", color: ClinicalTheme.teal500)
-                                    }
+                                    .background(ClinicalTheme.backgroundCard)
+                                    .cornerRadius(12)
+                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                                 }
                                 .padding(.horizontal)
-                            }
+
                         
                         // MARK: - INDUCTION TAB
                         } else if selectedTab == "induction" {
@@ -315,6 +323,32 @@ struct OUDConsultView: View {
                             .padding(.horizontal)
                             .padding(.top, 20)
                         }
+                        // Citations
+                        // Citations
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Best Practice References")
+                                .font(.caption).bold()
+                                .foregroundColor(ClinicalTheme.textSecondary)
+                                .textCase(.uppercase)
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("• American Society of Addiction Medicine (ASAM). National Practice Guideline for the Treatment of Opioid Use Disorder. 2020.")
+                                    .font(.caption2)
+                                    .foregroundColor(ClinicalTheme.textSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                
+                                Text("• SAMHSA. TIP 63: Medications for Opioid Use Disorder. 2021.")
+                                    .font(.caption2)
+                                    .foregroundColor(ClinicalTheme.textSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(ClinicalTheme.backgroundCard.opacity(0.5))
+                            .cornerRadius(8)
+                        }
+                        .padding(.horizontal)
+                        
                         // Footer
                         VStack(spacing: 4) {
                             Text("Powered by Lifeline Medical Technologies")
@@ -331,7 +365,7 @@ struct OUDConsultView: View {
             .navigationTitle("OUD Consult")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(isPresented: $showArchivedWizard) {
-                OUDConsultWizardView()
+                OUDConsultWizardView(store: sharedStore)
             }
         }
     }
@@ -396,8 +430,7 @@ private struct ScreenerRow: View {
                 .foregroundColor(ClinicalTheme.textMuted)
         }
         .padding(16)
-        .background(ClinicalTheme.backgroundCard)
-        .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+        // Background moved to parent container for list styling
+        .contentShape(Rectangle()) // Ensure tap area
     }
 }

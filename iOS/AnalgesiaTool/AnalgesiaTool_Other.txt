@@ -1,0 +1,737 @@
+// File: AnalgesiaTool/UI/Common/CitationFooter.swift
+import SwiftUI
+
+struct CitationFooter: View {
+    let citations: [Citation]
+    @State private var isExpanded: Bool = false
+    
+    // Initializer for Registry IDs
+    init(citationIDs: [String]) {
+        self.citations = CitationRegistry.resolve(citationIDs)
+    }
+    
+    // Initializer for Direct structured citations
+    init(citations: [Citation]) {
+        self.citations = citations
+    }
+    
+    // Legacy Initializer (converts strings to dummy citations for backward compatibility)
+    init(legacyCitations: [String]) {
+        self.citations = legacyCitations.map {
+            Citation(id: UUID().uuidString, type: .guideline, source: "Reference", section: nil, title: $0, year: "", url: nil, excerpt: nil, lastVerified: "", labelRevisionDate: nil)
+        }
+    }
+    
+    var body: some View {
+        if !citations.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                Button(action: {
+                    withAnimation {
+                        isExpanded.toggle()
+                    }
+                }) {
+                    HStack {
+                        Text("Sources (\(citations.count))")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                            .textCase(.uppercase)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(ClinicalTheme.textMuted)
+                            .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                    }
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle()) // Make full width tappable
+                }
+                
+                if isExpanded {
+                    VStack(alignment: .leading, spacing: 12) {
+                        ForEach(Array(citations.enumerated()), id: \.offset) { index, citation in
+                            CitationRow(index: index + 1, citation: citation)
+                        }
+                    }
+                    .padding(.top, 4)
+                    .padding(.bottom, 8)
+                }
+            }
+            .padding(.top, 8)
+        }
+    }
+}
+
+// Subview for individual citation row
+struct CitationRow: View {
+    let index: Int
+    let citation: Citation
+    
+    var isOutdated: Bool {
+        // Simple check: if year is not current year (2025) or previous (2024), considering it "older than 12 months" approximation for now,
+        // or properly parse ISO date.
+        // User said: "flag citations older than 12 months" based on "Last Verified".
+        // Using "lastVerified" string.
+        guard !citation.lastVerified.isEmpty else { return false }
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
+        if let date = formatter.date(from: citation.lastVerified) {
+            let oneYearAgo = Calendar.current.date(byAdding: .year, value: -1, to: Date())!
+            return date < oneYearAgo
+        }
+        return false
+    }
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text("[\(index)]")
+                .font(.caption)
+                .bold()
+                .foregroundColor(ClinicalTheme.teal500)
+                .frame(minWidth: 20, alignment: .leading)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                // Title & Source
+                Group {
+                    if !citation.year.isEmpty {
+                        Text("\(citation.source) (\(citation.year))\(citation.section != nil ? " • Section \(citation.section!)" : "")")
+                            .fontWeight(.semibold)
+                    } else {
+                        // Legacy Fallback
+                        Text(citation.title)
+                    }
+                }
+                .font(.caption)
+                .foregroundColor(ClinicalTheme.textPrimary)
+                
+                if !citation.title.isEmpty && !citation.year.isEmpty {
+                     Text(citation.title)
+                        .font(.caption2)
+                        .italic()
+                        .foregroundColor(ClinicalTheme.textSecondary)
+                }
+                
+                if let excerpt = citation.excerpt {
+                    Text("\"\(excerpt)\"")
+                        .font(.caption2)
+                        .foregroundColor(ClinicalTheme.textMuted)
+                        .padding(.leading, 4)
+                        .overlay(Rectangle().frame(width: 2).foregroundColor(ClinicalTheme.divider), alignment: .leading)
+                }
+                
+                HStack {
+                    if let urlString = citation.url, let url = URL(string: urlString) {
+                        Link("View Source", destination: url)
+                            .font(.caption2)
+                            .foregroundColor(ClinicalTheme.teal500)
+                    }
+                    
+                    if !citation.lastVerified.isEmpty {
+                        Spacer()
+                        if isOutdated {
+                             HStack(spacing: 4) {
+                                Image(systemName: "exclamationmark.arrow.triangle.2.circlepath")
+                                Text("Review Needed")
+                             }
+                             .font(.caption2)
+                             .foregroundColor(.orange)
+                        } else {
+                            Text("Verified: \(citation.lastVerified)")
+                                .font(.caption2)
+                                .foregroundColor(ClinicalTheme.textMuted)
+                        }
+                    }
+                }
+                .padding(.top, 2)
+            }
+        }
+        .padding(8)
+        .background(ClinicalTheme.backgroundCard)
+        .cornerRadius(6)
+    }
+}
+
+
+// File: AnalgesiaTool/UI/Common/FlowLayout.swift
+import SwiftUI
+
+/// A container that arranges its subviews in a horizontal flow, wrapping to the next line when necessary.
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 6
+    var lineSpacing: CGFloat = 6
+    
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let rows = computeRows(proposal: proposal, subviews: subviews)
+        
+        if rows.isEmpty { return .zero }
+        
+        var width: CGFloat = 0
+        var height: CGFloat = 0
+        
+        for row in rows {
+            let rowWidth = row.reduce(0) { $0 + $1.size.width } + CGFloat(row.count - 1) * spacing
+            width = max(width, rowWidth)
+            
+            let rowHeight = row.map { $0.size.height }.max() ?? 0
+            height += rowHeight
+        }
+        
+        height += CGFloat(rows.count - 1) * lineSpacing
+        
+        return CGSize(width: width, height: height)
+    }
+    
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let rows = computeRows(proposal: proposal, subviews: subviews)
+        
+        var y = bounds.minY
+        
+        for row in rows {
+            let rowHeight = row.map { $0.size.height }.max() ?? 0
+            var x = bounds.minX
+            
+            for item in row {
+                item.view.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(item.size))
+                x += item.size.width + spacing
+            }
+            
+            y += rowHeight + lineSpacing
+        }
+    }
+    
+    private func computeRows(proposal: ProposedViewSize, subviews: Subviews) -> [[LayoutItem]] {
+        var rows: [[LayoutItem]] = []
+        var currentRow: [LayoutItem] = []
+        var currentX: CGFloat = 0
+        let maxWidth = proposal.width ?? .infinity
+        
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            
+            if currentX + size.width > maxWidth && !currentRow.isEmpty {
+                rows.append(currentRow)
+                currentRow = []
+                currentX = 0
+            }
+            
+            currentRow.append(LayoutItem(view: subview, size: size))
+            currentX += size.width + spacing
+        }
+        
+        if !currentRow.isEmpty {
+            rows.append(currentRow)
+        }
+        
+        return rows
+    }
+    
+    private struct LayoutItem {
+        let view: LayoutSubview
+        let size: CGSize
+    }
+}
+
+
+// File: AnalgesiaTool/UI/Common/ScoreResultCard.swift
+import SwiftUI
+
+struct ScoreResultCard: View {
+    let title: String
+    let subtitle: String?
+    let value: String
+    let valueLabel: String? // e.g. "mg/day"
+    let badgeText: String
+    let badgeColor: Color
+    @EnvironmentObject var themeManager: ThemeManager
+    
+    init(title: String, 
+         subtitle: String? = nil, 
+         value: String, 
+         valueLabel: String? = nil, 
+         badgeText: String, 
+         badgeColor: Color) {
+        self.title = title
+        self.subtitle = subtitle
+        self.value = value
+        self.valueLabel = valueLabel
+        self.badgeText = badgeText
+        self.badgeColor = badgeColor
+    }
+    
+    var body: some View {
+        HStack(spacing: 20) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(ClinicalTheme.textPrimary)
+                if let sub = subtitle {
+                    Text(sub)
+                        .font(.caption)
+                        .foregroundColor(ClinicalTheme.textSecondary)
+                }
+            }
+            
+            Spacer()
+            
+            // Score & Badge Column
+            VStack(alignment: .trailing, spacing: 6) {
+               // Badge
+                Text(badgeText)
+                    .font(.caption2)
+                    .fontWeight(.black)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(badgeColor.opacity(0.15))
+                    .foregroundColor(badgeColor)
+                    .cornerRadius(8)
+                    .padding(.bottom, 4) // Vertical Rhythm: 4px gap
+                
+                // Score Value
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text(value)
+                        .font(.system(size: 28, weight: .black))
+                        .foregroundColor(badgeColor)
+                        .fixedSize() // Prevent Wrapping
+                    
+                    if let label = valueLabel {
+                        Text(label)
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                    }
+                }
+            }
+        }
+        .padding(20) // Even 20px padding
+        .background(ClinicalTheme.backgroundCard)
+        .cornerRadius(16)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+    }
+}
+
+
+// File: AnalgesiaTool/UI/Common/SegmentedButton.swift
+import SwiftUI
+
+struct SegmentedButton<T: Hashable>: View {
+    let options: [T]
+    @Binding var selection: T
+    let label: (T) -> String
+    
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(options, id: \.self) { option in
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            selection = option
+                        }
+                    }) {
+                        Text(label(option))
+                            .font(.system(size: 14, weight: .bold))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(
+                                selection == option
+                                ? ClinicalTheme.teal500
+                                : ClinicalTheme.slate800
+                            )
+                            .foregroundColor(
+                                selection == option
+                                ? .white
+                                : ClinicalTheme.slate400
+                            )
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(
+                                        selection == option
+                                        ? ClinicalTheme.teal500
+                                        : ClinicalTheme.slate700,
+                                        lineWidth: 1
+                                    )
+                            )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+// File: AnalgesiaTool/UI/Components/ClinicalComponents.swift
+import SwiftUI
+
+struct ClinicalCard<Content: View>: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let content: Content
+    
+    init(title: String, icon: String, color: Color, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.icon = icon
+        self.color = color
+        self.content = content()
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Header
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                    .font(.system(size: 14, weight: .semibold))
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(ClinicalTheme.textPrimary)
+                Spacer()
+            }
+            .padding(12)
+            .background(color.opacity(0.1))
+            
+            Divider()
+            
+            // Content
+            content
+                .padding(16)
+        }
+        .background(ClinicalTheme.backgroundCard)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(ClinicalTheme.cardBorder, lineWidth: 1)
+        )
+    }
+}
+
+
+// File: AnalgesiaTool/UI/Components/InformedConsentView.swift
+import SwiftUI
+
+struct InformedConsentView: View {
+    @AppStorage("hasAcceptedDisclaimer") private var hasAcceptedDisclaimer = false
+    @EnvironmentObject var themeManager: ThemeManager
+
+    var body: some View {
+        ZStack {
+            ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 24) {
+                // Header
+                VStack(spacing: 12) {
+                    Image(systemName: "hand.raised.fill")
+                        .font(.system(size: 48))
+                        .foregroundColor(ClinicalTheme.rose500)
+                    
+                    Text("Informed Consent & Legal Disclaimer")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(ClinicalTheme.textPrimary)
+                }
+                .padding(.top, 40)
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        disclaimerSection(title: "Not Medical Advice", content: """
+                            This application ("AnalgesiaTool") is a clinical decision support system intended for use ONLY by licensed healthcare professionals. It does NOT provide medical advice, diagnosis, or treatment.
+                            
+                            Calculations are estimates based on population averages. Individual patient variability in pharmacokinetics, genetics, and comorbidities cannot be fully accounted for.
+                            """)
+                        
+                        disclaimerSection(title: "Clinical Judgment Required", content: """
+                            You acknowledge that you are a licensed healthcare professional and will use your own independent clinical judgment when interpreting these results.
+                            
+                            Do NOT rely solely on this tool for dosing decisions. Always verify calculations with standard references and your institution's protocols.
+                            """)
+                        
+                        disclaimerSection(title: "Pediatric Warning", content: """
+                            This tool is NOT validated for pediatric use (patients under 18 years of age). Dosing logic is specific to adult physiology.
+                            """)
+                        
+                        disclaimerSection(title: "Liability Limitation", content: """
+                            The developers and affiliates of this application assume no liability for any adverse outcomes, medication errors, or damages resulting from the use or misuse of this software.
+                            """)
+                    }
+                    .padding()
+                }
+                .background(ClinicalTheme.backgroundCard)
+                .cornerRadius(12)
+                .padding(.horizontal)
+                
+                // Action Button
+                Button(action: {
+                    withAnimation {
+                        hasAcceptedDisclaimer = true
+                    }
+                }) {
+                    Text("I Acknowledge & Accept")
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(ClinicalTheme.teal500)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 20)
+            }
+        }
+    }
+    
+    private func disclaimerSection(title: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(ClinicalTheme.rose500)
+            
+            Text(content)
+                .font(.body)
+                .foregroundColor(ClinicalTheme.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+struct InformedConsentView_Previews: PreviewProvider {
+    static var previews: some View {
+        InformedConsentView()
+            .environmentObject(ThemeManager.shared)
+    }
+}
+
+
+// File: AnalgesiaTool/UI/DesignSystem/Theme.swift
+#if canImport(UIKit)
+import UIKit
+#endif
+import SwiftUI
+import Combine
+
+class ThemeManager: ObservableObject {
+    static let shared = ThemeManager()
+    @Published var isDarkMode: Bool = false
+    
+    private init() {}
+}
+
+struct ClinicalTheme {
+    // MARK: - Semantic Colors (Use these in Views)
+    
+    // Text
+    static var textPrimary: Color { Color(UIColor.label) }
+    static var textSecondary: Color { Color(UIColor.secondaryLabel) }
+    static var textMuted: Color { Color(UIColor.placeholderText) }
+    
+    // Backgrounds
+    static var backgroundMain: Color { Color(UIColor.systemGroupedBackground) }
+    static var backgroundCard: Color { Color(UIColor.secondarySystemGroupedBackground) } // White in Light, Dark Grey in Dark
+    static var backgroundInput: Color { Color(UIColor.tertiarySystemFill) }
+    
+    // UI Elements
+    static var divider: Color { Color(UIColor.separator) }
+    static var cardBorder: Color { Color(UIColor.opaqueSeparator) }
+    
+    // Accents
+    // Accents - Matched to Web Clinical Design (Tailwind)
+    // For Dark Mode, we lighten them slightly for legibility, but keep the core brand hue.
+    static var teal500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.16, green: 0.82, blue: 0.76) : Color(red: 0.05, green: 0.58, blue: 0.53) } // #0d9488 (Teal 600)
+    static var amber500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.99, green: 0.85, blue: 0.38) : Color(red: 0.85, green: 0.55, blue: 0.00) } // #d97706 (Amber 600)
+    static var rose500: Color  { ThemeManager.shared.isDarkMode ? Color(red: 0.98, green: 0.44, blue: 0.52) : Color(red: 0.88, green: 0.11, blue: 0.28) } // #e11d48 (Rose 600)
+    static var purple500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.70, green: 0.45, blue: 0.95) : Color(red: 0.55, green: 0.20, blue: 0.80) }
+    static var blue500: Color { ThemeManager.shared.isDarkMode ? Color(red: 0.26, green: 0.67, blue: 0.96) : Color(red: 0.00, green: 0.48, blue: 1.00) }
+    
+    // Legacy mapping (Deprecated)
+    static var slate900: Color { backgroundMain }
+    static var slate800: Color { backgroundCard }
+    static var slate700: Color { divider }
+    static var slate500: Color { textMuted }
+    static var slate400: Color { textSecondary }
+    static var slate300: Color { textPrimary }
+}
+
+struct ClinicalCardModifier: ViewModifier {
+    // Need to observe updates if utilizing binding? 
+    // Actually, accessing the computed var inside body causes re-evaluation if the view redraws.
+    // We rely on the View hierarchy to redraw when ThemeManager changes.
+    
+    func body(content: Content) -> some View {
+        content
+            .padding(16)
+            .background(ClinicalTheme.backgroundCard)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(ClinicalTheme.cardBorder, lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+    }
+}
+
+extension View {
+    func clinicalCard() -> some View {
+        self.modifier(ClinicalCardModifier())
+    }
+    
+    func slateBackground() -> some View {
+        self.background(ClinicalTheme.slate900.ignoresSafeArea())
+    }
+}
+
+
+// File: AnalgesiaTool/UI/Navigation/MainTabView.swift
+import SwiftUI
+
+struct MainTabView: View {
+    @ObservedObject var themeManager = ThemeManager.shared
+    @AppStorage("hasAcceptedDisclaimer") private var hasAcceptedDisclaimer = false
+    @State private var selectedTab = 0
+    @EnvironmentObject var assessmentStore: AssessmentStore // Injected from App
+    @StateObject private var calculatorStore = CalculatorStore() // Shared State for Tabs
+    @StateObject private var oudStore = OUDConsultStore() // Shared State for OUD
+    
+    // Safety Alerts
+    enum ActiveAlert: Identifiable {
+        case mismatch
+        var id: Int { hashValue }
+    }
+    @State private var activeAlert: ActiveAlert?
+
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            // Tab 1: Assessment
+            RiskAssessmentView()
+                .tabItem {
+                    Image(systemName: "heart.text.square")
+                    Text("Assessment")
+                }
+                .tag(0)
+            
+            // Tab 3: MME Calc
+            CalculatorView(sharedStore: calculatorStore)
+                .tabItem {
+                    Image(systemName: "pills")
+                    Text("MME Calc")
+                }
+                .tag(2)
+                
+            // Tab 4: OUD Consult
+            OUDConsultView(sharedStore: oudStore)
+                .tabItem {
+                    Image(systemName: "cross.case.fill")
+                    Text("OUD Consult")
+                }
+                .tag(3)
+                
+            // Tab 5: Library
+            LibraryView()
+                .tabItem {
+                    Image(systemName: "books.vertical.fill")
+                    Text("Library")
+                }
+                .tag(4)
+        }
+        .environmentObject(calculatorStore) // Inject shared Calculator State for Settings/Debug
+        .accentColor(ClinicalTheme.teal500)
+        .onAppear {
+            updateTabBar()
+        }
+        .onChange(of: selectedTab) { _, newTab in 
+            // 1. MME Calculator Porting
+            if newTab == 2 {
+                // User Request: Removed "Missing Data" check to allow starting in Calculator.
+                // Logic Flow:
+                // 1. If Dirty State -> Ask to Overwrite
+                // 2. If Clean State -> Seed (Even if empty)
+                
+                if calculatorStore.hasActiveDrugs && (
+                    String(calculatorStore.age) != assessmentStore.age ||
+                    calculatorStore.renalStatus != assessmentStore.renalFunction ||
+                    calculatorStore.hepaticStatus != assessmentStore.hepaticFunction ||
+                    calculatorStore.analgesicProfile != assessmentStore.analgesicProfile ||
+                    calculatorStore.isPregnant != assessmentStore.isPregnant ||
+                    calculatorStore.isBreastfeeding != assessmentStore.isBreastfeeding ||
+                    calculatorStore.matchesBenzos != assessmentStore.benzos ||
+                    calculatorStore.sleepApnea != assessmentStore.sleepApnea ||
+                    calculatorStore.historyOverdose != assessmentStore.historyOverdose
+                ) {
+                     // 2. Dirty State Check -> Confirm
+                     activeAlert = .mismatch
+                } else {
+                     // 3. Clean -> Seed Auto
+                     calculatorStore.seed(from: assessmentStore)
+                }
+            }
+            
+            // 2. OUD Consult Porting (New Request)
+            if newTab == 3 {
+                // Auto-Seed OUD Store from Assessment
+                oudStore.seed(from: assessmentStore)
+            }
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { !hasAcceptedDisclaimer },
+            set: { _ in } // Managed by the view itself
+        )) {
+            InformedConsentView()
+        }
+        .onChange(of: themeManager.isDarkMode) { _, _ in updateTabBar() }
+        .alert(item: $activeAlert) { alertType in
+            switch alertType {
+            case .mismatch:
+                return Alert(
+                    title: Text("Patient Context Changed"),
+                    message: Text("Assessment data is different from the current Calculator session.\n\nUpdate Calculator context? This will NOT clear your drug list, but may change safety factors."),
+                    primaryButton: .default(Text("Update")) {
+                        calculatorStore.seed(from: assessmentStore)
+                    },
+                    secondaryButton: .cancel(Text("Keep Current"))
+                )
+            }
+        }
+    }
+
+
+    private func updateTabBar() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground() // Use system default material (translucent blur)
+        
+        // Optional: Force a specific blur style if needed, but default is usually best for native feel.
+        // appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
+        
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+        
+        // Configuration for Navigation Bar to match theme
+        let navAppearance = UINavigationBarAppearance()
+        navAppearance.configureWithDefaultBackground()
+        // Ensure title contrast
+        navAppearance.titleTextAttributes = [.foregroundColor: UIColor.label]
+        navAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
+        
+        UINavigationBar.appearance().standardAppearance = navAppearance
+        UINavigationBar.appearance().compactAppearance = navAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navAppearance
+    }
+}
+
+
+// File: AnalgesiaTool/TestRunner.swift
+#if CLI
+import Foundation
+import SwiftUI
+
+@main
+@MainActor
+struct ValidationRunner {
+    static func main() {
+        print("Starting Validation Engine...")
+        let report = ClinicalValidationEngine.shared.runStressTest()
+        print(report)
+    }
+}
+#endif
+

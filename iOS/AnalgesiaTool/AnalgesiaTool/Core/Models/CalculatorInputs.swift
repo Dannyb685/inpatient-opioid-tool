@@ -10,9 +10,17 @@ protocol CalculatorInputs {
     var hepaticFunction: HepaticStatus { get }
     var painType: PainType { get }
     var isPregnant: Bool { get }
-    var age: String { get } // String in AssessmentStore ("45")
+    var isBreastfeeding: Bool { get }
+    var age: String { get }
     var benzos: Bool { get }
     var sleepApnea: Bool { get }
     var historyOverdose: Bool { get }
     var analgesicProfile: AnalgesicProfile { get }
+    
+    // Additional Risk Factors
+    var sex: Sex { get }
+    var chf: Bool { get }
+    var copd: Bool { get }
+    var psychHistory: Bool { get }
+    var currentMME: String { get } // To check for >100 MME risk
 }

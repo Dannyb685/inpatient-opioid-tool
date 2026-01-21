@@ -106,6 +106,14 @@ struct SettingsView: View {
                              Spacer()
                              Text("2025.12.RC1").font(.caption).monospaced().foregroundColor(ClinicalTheme.textSecondary)
                          }
+                         
+                         Divider()
+                         
+                         HStack {
+                             Text("Transparency").foregroundColor(ClinicalTheme.textSecondary)
+                             Spacer()
+                             Text("Glass Box Policy (Reviewable)").font(.caption).bold().foregroundColor(ClinicalTheme.teal500)
+                         }
                      }
                      .clinicalCard()
                      .padding(.horizontal)

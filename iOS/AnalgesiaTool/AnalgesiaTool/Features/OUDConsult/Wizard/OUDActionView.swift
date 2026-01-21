@@ -5,99 +5,160 @@ struct OUDActionView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
-                // Protocol Card
-                VStack(spacing: 8) {
-                    Image(systemName: iconName).font(.largeTitle).foregroundColor(.white)
-                    Text(protocolTitle).font(.title2).bold().foregroundColor(.white)
-                    Text(store.medicationName)
-                        .font(.subheadline).bold()
-                        .padding(6).background(Color.white.opacity(0.2)).cornerRadius(6)
-                        .foregroundColor(.white)
-                }
-                .frame(maxWidth: .infinity).padding().background(protocolColor).cornerRadius(12)
-                
-                // Detailed Instructions
-                if store.recommendedProtocol == .microInduction {
-                    BerneseTable()
-                } else if store.recommendedProtocol == .highDoseBup {
-                    InfoCard(title: "High-Dose Protocol", bodyText: "Administer 8-16mg immediately. Repeat q1h as needed.")
-                } else if store.recommendedProtocol == .standardBup {
-                    InfoCard(title: "Standard Induction", bodyText: "Give 4mg/2mg. Repeat in 1 hour if COWS > 8.")
-                } else if store.recommendedProtocol == .symptomManagement {
-                    InfoCard(title: "Supportive Care", bodyText: "COWS too low. Treat symptoms (Clonidine, Zofran). Reassess in 2h.")
-                } else if store.recommendedProtocol == .fullAgonist {
-                     InfoCard(title: "Specialist Consult", bodyText: "Rotate to Methadone or split-dose Oxycodone due to contraindications.")
-                }
-                
-                Button("Proceed to Discharge") {
-                    store.currentPhase = .followUp
-                    store.path.append(ConsultPhase.followUp)
-                }
-                .buttonStyle(.borderedProminent)
-            }
-            .padding()
-        }
-    }
-    
-    var protocolColor: Color {
-        switch store.recommendedProtocol {
-        case .standardBup, .highDoseBup: return .blue
-        case .microInduction: return .indigo
-        case .symptomManagement: return .orange
-        case .fullAgonist: return .purple
-        }
-    }
-    
-    var iconName: String {
-        store.recommendedProtocol == .symptomManagement ? "clock.arrow.circlepath" : "cross.case.fill"
-    }
-    
-    var protocolTitle: String {
-        switch store.recommendedProtocol {
-        case .standardBup: return "Standard Induction"
-        case .highDoseBup: return "High-Dose Rapid Induction"
-        case .microInduction: return "Bernese Method (Micro)"
-        case .symptomManagement: return "Symptom Management"
-        case .fullAgonist: return "Full Agonist Rotation"
-        }
-    }
-}
-
-// Helpers
-struct InfoCard: View {
-    let title: String, bodyText: String
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(title).font(.headline)
-            Text(bodyText).font(.body).foregroundColor(.secondary)
-        }.padding().frame(maxWidth: .infinity, alignment: .leading).background(Color(.secondarySystemBackground)).cornerRadius(12)
-    }
-}
-
-struct BerneseTable: View {
-    let steps = [
-        ("Day 1", "0.5 mg once", "Continue full agonist"),
-        ("Day 2", "0.5 mg BID", ""),
-        ("Day 3", "1 mg BID", ""),
-        ("Day 4", "2 mg BID", ""),
-        ("Day 5", "3 mg BID", ""),
-        ("Day 6", "4 mg BID", ""),
-        ("Day 7", "12 mg (Stop agonist)", "Discontinue other opioids")
-    ]
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Micro-Dosing Schedule").font(.headline).padding().frame(maxWidth: .infinity, alignment: .leading).background(Color.indigo.opacity(0.1))
-            ForEach(steps, id: \.0) { step in
-                HStack {
-                    Text(step.0).bold().frame(width: 60, alignment: .leading)
-                    VStack(alignment: .leading) {
-                        Text(step.1).font(.system(.body, design: .monospaced))
-                        if !step.2.isEmpty { Text(step.2).font(.caption).foregroundColor(.red) }
+            if let plan = store.generatedPlan {
+                VStack(spacing: 24) {
+                    
+                    // 1. Header Card
+                    VStack(spacing: 8) {
+                        Image(systemName: "cross.case.fill").font(.largeTitle).foregroundColor(.white)
+                        Text(plan.protocolName)
+                            .font(.title2).bold().foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                        
+                        Text(store.medicationName)
+                            .font(.subheadline).bold()
+                            .padding(6).background(Color.white.opacity(0.2)).cornerRadius(6)
+                            .foregroundColor(.white)
+                        
+                        if !plan.evidenceNote.isEmpty {
+                            Text(plan.evidenceNote)
+                                .font(.caption).italic().foregroundColor(.white.opacity(0.9))
+                                .multilineTextAlignment(.center)
+                                .padding(.top, 4)
+                        }
                     }
-                }.padding().padding(.vertical, 4)
-                Divider()
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(headerColor)
+                    .cornerRadius(12)
+                    .shadow(radius: 4)
+                    
+                    // 2. Safety Alerts (Dynamic)
+                    if !plan.safetyAlerts.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Safety Alerts").font(.headline).foregroundColor(.red)
+                            ForEach(plan.safetyAlerts, id: \.self) { alert in
+                                HStack(alignment: .top) {
+                                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.red)
+                                    Text(alert)
+                                        .font(.subheadline).bold()
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                .padding(8)
+                                .background(Color.red.opacity(0.1))
+                                .cornerRadius(8)
+                            }
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(12)
+                        .shadow(radius: 2)
+                    }
+                    
+                    // 2a. CLINICAL LOGIC TRANSPARENCY (v7.2.3)
+                    DisclosureGroup {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Why this Protocol?")
+                                .font(.headline)
+                                .foregroundColor(ClinicalTheme.textPrimary)
+                            
+                            if store.hasLiverFailure {
+                                Text("• Liver Failure detected: Methadone contraindicated due to unpredictable metabolism. Short-acting opioids favored.")
+                                    .font(.caption)
+                            } else if store.isPregnant {
+                                Text("• Pregnancy detected: Standard of Care supports Buprenorphine (Subutex) or Methadone. Buprenorphine/Naloxone (Suboxone) is becoming preferred but requires patient consent.")
+                                    .font(.caption)
+                            } else if plan.protocolName.contains("Micro-Induction") {
+                                Text("• High-Potency/Fentanyl Use: Micro-induction (Bernese Method) selected to minimize Precipitated Withdrawal risk.")
+                                    .font(.caption)
+                            } else {
+                                Text("• Standard Stratification: Balanced for safety and efficacy based on COWS score and physiological profile.")
+                                    .font(.caption)
+                            }
+                        }
+                        .padding(.vertical, 8)
+                    } label: {
+                        Label("Clinical Logic Breakdown", systemImage: "brain.head.profile")
+                            .font(.caption).bold()
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(12)
+                    .shadow(radius: 2)
+                    
+                    // 3. Induction Steps
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Text("Protocol Steps").font(.headline)
+                            Spacer()
+                            Image(systemName: "list.number")
+                        }
+                        .padding()
+                        .background(Color(.secondarySystemBackground))
+                        
+                        ForEach(plan.inductionSteps, id: \.self) { step in
+                            HStack(alignment: .top) {
+                                Text("•").bold().foregroundColor(.blue)
+                                Text(step).font(.body)
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            Divider()
+                        }
+                    }
+                    .background(Color.white)
+                    .cornerRadius(12)
+                    .shadow(radius: 2)
+                    
+                    // 4. Adjunct Medications
+                    if !plan.adjunctMeds.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Symptomatic Management").font(.headline)
+                            ForEach(plan.adjunctMeds, id: \.self) { med in
+                                Text("• \(med)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(12)
+                        .shadow(radius: 2)
+                    }
+                    
+                    // 5. Proceed
+                    Button("Proceed to Discharge") {
+                        store.currentPhase = .followUp
+                        store.path.append(ConsultPhase.followUp)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                }
+                .padding()
+            } else {
+                VStack {
+                    Image(systemName: "doc.text.magnifyingglass")
+                        .font(.largeTitle)
+                        .foregroundColor(.gray)
+                    Text("No Protocol Generated")
+                        .font(.headline)
+                    Text("Please complete the risk assessment first.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding()
             }
-        }.cornerRadius(12).overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3)))
+        }
+        .background(Color(UIColor.systemGroupedBackground))
+    }
+    
+    var headerColor: Color {
+        // Simple logic or can add urgency property to plan
+        let name = store.generatedPlan?.protocolName ?? ""
+        if name.contains("High-Dose") { return .purple }
+        if name.contains("Low-Dose") { return .indigo }
+        return .blue
     }
 }

@@ -44,3 +44,22 @@ extension Double {
         }
     }
 }
+
+struct SmartRounding {
+    static func roundDose(_ value: Double, drug: String, route: String) -> String {
+        // Simple logic for now matching the extension's intent but purely helper
+        if drug.contains("Fentanyl") && route.contains("Patch") {
+             return String(format: "%.0f", value)
+        }
+        if route.contains("IV") || (drug.contains("Fentanyl") && route.contains("IV")) {
+            return String(format: "%.1f", value)
+        }
+        // General PO
+        if value < 10 {
+            let rounded = (value * 2).rounded() / 2
+            return rounded.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", rounded) : String(format: "%.1f", rounded)
+        } else {
+            return String(format: "%.0f", value.rounded())
+        }
+    }
+}

@@ -60,7 +60,7 @@ struct ScoreResultCard: View {
                     
                     if let label = valueLabel {
                         Text(label)
-                            .font(.caption)
+                            .font(.headline)
                             .fontWeight(.bold)
                             .foregroundColor(ClinicalTheme.textSecondary)
                     }

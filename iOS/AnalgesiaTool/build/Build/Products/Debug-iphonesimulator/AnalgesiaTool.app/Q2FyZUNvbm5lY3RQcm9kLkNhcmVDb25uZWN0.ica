@@ -1,0 +1,180 @@
+[Encoding]
+InputEncoding=UTF8
+
+[WFClient]
+Hotkey1Char=F1
+Hotkey1Shift=Shift
+Hotkey2Char=(none)
+Hotkey2Shift=(none)
+Hotkey3Char=(none)
+Hotkey3Shift=(none)
+Hotkey4Char=(none)
+Hotkey4Shift=(none)
+Hotkey5Char=(none)
+Hotkey5Shift=(none)
+Hotkey6Char=(none)
+Hotkey6Shift=(none)
+Hotkey7Char=(none)
+Hotkey7Shift=(none)
+Hotkey8Char=(none)
+Hotkey8Shift=(none)
+Hotkey9Char=F3
+HotKey9Shift=Alt
+ProxyFavorIEConnectionSetting=Yes
+ProxyTimeout=30000
+ProxyType=Auto
+ProxyUseFQDN=Off
+RemoveICAFile=yes
+TransparentKeyPassthrough=Local
+TransportReconnectEnabled=Off
+Version=2
+VirtualCOMPortEmulation=On
+
+[ApplicationServers]
+CareConnect=
+
+[CareConnect]
+Address=;40;STA440279357;C1F0BDEAFFC47E6D9691BB65F1AAF9
+AutologonAllowed=ON
+BrowserProtocol=HTTPonTCP
+CGPSecurityTicket=On
+Citrix-TransactionId=97f81334-3180-4435-8da0-077c12bf1599
+ClearPassword=04836087C4266E
+ClientAudio=On
+DesiredColor=8
+DesiredHRES=0
+DesiredVRES=0
+DesktopViewer-ForceFullScreenStartup=false
+Domain=\5FDB25DFD4051F2C
+DoNotUseDefaultCSL=On
+FontSmoothingType=0
+HDXoverUDP=Off
+HTTPBrowserAddress=!
+InitialProgram=#CareConnect
+Launcher=WI
+LaunchReference=3506FEDD31E34E94467792B6FF9566
+LocHttpBrowserAddress=!
+LogonTicket=04836087C4266E5FDB25DFD4051F2C
+LogonTicketType=CTXS1
+LongCommandLine=
+LPWD=375
+NRWD=249
+ProxyTimeout=30000
+ProxyType=Auto
+SecureChannelProtocol=Detect
+SessionsharingKey=3myt5ZSCnK+9HDu0B5fvwQh+/iBesWlr
+SFRAllowed=Off
+SSLCiphers=all
+SSLEnable=On
+SSLProxyHost=webapps.ccnet.ucla.edu:443
+startSCD=1768402940329
+Title=CareConnect
+TransportDriver=TCP/IP
+TRWD=0
+TWIMode=On
+WinStationDriver=ICA 3.0
+
+[Citrix Admin VDI $S57-68]
+ScreenPercent=90
+TWIMode=False
+
+[Citrix Team Desktop $S74-96]
+ScreenPercent=90
+TWIMode=False
+
+[Compress]
+DriverNameWin16=pdcompw.dll
+DriverNameWin32=pdcompn.dll
+
+[ECSM Admin Desktop $S75-98]
+ScreenPercent=90
+TWIMode=False
+
+[EHR Admin Desktop $S28-34]
+ScreenPercent=90
+TWIMode=False
+
+[EncRC5-0]
+DriverNameWin16=pdc0w.dll
+DriverNameWin32=pdc0n.dll
+
+[EncRC5-128]
+DriverNameWin16=pdc128w.dll
+DriverNameWin32=pdc128n.dll
+
+[EncRC5-40]
+DriverNameWin16=pdc40w.dll
+DriverNameWin32=pdc40n.dll
+
+[EncRC5-56]
+DriverNameWin16=pdc56w.dll
+DriverNameWin32=pdc56n.dll
+
+[OHIA - App Dev VDI $S10-15]
+ScreenPercent=90
+TWIMode=False
+
+[OHIA App Dev 2 VDI $S55-65]
+ScreenPercent=90
+TWIMode=False
+
+[OHIA PowerBI VDI $S7-9]
+ScreenPercent=90
+TWIMode=False
+
+[OHIA Report Dev VDI $S9-13]
+ScreenPercent=90
+TWIMode=False
+
+[OHIA XDR VDI $S5-6]
+ScreenPercent=90
+TWIMode=False
+
+[Sergios VDI $S57-69]
+ScreenPercent=90
+TWIMode=False
+
+[Tableau Desktop CX7 $S59-73]
+ScreenPercent=90
+TWIMode=False
+
+[Tableau Test $S60-75]
+ScreenPercent=90
+TWIMode=False
+
+[Tableau Upgrade Desktop $S77-102]
+ScreenPercent=90
+TWIMode=False
+
+[TEST - xDR Desktop CX7 $S66-87]
+ScreenPercent=90
+TWIMode=False
+
+[TEST App Dev VDI $S62-79]
+ScreenPercent=90
+TWIMode=False
+
+[TEST Citrix Admin VDI $S58-71]
+ScreenPercent=90
+TWIMode=False
+
+[TEST EHR Admin Desktop $S76-100]
+ScreenPercent=90
+TWIMode=False
+
+[TEST PowerBI VDI $S63-81]
+ScreenPercent=90
+TWIMode=False
+
+[TEST Report Dev VDI $S64-83]
+ScreenPercent=90
+TWIMode=False
+
+[TEST XDR VDI $S65-85]
+ScreenPercent=90
+TWIMode=False
+
+[XDR Desktop CX7 $S61-77]
+ScreenPercent=90
+TWIMode=False
+

@@ -1,0 +1,616 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/Features/Assessment/RiskAssessmentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Opioid Risk Assessment",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 74
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enter patient parameters below",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 154
+        }
+      },
+      {
+        "comment": "",
+        "key": "CONSIDERATIONS",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 88
+        }
+      },
+      {
+        "comment": "",
+        "key": "OIRD Risk Score",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 132
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 139
+        }
+      },
+      {
+        "comment": "",
+        "key": "Age",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 175
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yrs",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 176
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sex",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 184
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sex",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 185
+        }
+      },
+      {
+        "comment": "",
+        "key": "Male",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 187
+        }
+      },
+      {
+        "comment": "",
+        "key": "Female",
+        "location": {
+          "startingColumn": 58,
+          "startingLine": 187
+        }
+      },
+      {
+        "comment": "",
+        "key": "Active Pregnancy",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 203
+        }
+      },
+      {
+        "comment": "",
+        "key": "Blocks NSAIDs & Colchicine",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 204
+        }
+      },
+      {
+        "comment": "",
+        "key": "Breastfeeding",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 211
+        }
+      },
+      {
+        "comment": "",
+        "key": "Monitor infant for sedation",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 212
+        }
+      },
+      {
+        "comment": "",
+        "key": "Visible Ascites?",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 293
+        }
+      },
+      {
+        "comment": "",
+        "key": "6. History of GI Bleed?",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 306
+        }
+      },
+      {
+        "comment": "",
+        "key": "Prevents systemic NSAID recommendations",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 307
+        }
+      },
+      {
+        "comment": "",
+        "key": "Immediate Post-Op NPO?",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 328
+        }
+      },
+      {
+        "comment": "",
+        "key": "Substance Profile",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 350
+        }
+      },
+      {
+        "comment": "",
+        "key": "Patient Baseline",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 359
+        }
+      },
+      {
+        "comment": "",
+        "key": "Profile",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 366
+        }
+      },
+      {
+        "comment": "",
+        "key": "Currently Split Dosing (q6-8h)?",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 420
+        }
+      },
+      {
+        "comment": "",
+        "key": "QTc Prolongation (>450ms)",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 398
+        }
+      },
+      {
+        "comment": "",
+        "key": "Warning: Limit QT-prolonging adjuvants",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 400
+        }
+      },
+      {
+        "comment": "",
+        "key": "Already on Split Dosing?",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 408
+        }
+      },
+      {
+        "comment": "",
+        "key": "Good for analgesia",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 410
+        }
+      },
+      {
+        "comment": "",
+        "key": "Recommendation: Split dose q8h",
+        "location": {
+          "startingColumn": 77,
+          "startingLine": 410
+        }
+      },
+      {
+        "comment": "",
+        "key": "Note: Tolerance Unpredictable",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 432
+        }
+      },
+      {
+        "comment": "",
+        "key": "Lipophilic storage prevents accurate MME calculation. Titrate by effect.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 434
+        }
+      },
+      {
+        "comment": "",
+        "key": "Receptor Blockade Active",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 448
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opioids ineffective. Prioritize Ketamine/Regional.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 450
+        }
+      },
+      {
+        "comment": "",
+        "key": "No specific non-drug interventions identified.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 477
+        }
+      },
+      {
+        "comment": "",
+        "key": "Non-Pharmacological",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 471
+        }
+      },
+      {
+        "comment": "",
+        "key": "OIRD Risk Factors",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 532
+        }
+      },
+      {
+        "comment": "",
+        "key": "Benzos / Sedatives",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 535
+        }
+      },
+      {
+        "comment": "",
+        "key": "COPD / Hypoventilation",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 536
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sleep Apnea (OSA)",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 537
+        }
+      },
+      {
+        "comment": "",
+        "key": "CHF",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 538
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hx Overdose / Subst. Use",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 539
+        }
+      },
+      {
+        "comment": "",
+        "key": "Depression / Anxiety",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 540
+        }
+      },
+      {
+        "comment": "",
+        "key": "Multiple Providers (PDMP)",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 541
+        }
+      },
+      {
+        "comment": "",
+        "key": "PATIENT CONTEXT",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 558
+        }
+      },
+      {
+        "comment": "",
+        "key": "Copy",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 571
+        }
+      },
+      {
+        "comment": "",
+        "key": "MONITORING PLAN",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 597
+        }
+      },
+      {
+        "comment": "",
+        "key": "CONTRAINDICATIONS",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 614
+        }
+      },
+      {
+        "comment": "",
+        "key": "Adjuvant Options",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 630
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opioid Options",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 659
+        }
+      },
+      {
+        "comment": "",
+        "key": "Complete inputs for options",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 667
+        }
+      },
+      {
+        "comment": "",
+        "key": "General reference only. Does not account for patient-specific safety parameters.",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 691
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pain Regimen By Condition",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 706
+        }
+      },
+      {
+        "comment": "",
+        "key": "RECOMMENDATIONS",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 726
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 733
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 744
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clinical Data Flow",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 772
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your inputs here drive downstream safety logic:",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 776
+        }
+      },
+      {
+        "comment": "",
+        "key": "Changes here require refresh in downstream tools.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 796
+        }
+      },
+      {
+        "comment": "",
+        "key": "Preferred",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 862
+        }
+      },
+      {
+        "comment": "",
+        "key": "Monitor",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 862
+        }
+      },
+      {
+        "comment": "",
+        "key": "citations",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 894
+        }
+      },
+      {
+        "comment": "",
+        "key": "Standard Orders",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 911
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clinical Pharmacology",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 938
+        }
+      },
+      {
+        "comment": "",
+        "key": "PO Profile",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 946
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ onset / %@ duration",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 947
+        }
+      },
+      {
+        "comment": "",
+        "key": "IV Profile",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 958
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ onset / %@ duration",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 959
+        }
+      },
+      {
+        "comment": "",
+        "key": "Oral Bio",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 970
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 994
+        }
+      },
+      {
+        "comment": "",
+        "key": "Legal & Safety Limitations",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1048
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Full Legal Disclaimers",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1062
+        }
+      },
+      {
+        "comment": "",
+        "key": "• EDUCATIONAL TOOL ONLY: Not medical advice.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1054
+        }
+      },
+      {
+        "comment": "",
+        "key": "• NOT VALIDATED for patients < 18 years.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1055
+        }
+      },
+      {
+        "comment": "",
+        "key": "• NO PROVIDER-PATIENT RELATIONSHIP established.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1056
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 1076
+        }
+      }
+    ]
+  },
+  "version": 1
+}

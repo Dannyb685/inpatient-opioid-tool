@@ -1,0 +1,64 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/Features/Library/Risk/COWSView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "COWS Assessment",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 100
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset Scale",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 77
+        }
+      },
+      {
+        "comment": "",
+        "key": "Powered by Lifeline Medical Technologies",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "TOTAL SCORE",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 111
+        }
+      },
+      {
+        "comment": "",
+        "key": "SYMPTOM RECOMMENDATIONS",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 137
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld Suggested",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 144
+        }
+      }
+    ]
+  },
+  "version": 1
+}

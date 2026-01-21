@@ -1,0 +1,256 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/Features/Calculator/SharedClinicalContextView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Clinical Context",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 33
+        }
+      },
+      {
+        "comment": "",
+        "key": "Patient Age",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "Age",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opioid Profile",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 59
+        }
+      },
+      {
+        "comment": "",
+        "key": "Profile",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 62
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pregnant Person",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 93
+        }
+      },
+      {
+        "comment": "",
+        "key": "Shows warnings / gates logic",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 94
+        }
+      },
+      {
+        "comment": "",
+        "key": "Safety Warning",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 103
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opioid management in pregnancy requires specialist consultation (OB/GYN / Addiction Medicine).",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 104
+        }
+      },
+      {
+        "comment": "",
+        "key": "Breastfeeding",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 115
+        }
+      },
+      {
+        "comment": "",
+        "key": "Logic for infant monitoring",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 116
+        }
+      },
+      {
+        "comment": "",
+        "key": "Lactation Note",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 125
+        }
+      },
+      {
+        "comment": "",
+        "key": "Monitor infant for sedation/respiratory depression if patient is using opioids.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 126
+        }
+      },
+      {
+        "comment": "",
+        "key": "Concurrent Benzodiazepines",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 138
+        }
+      },
+      {
+        "comment": "",
+        "key": "History of Overdose / SUD",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 143
+        }
+      },
+      {
+        "comment": "",
+        "key": "Obstructive Sleep Apnea",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 148
+        }
+      },
+      {
+        "comment": "",
+        "key": "Renal Impairment",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 164
+        }
+      },
+      {
+        "comment": "",
+        "key": "eGFR <60 (CKD 3+)",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 165
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dialysis status requires strict avoidance of Morphine/Codeine/Meperidine due to neurotoxic metabolite accumulation.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 180
+        }
+      },
+      {
+        "comment": "",
+        "key": "Status: %@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 175
+        }
+      },
+      {
+        "comment": "",
+        "key": "Revert to Standard CKD",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 185
+        }
+      },
+      {
+        "comment": "",
+        "key": "Escalate to Dialysis",
+        "location": {
+          "startingColumn": 88,
+          "startingLine": 185
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hepatic Impairment",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 208
+        }
+      },
+      {
+        "comment": "",
+        "key": "Child-Pugh B+",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 209
+        }
+      },
+      {
+        "comment": "",
+        "key": "Liver Failure (Child-Pugh C) increases Hydromorphone PO bioavailability 4x via portosystemic shunting.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 224
+        }
+      },
+      {
+        "comment": "",
+        "key": "Status: %@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 219
+        }
+      },
+      {
+        "comment": "",
+        "key": "Revert to Moderate Impairment",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 229
+        }
+      },
+      {
+        "comment": "",
+        "key": "Escalate to Liver Failure (Child-Pugh C)",
+        "location": {
+          "startingColumn": 96,
+          "startingLine": 229
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cross-Tolerance Reduction",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 249
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%lld%%",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 251
+        }
+      },
+      {
+        "comment": "",
+        "key": "Safety Logic: Renal/Hepatic restrictions applied IN ADDITION to this reduction.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 276
+        }
+      }
+    ]
+  },
+  "version": 1
+}

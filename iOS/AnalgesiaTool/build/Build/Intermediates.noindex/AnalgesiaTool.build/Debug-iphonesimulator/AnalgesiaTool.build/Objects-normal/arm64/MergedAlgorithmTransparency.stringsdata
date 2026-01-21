@@ -1,0 +1,32 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/Features/Calculator/MergedAlgorithmTransparency.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Visual Potency Guide",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "Equianalgesic factors based on CDC 2022 Guidelines.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 52
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clinical Evidence",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 65
+        }
+      }
+    ]
+  },
+  "version": 1
+}

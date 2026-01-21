@@ -19,6 +19,15 @@ struct CalculatorView: View {
     @State private var showMathSheet = false // Show Math Feature
     @State private var showMethadoneSheet = false // New Feature
     @State private var showComplexConversion = false // Moved from Library
+    @State private var showInfusionSheet = false // Phase 15: PCA/Drips
+    
+    // Keyboard Avoidance
+    @FocusState private var focusedFieldID: String?
+    
+    // Glass Box State
+    @State private var selectedEvidence: ConversionFactor? = nil
+    @State private var selectedEvidenceDrug: String = ""
+    @State private var selectedTarget: TargetDose? = nil // Glass Box Math
     
     // Mode State
     enum CalculatorMode: String, CaseIterable {
@@ -30,6 +39,31 @@ struct CalculatorView: View {
     // Taper Sync State (Hoisted from TaperScheduleView)
     @State private var taperStartMME: String = ""
     @State private var hasTaperOverride: Bool = false
+
+    // Moved from extension to fix $expandedInfoTab scope
+    var infoSection: some View {
+        VStack(spacing: 12) {
+            Text("Reference & Guidelines")
+                .font(.headline)
+                .foregroundColor(ClinicalTheme.textSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+
+            // E. CLINICAL CONTEXT (MDCalc Style)
+            // Instructions, Pearls, Evidence
+            VStack(spacing: 1) {
+                InfoAccordion(title: "Instructions & Warnings", icon: "exclamationmark.circle", content: InfoContent.instructions + "\n\n" + InfoContent.pearls, expandedItem: $expandedInfoTab)
+                MergedAlgorithmTransparencyAccordion(expandedItem: $expandedInfoTab)
+            }
+            .background(ClinicalTheme.backgroundCard)
+            .cornerRadius(12)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, style: StrokeStyle(lineWidth: 1, dash: [5])))
+            .padding(.horizontal)
+            .padding(.bottom, 140)
+            
+            Spacer().frame(height: 100)
+        }
+    }
 
     var body: some View {
         NavigationView {
@@ -70,37 +104,54 @@ struct CalculatorView: View {
                         headerSection
                         
                         // MARK: - 2. SCROLLABLE CONTENT
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 24) {
-                                
-                                // A. SAFETY FACTORS (Renal/Hepatic) - Moved to Top
-                                clinicalContextView
-                                    .padding(.top, 4)
-                                
-                                // B. ACTIVE MEDICATIONS LIST
-                                activeMedsList
-                                
-                                // C. VISUAL FLOW DIVIDER (v1.6)
-                                CalculationFlowDivider()
-                                    .padding(.vertical, 8)
-                                
-                                // D. ESTIMATED TARGETS
-                                targetsSection
-                                
-                                // E. ADVANCED TOOLS
-                                toolsSection
+                        ScrollViewReader { scrollProxy in
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: 24) {
+                                    
+                                    // A. SAFETY FACTORS (Renal/Hepatic) - Moved to Top
+                                    clinicalContextView
+                                        .padding(.top, 4)
+                                    
+                                    // B. ACTIVE MEDICATIONS LIST
+                                    activeMedsList(focusedField: $focusedFieldID)
+                                    
+                                    // C. VISUAL FLOW DIVIDER (v1.6)
+                                    CalculationFlowDivider()
+                                        .padding(.vertical, 8)
+                                    
+                                    // D. ESTIMATED TARGETS
+                                    targetsSection
+                                    
+                                    // E. ADVANCED TOOLS
+                                    toolsSection
 
-                                infoSection
-                                
-                                VStack(spacing: 4) {
-                                    Text("Powered by Lifeline Medical Technologies")
-                                        .font(.system(size: 10))
-                                        .foregroundColor(ClinicalTheme.teal500.opacity(0.6))
+                                    infoSection
+                                    
+                                    CitationFooter(citations: CitationRegistry.resolve([
+                                        "cdc_opioids_2022",
+                                        "cms_mme_2024"
+                                    ]))
+                                    
+                                    VStack(spacing: 4) {
+                                        Text("Powered by Lifeline Medical Technologies")
+                                            .font(.system(size: 10))
+                                            .foregroundColor(ClinicalTheme.teal500.opacity(0.6))
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.top, 12)
+                                    
+                                    // Padding for keyboard
+                                    Rectangle().fill(Color.clear).frame(height: focusedFieldID != nil ? 300 : 100)
                                 }
-                                .frame(maxWidth: .infinity)
-                                .padding(.top, 12)
+                                .padding(.bottom, 100) // Base padding
                             }
-                            .padding(.bottom, 100)
+                            .onChange(of: focusedFieldID) { _, newId in
+                                if let id = newId {
+                                    withAnimation {
+                                        scrollProxy.scrollTo(id, anchor: .center)
+                                    }
+                                }
+                            }
                         }
                     } else {
                         // MARK: - TAPER SCHEDULE
@@ -113,13 +164,37 @@ struct CalculatorView: View {
                 }
                 .disabled(store.isPediatric) // STRICT SAFETY: Hard Stop
                 .blur(radius: store.isPediatric ? 4 : 0) // Visual Cues
+                
+                // GLASS BOX SHEET
+                .sheet(item: $selectedEvidence) { evidence in
+                    GlassBoxView(evidence: evidence, drugName: selectedEvidenceDrug)
+                }
+                // GLASS BOX MATH SHEET
+                .sheet(item: $selectedTarget) { target in
+                    TargetMathView(target: target, calculatorStore: store)
+                }
             }
             .navigationTitle("MME Calculator")
             .navigationBarTitleDisplayMode(.inline)
             // Removed redundant done button modifier
             .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        UIApplication.shared.endEditing()
+                    }
+                    .font(.body.bold())
+                    .foregroundColor(ClinicalTheme.teal500)
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 16) {
+                        // Infusion Button (Phase 15)
+                         Button(action: { showInfusionSheet = true }) {
+                            Image(systemName: "iv.bag")
+                                .foregroundColor(ClinicalTheme.blue500)
+                        }
+                        
                         if calculatorMode == .dosing {
                             Button(action: copyToClipboard) {
                                 Image(systemName: "doc.on.doc")
@@ -141,8 +216,12 @@ struct CalculatorView: View {
             .sheet(isPresented: $showAddDrugSheet) {
                 AddDrugSheet(store: store, isPresented: $showAddDrugSheet)
             }
+
             .sheet(isPresented: $showMathSheet) {
                  MathReceiptView(receipt: store.calculationReceipt, total: store.resultMME)
+            }
+            .sheet(isPresented: $showInfusionSheet) {
+                 InfusionView(calculatorStore: store)
             }
             .fullScreenCover(isPresented: $showMethadoneSheet) {
                 MethadoneView(
@@ -150,7 +229,12 @@ struct CalculatorView: View {
                     initialMME: store.resultMME,
                     initialAge: Int(store.age), // Auto-Seed Age (User Request)
                     isPregnant: store.isPregnant,
-                    isNaltrexone: store.analgesicProfile == .naltrexone
+                    isBreastfeeding: store.isBreastfeeding,
+                    isNaltrexone: store.analgesicProfile == .naltrexone,
+                    hepaticStatus: store.hepaticStatus,
+                    renalStatus: store.renalStatus,
+                    benzos: store.matchesBenzos,
+                    isOUD: store.historyOverdose // Mapping History of Overdose/SUD to OUD Context
                 )
             }
 
@@ -166,6 +250,7 @@ struct CalculatorView: View {
             .preferredColorScheme(themeManager.isDarkMode ? .dark : .light)
             .addKeyboardDoneButton()
         }
+        .hideKeyboardOnTap()
     }
     
     // MARK: - GENERATE NOTE
@@ -178,6 +263,7 @@ struct CalculatorView: View {
         - Renal Function: \(store.renalStatus.rawValue)
         - Hepatic Function: \(store.hepaticStatus.rawValue)
         - Comorbidities: \(store.sleepApnea ? "OSA, " : "")\(store.matchesBenzos ? "Concurrent Benzos, " : "")\(store.historyOverdose ? "Hx Overdose/SUD" : "")
+        - Perinatal: \(store.isPregnant ? "Pregnant" : (store.isBreastfeeding ? "Breastfeeding" : "N/A"))
         - Analgesic Profile: \(store.analgesicProfile.rawValue)
         
         MME Calculation:
@@ -187,8 +273,13 @@ struct CalculatorView: View {
         Plan:
         \(store.warningText.isEmpty ? "- Standard monitoring" : "- Caution: High Risk. " + store.warningText)
         - PDMP Checked.
+
+        DISCLAIMER: This calculation is for informational purposes. Individual patient physiology varies. Clinical decisions should be individualized. (Lifeline Medical Technologies)
         """
         UIPasteboard.general.string = note
+        
+        // Log Safety Action
+        SafetyLogger.shared.log(.actionTaken(action: "Copy Note", context: "Calculator View | Warnings: \(store.warningText.isEmpty ? "None" : "Active")"))
     }
     
     // MARK: - HELPERS
@@ -215,30 +306,33 @@ struct CalculatorView: View {
 struct ActiveMedicationRow: View {
     let input: CalculatorInput
     @ObservedObject var store: CalculatorStore
+    @FocusState.Binding var focusedField: String?
     
     var body: some View {
-        HStack(spacing: 12) {
-            // Label
-            VStack(alignment: .leading, spacing: 0) {
-                Text(input.name)
-                    .font(.system(size: 16, weight: .semibold)) // Explicit Hierarchy
-                    .foregroundColor(ClinicalTheme.textPrimary)
-                
-                Text(routeLabel(for: input.routeType))
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundColor(ClinicalTheme.textSecondary)
-                    .padding(.top, 2) // Separation
+        VStack(spacing: 0) { // Container for Row + Divider
+            HStack(spacing: 12) {
+                // Label Section
+                VStack(alignment: .leading, spacing: 2) { // Tightened spacing
+                    Text(input.name)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(ClinicalTheme.textPrimary)
+                        .layoutPriority(1) // 1. FORCE text to keep its width
                     
-                // SAFETY: Inline Contraindication Warning
-                if shouldFlagContraindication(for: input) {
-                    Text("⛔️ CONTRAINDICATED")
-                        .font(.system(size: 8, weight: .bold))
-                        .foregroundColor(ClinicalTheme.rose500)
-                        .padding(.top, 2)
-                }
+                    Text(routeLabel(for: input.routeType))
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundColor(ClinicalTheme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true) // 2. Let it wrap vertically if needed
+                        
+                    // SAFETY: Inline Contraindication Warning
+                    if shouldFlagContraindication(for: input) {
+                        Text("CONTRAINDICATED")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundColor(ClinicalTheme.rose500)
+                            .padding(.top, 2)
+                    }
                     
                     if input.drugId == "sufentanil" || input.drugId == "alfentanil" {
-                         Text("⚠️ Not CDC-Validated")
+                         Text("Not CDC-Validated")
                             .font(.system(size: 9, weight: .bold))
                             .padding(.horizontal, 4)
                             .padding(.vertical, 2)
@@ -248,7 +342,6 @@ struct ActiveMedicationRow: View {
                             .padding(.top, 4)
                     }
 
-                    
                     // INLINE WARNING (v1.6)
                     if let warning = input.warningMessage {
                         Text(warning)
@@ -256,58 +349,74 @@ struct ActiveMedicationRow: View {
                             .foregroundColor(ClinicalTheme.amber500)
                             .padding(.top, 2)
                             .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true) // Wrap text if needed
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
-            
-            Spacer()
-            
-            // Input Field
-            HStack(spacing: 4) {
-                TextField("0", text: Binding(
-                    get: { input.dose },
-                    set: { store.updateDose(for: input.id, dose: $0) }
-                ))
-                .keyboardType(.decimalPad)
-                .multilineTextAlignment(TextAlignment.trailing)
-                .font(Font.body.monospacedDigit().bold())
-                .foregroundColor(ClinicalTheme.teal500)
-                .frame(width: 70)
                 
-                // Unit Label
-                Text(unitLabel(for: input.routeType))
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundColor(ClinicalTheme.textSecondary)
-                    .frame(width: 45, alignment: .leading)
+                Spacer() // This spacer now shrinks, not the text
+                
+                // Input Field Section
+                HStack(spacing: 8) {
+                    TextField("0", text: Binding(
+                        get: { input.dose },
+                        set: { store.updateDose(for: input.id, dose: $0) }
+                    ))
+                    .keyboardType(.decimalPad)
+                    .focused($focusedField, equals: input.id.uuidString)
+                    .id(input.id)
+                    .multilineTextAlignment(.trailing)
+                    .font(Font.body.monospacedDigit().bold())
+                    .foregroundColor(ClinicalTheme.teal500)
+                    .frame(width: 80) // Slightly wider
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 10)
+                    .background(ClinicalTheme.backgroundInput) // bg-gray-50
+                    .cornerRadius(8) // rounded-md
+                    // Subtle Border
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(shouldFlagContraindication(for: input) ? ClinicalTheme.rose500 : Color.gray.opacity(0.2), lineWidth: 1)
+                    )
+                    
+                    // Unit Label (Outside Input)
+                    Text(unitLabel(for: input.routeType))
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(ClinicalTheme.textSecondary)
+                        .frame(width: 45, alignment: .leading) // Fixed width
+                }
+                .padding(.vertical, 4) // Breathing room
+                
+                // FAT FINGER CHECK (Extreme Dose)
+                if isExtremeDose(input) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(ClinicalTheme.amber500)
+                }
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, 16) // py-4
             .padding(.horizontal, 12)
-            .frame(height: 44) // Standard Touch Target
-            .background(ClinicalTheme.backgroundInput)
-            .cornerRadius(8)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(shouldFlagContraindication(for: input) ? ClinicalTheme.rose500 : Color.clear, lineWidth: 2)
-            )
             
-            // FAT FINGER CHECK (Extreme Dose)
-            if isExtremeDose(input) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundColor(ClinicalTheme.amber500)
-            }
+            // Bottom Divider
+            Divider().background(Color.gray.opacity(0.1))
         }
-        .padding(.vertical, 16)
-        .padding(.horizontal, 12)
-        .background(ClinicalTheme.backgroundCard)
-        .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+        .background(ClinicalTheme.backgroundCard) // Solid background
+        // Removed default Card styling to allow list-like feel inside container
+        .contentShape(Rectangle()) // For swipe actions
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
                 withAnimation { store.removeInput(inputId: input.id) }
             } label: {
                 Label("Delete", systemImage: "trash")
             }
+        }
+    }
+    
+    func qualityColor(for quality: String) -> Color {
+        switch quality.lowercased() {
+        case "high": return ClinicalTheme.teal500
+        case "moderate": return ClinicalTheme.amber500
+        case "low": return ClinicalTheme.rose500
+        default: return ClinicalTheme.textSecondary
         }
     }
     
@@ -332,7 +441,7 @@ struct ActiveMedicationRow: View {
     // Helper: Check for specific "AVOID" warnings in the store text matching this drug
     func shouldFlagContraindication(for input: CalculatorInput) -> Bool {
         return store.warningText.uppercased().contains("AVOID \(input.name.uppercased())") || 
-               store.warningText.uppercased().contains("CONTRAINDICATED") && input.name == "Morphine" && store.renalStatus == .dialysis // Fallback exact check
+               store.warningText.uppercased().contains("CONTRAINDICATED") && input.name.contains("Morphine") && store.renalStatus == .dialysis // Fallback exact check
     }
     
     // Helper: Fat Finger Logic
@@ -353,6 +462,100 @@ struct ActiveMedicationRow: View {
     }
 }
 
+
+    
+    // Glass Box Helper
+
+
+// MARK: - GLASS BOX VIEW
+struct GlassBoxView: View {
+    let evidence: ConversionFactor
+    let drugName: String
+    @Environment(\.presentationMode) var presentationMode
+    
+    var body: some View {
+        NavigationView {
+             ScrollView {
+                 VStack(alignment: .leading, spacing: 20) {
+                     // HEADER: Factor
+                     HStack {
+                         VStack(alignment: .leading) {
+                             Text(drugName)
+                                 .font(.headline)
+                                 .foregroundColor(ClinicalTheme.textSecondary)
+                             Text("Factor: \(String(format: "%.1f", evidence.factor))")
+                                 .font(.system(size: 34, weight: .bold))
+                                 .foregroundColor(ClinicalTheme.teal500)
+                         }
+                         Spacer()
+                         
+                         // QUALITY BADGE
+                         VStack(spacing: 4) {
+                             Text("EVIDENCE")
+                                 .font(.system(size: 8, weight: .bold))
+                                 .foregroundColor(ClinicalTheme.textSecondary)
+                             Text(evidence.evidenceQuality.uppercased())
+                                 .font(.caption2).bold()
+                                 .padding(.horizontal, 8)
+                                 .padding(.vertical, 4)
+                                 .background(qualityColor(for: evidence.evidenceQuality).opacity(0.2))
+                                 .foregroundColor(qualityColor(for: evidence.evidenceQuality))
+                                 .cornerRadius(4)
+                         }
+                     }
+                     .padding()
+                     .background(ClinicalTheme.backgroundCard)
+                     .cornerRadius(12)
+                     
+                     // DEFINITION
+                     if let def = ConversionService.shared.getDefinition(for: evidence.evidenceQuality) {
+                         Text(def)
+                             .font(.caption2)
+                             .foregroundColor(ClinicalTheme.textSecondary)
+                             .padding(.horizontal)
+                     }
+                     
+                     // SECTIONS
+                     Group {
+                         Text("SOURCE").font(.caption).fontWeight(.bold).foregroundColor(ClinicalTheme.textSecondary)
+                         Text(evidence.source).font(.body)
+                         
+                         Text("CLINICAL RATIONALE").font(.caption).fontWeight(.bold).foregroundColor(ClinicalTheme.textSecondary)
+                         Text(evidence.citation).italic().font(.body)
+                         
+                         if !evidence.clinicalContext.isEmpty {
+                             Text("CONTEXT").font(.caption).fontWeight(.bold).foregroundColor(ClinicalTheme.textSecondary)
+                             Text(evidence.clinicalContext).font(.body)
+                         }
+                         
+                         if let rationale = evidence.pharmacokineticRationale {
+                             Text("PHARMACOKINETICS").font(.caption).fontWeight(.bold).foregroundColor(ClinicalTheme.textSecondary)
+                             Text(rationale).font(.body).foregroundColor(ClinicalTheme.textSecondary)
+                         }
+                     }
+                 }
+                 .padding()
+             }
+             .navigationTitle("Conversion Logic")
+             .navigationBarTitleDisplayMode(.inline)
+             .toolbar {
+                 ToolbarItem(placement: .navigationBarTrailing) {
+                     Button("Done") { presentationMode.wrappedValue.dismiss() }
+                 }
+             }
+        }
+    }
+    
+    func qualityColor(for quality: String) -> Color {
+        switch quality.lowercased() {
+        case "high": return ClinicalTheme.teal500
+        case "moderate": return ClinicalTheme.amber500
+        case "low": return ClinicalTheme.rose500
+        default: return ClinicalTheme.textSecondary
+        }
+    }
+}
+
 struct EmptyStateView: View {
     let action: () -> Void
     
@@ -360,6 +563,7 @@ struct EmptyStateView: View {
         Button(action: action) {
             VStack(spacing: 16) {
                 Image(systemName: "plus.circle.dashed")
+                // ... (rest of EmptyState remains the same)
                     .font(.system(size: 44))
                     .foregroundColor(ClinicalTheme.textMuted.opacity(0.5))
                 
@@ -517,6 +721,8 @@ struct InfoAccordion: View {
 
 struct InfoContent {
     static let instructions = """
+    • MME calculations are for RISK STRATIFICATION and RESEARCH STANDARDIZATION only. NOT for direct clinical dose conversion.
+    • WIDE VARIABILITY exists in conversion ratios (e.g. Tramadol, Hydromorphone). Verify consistency with your INSTITUTION'S guidelines.
     • For combination drugs (e.g. Percocet), enter only the opioid component (e.g., 5mg).
     • ER and IR formulations (e.g. OxyContin) differ in duration, NOT MME potency. Enter the Total Daily Dose (e.g. 30mg BID = 60mg Total).
     • Do NOT use for pediatric patients.
@@ -605,6 +811,7 @@ struct AddDrugSheet: View {
 struct TargetDoseCard: View {
     let dose: TargetDose
     var sortPreference: OpioidRoute = .po // Added for visual dimming
+    var onTap: () -> Void = {} // Default empty action
     @EnvironmentObject var themeManager: ThemeManager
 
     
@@ -623,10 +830,13 @@ struct TargetDoseCard: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     // Visual Indicator for Safety Adjustments
                     if let original = dose.originalDaily {
-                        Text(original)
-                            .font(.caption)
-                            .strikethrough()
-                            .foregroundColor(ClinicalTheme.textMuted)
+                        HStack(spacing: 4) {
+                            Text("Safety Reduced").font(.system(size: 8)).bold().foregroundColor(ClinicalTheme.rose500).padding(2).background(ClinicalTheme.rose500.opacity(0.1)).cornerRadius(2)
+                            Text(original)
+                                .font(.caption)
+                                .strikethrough()
+                                .foregroundColor(ClinicalTheme.textMuted)
+                        }
                     }
                     
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
@@ -659,6 +869,9 @@ struct TargetDoseCard: View {
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
         .padding(.horizontal)
         .opacity(isDimmed ? 0.5 : 1.0)
+        .onTapGesture {
+            onTap()
+        }
     }
 
     // Helper: Dim Cards based on Priority
@@ -709,185 +922,39 @@ struct MathReceiptView: View {
 
 extension CalculatorView {
     var clinicalContextView: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: "cross.case.fill").foregroundColor(ClinicalTheme.teal500)
-                Text("Clinical Context").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
-            }
-            .padding(.horizontal)
-            
-            // EPHEMERAL STATUS INDICATOR (UX Safety)
-            EphemeralStatusBanner(isSandboxMode: store.isSandboxMode)
-                .padding(.horizontal)
-                .padding(.bottom, 4)
-            
-            VStack(spacing: 12) {
-                // Route Preference Moved to Top
-                routePreferenceControl
-                
-                // 1. Safety Toggles (Binary - Synced with Assessment Tab)
-                // 0. Age & Opioid Status (Strictly Local Sandbox)
-                VStack(spacing: 8) {
-                    HStack {
-                        Text("Patient Age").font(.subheadline).foregroundColor(ClinicalTheme.textSecondary)
-                        Spacer()
-                        TextField("Age", text: $store.age)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 60)
-                            .padding(6)
-                            .background(ClinicalTheme.backgroundInput)
-                            .cornerRadius(6)
-                    }
-                    
-                    HStack {
-                        Text("Opioid Profile").font(.subheadline).foregroundColor(ClinicalTheme.textSecondary)
-                        Spacer()
-                        Picker("Profile", selection: $store.analgesicProfile) {
-                            ForEach(AnalgesicProfile.allCases, id: \.self) { profile in
-                                Text(profile.rawValue).tag(profile)
-                            }
-                        }
-                        .pickerStyle(.menu) // Compact
-                        .labelsHidden()
-                    }
+        SharedClinicalContextView(
+            age: $store.age,
+            analgesicProfile: $store.analgesicProfile,
+            renalStatus: $store.renalStatus,
+            hepaticStatus: $store.hepaticStatus,
+            isPregnant: $store.isPregnant,
+            isBreastfeeding: $store.isBreastfeeding,
+            benzos: $store.matchesBenzos,
+            isOUD: $store.historyOverdose,
+            sleepApnea: $store.sleepApnea,
+            reduction: $store.reduction,
+            reductionGuidance: reductionGuidance,
+            reductionColor: reductionColor,
+            isSandboxMode: store.isSandboxMode,
+            showReduction: true,
+            onRenalEscalation: {
+                withAnimation {
+                    let newStatus: RenalStatus = (store.renalStatus == .dialysis) ? .impaired : .dialysis
+                    store.renalStatus = newStatus
                 }
-                .padding(.bottom, 4)
-                
-                // 1. Safety Toggles (Local Sandbox)
-                Toggle(isOn: $store.isRenalImpaired) {
-                    VStack(alignment: .leading) {
-                        Text("Renal Impairment").font(.subheadline).fontWeight(.bold).foregroundColor(ClinicalTheme.textPrimary)
-                        Text("eGFR <60 (CKD 3+)").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-                    }
-                }
-                .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.amber500))
-                
-                // Renal Escalation Footer (v1.5.5 Safety)
-                if store.renalStatus != .normal {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(store.renalStatus == .dialysis ? ClinicalTheme.rose500 : ClinicalTheme.amber500)
-                            Text("Status: \(store.renalStatus.rawValue)")
-                                .font(.caption).fontWeight(.bold)
-                                .foregroundColor(ClinicalTheme.textPrimary)
-                        }
-                        
-                        Text("Dialysis status requires strict avoidance of Morphine/Codeine/Meperidine due to neurotoxic metabolite accumulation.")
-                            .font(.system(size: 10))
-                            .foregroundColor(ClinicalTheme.textSecondary)
-                        
-                        Button(action: {
-                            withAnimation {
-                                let newStatus: RenalStatus = (store.renalStatus == .dialysis) ? .impaired : .dialysis
-                                store.renalStatus = newStatus
-                            }
-                        }) {
-                            Text(store.renalStatus == .dialysis ? "Revert to Standard CKD" : "Escalate to Dialysis")
-                                .font(.caption2).fontWeight(.bold)
-                                .foregroundColor(store.renalStatus == .dialysis ? ClinicalTheme.teal500 : ClinicalTheme.rose500)
-                                .padding(.vertical, 4)
-                                .padding(.horizontal, 8)
-                                .background((store.renalStatus == .dialysis ? ClinicalTheme.teal500 : ClinicalTheme.rose500).opacity(0.1))
-                                .cornerRadius(6)
-                        }
-                    }
-                    .padding(10)
-                    .frame(maxWidth: .infinity)
-                    .background(ClinicalTheme.backgroundMain.opacity(0.5))
-                    .cornerRadius(8)
-                }
-                
-                // 2. Hepatic Impairment (Local Sandbox)
-                Toggle(isOn: $store.isHepaticImpaired) {
-                    VStack(alignment: .leading) {
-                        Text("Hepatic Impairment").font(.subheadline).fontWeight(.bold).foregroundColor(ClinicalTheme.textPrimary)
-                        Text("Child-Pugh B+").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-                    }
-                }
-                .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.amber500))
-                
-                // Hepatic Escalation Footer (v1.5.5 Safety)
-                if store.hepaticStatus != .normal {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(store.hepaticStatus == .failure ? ClinicalTheme.rose500 : ClinicalTheme.amber500)
-                            Text("Status: \(store.hepaticStatus.rawValue)")
-                                .font(.caption).fontWeight(.bold)
-                                .foregroundColor(ClinicalTheme.textPrimary)
-                        }
-                        
-                        Text("Liver Failure (Child-Pugh C) increases Hydromorphone PO bioavailability 4x via portosystemic shunting.")
-                            .font(.system(size: 10))
-                            .foregroundColor(ClinicalTheme.textSecondary)
-                        
-                        Button(action: {
-                            withAnimation {
-                                let newStatus: HepaticStatus = (store.hepaticStatus == .failure) ? .impaired : .failure
-                                store.hepaticStatus = newStatus
-                            }
-                        }) {
-                            Text(store.hepaticStatus == .failure ? "Revert to Moderate Impairment" : "Escalate to Liver Failure (Child-Pugh C)")
-                                .font(.caption2).fontWeight(.bold)
-                                .foregroundColor(store.hepaticStatus == .failure ? ClinicalTheme.teal500 : ClinicalTheme.rose500)
-                                .padding(.vertical, 4)
-                                .padding(.horizontal, 8)
-                                .background((store.hepaticStatus == .failure ? ClinicalTheme.teal500 : ClinicalTheme.rose500).opacity(0.1))
-                                .cornerRadius(6)
-                        }
-                    }
-                    .padding(10)
-                    .frame(maxWidth: .infinity)
-                    .background(ClinicalTheme.backgroundMain.opacity(0.5))
-                    .cornerRadius(8)
-                }
-                
-                Divider().padding(.vertical, 4)
-                
-                // 3. Tolerance & Reduction
-                HStack {
-                    Text("Cross-Tolerance Reduction").font(.subheadline).foregroundColor(ClinicalTheme.textSecondary)
-                    Spacer()
-                    Text("-\(Int(store.reduction))%").font(.headline).fontWeight(.bold).foregroundColor(ClinicalTheme.teal500)
-                }
-                Slider(value: $store.reduction, in: 0...75, step: 5)
-                    .accentColor(ClinicalTheme.teal500)
-                
-                // Guidance Label
-                HStack {
-                    Spacer()
-                    Text(reductionGuidance(for: store.reduction))
-                        .font(.caption2)
-                        .italic()
-                        .foregroundColor(reductionColor(for: store.reduction))
-                        .transition(.opacity)
+            },
+            onHepaticEscalation: {
+                withAnimation {
+                    let newStatus: HepaticStatus = (store.hepaticStatus == .failure) ? .impaired : .failure
+                    store.hepaticStatus = newStatus
                 }
             }
-            .padding()
-            .background(ClinicalTheme.backgroundCard)
-            .cornerRadius(12)
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-            .padding(.horizontal)
-            
-            // LOGIC CLARIFICATION
-            // LOGIC CLARIFICATION
-            if store.renalStatus != .normal || store.hepaticStatus != .normal {
-                HStack(spacing: 6) {
-                    Image(systemName: "shield.lefthalf.filled").foregroundColor(ClinicalTheme.teal500)
-                    Text("Safety Logic: Renal/Hepatic restrictions applied IN ADDITION to this reduction.")
-                        .font(.caption2)
-                        .foregroundColor(ClinicalTheme.textSecondary)
-                }
-                .padding(.horizontal, 24)
-            }
-        }
+        )
     }
 }
 
 extension CalculatorView {
-    var activeMedsList: some View {
+    func activeMedsList(focusedField: FocusState<String?>.Binding) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 0) {
@@ -914,7 +981,7 @@ extension CalculatorView {
             } else {
                 List {
                     ForEach(store.inputs.filter { $0.isVisible }) { input in
-                        ActiveMedicationRow(input: input, store: store)
+                        ActiveMedicationRow(input: input, store: store, focusedField: focusedField)
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
@@ -944,7 +1011,7 @@ extension CalculatorView {
                         HStack {
                             Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
                                 .foregroundColor(ClinicalTheme.teal500)
-                            Text("Methadone Conversion / Rotation")
+                            Text("Methadone Conversion")
                                 .font(.body)
                                 .fontWeight(.medium)
                                 .foregroundColor(ClinicalTheme.textPrimary)
@@ -956,6 +1023,32 @@ extension CalculatorView {
                         .background(ClinicalTheme.backgroundCard)
                         .cornerRadius(12)
                         .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                    }
+                    .padding(.horizontal)
+                    
+                    // Advanced Feature: Formulation (Transdermal)
+                    Button(action: { /* Placeholder for future feature or sheet */ }) {
+                         HStack {
+                             Image(systemName: "square.on.square.dashed")
+                                 .foregroundColor(ClinicalTheme.blue500)
+                             Text("Formulation Conversion (Transdermal)")
+                                 .font(.body)
+                                 .fontWeight(.medium)
+                                 .foregroundColor(ClinicalTheme.textPrimary)
+                             Spacer()
+                             Text("Coming Soon")
+                                 .font(.caption2)
+                                 .fontWeight(.bold)
+                                 .padding(.horizontal, 6)
+                                 .padding(.vertical, 2)
+                                 .background(ClinicalTheme.backgroundMain)
+                                 .foregroundColor(ClinicalTheme.textMuted)
+                                 .cornerRadius(4)
+                         }
+                         .padding()
+                         .background(ClinicalTheme.backgroundCard)
+                         .cornerRadius(12)
+                         .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                     }
                     .padding(.horizontal)
                 }
@@ -976,43 +1069,19 @@ extension CalculatorView {
 
 }
 
-extension CalculatorView {
-    var infoSection: some View {
-        VStack(spacing: 12) {
-            Text("Reference & Guidelines")
-                .font(.headline)
-                .foregroundColor(ClinicalTheme.textSecondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
 
-            // E. CLINICAL CONTEXT (MDCalc Style)
-            // Instructions, Pearls, Evidence
-            VStack(spacing: 1) {
-                InfoAccordion(title: "Instructions & Warnings", icon: "exclamationmark.circle", content: InfoContent.instructions, expandedItem: $expandedInfoTab)
-                MergedAlgorithmTransparencyAccordion(expandedItem: $expandedInfoTab)
-                InfoAccordion(title: "Pearls & Pitfalls", icon: "lightbulb", content: InfoContent.pearls, expandedItem: $expandedInfoTab)
-                InfoAccordion(title: "Evidence (CDC 2022)", icon: "book.closed", content: InfoContent.evidence, expandedItem: $expandedInfoTab)
-            }
-            .background(ClinicalTheme.backgroundCard)
-            .cornerRadius(12)
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, style: StrokeStyle(lineWidth: 1, dash: [5])))
-            .padding(.horizontal)
-            .padding(.bottom, 140)
-            
-            Spacer().frame(height: 100)
-        }
-    }
-}
 
 extension CalculatorView {
     var targetsSection: some View {
         Group {
             if !store.targetDoses.isEmpty {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Estimated Targets").font(.headline).foregroundColor(ClinicalTheme.textSecondary).padding(.horizontal)
+                    Text("Estimated Target Data").font(.headline).foregroundColor(ClinicalTheme.textSecondary).padding(.horizontal)
                     
                     ForEach(store.targetDoses) { dose in
-                        TargetDoseCard(dose: dose, sortPreference: store.routePreference)
+                        TargetDoseCard(dose: dose, sortPreference: store.routePreference, onTap: {
+                            self.selectedTarget = dose
+                        })
                     }
                     
 
@@ -1037,10 +1106,14 @@ extension CalculatorView {
             
             // Stewardship Warning (Pinned Below Card)
             if !store.warningText.isEmpty {
-                CollapsibleWarningCard(text: store.warningText)
+                // On-the-fly Alert Creation (Legacy Bridging)
+                let alert = SafetyAlert(title: "Safety Alert", description: store.warningText, severity: .warning, source: "Calculator")
+                CollapsibleWarningCard(alert: alert)
                     .padding(.horizontal)
+                    .transition(.opacity.animation(.easeInOut(duration: 0.2)))
             }
         }
+        .animation(.easeInOut(duration: 0.25), value: store.warningText.isEmpty)
         .padding(.bottom, 12)
         .background(ClinicalTheme.backgroundMain) // Opaque background for pinning
         .zIndex(10)
@@ -1100,20 +1173,42 @@ struct ComplexConversionCard: View {
 
 // MARK: - Collapsible Warning Card (v1.6)
 struct CollapsibleWarningCard: View {
-    let text: String
-    @State private var isExpanded: Bool = false
+    let alert: SafetyAlert
+    @State private var isExpanded: Bool = true
     
-    // Safety: If it's a "High Risk" warning, maybe default open?
-    // User requested "Warning" with a chevron.
+    // Severity Logic
+    var alertColor: Color {
+        switch alert.severity {
+        case .critical: return ClinicalTheme.rose500
+        case .warning: return ClinicalTheme.amber500
+        case .info: return ClinicalTheme.teal500
+        }
+    }
+    
+    var iconName: String {
+        switch alert.severity {
+        case .critical: return "exclamationmark.octagon.fill"
+        case .warning: return "exclamationmark.triangle.fill"
+        case .info: return "info.circle.fill"
+        }
+    }
+    
+    var isCollapsible: Bool {
+        return alert.severity != .critical
+    }
     
     var body: some View {
         VStack(spacing: 0) {
-            Button(action: { withAnimation { isExpanded.toggle() } }) {
+            Button(action: {
+                if isCollapsible {
+                    withAnimation { isExpanded.toggle() }
+                }
+            }) {
                 HStack {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(ClinicalTheme.amber500)
+                    Image(systemName: iconName)
+                        .foregroundColor(alertColor)
                     
-                    Text("Safety Alerts")
+                    Text(alert.title)
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(ClinicalTheme.textPrimary)
@@ -1126,19 +1221,22 @@ struct CollapsibleWarningCard: View {
                     
                     Spacer()
                     
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.caption)
-                        .foregroundColor(ClinicalTheme.textSecondary)
+                    if isCollapsible {
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .font(.caption)
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                    }
                 }
                 .padding(12)
-                .background(ClinicalTheme.amber500.opacity(0.1))
+                .background(alertColor.opacity(0.1))
             }
+            .disabled(!isCollapsible) // Disable interaction if Critical
             
-            if isExpanded {
-                Divider().background(ClinicalTheme.amber500.opacity(0.3))
+            if isExpanded || !isCollapsible {
+                Divider().background(alertColor.opacity(0.3))
                 
                 HStack(alignment: .top, spacing: 8) {
-                    Text(text)
+                    Text(alert.description)
                         .font(.caption)
                         .fontWeight(.medium)
                         .foregroundColor(ClinicalTheme.textPrimary)
@@ -1151,7 +1249,17 @@ struct CollapsibleWarningCard: View {
 
         }
         .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.amber500.opacity(0.3), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(alertColor.opacity(0.3), lineWidth: 1))
+        .onAppear {
+            // Force Open if Critical
+            if alert.severity == .critical {
+                isExpanded = true
+            } else if alert.severity == .info {
+                isExpanded = false
+            } else {
+                isExpanded = true // Warning defaults open
+            }
+        }
     }
 }
 

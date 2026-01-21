@@ -1,0 +1,104 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/Features/OUDConsult/Wizard/OUDFollowUpView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Discharge",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "End Consult",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Discharge Checklist",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 13
+        }
+      },
+      {
+        "comment": "",
+        "key": "Counsel: Respiratory Depression (Sedatives)",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 20
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bridge Prescription",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 30
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 36
+        }
+      },
+      {
+        "comment": "",
+        "key": "Days until appt:",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 32
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld days",
+        "location": {
+          "startingColumn": 75,
+          "startingLine": 32
+        }
+      },
+      {
+        "comment": "",
+        "key": "Daily Dose:",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld mg",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total Dispense:",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 41
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld mg",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 43
+        }
+      }
+    ]
+  },
+  "version": 1
+}

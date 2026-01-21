@@ -1,0 +1,40 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/Features/OUDConsult/OUDConsultTools.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Urine Toxicology Window",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 7
+        }
+      },
+      {
+        "comment": "",
+        "key": "Standard Drink Equivalents",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 105
+        }
+      },
+      {
+        "comment": "",
+        "key": "Street Pricing & Metrics",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 137
+        }
+      },
+      {
+        "comment": "",
+        "key": "Common Street Terms",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 175
+        }
+      }
+    ]
+  },
+  "version": 1
+}

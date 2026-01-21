@@ -3,6 +3,18 @@ import SwiftUI
 
 // MARK: - MODELS
 
+struct AberrantBehavior: Identifiable, Hashable {
+    let id = UUID()
+    let behavior: String
+    let category: BehaviorCategory
+    let action: String
+}
+
+enum BehaviorCategory: String, CaseIterable, Hashable {
+    case yellowFlag = "Yellow Flag (Pacing/Minor)"
+    case redFlag = "Red Flag (Diversion/Illegal)"
+}
+
 struct DSMCriterion: Identifiable, Hashable {
     let id: Int
     let text: String
@@ -72,5 +84,40 @@ struct OUDStaticData {
             ClinicalReferenceItem(title: "COWS Severe", value: "25 - 36", subtitle: "Urgent management"),
             ClinicalReferenceItem(title: "COWS Extreme", value: "> 36", subtitle: "High risk")
         ])
+    ]
+    
+    // MARK: - Aberrant Behavior (ASCO Guidelines)
+    static let aberrantBehaviors: [AberrantBehavior] = [
+        // Yellow Flags (Minor/Pacing)
+        AberrantBehavior(behavior: "Requesting early refills (1-2 days)", category: .yellowFlag, action: "Re-educate, Pill Count, Monitor intervals"),
+        AberrantBehavior(behavior: "Unsanctioned dose escalation (1-2 extra)", category: .yellowFlag, action: "Discuss safety, Warning, Reduce dispense quantity"),
+        AberrantBehavior(behavior: "Missed appointments (occasional)", category: .yellowFlag, action: "Re-schedule, Discuss adherence barriers"),
+        AberrantBehavior(behavior: "Sedation/Slurring during visit", category: .yellowFlag, action: "Hold dose, Assess for other substances, PDMP check"),
+        
+        // Red Flags (Major/Diversion)
+        AberrantBehavior(behavior: "Urine Negative for Prescribed Opioid", category: .redFlag, action: "Suspect Diversion. Confirm w/ GC/MS. Restrict supply."),
+        AberrantBehavior(behavior: "Urine Positive for Illicit Drugs (Cocaine/Heroin)", category: .redFlag, action: "SUD Concern. Refer to Addiction Medicine. Tighten monitoring."),
+        AberrantBehavior(behavior: "Prescription Forgery / Alteration", category: .redFlag, action: "Immediate Halt. Security/Police report if necessary. Discharge."),
+        AberrantBehavior(behavior: "Selling Medications / Diversion", category: .redFlag, action: "Immediate Halt. Discharge. Report to authorities."),
+        AberrantBehavior(behavior: "Lost/Stolen Prescriptions (Repeated)", category: .redFlag, action: "Do not replace. Require police report. Restrict supply.")
+    ]
+    
+    
+    // Cancer / Palliative Context (ASCO 2016 / NCCN 2025)
+    // Goal: Maintain pain control, increase monitoring. AVOID TAPER unless diversion.
+    static let cancerActionSteps: [String] = [
+        "1. **Reassess**: Check PDMP & Urine Tox today to rule out diversion.",
+        "2. **RESTRUCTURE (Don't Taper)**: Switch to weekly dispensing. Increase visit frequency.",
+        "3. **Safe Storage**: Emphasize lockbox use. Consider caregiver control.",
+        "4. **No Taper**: Do not taper unless diversion is confirmed or safety is compromised."
+    ]
+    
+    // Non-Cancer Chronic Pain (CDC 2022)
+    // Goal: Harm reduction. Taper if risks > benefits.
+    static let nonCancerActionSteps: [String] = [
+        "1. **Reassess**: Check PDMP & Urine Tox today.",
+        "2. **TIGHTEN**: Switch to weekly dispensing. Count pills.",
+        "3. **CONSIDER TAPER**: Initiation of slow taper (10%/month) if adherence fails.",
+        "4. **Naloxone**: Mandatory co-prescription."
     ]
 }

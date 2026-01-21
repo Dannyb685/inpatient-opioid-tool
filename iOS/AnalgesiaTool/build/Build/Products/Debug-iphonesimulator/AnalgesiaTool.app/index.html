@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Start | Opioid Precision</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Hero: The "30-Second" Pitch -->
+    <header class="bg-slate-900 text-white py-12">
+        <div class="max-w-5xl mx-auto px-6">
+            <h1 class="text-3xl font-bold mb-4 flex items-center gap-3">
+                <i data-lucide="activity" class="text-blue-400"></i>
+                Opioid Precision: The 30-Second Guide
+            </h1>
+            <p class="text-xl text-slate-300 leading-relaxed max-w-3xl">
+                <strong>What:</strong> A Clinical Decision Support System (CDSS) for high-acuity opioid prescribing and
+                OUD management.<br>
+                <strong>Why:</strong> Prevents math errors, enforces organ-safety checks (renal/hepatic), and automates
+                documentation.<br>
+                <strong>When:</strong> Use during Rotations, Inductions, or New Consults.
+            </p>
+            <div class="mt-8 flex gap-4">
+                <a href="workflow.html"
+                    class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-semibold transition flex items-center gap-2">
+                    <i data-lucide="git-branch" class="w-4 h-4"></i> Clinical Workflows
+                </a>
+                <a href="cheat_sheet.html"
+                    class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-lg font-semibold transition flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> Cheat Sheet
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- The 5 Tabs: Mapping UX to Action -->
+    <main class="max-w-5xl mx-auto px-6 py-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-8 pb-2 border-b border-slate-200">The 5-Tab Architecture</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Tab 1: Assessment -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex gap-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                    <span class="text-xl font-bold text-blue-700">1</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Assessment</h3>
+                    <p class="text-sm text-slate-600 mt-1"><strong>Start Here.</strong> Input patient demographics (Age,
+                        Sex) and Organ Function (eGFR). The system sets global safety locks based on this data.</p>
+                </div>
+            </div>
+
+            <!-- Tab 2: Protocols -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex gap-4">
+                <div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                    <span class="text-xl font-bold text-teal-700">2</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Protocols</h3>
+                    <p class="text-sm text-slate-600 mt-1"><strong>Action Engine.</strong> Step-by-step guidance for
+                        Bernese (Micro-Induction), Standard Induction, and Withdrawal Management.</p>
+                </div>
+            </div>
+
+            <!-- Tab 3: MME Calc -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex gap-4">
+                <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center shrink-0">
+                    <span class="text-xl font-bold text-indigo-700">3</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">MME Calculator</h3>
+                    <p class="text-sm text-slate-600 mt-1"><strong>Safe Rotation.</strong> Calculate daily load and
+                        rotate opioids. Features "Trauma Mode" and auto-reduction for incomplete cross-tolerance.</p>
+                </div>
+            </div>
+
+            <!-- Tab 4: OUD Consult -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex gap-4">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center shrink-0">
+                    <span class="text-xl font-bold text-purple-700">4</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">OUD Consult</h3>
+                    <p class="text-sm text-slate-600 mt-1"><strong>Diagnosis & Note.</strong> Check DSM-5 criteria, run
+                        Screeners (COWS, DAST), and generate a compliant clinical note.</p>
+                </div>
+            </div>
+
+            <!-- Tab 5: Library -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex gap-4 md:col-span-2">
+                <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center shrink-0">
+                    <span class="text-xl font-bold text-slate-600">5</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Library</h3>
+                    <p class="text-sm text-slate-600 mt-1"><strong>Reference.</strong> Access static references, risk
+                        scoring tools (ORT, PEG), and pharmacy pearls without leaving the workflow.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

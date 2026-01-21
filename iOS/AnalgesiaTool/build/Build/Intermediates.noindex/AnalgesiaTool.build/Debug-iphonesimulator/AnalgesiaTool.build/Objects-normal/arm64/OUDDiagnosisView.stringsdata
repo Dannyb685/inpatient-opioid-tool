@@ -1,0 +1,48 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/Features/OUDConsult/Wizard/OUDDiagnosisView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Status",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 23
+        }
+      },
+      {
+        "comment": "",
+        "key": "DSM-5 Criteria",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 33
+        }
+      },
+      {
+        "comment": "",
+        "key": "Confirm & Assess Risk",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "Medically Supervised (Pain Mgmt)",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 30
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current Severity",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 25
+        }
+      }
+    ]
+  },
+  "version": 1
+}

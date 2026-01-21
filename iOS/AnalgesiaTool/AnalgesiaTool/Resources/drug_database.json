@@ -1,0 +1,573 @@
+{
+    "version": "2.1.0",
+    "lastUpdated": "2026-01-08",
+    "evidenceSource": "CDC 2022, NCCN 2025, FDA Labels",
+    "globalWarnings": [
+        "MME calculations are for RISK STRATIFICATION and RESEARCH STANDARDIZATION only",
+        "Do NOT use MME for direct clinical dose conversion",
+        "When rotating opioids, reduce calculated dose by 25-50% for incomplete cross-tolerance",
+        "Individual variability in genetics and pharmacokinetics cannot be accounted for",
+        "Close monitoring and frequent dose titration required during opioid rotation",
+        "WIDE VARIABILITY in conversion ratios exists (e.g. Tramadol 6.7±2.8, Hydromorphone 4.06±1.2). Verify MME consistency with YOUR INSTITUTION'S guidelines."
+    ],
+    "evidenceQualityDefinitions": {
+        "high": "Multiple high-quality RCTs or systematic reviews with consistent results. Guideline consensus (CDC, NCCN). Direct clinical validation.",
+        "moderate": "Single high-quality study, expert consensus, or pharmacokinetic modeling with clinical validation. Some variability in published ratios.",
+        "low": "Pharmacokinetic extrapolation, theoretical derivation, or wide variability in published ratios. Limited clinical validation.",
+        "insufficient": "No validated conversion factor available. Specialist consultation required."
+    },
+    "definitions": {
+        "opioid_tolerant": "FDA Definition: Patients receiving, for ≥1 week, at least: 60 mg oral morphine/day, 25 mcg/hr transdermal fentanyl, 30 mg oral oxycodone/day, 8 mg oral hydromorphone/day, 25 mg oral oxymorphone/day, or an equianalgesic dose of another opioid.",
+        "opioid_naive": "NCCN 2025: Patients not chronically receiving opioid analgesic on a daily basis and therefore have not developed significant tolerance.",
+        "evidence_transparency": "NIH HEAL 2025 Analysis: Only 24 of 170,050 screened articles provided valid conversion evidence. Most studies have methodological flaws. ASCO 2023: Few studies compare potency across pain types (acute vs chronic, neuropathic vs nociceptive)."
+    },
+    "clinicalPharmacology": {
+        "morphine_iv": {
+            "familyId": "morphine_generic",
+            "name": "Morphine",
+            "subtitle": "Injectable (IV/SQ/IM)",
+            "route": "IV",
+            "mmeFactor": 3.0,
+            "pkProfile": {
+                "onset": "5-10 min",
+                "peak": "20 min",
+                "duration": "3-4 hrs",
+                "bioavailability": null
+            },
+            "safetyProfile": {
+                "renalNote": "Active Metabolites (M3G/M6G). Neurotoxic in failure.",
+                "boxedWarning": "Respiratory Depression"
+            },
+            "citations": [
+                "FDA Label 2024",
+                "ASAM 2020"
+            ]
+        },
+        "morphine_po_ir": {
+            "familyId": "morphine_generic",
+            "name": "Morphine",
+            "subtitle": "Oral Tablet (IR)",
+            "route": "PO",
+            "mmeFactor": 1.0,
+            "pkProfile": {
+                "onset": "30-60 min",
+                "peak": "60 min",
+                "duration": "4 hrs",
+                "bioavailability": "25-35%"
+            },
+            "safetyProfile": {
+                "renalNote": "Active metabolites (M3G/M6G) accumulate in renal failure. M6G is potent/neurotoxic.",
+                "boxedWarning": "Respiratory Depression"
+            },
+            "citations": [
+                "FDA Label 2024",
+                "CDC 2022",
+                "Berger 2024"
+            ]
+        },
+        "hydromorphone_iv": {
+            "familyId": "hydromorphone_generic",
+            "name": "Hydromorphone",
+            "subtitle": "Injectable (IV/SQ/IM)",
+            "route": "IV",
+            "mmeFactor": 20.0,
+            "pkProfile": {
+                "onset": "5 min",
+                "peak": "10-20 min",
+                "duration": "2-4 hrs",
+                "bioavailability": null
+            },
+            "safetyProfile": {
+                "renalNote": "Safer than Morphine. Accumulation of H3G (Neuroexcitatory) in failure.",
+                "boxedWarning": "Respiratory Depression"
+            },
+            "citations": [
+                "FDA Label 2024",
+                "NCCN 2025"
+            ]
+        },
+        "hydromorphone_po_ir": {
+            "familyId": "hydromorphone_generic",
+            "name": "Hydromorphone",
+            "subtitle": "Oral Tablet (IR)",
+            "route": "PO",
+            "mmeFactor": 4.0,
+            "pkProfile": {
+                "onset": "15-30 min",
+                "peak": "30-60 min",
+                "duration": "3-4 hrs",
+                "bioavailability": "62%"
+            },
+            "safetyProfile": {
+                "renalNote": "H3G Accumulation Risk (Neuroexcitatory/Seizures).",
+                "boxedWarning": "High Potency - Check Dose"
+            },
+            "citations": [
+                "FDA Label 2024"
+            ]
+        },
+        "oxycodone_po_ir": {
+            "familyId": "oxycodone_generic",
+            "name": "Oxycodone",
+            "subtitle": "Oral Tablet (IR)",
+            "route": "PO",
+            "mmeFactor": 1.5,
+            "pkProfile": {
+                "onset": "10-15 min",
+                "peak": "30-60 min",
+                "duration": "3-6 hrs",
+                "bioavailability": "60-87%"
+            },
+            "safetyProfile": {
+                "renalNote": "Active metabolites (Noroxycodone). Use caution in impairment.",
+                "boxedWarning": "Addiction, Abuse, and Misuse"
+            },
+            "citations": [
+                "FDA Label 2024",
+                "CDC 2022"
+            ]
+        },
+        "fentanyl_iv": {
+            "familyId": "fentanyl_generic",
+            "name": "Fentanyl",
+            "subtitle": "Injectable (IV)",
+            "route": "IV",
+            "mmeFactor": 0.13,
+            "pkProfile": {
+                "onset": "Immediate",
+                "peak": "3-5 min",
+                "duration": "0.5-1 hr",
+                "bioavailability": null
+            },
+            "safetyProfile": {
+                "renalNote": "Appears safe. Inactive metabolites.",
+                "boxedWarning": "Life-Threatening Respiratory Depression"
+            },
+            "citations": [
+                "FDA Label 2024",
+                "NCCN 2025"
+            ]
+        },
+        "fentanyl_patch": {
+            "familyId": "fentanyl_generic",
+            "name": "Fentanyl",
+            "subtitle": "Transdermal Patch",
+            "route": "PATCH",
+            "mmeFactor": 2.4,
+            "pkProfile": {
+                "onset": "12-24 hrs (Delayed)",
+                "peak": "20-72 hrs",
+                "duration": "72 hrs",
+                "bioavailability": "92%"
+            },
+            "safetyProfile": {
+                "renalNote": "Safe, but difficult to titrate in unstable patients.",
+                "boxedWarning": "FATAL in Opioid Naive. Heat increases absorption."
+            },
+            "citations": [
+                "FDA Label 2024",
+                "CDC 2022"
+            ]
+        },
+        "methadone_iv": {
+            "familyId": "methadone_generic",
+            "name": "Methadone",
+            "subtitle": "Injectable (IV)",
+            "route": "IV",
+            "mmeFactor": 4.7,
+            "pkProfile": {
+                "onset": "10-20 min",
+                "peak": "30-60 min",
+                "duration": "Variable (4-8 hrs Analgesia)",
+                "bioavailability": null
+            },
+            "safetyProfile": {
+                "renalNote": "Safe (Fecal excretion). Watch for QT Prolongation.",
+                "boxedWarning": "QT Prolongation & Torsades de Pointes"
+            },
+            "citations": [
+                "FDA Label 2024",
+                "ASAM 2020"
+            ]
+        },
+        "methadone_po": {
+            "familyId": "methadone_generic",
+            "name": "Methadone",
+            "subtitle": "Oral Tablet",
+            "route": "PO",
+            "mmeFactor": 4.7,
+            "pkProfile": {
+                "onset": "30-60 min",
+                "peak": "1-3 hrs",
+                "duration": "Variable (4-8 hrs Analgesia)",
+                "bioavailability": "80-100%"
+            },
+            "safetyProfile": {
+                "renalNote": "Safe (Fecal excretion). Watch for QT Prolongation.",
+                "boxedWarning": "QT Prolongation & Respiratory Depression (Late Onset)"
+            },
+            "citations": [
+                "FDA Label 2024",
+                "ASAM 2020"
+            ]
+        }
+    },
+    "conversionFactors": {
+        "fentanyl": {
+            "routes": [
+                {
+                    "route": "iv_acute",
+                    "factor": 0.3,
+                    "unit": "mcg/day",
+                    "evidenceQuality": "high",
+                    "source": "FDA Label + NCCN 2025",
+                    "citation": "100 mcg IV fentanyl = 10 mg IV morphine (single-dose)",
+                    "clinicalContext": "For bolus dosing, PRN administration, or short-duration infusions."
+                },
+                {
+                    "route": "iv_continuous",
+                    "factor": 0.12,
+                    "unit": "mcg/day",
+                    "evidenceQuality": "moderate",
+                    "source": "NCCN 2025",
+                    "citation": "Steady-state ratio 250 mcg IV fentanyl = 10 mg IV morphine",
+                    "clinicalContext": "For continuous infusions >24 hours. Accounts for accumulation and context-sensitive half-life.",
+                    "temporalThreshold": "24 hours",
+                    "pharmacokineticRationale": "Fentanyl accumulates in skeletal muscle and fat (Vd 6 L/kg). Terminal t½ 219 minutes. Steady-state reached after ~5 half-lives (18 hours)."
+                },
+                {
+                    "route": "transdermal",
+                    "factor": 2.4,
+                    "unit": "mcg/hr",
+                    "evidenceQuality": "high",
+                    "source": "CDC 2022",
+                    "citation": "25mcg/hr Fentanyl ≈ 60 MME",
+                    "warnings": [
+                        "DANGER: Do not use in Opioid Naive patients",
+                        "Patches have delayed onset (12-24h) and offset",
+                        "Absorption increased by heat (fever, heating pads) - RISK OF OVERDOSE (CDC 2022)",
+                        "Cachexia: Poor absorption in patients with little subcutaneous fat"
+                    ],
+                    "clinicalContext": "EAPC recommends 100:1 ratio (Oral Morphine:Transdermal Fentanyl). ONLY for Opioid Tolerant patients (FDA: 60mg MS, 30mg Oxy, 8mg Hydro, 25mcg Fent for ≥1 week)."
+                }
+            ]
+        },
+        "hydromorphone": {
+            "routes": [
+                {
+                    "route": "iv",
+                    "factor": 20.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "moderate",
+                    "source": "NCCN 2025 / Clinical Standard",
+                    "citation": "1.5mg IV HM = 10mg IV MS = 30mg PO MS (Ratio 20:1)",
+                    "clinicalContext": "Factor 20.0 aligns with standard equianalgesic table. 1.5mg IV Dilaudid is approx 30 MME. Previous factor (6.7) was too conservative."
+                },
+                {
+                    "route": "po",
+                    "factor": 4.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "high",
+                    "source": "CDC 2022",
+                    "citation": "Standard 1:4 ratio (7.5mg HM = 30 MME)",
+                    "clinicalContext": "Standard oral conversion."
+                },
+                {
+                    "route": "iv_continuous",
+                    "factor": 20.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "moderate",
+                    "source": "Clinical Estimate",
+                    "citation": "Same as IV Push.",
+                    "clinicalContext": "Continuous infusion."
+                }
+            ]
+        },
+        "morphine_iv": {
+            "routes": [
+                {
+                    "route": "iv",
+                    "factor": 3.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "high",
+                    "source": "CDC 2022 / Mercadante 2010",
+                    "citation": "Chronic dosing ratio 1:3 (IV:PO)",
+                    "clinicalContext": "Standard chronic ratio (1:3). Acute rotation often uses 1:6 ratio due to incomplete cross-tolerance. Mercadante 2010 supports 1:2.5-1:3 for chronic."
+                },
+                {
+                    "route": "iv_continuous",
+                    "factor": 3.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "high",
+                    "source": "CDC 2022",
+                    "citation": "Reference Standard (1 mg = 1 MME)",
+                    "clinicalContext": "Continuous infusion."
+                }
+            ]
+        },
+        "morphine_po_ir": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 1.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "high",
+                    "source": "CDC 2022",
+                    "citation": "Reference Standard (1 mg = 1 MME)",
+                    "clinicalContext": "Reference Standard."
+                }
+            ]
+        },
+        "methadone": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 4.7,
+                    "unit": "mg/day",
+                    "evidenceQuality": "low",
+                    "source": "CDC 2022",
+                    "citation": "CDC conversion factor for MME calculation only. NOT for dose conversion.",
+                    "clinicalContext": "FOR RISK STRATIFICATION ONLY. Methadone conversion is non-linear and dose-dependent (ratios 2:1 to 20:1). When converting TO methadone, use tiered ratios.",
+                    "warnings": [
+                        "NON-LINEAR: Conversion ratio changes with dose",
+                        "DO NOT use this factor to convert FROM methadone to other opioids",
+                        "Risk Stratification ONLY"
+                    ]
+                },
+                {
+                    "route": "iv",
+                    "factor": 4.7,
+                    "unit": "mg/day",
+                    "evidenceQuality": "low",
+                    "source": "Clinical Estimate",
+                    "citation": "Using conservative PO factor (bioavailability ~80%).",
+                    "clinicalContext": "IV Methadone is roughly equipotent to PO. Used conservative estimate.",
+                    "warnings": [
+                        "HIGH VARIABILITY",
+                        "Risk Stratification ONLY"
+                    ]
+                }
+            ]
+        },
+        "oxycodone": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 1.5,
+                    "unit": "mg/day",
+                    "evidenceQuality": "high",
+                    "source": "CDC 2022",
+                    "citation": "Standard 1.5:1 ratio",
+                    "clinicalContext": "Consistent across guidelines."
+                }
+            ]
+        },
+        "oxymorphone": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 3.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "moderate",
+                    "source": "FDA Label",
+                    "citation": "Approximately 3x potency of oral morphine",
+                    "clinicalContext": "Potent mu-agonist. 10mg Oral Oxymorphone ≈ 30mg Oral Morphine."
+                },
+                {
+                    "route": "iv",
+                    "factor": 30.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "low",
+                    "source": "Clinical Estimate",
+                    "citation": "Estimated 10:1 IV:PO ratio (1mg IV ≈ 10mg PO ≈ 30mg Morphine)",
+                    "clinicalContext": "Use extreme caution. IV formulation rarely used."
+                }
+            ]
+        },
+        "tramadol": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 0.2,
+                    "unit": "mg/day",
+                    "evidenceQuality": "moderate",
+                    "source": "CDC 2022",
+                    "citation": "100mg Tramadol ≈ 20 MME",
+                    "warnings": [
+                        "Seizure risk >400mg/day",
+                        "Serotonin Syndrome risk"
+                    ],
+                    "clinicalContext": "Dual mechanism (Mu-opioid + SNRI). Factor 0.1-0.2 used variably; CDC 2022 uses 0.2."
+                }
+            ]
+        },
+        "codeine": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 0.15,
+                    "unit": "mg/day",
+                    "evidenceQuality": "moderate",
+                    "source": "CDC 2022",
+                    "citation": "200mg Codeine ≈ 30 MME",
+                    "clinicalContext": "Prodrug requiring CYP2D6 metabolism. Genetic variability affects efficacy."
+                }
+            ]
+        },
+        "tapentadol": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 0.4,
+                    "unit": "mg/day",
+                    "evidenceQuality": "moderate",
+                    "source": "Manufacturer / CDC",
+                    "citation": "100mg Tapentadol ≈ 40 MME",
+                    "clinicalContext": "Dual mechanism (Mu-opioid + NRI). Lower GI side effect profile."
+                }
+            ]
+        },
+        "hydrocodone": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 1.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "high",
+                    "source": "CDC 2022",
+                    "citation": "1:1 conversion with Morphine",
+                    "clinicalContext": "Standard 1:1 ratio. WARNING: Available only in combination with Acetaminophen (APAP) or Ibuprofen. Limit APAP < 4000mg/day (FDA limited tablets to 325mg APAP)."
+                }
+            ]
+        },
+        "suzetrigine": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 0.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "high",
+                    "source": "FDA Label (VX-548)",
+                    "citation": "Non-Opioid NaV1.8 Inhibitor. Zero MME.",
+                    "warnings": [
+                        "Non-Opioid: Do not use for withdrawal management",
+                        "Renal: Avoid in eGFR < 15 or Dialysis"
+                    ],
+                    "clinicalContext": "First-in-class NaV1.8 Inhibitor. Indicated for moderate-to-severe acute pain. No physical dependence risk."
+                }
+            ]
+        },
+        "levorphanol": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 8.0,
+                    "unit": "mg/day",
+                    "evidenceQuality": "moderate",
+                    "source": "FDA Label 2026",
+                    "citation": "4-8x potency of morphine (Used upper limit 8x).",
+                    "warnings": [
+                        "Long half-life (11-16h)",
+                        "Accumulation risk similar to methadone"
+                    ],
+                    "clinicalContext": "Potent NMDA antagonist properties. Used for refractory pain."
+                }
+            ]
+        },
+        "meperidine": {
+            "routes": [
+                {
+                    "route": "po",
+                    "factor": 0.1,
+                    "unit": "mg/day",
+                    "evidenceQuality": "low",
+                    "source": "Legacy / Equianalgesic Tables",
+                    "citation": "300mg Meperidine ≈ 30mg Morphine",
+                    "warnings": [
+                        "NOT RECOMMENDED for chronic pain",
+                        "Neurotoxic metabolite (Normeperidine)",
+                        "Seizure risk",
+                        "Serotonin Syndrome",
+                        "Avoid in elderly/renal failure",
+                        "Oral efficacy significantly less than parenteral (Variable)"
+                    ],
+                    "clinicalContext": "NOT RECOMMENDED. Poor oral bioavailability (<50%). MME factor (0.1) likely OVERESTIMATES potency; use caution when rotating FROM Meperidine (risk of overdosing new drug)."
+                },
+                {
+                    "route": "iv",
+                    "factor": 0.4,
+                    "unit": "mg/day",
+                    "evidenceQuality": "low",
+                    "source": "Legacy",
+                    "citation": "75mg IV Meperidine ≈ 30mg Morphine",
+                    "clinicalContext": "Short duration. Neurotoxic risk remains."
+                }
+            ]
+        },
+        "buprenorphine": {
+            "routes": [
+                {
+                    "route": "transdermal",
+                    "factor": 0.0,
+                    "unit": "mcg/hr",
+                    "evidenceQuality": "high",
+                    "source": "CDC 2022",
+                    "citation": "Excluded from MME calculation due to partial agonism and ceiling effect (CDC 2022).",
+                    "warnings": [
+                        "Partial Agonist: Ceiling effect on respiratory depression & analgesia",
+                        "Precipitated Withdrawal risk if full agonist on board",
+                        "QT Prolongation risk >20mcg/hr (FDA warning context: risk mainly at supratherapeutic >40mcg)",
+                        "NIH HEAL 2025: Calculator excludes by default but acknowledges emerging role in pain analysis"
+                    ],
+                    "clinicalContext": "Use cautiously. Not suitable for acute pain MME conversion. NIH HEAL 2025 calculator allows optional analysis."
+                },
+                {
+                    "route": "sl",
+                    "factor": 0.0,
+                    "unit": "mg",
+                    "evidenceQuality": "high",
+                    "source": "CDC 2022",
+                    "citation": "Excluded from MME calculations",
+                    "warnings": [
+                        "Partial Agonist - MME not applicable"
+                    ],
+                    "clinicalContext": "Sublingual bioavailability widely variable."
+                }
+            ]
+        },
+        "sufentanil": {
+            "routes": [
+                {
+                    "route": "iv",
+                    "factor": 1.0,
+                    "unit": "mcg",
+                    "evidenceQuality": "low",
+                    "source": "Anesthesia Textbooks",
+                    "citation": "500-1000x potency of morphine. (1 mcg Suf = 1 mg Morphine)",
+                    "warnings": [
+                        "Potent Anesthetic",
+                        "ICU/OR Setting Only"
+                    ],
+                    "clinicalContext": "Extreme potency. Not for general ward use."
+                }
+            ]
+        },
+        "alfentanil": {
+            "routes": [
+                {
+                    "route": "iv",
+                    "factor": 0.02,
+                    "unit": "mcg",
+                    "evidenceQuality": "low",
+                    "source": "Anesthesia Textbooks",
+                    "citation": "10-20x potency of morphine (1 mcg Alf = 0.02 mg Morphine)",
+                    "warnings": [
+                        "Short duration",
+                        "ICU/OR Setting Only"
+                    ],
+                    "clinicalContext": "Rapid onset/offset. Factor derived from 15x Morphine potency."
+                }
+            ]
+        }
+    }
+}

@@ -45,6 +45,28 @@ struct ReferenceLibrary {
                 citation: "FDA. Duragesic (Fentanyl Transdermal System). Revised 2023.",
                 urlString: "https://www.accessdata.fda.gov/drugsatfda_docs/label/2005/19813s039lbl.pdf"
             )
+        ]),
+        ReferenceCategory(name: "Monitoring Protocols", icon: "waveform.path.ecg.rectangle.fill", items: [
+            ReferenceItem(
+                title: "High-Risk PCA Monitoring",
+                citation: "Evidence-based monitoring for high-risk PCA patients with obesity or OSA should include continuous pulse oximetry and, when available, capnography, combined with frequent sedation assessment using validated scales. The American Society of Anesthesiologists recommends increased monitoring intensity and duration for patients at increased risk of respiratory depression, specifically identifying obesity and obstructive sleep apnea as high-risk conditions requiring enhanced surveillance.[1] Continuous pulse oximetry is strongly recommended for all patients at increased perioperative risk from OSA until they can maintain baseline oxygen saturation on room air.[2]\n\nHowever, pulse oximetry alone has significant limitations—hypoxemia may be a very late sign of hypoventilation, especially in patients receiving supplemental oxygen.[3] Capnography provides earlier detection of respiratory compromise than pulse oximetry alone by identifying hypercarbia before hypoxemia develops.[3-4] The PRODIGY study demonstrated that continuous capnography and oximetry monitoring detected respiratory depression episodes in 46% of general care floor patients receiving parenteral opioids, with affected patients experiencing hospital stays 3 days longer than those without respiratory depression.[5]",
+                urlString: ""
+            ),
+            ReferenceItem(
+                title: "Sedation Assessment (POSS)",
+                citation: "Sedation monitoring is critical and may be more reliable than respiratory rate alone. The National Comprehensive Cancer Network recommends using validated tools such as the Pasero Opioid-Induced Sedation Scale (POSS), noting that sedation typically precedes respiratory depression.[4] Respiratory rates below 8-10 breaths per minute are commonly used thresholds, but this measure is unreliable—some patients maintain normal respiratory rates even with severe OIVI, while carbon dioxide concentrations correlate better with sedation level than with respiratory rate.[3] Oversedation in any patient receiving opioids should be considered OIVI until proven otherwise, regardless of respiratory rate or oxygen saturation.[3]",
+                urlString: ""
+            ),
+            ReferenceItem(
+                title: "Risk Stratification (PRODIGY)",
+                citation: "Risk stratification using the PRODIGY score can guide monitoring intensity. The validated prediction tool identifies five independent risk factors: age ≥60 years, male sex, opioid naivety, sleep disorders, and chronic heart failure, with an odds ratio of 6.07 between high- and low-risk groups.[5] Implementation of this score to determine need for continuous monitoring may reduce the incidence and consequences of respiratory compromise. Continuous monitoring should be maintained as long as patients remain at increased risk and may be provided in critical care units, stepdown units, telemetry on hospital wards, or by dedicated trained observers.[2]",
+                urlString: ""
+            ),
+            ReferenceItem(
+                title: "AASM Guidelines (2025)",
+                citation: "Adjunctive strategies enhance safety beyond monitoring alone. Supplemental oxygen should be administered continuously until patients maintain baseline saturation on room air.[2] Patients using CPAP or noninvasive positive pressure ventilation preoperatively should continue these therapies postoperatively unless contraindicated.[2] For PCA specifically, continuous background infusions should be avoided or used with extreme caution in OSA patients.[2] The American Academy of Sleep Medicine's 2025 guideline notes that while physiologic monitoring shows promise, evidence remains limited, and implementation challenges include sensor displacement and alarm fatigue.",
+                urlString: ""
+            )
         ])
     ]
 }
@@ -109,7 +131,8 @@ struct ReferenceContentView: View {
  
     @EnvironmentObject var themeManager: ThemeManager
     @Binding var searchText: String
-    @Binding var expandedId: String?
+    @Binding var expandedId: String? // Kept for API compatibility, though unused now due to Sheet migration
+    @State private var selectedMonograph: DrugData? = nil
     // State for Search
 
     
@@ -120,7 +143,8 @@ struct ReferenceContentView: View {
             return ClinicalData.drugData.filter { drug in
                 drug.name.localizedCaseInsensitiveContains(searchText) ||
                 drug.clinicalNuance.localizedCaseInsensitiveContains(searchText) ||
-                drug.type.localizedCaseInsensitiveContains(searchText)
+                drug.type.localizedCaseInsensitiveContains(searchText) ||
+                drug.tags.contains { $0.localizedCaseInsensitiveContains(searchText) }
             }
         }
     }
@@ -140,33 +164,70 @@ struct ReferenceContentView: View {
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
             .padding()
             
-
-                
-
-            
             ScrollView {
                 VStack(spacing: 12) {
                     ForEach(filteredDrugs) { drug in
-                        ReferenceCard(drug: drug, isExpanded: expandedId == drug.id) {
-                            withAnimation(.spring()) {
-                                if expandedId == drug.id {
-                                    expandedId = nil
-                                } else {
-                                    expandedId = drug.id
-                                }
-                            }
-                        }
+                        ReferenceCard(drug: drug, onTap: {
+                             self.selectedMonograph = drug
+                        })
                     }
                 }
                 .padding(.horizontal)
                 
                 Divider().padding(.vertical, 8)
                 
-
-
-             Divider().padding(.vertical, 8)
+                // Clinical Tools Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Clinical Algorithms")
+                        .font(.title2).bold().foregroundColor(ClinicalTheme.teal500)
+                        .padding(.horizontal)
+                        
+                    NavigationLink(destination: NeuropathicMatrixView()) {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("Neuropathic Efficacy Matrix")
+                                    .font(.headline)
+                                    .foregroundColor(ClinicalTheme.textPrimary)
+                                Text("Mechanism-based selection (NMDA/Kappa/Mu)")
+                                    .font(.caption)
+                                    .foregroundColor(ClinicalTheme.textSecondary)
+                            }
+                            Spacer()
+                            Image(systemName: "arrow.right.circle.fill")
+                                .foregroundColor(ClinicalTheme.teal500)
+                        }
+                        .padding()
+                        .background(ClinicalTheme.backgroundCard)
+                        .cornerRadius(12)
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                    }
+                    .padding(.horizontal)
+                    
+                    NavigationLink(destination: ClinicalMethodologyView()) {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("Methodology & Evidence")
+                                    .font(.headline)
+                                    .foregroundColor(ClinicalTheme.textPrimary)
+                                Text("Opioid Verification & Validation (CDC/FDA/PRODIGY/RIOSORD)")
+                                    .font(.caption)
+                                    .foregroundColor(ClinicalTheme.textSecondary)
+                            }
+                            Spacer()
+                            Image(systemName: "doc.text.magnifyingglass")
+                                .foregroundColor(ClinicalTheme.teal500)
+                        }
+                        .padding()
+                        .background(ClinicalTheme.backgroundCard)
+                        .cornerRadius(12)
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                    }
+                    .padding(.horizontal)
+                }
                 
-                // CITATIONS \u0026 REFERENCES SECTION
+                Divider().padding(.vertical, 8)
+                
+                // CITATIONS & REFERENCES SECTION
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Clinical References")
                         .font( .title2).bold().foregroundColor(ClinicalTheme.teal500)
@@ -225,72 +286,40 @@ struct ReferenceContentView: View {
             }
         }
         .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
+        .sheet(item: $selectedMonograph) { drug in
+            NavigationView {
+                DrugMonographView(drug: drug, patientContext: store)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Close") { selectedMonograph = nil }
+                        }
+                    }
+            }
+        }
     }
 }
 
 struct ReferenceCard: View {
     let drug: DrugData
-    let isExpanded: Bool
+
+    // Removed isExpanded
     let onTap: () -> Void
     @EnvironmentObject var store: AssessmentStore
     
-    // Computed property for badges to avoid imperative code in ViewBuilder
+    // Computed property for badges using centralized BadgeService
     private var activeBadges: [(label: String, color: Color, icon: String, priority: Int)] {
-        var badges: [(label: String, color: Color, icon: String, priority: Int)] = [] // priority: 2=Red, 1=Amber, 0=Green
+        // DYNAMIC TAGS (via BadgeService)
+        let generatedBadges = BadgeService.shared.generateBadges(for: drug, context: store)
         
-        // Renal (Default)
-        let rBadge = drug.getRenalBadge(patientRenal: store.renalFunction)
-        let rPriority = rBadge.label.contains("Avoid") || rBadge.label.contains("Contraindicated") ? 2 : (rBadge.label.contains("Compatible") ? 0 : 1)
-        badges.append(("Renal: \(rBadge.label)", rBadge.color, rBadge.icon, rPriority))
-        
-        // Hepatic
-        let hBadge = drug.getHepaticBadge(patientHepatic: store.hepaticFunction)
-        if hBadge.label != "Compatible" {
-            let hPriority = hBadge.label.contains("Avoid") || hBadge.label.contains("Contraindicated") ? 2 : 1
-            badges.append(("Hepatic: \(hBadge.label)", hBadge.color, hBadge.icon, hPriority))
+        // Map SafetyBadge to tuple format
+        var badges: [(label: String, color: Color, icon: String, priority: Int)] = generatedBadges.map {
+            (label: $0.label, color: $0.color, icon: $0.icon, priority: $0.priority)
         }
         
-        // Hemodynamic (NEW)
-        if store.hemo == .unstable {
-            if drug.id == "morphine" || drug.id == "codeine" {
-                badges.append(("Hemo: Avoid (Histamine)", ClinicalTheme.rose500, "exclamationmark.triangle.fill", 2))
-            }
-        }
-        
-        // Naive Safety (Fentanyl Patch)
-        if store.analgesicProfile == .naive && drug.id == "fentanyl_patch" {
-            badges.append(("Contraindicated (Naive)", ClinicalTheme.rose500, "hand.raised.fill", 2))
-        }
-        
-        // Pregnancy Safety
-        if store.isPregnant && (drug.id == "codeine" || drug.id == "tramadol") {
-            badges.append(("Avoid (Pregnancy)", ClinicalTheme.rose500, "exclamationmark.triangle.fill", 2))
-        }
-        
-        // Naltrexone Blockade
-        if store.analgesicProfile == .naltrexone && (drug.type.contains("Agonist") || drug.type.contains("Phenylpiperidine")) {
-            badges.append(("Blocked / Ineffective", ClinicalTheme.rose500, "nosign", 2))
-        }
-        
-        // Meperidine (Elderly)
-        if drug.id == "meperidine" && (Int(store.age) ?? 0) >= 65 {
-            badges.append(("Avoid (Beers Criteria)", ClinicalTheme.rose500, "person.fill.xmark", 2))
-        }
-        
-        // Methadone (QTc)
-        if drug.id == "methadone" && store.qtcProlonged {
-            badges.append(("Contraindicated (QTc)", ClinicalTheme.rose500, "heart.slash.fill", 2))
-        }
-        
-        // Hydrocodone (Hepatic/APAP)
-        if drug.id == "hydrocodone" && store.hepaticFunction == .failure {
-            badges.append(("Avoid Combo (APAP)", ClinicalTheme.rose500, "exclamationmark.triangle.fill", 2))
-        }
-        
-        // 2. Suppression Logic (Red Trumps Green)
-        let hasRed = badges.contains { $0.priority == 2 }
-        if hasRed {
-            // Filter out "Compatible" (Priority 0)
+        // Suppression Logic (Red Trumps Green)
+        if badges.contains(where: { $0.priority == 2 }) {
+            // Filter out "Compatible" or "Preferred" (Priority 0)
             badges.removeAll { $0.priority == 0 }
         }
         
@@ -311,7 +340,7 @@ struct ReferenceCard: View {
                         }
                         
                         // Dynamic Badges (Consolidated Logic)
-                        HStack(spacing: 6) {
+                        FlowLayout(spacing: 6, lineSpacing: 6) {
                             ForEach(activeBadges, id: \.label) { b in
                                 ReferenceBadgeView(label: b.label, color: b.color, icon: b.icon)
                             }
@@ -324,94 +353,22 @@ struct ReferenceCard: View {
                     Image(systemName: "chevron.right")
                         .font(.caption)
                         .foregroundColor(ClinicalTheme.textMuted)
-                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                        .font(.caption)
+                        .foregroundColor(ClinicalTheme.textMuted)
+                        // Removed rotationEffect
                 }
                 .padding()
                 .background(ClinicalTheme.backgroundCard)
             }
             
-            // Expanded Content
-            if isExpanded {
-                VStack(alignment: .leading, spacing: 16) {
-                    
-                    // PK Grid
-                    HStack(spacing: 16) {
-                        // IV Profile
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("IV Profile").font(.caption2).fontWeight(.black).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
-                            Text("\(drug.ivOnset) onset")
-                                .font(.caption).foregroundColor(ClinicalTheme.textPrimary)
-                            Text("\(drug.ivDuration) duration")
-                                .font(.caption).foregroundColor(ClinicalTheme.textPrimary)
-                        }
-                        .padding(12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(ClinicalTheme.backgroundMain)
-                        .cornerRadius(8)
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                        
-                        // Bioavailability
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Oral Bio").font(.caption2).fontWeight(.black).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
-                            HStack {
-                                GeometryReader { geo in
-                                    ZStack(alignment: .leading) {
-                                        Capsule().fill(ClinicalTheme.cardBorder).frame(height: 6)
-                                        Capsule().fill(ClinicalTheme.teal500)
-                                            .frame(width: geo.size.width * (CGFloat(drug.bioavailability) / 100.0), height: 6)
-                                    }
-                                }
-                                .frame(height: 6)
-                                
-                                Text(drug.bioavailability > 0 ? "\(drug.bioavailability)%" : "N/A")
-                                    .font(.caption2).bold().foregroundColor(ClinicalTheme.teal500)
-                                    .frame(width: 30, alignment: .trailing)
-                            }
-                        }
-                        .padding(12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(ClinicalTheme.backgroundMain)
-                        .cornerRadius(8)
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
-                    }
-                    
-                    // Clinical Nuance
-                    HStack(alignment: .top, spacing: 8) {
-                        Image(systemName: "bolt.fill").foregroundColor(ClinicalTheme.amber500).font(.caption)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Clinical Nuance").font(.caption2).fontWeight(.black).foregroundColor(ClinicalTheme.textPrimary).textCase(.uppercase)
-                            Text(drug.clinicalNuance)
-                                .font(.caption)
-                                .foregroundColor(ClinicalTheme.textSecondary)
-                                .lineSpacing(2)
-                        }
-                    }
-                    
-                    // Pharmacokinetics
-                    HStack(alignment: .top, spacing: 8) {
-                        Image(systemName: "waveform.path.ecg").foregroundColor(ClinicalTheme.textSecondary).font(.caption)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Pharmacokinetics").font(.caption2).fontWeight(.black).foregroundColor(ClinicalTheme.textPrimary).textCase(.uppercase)
-                            Text(drug.pharmacokinetics)
-                                .font(.caption)
-                                .foregroundColor(ClinicalTheme.textSecondary)
-                                .lineSpacing(2)
-                        }
-                    }
-                }
-                .padding()
-                .background(ClinicalTheme.backgroundCard.opacity(0.5))
-                .overlay(
-                    Rectangle()
-                        .frame(height: 1)
-                        .foregroundColor(ClinicalTheme.divider),
-                    alignment: .top
-                )
-            }
+            // Expanded content block removed (Moved to Sheet)
         }
         .cornerRadius(12)
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
     }
+    
+    // Helper to fetch standard orders for both PO and IV if applicable
+
 }
 
 struct ReferenceBadgeView: View {
@@ -467,7 +424,7 @@ struct DisclaimerCard: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundColor(.orange)
+                .foregroundColor(.orange)
                 Text("Clinical Decision Support Disclaimer")
                     .font(.headline)
                     .bold()
@@ -518,4 +475,3 @@ struct DisclaimerCard: View {
 
 
 // MARK: - Workup Checkbox Component (Moved from OUDConsultView)
-

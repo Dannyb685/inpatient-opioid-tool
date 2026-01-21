@@ -25,7 +25,7 @@ struct OUDFollowUpView: View {
                 .background(Color(.secondarySystemBackground)).cornerRadius(12)
                 
                 // Bridge Calculator
-                if store.recommendedProtocol != .fullAgonist {
+                if store.recommendedProtocol != ProtocolType.fullAgonist {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Bridge Prescription").font(.headline)
                         

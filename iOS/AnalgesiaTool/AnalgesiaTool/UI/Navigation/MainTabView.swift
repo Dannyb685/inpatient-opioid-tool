@@ -6,10 +6,11 @@ struct MainTabView: View {
     @State private var selectedTab = 0
     @EnvironmentObject var assessmentStore: AssessmentStore // Injected from App
     @StateObject private var calculatorStore = CalculatorStore() // Shared State for Tabs
+    @StateObject private var oudStore = OUDConsultStore() // Shared State for OUD
     
     // Safety Alerts
     enum ActiveAlert: Identifiable {
-        case mismatch, disclaimer
+        case mismatch
         var id: Int { hashValue }
     }
     @State private var activeAlert: ActiveAlert?
@@ -33,7 +34,7 @@ struct MainTabView: View {
                 .tag(2)
                 
             // Tab 4: OUD Consult
-            OUDConsultView()
+            OUDConsultView(sharedStore: oudStore)
                 .tabItem {
                     Image(systemName: "cross.case.fill")
                     Text("OUD Consult")
@@ -52,10 +53,9 @@ struct MainTabView: View {
         .accentColor(ClinicalTheme.teal500)
         .onAppear {
             updateTabBar()
-            // Legal Requirement: Show disclaimer every time app opens
-            activeAlert = .disclaimer
         }
         .onChange(of: selectedTab) { _, newTab in 
+            // 1. MME Calculator Porting
             if newTab == 2 {
                 // User Request: Removed "Missing Data" check to allow starting in Calculator.
                 // Logic Flow:
@@ -66,7 +66,12 @@ struct MainTabView: View {
                     String(calculatorStore.age) != assessmentStore.age ||
                     calculatorStore.renalStatus != assessmentStore.renalFunction ||
                     calculatorStore.hepaticStatus != assessmentStore.hepaticFunction ||
-                    calculatorStore.analgesicProfile != assessmentStore.analgesicProfile
+                    calculatorStore.analgesicProfile != assessmentStore.analgesicProfile ||
+                    calculatorStore.isPregnant != assessmentStore.isPregnant ||
+                    calculatorStore.isBreastfeeding != assessmentStore.isBreastfeeding ||
+                    calculatorStore.matchesBenzos != assessmentStore.benzos ||
+                    calculatorStore.sleepApnea != assessmentStore.sleepApnea ||
+                    calculatorStore.historyOverdose != assessmentStore.historyOverdose
                 ) {
                      // 2. Dirty State Check -> Confirm
                      activeAlert = .mismatch
@@ -75,6 +80,18 @@ struct MainTabView: View {
                      calculatorStore.seed(from: assessmentStore)
                 }
             }
+            
+            // 2. OUD Consult Porting (New Request)
+            if newTab == 3 {
+                // Auto-Seed OUD Store from Assessment
+                oudStore.seed(from: assessmentStore)
+            }
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { !hasAcceptedDisclaimer },
+            set: { _ in } // Managed by the view itself
+        )) {
+            InformedConsentView()
         }
         .onChange(of: themeManager.isDarkMode) { _, _ in updateTabBar() }
         .alert(item: $activeAlert) { alertType in
@@ -87,14 +104,6 @@ struct MainTabView: View {
                         calculatorStore.seed(from: assessmentStore)
                     },
                     secondaryButton: .cancel(Text("Keep Current"))
-                )
-            case .disclaimer:
-                return Alert(
-                    title: Text("Clinical Disclaimer"),
-                    message: Text("This tool is intended for ADULT patients (18+) only. It is NOT validated for pediatric use.\n\nCalculations are estimates. Clinical judgment is mandatory."),
-                    dismissButton: .default(Text("I Understand")) {
-                        hasAcceptedDisclaimer = true
-                    }
                 )
             }
         }

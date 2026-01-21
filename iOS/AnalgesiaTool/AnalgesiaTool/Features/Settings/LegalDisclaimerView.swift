@@ -42,6 +42,35 @@ struct LegalDisclaimerView: View {
                     ("Indemnification", "You agree to defend, indemnify, and hold harmless the Developers from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys' fees) resulting from your violation of these Terms or your use of the Application, including any clinical decisions made using its data."),
                     ("Governing Law", "These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which the Developers act, without giving effect to any principles of conflicts of law.")
                 ])
+                
+                // 5. Transparent Rationale
+                DisclaimerSection(title: "5. Transparent Rationale & Independent Review", items: [
+                    ("Critical Legal Factor", "The software must enable the health care professional to independently review the basis for the recommendation. This application provides full citations, logic transparency (Glass Box Mode), and accessible guidelines to ensure you can validate all outputs."),
+                    ("Data Point, Not Mandate", "All outputs are presented as 'Clinical Data Points' or 'Informational MME' to guide your judgment. You retain full autonomy and responsibility for the final clinical decision.")
+                ])
+
+                
+                // 6. Active Acknowledgement (Session Handshake)
+                Button(action: {
+                    // Logic: Log acceptance to session or reset context
+                    // For now, this is a symbolic handshake that could be hooked into a gate.
+                    let generator = UINotificationFeedbackGenerator()
+                    generator.notificationOccurred(.success)
+                }) {
+                    VStack(spacing: 4) {
+                        Text("I Acknowledge & Accept Clinical Responsibility")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Text("Tap to digitally assert your status as a Learned Intermediary")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(ClinicalTheme.blue500)
+                    .cornerRadius(12)
+                }
+                .padding(.top, 16)
             }
             .padding()
         }

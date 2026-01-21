@@ -6,30 +6,86 @@ struct OUDRiskAssessmentView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // 1. Risk Factors
+                // 1. Risk Factors & Toxicology
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Clinical Context").font(.headline)
-                    Picker("Substance", selection: $store.substanceType) {
-                        Text("Short Acting").tag("Short Acting")
-                        Text("Fentanyl").tag("Fentanyl")
-                        Text("Methadone").tag("Methadone")
+                    Text("Toxicology & History").font(.headline)
+                    
+                    // Dynamic Substance List
+                    if store.entries.isEmpty {
+                        Text("No substances selected.")
+                            .font(.caption).italic().foregroundColor(.secondary)
+                    } else {
+                        ForEach(store.entries) { entry in
+                            HStack {
+                                Image(systemName: "pills.fill")
+                                VStack(alignment: .leading) {
+                                    Text(entry.type.rawValue).font(.subheadline).bold()
+                                    Text("\(entry.quantity, specifier: "%.1f") \(entry.unit) • \(entry.route.rawValue)").font(.caption).foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                Button(action: {
+                                    if let index = store.entries.firstIndex(of: entry) {
+                                        store.entries.remove(at: index)
+                                        let gen = UIImpactFeedbackGenerator(style: .medium); gen.impactOccurred()
+                                    }
+                                }) {
+                                    Image(systemName: "trash").foregroundColor(.red)
+                                }
+                            }
+                            .padding(8)
+                            .background(Color.white)
+                            .cornerRadius(8)
+                        }
                     }
-                    .pickerStyle(.segmented)
+                    
+                    // Quick Add Buttons
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            QuickAddButton(symbol: "exclamationmark.triangle.fill", label: "Fentanyl", color: .purple) {
+                                store.entries.append(SubstanceEntry(type: .streetFentanylPowder, quantity: 1, unit: "g", route: .intranasal, lastUseHoursAgo: 12))
+                            }
+                            QuickAddButton(symbol: "capsule.fill", label: "Oxy/Hydro", color: .orange) {
+                                store.entries.append(SubstanceEntry(type: .oxycodone, quantity: 30, unit: "mg", route: .oral, lastUseHoursAgo: 6))
+                            }
+                            QuickAddButton(symbol: "cross.case.fill", label: "Benzos", color: .red) {
+                                store.entries.append(SubstanceEntry(type: .benzodiazepinesStreet, quantity: 2, unit: "mg", route: .oral, lastUseHoursAgo: 4))
+                            }
+                            QuickAddButton(symbol: "ant.fill", label: "Xylazine", color: .gray) {
+                                store.entries.append(SubstanceEntry(type: .xylazineAdulterant, quantity: 1, unit: "trace", route: .intravenous, lastUseHoursAgo: 12))
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                    
+                    Divider()
                     
                     Toggle("Pregnancy", isOn: $store.isPregnant)
-                    Toggle("Liver Failure / Acute Pain", isOn: $store.hasLiverFailure)
+                    Toggle("Breastfeeding", isOn: $store.isBreastfeeding)
+                    Toggle("Liver Failure (Child-Pugh C)", isOn: $store.hasLiverFailure)
+                    Toggle("Renal Failure (Dialysis / <30)", isOn: $store.hasRenalFailure)
                     Toggle("ER / Inpatient Setting", isOn: $store.erSetting)
-                    Toggle("Benzo / Alcohol Use", isOn: $store.hasSedativeUse)
+                    Divider()
+                    Toggle("Skin Ulcers (Xylazine Marker)", isOn: $store.hasUlcers)
                 }
+
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(ClinicalTheme.backgroundCard)
                 .cornerRadius(12)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
 
                 // 2. Score Dashboard
                 HStack {
                     VStack(alignment: .leading) {
                         Text("COWS Score").font(.caption).bold().foregroundColor(.secondary)
-                        Text("\(store.cowsScore)").font(.system(size: 34, weight: .bold)).foregroundColor(scoreColor)
+                        HStack(spacing: 8) {
+                            Text("\(store.cowsScore)").font(.system(size: 34, weight: .bold)).foregroundColor(scoreColor)
+                            Button(action: {
+                                store.copyCOWSAssessment()
+                                let gen = UINotificationFeedbackGenerator(); gen.notificationOccurred(.success)
+                            }) {
+                                Image(systemName: "doc.on.doc").font(.subheadline).foregroundColor(ClinicalTheme.teal500)
+                            }
+                        }
                     }
                     Spacer()
                     Text(store.withdrawalSeverity).font(.headline)
@@ -43,6 +99,7 @@ struct OUDRiskAssessmentView: View {
                 
                 // 4. Action
                 Button(action: {
+                    store.generateClinicalPlan()
                     store.currentPhase = .action
                     store.path.append(ConsultPhase.action)
                 }) {
@@ -50,9 +107,11 @@ struct OUDRiskAssessmentView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.blue)
+
+                        .background(ClinicalTheme.teal500)
                         .foregroundColor(.white)
                         .cornerRadius(12)
+                        .shadow(color: ClinicalTheme.teal500.opacity(0.3), radius: 4, x: 0, y: 2)
                 }
                 .padding()
             }
@@ -74,24 +133,9 @@ struct OUDRiskAssessmentView: View {
 struct COWSGrid: View {
     @ObservedObject var store: OUDConsultStore
     
-    // Full COWS Data Set
-    let items: [COWSItem] = [
-        .init(id: 1, title: "Resting Pulse", options: [(0,"<80"), (1,"80-100"), (2,"100-120"), (4,">120")]),
-        .init(id: 2, title: "Sweating", options: [(0,"None"), (1,"Chills"), (2,"Flushed"), (3,"Beads"), (4,"Stream")]),
-        .init(id: 3, title: "Restlessness", options: [(0,"None"), (1,"Hard to sit"), (3,"Shift"), (5,"Can't sit")]),
-        .init(id: 4, title: "Pupil Size", options: [(0,"Normal"), (1,"Large"), (2,"Dilated"), (5,"Rim only")]),
-        .init(id: 5, title: "Bone/Joint Aches", options: [(0,"None"), (1,"Mild"), (2,"Severe"), (4,"Rubbing")]),
-        .init(id: 6, title: "Runny Nose", options: [(0,"None"), (1,"Moist"), (2,"Running"), (4,"Stream")]),
-        .init(id: 7, title: "GI Upset", options: [(0,"None"), (1,"Cramps"), (2,"Nausea"), (3,"Vomit"), (5,"Multi-Epis")]),
-        .init(id: 8, title: "Tremor", options: [(0,"None"), (1,"Felt"), (2,"Slight"), (4,"Gross")]),
-        .init(id: 9, title: "Yawning", options: [(0,"None"), (1,"1-2x"), (2,"3+ times"), (4,"Freq/Min")]),
-        .init(id: 10, title: "Anxiety", options: [(0,"None"), (1,"Reported"), (2,"Obvious"), (4,"Difficult")]),
-        .init(id: 11, title: "Gooseflesh", options: [(0,"Smooth"), (3,"Felt"), (5,"Prominent")])
-    ]
-
     var body: some View {
         VStack(spacing: 24) {
-            ForEach(items, id: \.id) { item in
+            ForEach(store.cowsItems) { item in
                 VStack(alignment: .leading, spacing: 10) {
                     Text(item.title).font(.headline).padding(.horizontal)
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -103,12 +147,14 @@ struct COWSGrid: View {
                                 }) {
                                     VStack(spacing: 4) {
                                         Text("\(option.0)").font(.title3).bold()
-                                        Text(option.1).font(.caption2).lineLimit(1)
+                                        Text(option.1).font(.caption2).lineLimit(2).minimumScaleFactor(0.8).multilineTextAlignment(.center)
                                     }
-                                    .frame(width: 80, height: 60)
-                                    .background(store.cowsSelections[item.id] == option.0 ? Color.blue : Color(.systemGray6))
-                                    .foregroundColor(store.cowsSelections[item.id] == option.0 ? .white : .primary)
+                                    .padding(4)
+                                    .frame(width: 110, height: 65)
+                                    .background(store.cowsSelections[item.id] == option.0 ? ClinicalTheme.teal500 : ClinicalTheme.backgroundInput)
+                                    .foregroundColor(store.cowsSelections[item.id] == option.0 ? .white : ClinicalTheme.textPrimary)
                                     .cornerRadius(12)
+                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(store.cowsSelections[item.id] == option.0 ? ClinicalTheme.teal500 : ClinicalTheme.cardBorder, lineWidth: 1))
                                 }
                             }
                         }
@@ -120,4 +166,27 @@ struct COWSGrid: View {
         }
     }
 }
-struct COWSItem { let id: Int; let title: String; let options: [(Int, String)] }
+
+struct QuickAddButton: View {
+    let symbol: String
+    let label: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: {
+            let gen = UIImpactFeedbackGenerator(style: .medium); gen.impactOccurred()
+            action()
+        }) {
+            VStack {
+                Image(systemName: symbol).font(.headline)
+                Text(label).font(.caption2).bold()
+            }
+            .padding(10)
+            .frame(width: 80, height: 60)
+            .background(color.opacity(0.15))
+            .foregroundColor(color)
+            .cornerRadius(10)
+        }
+    }
+}

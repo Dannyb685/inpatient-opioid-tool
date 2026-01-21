@@ -5,22 +5,15 @@ struct RiskAssessmentView: View {
     @EnvironmentObject var store: AssessmentStore
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showFullDetails = false
+    @State private var activeMonographDrug: DrugData? = nil // Monograph Sheet Logic
+    
+    // Keyboard Avoidance (Age Input)
+    @FocusState private var focusedField: String?
+    @State private var isNoteCopied: Bool = false // UI Refinement: Copy Feedback Helper
 
-    @State private var isQuickMode = true // Quick Mode Default: TRUE
     
     var accentColor: Color {
-        return store.isPregnant ? ClinicalTheme.purple500 : ClinicalTheme.teal500
-    }
-
-    var profileColor: Color {
-        switch store.analgesicProfile {
-        case .naive: return ClinicalTheme.teal500      // Safe / Standard
-        case .chronicRx: return ClinicalTheme.amber500 // Moderate Tolerance
-        case .highPotency: return ClinicalTheme.rose500 // Danger / Unknown
-        case .buprenorphine: return ClinicalTheme.purple500 // Blockade / High Affinity
-        case .methadone: return Color.indigo // QTc / Variable Half-life
-        case .naltrexone: return Color.gray            // Blocked
-        }
+        store.isPregnant ? ClinicalTheme.purple500 : ClinicalTheme.teal500
     }
     
     var body: some View {
@@ -29,36 +22,31 @@ struct RiskAssessmentView: View {
                 pinnedHeader
                 
                 // MARK: - SCROLLABLE INPUTS
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        // MODE TOGGLE
-                        Picker("Assessment Mode", selection: Binding(
-                            get: { self.isQuickMode },
-                            set: { newValue in
-                                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                                    self.isQuickMode = newValue
-                                }
-                            }
-                        )) {
-                            Text("⚡️ Quick Mode").tag(true)
-                            Text("Full Assessment").tag(false)
+                ScrollViewReader { scrollProxy in // 1. Reader Wrapper
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 24) {
+                            
+                            demographicsSection
+                            clinicalInputsSection
+                            additionalParametersSection
+                            medicationHistorySection
+                            // nonPharmSection moved to detailsSheet
+                            riskFactorsSection
+                            
+                            AssessmentContextFlowCard()
+                                .padding(.horizontal)
                         }
-                        .pickerStyle(.segmented)
-                        .padding(.horizontal)
-                        
-                        demographicsSection
-                        clinicalInputsSection
-                        additionalParametersSection
-                        medicationHistorySection
-                        riskFactorsSection
-                        
-                        AssessmentContextFlowCard()
-                            .padding(.horizontal)
+                        .padding(.top)
+                        .padding(.bottom, 100)
+                        .padding(.bottom, 100)
+                        // .hideKeyboardOnTap() moved to root for better hit testing
                     }
-                    .padding(.top)
-                    .padding(.bottom, 100)
-                    .onTapGesture {
-                        UIApplication.shared.endEditing()
+                    .onChange(of: focusedField) { _, newField in
+                        if let field = newField {
+                            withAnimation {
+                                scrollProxy.scrollTo(field, anchor: .center)
+                            }
+                        }
                     }
                 }
             }
@@ -89,7 +77,19 @@ struct RiskAssessmentView: View {
             .sheet(isPresented: $showFullDetails) {
                 detailsSheet
             }
+            .sheet(item: $activeMonographDrug) { drug in
+                NavigationView {
+                    DrugMonographView(drug: drug, patientContext: store)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button("Close") { activeMonographDrug = nil }
+                            }
+                        }
+                }
+            }
         }
+        .hideKeyboardOnTap() // Global dismissal for this screen
     }
     
     // MARK: - SUBVIEWS
@@ -98,7 +98,7 @@ struct RiskAssessmentView: View {
         VStack(spacing: 4) {
              // Header Title
             HStack {
-                Text("RECOMMENDATIONS")
+                Text("CONSIDERATIONS")
                     .font(.caption2)
                     .fontWeight(.black)
                     .padding(.horizontal, 10)
@@ -106,6 +106,16 @@ struct RiskAssessmentView: View {
                     .background(accentColor.opacity(0.15))
                     .foregroundColor(accentColor)
                     .cornerRadius(8)
+                
+                Button(action: {
+                    store.copySummary()
+                    let gen = UINotificationFeedbackGenerator(); gen.notificationOccurred(.success)
+                }) {
+                    Image(systemName: "doc.on.doc").font(.caption2)
+                }
+                .foregroundColor(accentColor)
+                .padding(4)
+                
                 Spacer()
                 Image(systemName: "chevron.right")
                     .font(.caption)
@@ -130,17 +140,16 @@ struct RiskAssessmentView: View {
                 
                 Divider().background(ClinicalTheme.divider).padding(.vertical, 4)
                 
-                // 2. PRODIGY (Secondary/Compact)
-                if !isQuickMode {
+                // 2. OIRD (Secondary/Compact)
                     HStack(spacing: 8) {
-                        Text("PRODIGY Risk Score")
+                        Text("OIRD Risk Score")
                             .font(.caption).bold()
                             .foregroundColor(ClinicalTheme.textSecondary)
                             .textCase(.uppercase)
                         
                         Spacer()
                         
-                        Text("\(store.prodigyScore)")
+                        Text("\(store.compositeOIRDScore)")
                             .font(.body).fontWeight(.black)
                             .foregroundColor(ClinicalTheme.textPrimary)
                         
@@ -152,8 +161,6 @@ struct RiskAssessmentView: View {
                             .background((store.prodigyRisk == "High" ? ClinicalTheme.rose500 : (store.prodigyRisk == "Intermediate" ? ClinicalTheme.amber500 : ClinicalTheme.teal500)).opacity(0.1))
                             .cornerRadius(4)
                     }
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                }
 
             } else {
                  // Empty State
@@ -170,6 +177,12 @@ struct RiskAssessmentView: View {
         .clinicalCard()
         .padding()
         .zIndex(1)
+        .overlay {
+            if store.isPediatric {
+                PediatricLockScreen()
+                    .zIndex(200)
+            }
+        }
     }
     
     @ViewBuilder
@@ -181,6 +194,8 @@ struct RiskAssessmentView: View {
                     Text("Age").font(.caption).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
                     TextField("Yrs", text: $store.age)
                         .keyboardType(.numberPad)
+                        .focused($focusedField, equals: "ageInput") // 2. Link Focus
+                        .id("ageInput") // 3. Link Reader Pivot
                         .foregroundColor(ClinicalTheme.textPrimary)
                         .padding()
                         .background(ClinicalTheme.backgroundInput)
@@ -201,20 +216,29 @@ struct RiskAssessmentView: View {
             
         }
         
-        // Perinatal Toggle
+        // Perinatal Toggles
         if store.shouldShowPregnancyToggle() {
-            Toggle(isOn: $store.isPregnant) {
-                 VStack(alignment: .leading, spacing: 2) {
-                     Text("Pregnant / Breastfeeding").font(.subheadline).bold().foregroundColor(ClinicalTheme.purple500)
-                     Text("Activates Perinatal Safety Mode").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-                 }
+            VStack(spacing: 12) {
+                Toggle(isOn: $store.isPregnant) {
+                    Text("Patient is Pregnant")
+                        .font(.subheadline)
+                        .foregroundColor(ClinicalTheme.textPrimary)
+                }
+                .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.purple500))
+                
+                Toggle(isOn: $store.isBreastfeeding) {
+                    Text("Patient is Breastfeeding")
+                        .font(.subheadline)
+                        .foregroundColor(ClinicalTheme.textPrimary)
+                }
+                .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.purple500))
             }
-            .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.purple500))
             .padding()
-            .background(ClinicalTheme.purple500.opacity(0.1))
+            .background(ClinicalTheme.backgroundInput)
             .cornerRadius(8)
             .padding(.horizontal)
         }
+
     }
 
     
@@ -226,7 +250,8 @@ struct RiskAssessmentView: View {
             SelectionView(
                 title: "1. Route Preference",
                 options: OpioidRoute.allCases,
-                selection: $store.route
+                selection: $store.route,
+                layout: .verticalStack
             )
             
             // 2. Hemodynamics (ALWAYS SHOW - ACUTE SAFETY)
@@ -234,6 +259,7 @@ struct RiskAssessmentView: View {
                 title: "2. Hemodynamics",
                 options: Hemodynamics.allCases,
                 selection: $store.hemo,
+                layout: .verticalStack, // Added layout
                 colorMapper: { status in
                     switch status {
                     case .stable: return ClinicalTheme.teal500
@@ -247,6 +273,7 @@ struct RiskAssessmentView: View {
                 title: "3. Renal Function (CrCl)",
                 options: RenalStatus.allCases,
                 selection: $store.renalFunction,
+                layout: .verticalStack, // Added layout
                 colorMapper: { status in
                     switch status {
                     case .normal: return ClinicalTheme.teal500
@@ -261,68 +288,84 @@ struct RiskAssessmentView: View {
                 title: "4. Hepatic Function",
                 options: HepaticStatus.allCases,
                 selection: $store.hepaticFunction,
+                layout: .verticalStack,
                 colorMapper: { status in
                     switch status {
                     case .normal: return ClinicalTheme.teal500
                     case .impaired: return ClinicalTheme.amber500
                     case .failure: return ClinicalTheme.rose500
                     }
+                },
+                footer: {
+                   if store.hepaticFunction != .normal {
+                       Divider().padding(.vertical, 4)
+                       
+                       VStack(spacing: 12) {
+                           Toggle("Visible Ascites?", isOn: $store.hasAscites)
+                           
+                           SelectionView(
+                               title: "Encephalopathy Grade",
+                               options: EncephalopathyGrade.allCases,
+                               selection: $store.encephalopathyGrade,
+                               isEmbedded: true
+                           )
+                       }
+                   }
                 }
             )
             
-            // 5. GI / Mental Status (HIDDEN IN QUICK MODE)
-            if !isQuickMode {
-                SelectionView(
-                    title: "5. GI / Mental Status",
-                    options: GIStatus.allCases,
-                    selection: $store.gi,
-                    colorMapper: { status in
-                        switch status {
-                        case .intact: return ClinicalTheme.teal500
-                        case .tube: return ClinicalTheme.amber500
-                        case .npo: return ClinicalTheme.rose500
-
-                        }
+            SelectionView(
+                title: "5. GI / Mental Status",
+                options: GIStatus.allCases,
+                selection: $store.gi,
+                layout: .verticalStack,
+                colorMapper: { status in
+                    switch status {
+                    case .intact: return ClinicalTheme.teal500
+                    case .tube: return ClinicalTheme.amber500
+                    case .npo: return ClinicalTheme.rose500
                     }
-                )
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-            
-            // 6. History of GI Bleed (Independent Question)
-            if !isQuickMode {
-                Toggle(isOn: $store.historyGIBleed) {
-                     VStack(alignment: .leading, spacing: 2) {
-                         Text("6. History of GI Bleed?").font(.subheadline).bold().foregroundColor(ClinicalTheme.rose500)
-                         Text("Prevents systemic NSAID recommendations").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
-                     }
                 }
-                .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.rose500))
-                .padding()
-                .background(ClinicalTheme.rose500.opacity(0.05))
-                .cornerRadius(8)
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.rose500.opacity(0.3), lineWidth: 1))
-                .transition(.opacity.combined(with: .move(edge: .top)))
+            )
+            
+            Toggle(isOn: $store.historyGIBleed) {
+                 VStack(alignment: .leading, spacing: 2) {
+                     Text("6. History of GI Bleed?").font(.subheadline).bold().foregroundColor(ClinicalTheme.rose500)
+                     Text("Prevents systemic NSAID recommendations").font(.caption).foregroundColor(ClinicalTheme.textSecondary)
+                 }
             }
+            .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.rose500))
+            .padding()
+            .background(ClinicalTheme.rose500.opacity(0.05))
+            .cornerRadius(8)
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.rose500.opacity(0.3), lineWidth: 1))
+            .padding(.horizontal)
         }
     }
     
     var additionalParametersSection: some View {
         Group {
-            if !isQuickMode {
-                // 7. Clinical Indication
-                SelectionView(
-                    title: "7. Clinical Indication",
-                    options: ClinicalIndication.allCases,
-                    selection: $store.indication
-                )
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
+            SelectionView(
+                title: "7. Clinical Indication",
+                options: ClinicalIndication.allCases,
+                selection: $store.indication,
+                layout: .verticalStack,
+                footer: {
+                    if store.indication == .postoperative {
+                        Divider().padding(.vertical, 4)
+                        
+                        Toggle("Immediate Post-Op NPO?", isOn: $store.postOpNPO)
+                            .padding(.top, 4)
+                    }
+                }
+            )
             
             // 8. Pain Type (CRITICAL STEWARDSHIP GATE - ALWAYS SHOW)
             SelectionView(
                 title: "8. Pain Type",
                 options: PainType.allCases,
-                selection: $store.painType
+                selection: $store.painType,
+                layout: .verticalStack
             )
         }
     }
@@ -368,7 +411,7 @@ struct RiskAssessmentView: View {
                     .cornerRadius(8)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(profileColor.opacity(0.5), lineWidth: 1.5)
+                            .stroke(store.analgesicProfile.color.opacity(0.5), lineWidth: 1.5)
                     )
                 }
             }
@@ -448,34 +491,83 @@ struct RiskAssessmentView: View {
         .padding(.horizontal)
     }
 
+    var nonPharmSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+             HStack {
+                Image(systemName: "figure.mind.and.body")
+                    .foregroundColor(ClinicalTheme.teal500)
+                Text("Non-Pharmacological")
+                    .font(.headline)
+                    .foregroundColor(ClinicalTheme.textSecondary)
+            }
+            
+            if store.nonPharmRecs.isEmpty {
+                Text("No specific non-drug interventions identified.")
+                    .font(.caption)
+                    .italic()
+                    .foregroundColor(ClinicalTheme.textSecondary)
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .background(ClinicalTheme.backgroundCard)
+                    .cornerRadius(8)
+            } else {
+                ForEach(store.nonPharmRecs) { rec in
+                    HStack(alignment: .top, spacing: 12) {
+                        // Icon
+                        Image(systemName: rec.category == "Physical" ? "figure.walk" : (rec.category == "Psychological" ? "brain.head.profile" : "leaf"))
+                            .font(.title3)
+                            .foregroundColor(rec.evidence.color)
+                            .frame(width: 24)
+                            .padding(.top, 2)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(rec.intervention)
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(ClinicalTheme.textPrimary)
+                                
+                                Spacer()
+                                
+                                Text(rec.evidence.rawValue)
+                                    .font(.caption2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(rec.evidence.color)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(rec.evidence.color.opacity(0.1))
+                                    .cornerRadius(4)
+                            }
+                            
+                            Text(rec.detail)
+                                .font(.caption)
+                                .foregroundColor(ClinicalTheme.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .padding()
+                    .background(ClinicalTheme.backgroundCard)
+                    .cornerRadius(8)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+                }
+            }
+        }
+        .padding(.horizontal)
+    }
+
     var riskFactorsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-             Text("Risk Factors (PRODIGY)").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
+             Text("OIRD Risk Factors").font(.headline).foregroundColor(ClinicalTheme.textSecondary)
              
-             if !isQuickMode {
-                 Group {
-                     Toggle("Benzos / Sedatives", isOn: $store.benzos)
-                     Toggle("Sleep Apnea (OSA)", isOn: $store.sleepApnea)
-                     Toggle("CHF", isOn: $store.chf)
-                     Toggle("Hx Overdose / Subst. Use", isOn: $store.historyOverdose)
-                     Toggle("Depression / Anxiety", isOn: $store.psychHistory)
-                 }
-                 .transition(.opacity.combined(with: .move(edge: .top)))
-             } else {
-                 Button(action: {
-                     withAnimation { isQuickMode = false }
-                 }) {
-                     HStack {
-                         Text("Show PRODIGY risk factors...")
-                         Spacer()
-                         Image(systemName: "chevron.down")
-                     }
-                     .font(.caption)
-                     .foregroundColor(ClinicalTheme.teal500)
-                 }
-                 .padding(.top, 8)
-                 .transition(.opacity.combined(with: .move(edge: .top)))
-             }
+              Group {
+                  Toggle("Benzos / Sedatives", isOn: $store.benzos)
+                  Toggle("COPD / Hypoventilation", isOn: $store.copd)
+                  Toggle("Sleep Apnea (OSA)", isOn: $store.sleepApnea)
+                  Toggle("CHF", isOn: $store.chf)
+                  Toggle("Hx Overdose / Subst. Use", isOn: $store.historyOverdose)
+                  Toggle("Depression / Anxiety", isOn: $store.psychHistory)
+                  Toggle("Multiple Providers (PDMP)", isOn: $store.multipleProviders)
+              }
         }
         .toggleStyle(SwitchToggleStyle(tint: ClinicalTheme.rose500))
         .clinicalCard()
@@ -489,11 +581,30 @@ struct RiskAssessmentView: View {
                 VStack(spacing: 24) {
                     
                     // 0. PATIENT CONTEXT (Reverted to Styled One-Liner)
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("PATIENT CONTEXT")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundColor(ClinicalTheme.textSecondary)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("PATIENT CONTEXT")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundColor(ClinicalTheme.textSecondary)
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                store.copySummary()
+                                let gen = UINotificationFeedbackGenerator(); gen.notificationOccurred(.success)
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "doc.on.doc").font(.caption)
+                                    Text("Copy").font(.caption2).bold()
+                                }
+                                .foregroundColor(accentColor)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(accentColor.opacity(0.1))
+                                .cornerRadius(6)
+                            }
+                        }
                         
                         Text(LocalizedStringKey(store.generatedSummary))
                             .font(.body) // System font (no serif)
@@ -501,12 +612,98 @@ struct RiskAssessmentView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .lineSpacing(4)
                     }
+                    
+                    Divider()
+                    
+                    // 1. CONSULT NOTE (SOAP)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("CONSULT NOTE (SOAP)")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundColor(ClinicalTheme.textSecondary)
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                let note = NoteGenerator.generateSOAP(store: store)
+                                UIPasteboard.general.string = note
+                                let gen = UINotificationFeedbackGenerator(); gen.notificationOccurred(.success)
+                                
+                                // Copy Feedback Logic
+                                withAnimation { isNoteCopied = true }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    withAnimation { isNoteCopied = false }
+                                }
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: isNoteCopied ? "checkmark" : "doc.on.clipboard")
+                                        .font(.caption)
+                                    Text(isNoteCopied ? "Copied!" : "Copy Note")
+                                        .font(.caption2).bold()
+                                }
+                                .foregroundColor(isNoteCopied ? Color.green : ClinicalTheme.teal500)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(
+                                    (isNoteCopied ? Color.green : ClinicalTheme.teal500).opacity(0.1)
+                                )
+                                .cornerRadius(6)
+                            }
+                        }
+                        
+                        Text("Ready for EMR Paste")
+                            .font(.caption2)
+                            .italic()
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                        
+                        // Refined Text Block
+                        Text(NoteGenerator.generateSOAP(store: store))
+                            .font(.system(size: 14, weight: .medium, design: .monospaced)) // font-mono, text-sm, font-medium
+                            .foregroundColor(Color.primary.opacity(0.8)) // text-gray-800 equivalent (#333)
+                            .lineLimit(nil) // Allow full expansion or limit if preferred
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(ClinicalTheme.backgroundInput) // bg-gray-50
+                            .cornerRadius(8) // rounded-lg
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.2), lineWidth: 1) // border-gray-200
+                            )
+                    }
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(ClinicalTheme.backgroundCard) // White card
                     .cornerRadius(12)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
                     .padding(.horizontal)
+
+                    // 0a. NEUROPATHIC MATRIX SHORTCUT (User Request)
+                    if store.painType == .neuropathic {
+                       NavigationLink(destination: NeuropathicMatrixView()) {
+                           HStack {
+                               Image(systemName: "brain.head.profile")
+                                   .font(.title2)
+                                   .foregroundColor(.white)
+                               VStack(alignment: .leading, spacing: 2) {
+                                   Text("Neuropathic Efficiency Matrix")
+                                       .font(.headline)
+                                       .foregroundColor(.white)
+                                   Text("Compare Atypical Opioid Efficacy")
+                                       .font(.caption)
+                                       .foregroundColor(.white.opacity(0.8))
+                               }
+                               Spacer()
+                               Image(systemName: "chevron.right")
+                                   .foregroundColor(.white.opacity(0.8))
+                           }
+                           .padding()
+                           .background(LinearGradient(gradient: Gradient(colors: [ClinicalTheme.teal500, ClinicalTheme.blue500]), startPoint: .leading, endPoint: .trailing))
+                           .cornerRadius(12)
+                           .shadow(color: ClinicalTheme.teal500.opacity(0.3), radius: 5, x: 0, y: 3)
+                       }
+                       .padding(.horizontal)
+                    }
 
                     // 1. Monitoring Plan (High Priority)
                     if !store.monitoringPlan.isEmpty {
@@ -558,6 +755,19 @@ struct RiskAssessmentView: View {
                         }
                     }
                     
+                    // 3b. NON-PHARMACOLOGICAL (Moved from Main View)
+                    nonPharmSection
+                        .clinicalCard() // Ensure it has card styling if not already internal (it has internal styling but clinicalCard wrapper adds shadow consistency?)
+                        // usage in main view: nonPharmSection (lines 466-528) had a padding(.horizontal) at end.
+                        // inside detailsSheet, we want consistent padding.
+                        // Let's looks at nonPharmSection definition: it returns a VStack with .padding(.horizontal).
+                        // detailsSheet uses padding(.horizontal) on container or components?
+                        // Components like MonitoringPlan use .padding(.horizontal) at the end.
+                        // So just calling `nonPharmSection` should be fine, but let's check its definition again.
+                        // It has .padding(.horizontal) at the end.
+                        // I will just insert `nonPharmSection` here.
+
+                    
                     // 4. Opioid Options
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Opioid Options").font(.title3).bold().foregroundColor(ClinicalTheme.textPrimary).padding(.horizontal)
@@ -576,7 +786,7 @@ struct RiskAssessmentView: View {
                             .padding(.vertical, 40)
                         } else {
                             ForEach(store.recommendations) { rec in
-                                RecommendationCard(rec: rec)
+                                RecommendationCard(rec: rec, activeMonographDrug: $activeMonographDrug)
                             }
                         }
                     }
@@ -639,7 +849,17 @@ struct RiskAssessmentView: View {
                 }
             }
         }
-        // Removed .colorScheme(.dark)
+        .sheet(item: $activeMonographDrug) { drug in
+            NavigationView {
+                DrugMonographView(drug: drug, patientContext: store)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Close") { activeMonographDrug = nil }
+                        }
+                    }
+            }
+        }
     }
     
     var scoreColor: Color {
@@ -720,6 +940,7 @@ struct FlowBadge: View {
 
 struct RecommendationCard: View {
     let rec: DrugRecommendation
+    @Binding var activeMonographDrug: DrugData? // Added Binding
     @State private var showDetails = false
     var color: Color {
         switch rec.type {
@@ -728,7 +949,9 @@ struct RecommendationCard: View {
         case .unsafe: return ClinicalTheme.rose500
         }
     }
+
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var store: AssessmentStore
     
     var body: some View {
         Button(action: { withAnimation(.spring()) { showDetails.toggle() } }) {
@@ -751,14 +974,27 @@ struct RecommendationCard: View {
                     Spacer()
                     
                     // Status Badge
-                    Text(rec.type == .safe ? "Preferred" : "Monitor")
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(color.opacity(0.15))
-                        .foregroundColor(color)
-                        .cornerRadius(6)
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text(rec.type == .safe ? "Preferred" : "Monitor")
+                            .font(.caption2)
+                            .fontWeight(.bold)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(color.opacity(0.15))
+                            .foregroundColor(color)
+                            .cornerRadius(6)
+                        
+                        if let profile = rec.durationProfile {
+                            Text(profile.rawValue)
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(profile.color.opacity(0.15))
+                                .foregroundColor(profile.color)
+                                .cornerRadius(6)
+                        }
+                    }
                 }
                 
                 // Detail Text
@@ -767,6 +1003,35 @@ struct RecommendationCard: View {
                     .foregroundColor(ClinicalTheme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.leading) // Ensure left alignment
+                
+                // Citation Link (User Request)
+                if let linkedDrug = ClinicalData.drugData.first(where: { rec.name.localizedCaseInsensitiveContains($0.name) }) {
+                   Button(action: { activeMonographDrug = linkedDrug }) {
+                       Text("citations")
+                           .font(.caption2)
+                           .italic()
+                           .foregroundColor(.gray)
+                   }
+                   .padding(.top, 2)
+                   .buttonStyle(PlainButtonStyle()) // Ensure it doesn't trigger parent row tap
+               }
+               
+               // MARK: - Safety Alerts (e.g. Tube Feed)
+               if store.gi == .tube {
+                   HStack(spacing: 8) {
+                       Image(systemName: "exclamationmark.triangle.fill")
+                           .foregroundColor(ClinicalTheme.amber500)
+                       Text("Liquid formulation required. Do not crush ER.")
+                           .font(.caption)
+                           .fontWeight(.bold)
+                           .foregroundColor(ClinicalTheme.textSecondary)
+                   }
+                   .padding(8)
+                   .background(ClinicalTheme.amber500.opacity(0.1))
+                   .cornerRadius(6)
+                   .padding(.top, 4)
+               }
+
                 
                 // EXPANDABLE CONTENT INDICATOR
                 if showDetails {
@@ -805,28 +1070,70 @@ struct RecommendationCard: View {
                              Label("Clinical Pharmacology", systemImage: "flask.fill")
                                 .font(.caption).fontWeight(.bold).foregroundColor(ClinicalTheme.purple500)
                             
-                            // PK Grid
-                            HStack(spacing: 12) {
-                                // IV Profile
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("IV Profile").font(.caption2).fontWeight(.black).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
-                                    Text("\(drug.ivOnset) onset").font(.caption).foregroundColor(ClinicalTheme.textPrimary)
-                                    Text("\(drug.ivDuration) duration").font(.caption).foregroundColor(ClinicalTheme.textPrimary)
+                            // PK Grid (Vertical Stack)
+                            VStack(alignment: .leading, spacing: 8) {
+                                // PO Profile
+                                if !drug.poOnset.contains("N/A") && !drug.poOnset.isEmpty {
+                                    HStack {
+                                        Text("PO Profile").font(.caption2).fontWeight(.black).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase).frame(width: 80, alignment: .leading)
+                                        Text("\(drug.poOnset) onset / \(drug.poDuration) duration").font(.caption).foregroundColor(ClinicalTheme.textPrimary)
+                                    }
+                                    .padding(8)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(ClinicalTheme.backgroundMain)
+                                    .cornerRadius(8)
                                 }
-                                .padding(10)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(ClinicalTheme.backgroundMain)
-                                .cornerRadius(8)
                                 
-                                // Bioavailability
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Oral Bio").font(.caption2).fontWeight(.black).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase)
-                                    Text(drug.bioavailability > 0 ? "\(drug.bioavailability)%" : "N/A").font(.caption).bold().foregroundColor(ClinicalTheme.teal500)
+                                // IV Profile
+                                if !drug.ivOnset.contains("N/A") && !drug.ivOnset.isEmpty {
+                                    HStack {
+                                        Text("IV Profile").font(.caption2).fontWeight(.black).foregroundColor(ClinicalTheme.textSecondary).textCase(.uppercase).frame(width: 80, alignment: .leading)
+                                        Text("\(drug.ivOnset) onset / \(drug.ivDuration) duration").font(.caption).foregroundColor(ClinicalTheme.textPrimary)
+                                    }
+                                    .padding(8)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(ClinicalTheme.backgroundMain)
+                                    .cornerRadius(8)
                                 }
-                                .padding(10)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(ClinicalTheme.backgroundMain)
-                                .cornerRadius(8)
+                                
+                                // Bioavailability (Graphical Bar)
+                                if drug.bioavailability > 0 {
+                                    HStack(spacing: 12) {
+                                        Text("Oral Bio")
+                                            .font(.caption2)
+                                            .fontWeight(.black)
+                                            .foregroundColor(ClinicalTheme.textSecondary)
+                                            .textCase(.uppercase)
+                                            .frame(width: 80, alignment: .leading)
+                                        
+                                        // Flexible Bar
+                                        GeometryReader { geo in
+                                            ZStack(alignment: .leading) {
+                                                Capsule()
+                                                    .fill(Color.gray.opacity(0.15))
+                                                    .frame(height: 8)
+                                                
+                                                Capsule()
+                                                    .fill(ClinicalTheme.teal500)
+                                                    .frame(width: geo.size.width * min(CGFloat(drug.bioavailability) / 100.0, 1.0), height: 8)
+                                            }
+                                            // Center vertically within the reader
+                                            .frame(height: 8)
+                                            .position(x: geo.size.width / 2, y: geo.size.height / 2)
+                                        }
+                                        .frame(height: 12) // Slightly taller than bar to allow padding
+                                        
+                                        Text("\(drug.bioavailability)%")
+                                            .font(.caption2)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(ClinicalTheme.teal500)
+                                            .frame(width: 32, alignment: .trailing)
+                                    }
+                                    .padding(8)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(ClinicalTheme.backgroundMain)
+                                    .cornerRadius(8)
+                                }
                             }
                             
                             // Nuance

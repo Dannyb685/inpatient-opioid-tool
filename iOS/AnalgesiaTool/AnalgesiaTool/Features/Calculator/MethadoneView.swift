@@ -3,169 +3,13 @@ import Charts
 
 // MARK: - Methadone Data Models
 
-struct MethadoneConversionResult {
-    let totalDailyDose: Double
-    let individualDose: Double
-    let dosingSchedule: String
-    let warnings: [String]
-    let isContraindicatedForCalculator: Bool
-    let transitionSchedule: [MethadoneScheduleStep]?
-    let ratioUsed: Double // Added for note context
-    let reductionApplied: Double // Added for note context
-}
+// Struct moved to MethadoneCalculator.swift
 
-struct MethadoneScheduleStep: Hashable {
-    let dayLabel: String
-    let methadoneDose: String
-    let instructions: String
-    let methadoneDailyMg: Double // For Chart
-    let prevOpioidPercentVal: Double // For Chart
-    let prevMME: Int // New: Calculated MME value for display
-}
-
-
-enum ConversionMethod: String, CaseIterable {
-    case rapid = "Rapid"
-    case stepwise = "Stepwise"
-}
+// Models moved to MethadoneCalculator.swift
 
 // MARK: - Logic Engine
 
-func calculateMethadoneConversion(totalMME: Double, patientAge: Int, method: ConversionMethod) -> MethadoneConversionResult {
-    var ratio: Double
-    var maxDailyDose: Double?
-    var warnings: [String] = []
-    var crossToleranceReduction: Double = 0.0
-    
-    // NCCN age-based adjustment
-    let useConservativeRatio = patientAge >= 65
-    
-    // Check for special low-dose fixed rules first
-    // Note: The new ClinicalData rules handle this via the RatioRule properties
-    
-    guard let rule = ClinicalData.MMEConversionRules.getRatio(for: totalMME, age: patientAge) else {
-        warnings.append("🚨 SPECIALIST CONSULTATION MANDATORY")
-        return MethadoneConversionResult(
-            totalDailyDose: 0,
-            individualDose: 0,
-            dosingSchedule: "Consult Pain Specialist",
-            warnings: warnings,
-            isContraindicatedForCalculator: true,
-            transitionSchedule: nil,
-            ratioUsed: 0,
-            reductionApplied: 0
-        )
-    }
-    
-    // Apply logic from rule
-    ratio = rule.ratio
-    
-    // Override for Elderly Patients (>65y) per NCCN Guidelines
-    // Use conservative ratio (20:1) for moderate doses (60-200 MME)
-    if useConservativeRatio && (totalMME >= 60 && totalMME < 200) {
-        ratio = 20.0
-    }
-    
-    crossToleranceReduction = rule.reduction
-    maxDailyDose = rule.maxDose
-    
-    if let warn = rule.warning {
-        warnings.append(warn)
-    }
-    
-    var methadoneDailyDose = totalMME / ratio
-    
-    // Apply Dose-Dependent Cross-Tolerance Reduction (NCCN/APS Safety Protocol)
-    if crossToleranceReduction > 0 {
-        methadoneDailyDose *= (1.0 - crossToleranceReduction)
-        warnings.append("Applied \(Int(crossToleranceReduction * 100))% reduction for incomplete cross-tolerance (Standard Safety Protocol).")
-    }
-
-    // Apply minimum floor for very low calculations (< APS Minimum)
-    let minimumDose = 7.5 // APS floor (2.5mg TID)
-    if methadoneDailyDose < minimumDose && totalMME >= 30 {
-        methadoneDailyDose = minimumDose
-        warnings.append("Note: Dose rounded up to APS minimum (2.5mg TID).")
-    }
-    
-    // Apply maximum cap
-    if let maxDose = maxDailyDose, methadoneDailyDose > maxDose {
-        methadoneDailyDose = maxDose
-        warnings.append("⚠️ Dose capped at \(maxDose)mg/day per NCCN/APS guidelines.")
-    }
-
-    // Age-specific warning
-    if useConservativeRatio && totalMME >= 60 {
-        warnings.append("⚠️ **ELDERLY PATIENT:** Using more conservative NCCN ratios.")
-    }
-    
-    // Step 5: Divide into dosing schedule (TID preferred for analgesia)
-    var individualDose = methadoneDailyDose / 3.0
-    
-    // Practical Rounding (Nearest 0.5mg) to avoid "1.8mg"
-    individualDose = (individualDose * 2).rounded() / 2
-    
-    // Recalculate daily total based on rounded val
-    methadoneDailyDose = individualDose * 3.0
-    
-    // Step 6: Generate comprehensive warnings
-    warnings.append("🚨 **METHADONE SAFETY PROTOCOL:**")
-    warnings.append("**Do NOT titrate** more frequently than every 5-7 days.")
-    warnings.append("**ECG required:** Baseline, 2-4 weeks, and at 100mg/day.")
-    warnings.append("   • **Avoid if QTc >500ms;** Caution if 450-500ms.")
-    warnings.append("**Monitor** for delayed respiratory depression (peak 2-4 days).")
-    warnings.append("**Provide** naloxone rescue kit.")
-    warnings.append("**UNIDIRECTIONAL conversion** - do NOT use reverse calculation.")
-    
-    // Generate Schedule if Stepwise
-    var schedule: [MethadoneScheduleStep]? = nil
-    if method == .stepwise {
-        // Standard 3-Day Switch (33% increments)
-        let step1Methadone = (methadoneDailyDose * 0.33 / 3.0 * 2).rounded() / 2 // TID
-        let step2Methadone = (methadoneDailyDose * 0.66 / 3.0 * 2).rounded() / 2 // TID
-        let finalMethadone = individualDose // Already rounded
-        
-        schedule = [
-            MethadoneScheduleStep(
-                dayLabel: "Days 1-3",
-                methadoneDose: "\(String(format: "%g", step1Methadone)) mg TID",
-                instructions: "Continue PRN breakthrough.",
-                methadoneDailyMg: step1Methadone * 3,
-                prevOpioidPercentVal: 66,
-                prevMME: Int(totalMME * 0.66)
-            ),
-            MethadoneScheduleStep(
-                dayLabel: "Days 4-6",
-                methadoneDose: "\(String(format: "%g", step2Methadone)) mg TID",
-                instructions: "Monitor for sedation.",
-                methadoneDailyMg: step2Methadone * 3,
-                prevOpioidPercentVal: 33,
-                prevMME: Int(totalMME * 0.33)
-            ),
-            MethadoneScheduleStep(
-                dayLabel: "Day 7+",
-                methadoneDose: "\(String(format: "%g", finalMethadone)) mg TID",
-                instructions: "Full Target Dose Reached.",
-                methadoneDailyMg: finalMethadone * 3,
-                prevOpioidPercentVal: 0,
-                prevMME: 0
-            )
-        ]
-        
-        warnings.append("**STEPWISE INDUCTION:** Follow the 3-Step Transition Schedule below.")
-    }
-
-    return MethadoneConversionResult(
-        totalDailyDose: methadoneDailyDose,
-        individualDose: individualDose,
-        dosingSchedule: "Every 8 hours (TID)",
-        warnings: warnings,
-        isContraindicatedForCalculator: false,
-        transitionSchedule: schedule,
-        ratioUsed: ratio,
-        reductionApplied: crossToleranceReduction
-    )
-}
+// Logic moved to MethadoneCalculator.swift
 
 // MARK: - Methadone View
 
@@ -174,8 +18,7 @@ struct MethadoneView: View {
     @EnvironmentObject var themeManager: ThemeManager // Needed for color scheme
     @State private var currentTotalMME: String = ""
     @State private var conversionResult: MethadoneConversionResult?
-    @State private var currentTotalMME: String = ""
-    @State private var conversionResult: MethadoneConversionResult?
+
     @State private var patientAge: Int = 50
     // NEW: Allow auto-seeding
     var initialAge: Int?
@@ -183,10 +26,17 @@ struct MethadoneView: View {
     @State private var showAlgorithmNote: Bool = false
     @State private var showChart: Bool = false
     @State private var conversionMethod: ConversionMethod = .rapid
+    @State private var manualReduction: Double = 25.0 // Default 25% Reduction (NCCN/APS Recommendation)
     
     // Safety Gates (Passed from Calculator)
     let isPregnant: Bool
+    let isBreastfeeding: Bool
     let isNaltrexone: Bool
+    // Safety Enhancement 1/9/26
+    let hepaticStatus: HepaticStatus
+    let renalStatus: RenalStatus
+    let benzos: Bool
+    let isOUD: Bool
     
     // Optional: Initial MME passed from Calculator
     var initialMME: String?
@@ -196,12 +46,40 @@ struct MethadoneView: View {
         Text(LocalizedStringKey(text))
     }
     
-    init(isPresented: Binding<Bool>, initialMME: String? = nil, initialAge: Int? = nil, isPregnant: Bool = false, isNaltrexone: Bool = false) {
+    init(isPresented: Binding<Bool>, initialMME: String? = nil, initialAge: Int? = nil, isPregnant: Bool = false, isBreastfeeding: Bool = false, isNaltrexone: Bool = false, hepaticStatus: HepaticStatus = .normal, renalStatus: RenalStatus = .normal, benzos: Bool = false, isOUD: Bool = false) {
         self._isPresented = isPresented
         self.initialMME = initialMME
         self.initialAge = initialAge
         self.isPregnant = isPregnant
+        self.isBreastfeeding = isBreastfeeding
         self.isNaltrexone = isNaltrexone
+        self.hepaticStatus = hepaticStatus
+        self.renalStatus = renalStatus
+        self.benzos = benzos
+        self.isOUD = isOUD
+    }
+    
+    var warningBanner: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.title2)
+                .foregroundColor(ClinicalTheme.rose500)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("SPECIALIST CONSULTATION RECOMMENDED")
+                    .font(.headline)
+                    .foregroundColor(ClinicalTheme.rose500)
+                Text("Methadone conversion is complex and risky. This tool calculates a STARTING dose only.")
+                    .font(.caption)
+                    .foregroundColor(ClinicalTheme.textPrimary)
+            }
+        }
+        .padding()
+        .background(ClinicalTheme.rose500.opacity(0.1))
+        .cornerRadius(12)
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.rose500.opacity(0.3), lineWidth: 1))
+        .padding(.horizontal)
+        .addKeyboardDoneButton()
     }
     
     var body: some View {
@@ -210,26 +88,7 @@ struct MethadoneView: View {
                 VStack(spacing: 24) {
                     
                     // 1. WARNING BANNER
-                    HStack(alignment: .top, spacing: 12) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.title2)
-                            .foregroundColor(ClinicalTheme.rose500)
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("SPECIALIST CONSULTATION RECOMMENDED")
-                                .font(.headline)
-                                .foregroundColor(ClinicalTheme.rose500)
-                            Text("Methadone conversion is complex and risky. This tool calculates a STARTING dose only.")
-                                .font(.caption)
-                                .foregroundColor(ClinicalTheme.textPrimary)
-                        }
-                    }
-                    .padding()
-                    .background(ClinicalTheme.rose500.opacity(0.1))
-                    .cornerRadius(12)
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.rose500.opacity(0.3), lineWidth: 1))
-                    .padding(.horizontal)
-                    .addKeyboardDoneButton() // Add Done Button (User Request)
+                    warningBanner
                     
                     // 2. INPUT CARD
                     VStack(alignment: .leading, spacing: 16) {
@@ -332,10 +191,47 @@ struct MethadoneView: View {
                             .foregroundColor(ClinicalTheme.textSecondary)
                             .padding(.top, 4)
                         }
-                    }
-
+                        
+                        Divider()
+                        
+                        // Cross-Tolerance Reduction Slider (User Request 1/9/26)
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Cross-Tolerance Reduction")
+                                    .font(.subheadline)
+                                    .foregroundColor(ClinicalTheme.textSecondary)
+                                Spacer()
+                                Text("-\(Int(manualReduction))%")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(manualReduction <= 25 ? ClinicalTheme.rose500 : ClinicalTheme.teal500)
+                            }
+                            
+                            // Safety: Minimum unbound 15% to prevent complete accidental 1:1 rotation
+                            Slider(value: $manualReduction, in: 15...75, step: 5)
+                                .accentColor(manualReduction <= 25 ? ClinicalTheme.rose500 : ClinicalTheme.teal500)
+                            
+                            HStack {
+                                Spacer()
+                                if manualReduction <= 25 {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "exclamationmark.triangle.fill").font(.caption2)
+                                        Text("HIGH RISK: Incomplete Cross-Tolerance")
+                                            .font(.caption2).bold()
+                                    }
+                                    .foregroundColor(ClinicalTheme.rose500)
+                                } else {
+                                    Text(manualReduction > 50 ? "Aggressive Reduction" : "Standard Safety Protocol")
+                                        .font(.caption2)
+                                        .italic()
+                                        .foregroundColor(manualReduction > 50 ? ClinicalTheme.amber500 : ClinicalTheme.textSecondary)
+                                }
+                            }
+                        }
+                    } // Closing brace for the Input Card VStack
                     .padding(.horizontal)
                     
+                    // SAFETY GATES (Inject Here)
                     // SAFETY GATES (Inject Here)
                     if isNaltrexone {
                          VStack(spacing: 12) {
@@ -350,6 +246,9 @@ struct MethadoneView: View {
                          .padding(.vertical, 40)
                          .frame(maxWidth: .infinity)
                          .background(ClinicalTheme.backgroundMain)
+                         .onAppear {
+                             SafetyLogger.shared.log(.safetyGateFailure(errors: ["Methadone Calculator Blocked: Naltrexone Active"]))
+                         }
                     } else if isPregnant {
                         VStack(spacing: 12) {
                              Image(systemName: "person.crop.circle.badge.exclamationmark")
@@ -363,6 +262,9 @@ struct MethadoneView: View {
                          .padding(.vertical, 40)
                          .frame(maxWidth: .infinity)
                          .background(ClinicalTheme.backgroundMain)
+                         .onAppear {
+                             SafetyLogger.shared.log(.safetyGateFailure(errors: ["Methadone Calculator Blocked: Pregnancy"]))
+                         }
                     } else {
                         // Standard Calculator Flow
                     }
@@ -397,7 +299,7 @@ struct MethadoneView: View {
                                         Text("Scheduled Dose")
                                             .font(.caption)
                                             .foregroundColor(ClinicalTheme.textSecondary)
-                                        Text("\(String(format: "%g", result.individualDose)) mg")
+                                        Text("\(String(format: "%.1f", result.individualDose)) mg")
                                             .font(.system(size: 32, weight: .bold)) // Prominent
                                             .foregroundColor(ClinicalTheme.teal500)
                                         Text("TID (Every 8 hours)")
@@ -412,6 +314,18 @@ struct MethadoneView: View {
                                         Text("Total Daily")
                                             .font(.caption)
                                             .foregroundColor(ClinicalTheme.textSecondary)
+                                        
+                                        // Transparency: Original Calculation
+                                        if let original = result.originalDailyDose, original > result.totalDailyDose {
+                                            HStack(spacing: 4) {
+                                                Text("Ratio Protected").font(.system(size: 8)).bold().foregroundColor(ClinicalTheme.teal500).padding(2).background(ClinicalTheme.teal500.opacity(0.1)).cornerRadius(2)
+                                                Text("\(String(format: "%.1f", original)) mg")
+                                                    .font(.caption)
+                                                    .strikethrough()
+                                                    .foregroundColor(ClinicalTheme.textMuted)
+                                            }
+                                        }
+                                        
                                         Text("\(String(format: "%.1f", result.totalDailyDose)) mg")
                                             .font(.title3)
                                             .bold()
@@ -615,6 +529,8 @@ struct MethadoneView: View {
                 Text("Powered by Lifeline Medical Technologies")
                     .font(.system(size: 10))
                     .foregroundColor(ClinicalTheme.teal500.opacity(0.6))
+                CitationFooter(citations: CitationRegistry.resolve(["cdc_opioids_2022", "aps_opioids_2024"]))
+                    .padding(.top, 20)
             }
             .frame(maxWidth: .infinity)
             .padding(.bottom, 20)
@@ -622,10 +538,20 @@ struct MethadoneView: View {
             .navigationTitle("Methadone Calculator")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { isPresented = false }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") { isPresented = false }
                 }
             }
+            .onChange(of: currentTotalMME) { _, _ in performConversion() }
+            .onChange(of: patientAge) { _, _ in performConversion() }
+            .onChange(of: conversionMethod) { _, _ in performConversion() }
+            .onChange(of: manualReduction) { _, _ in performConversion() }
+            .onChange(of: hepaticStatus) { _, _ in performConversion() }
+            .onChange(of: renalStatus) { _, _ in performConversion() }
+            .onChange(of: isPregnant) { _, _ in performConversion() }
+            .onChange(of: isBreastfeeding) { _, _ in performConversion() }
+            .onChange(of: benzos) { _, _ in performConversion() }
+            .onAppear { performConversion() }
             .background(ClinicalTheme.backgroundMain.edgesIgnoringSafeArea(.all))
         }
     }
@@ -640,10 +566,11 @@ struct MethadoneView: View {
         let text = """
         Methadone Conversion Note
         Input: \(currentTotalMME) MME (Age: \(patientAge))
+        Context: \(isPregnant ? "Pregnant" : (isBreastfeeding ? "Breastfeeding" : "Standard"))
         Ratio Used: ~1:\(Int(result.ratioUsed)) (NCCN Guidelines)
         Reduction: \(Int(result.reductionApplied * 100))% for cross-tolerance
         
-        Plan: Methadone \(String(format: "%g", result.individualDose)) mg TID
+        Plan: Methadone \(String(format: "%.1f", result.individualDose)) mg TID
         Total Daily: \(String(format: "%.1f", result.totalDailyDose)) mg
         
         Safety:
@@ -661,7 +588,7 @@ struct MethadoneView: View {
         Your Methadone Schedule
         Start Date: _____________
         
-        Dose: Take \(String(format: "%g", result.individualDose)) mg every 8 hours.
+        Dose: Take \(String(format: "%.1f", result.individualDose)) mg every 8 hours.
         (Example: 8:00 AM, 4:00 PM, 12:00 AM)
         
         IMPORTANT SAFETY:
@@ -686,11 +613,29 @@ struct MethadoneView: View {
         copyPatientInstructions() // Redirect to new format
     }
     
-    // Action
     func performConversion() {
         guard let mme = Double(currentTotalMME), mme > 0 else { return }
+        
+        // Auto-adjust reduction if it's still at default and MME is low
+        if manualReduction == 25.0 && mme < 100 {
+            // NCCN Suggests 15% for <100 MME baseline
+            manualReduction = 15.0
+        }
+        
         withAnimation {
-            self.conversionResult = calculateMethadoneConversion(totalMME: mme, patientAge: patientAge, method: conversionMethod)
+            self.conversionResult = MethadoneCalculator.calculate(
+                totalMME: mme,
+                patientAge: patientAge,
+                method: conversionMethod,
+                hepaticStatus: hepaticStatus,
+                renalStatus: renalStatus,
+                isPregnant: isPregnant,
+                isBreastfeeding: isBreastfeeding,
+                benzos: benzos,
+                isOUD: isOUD,
+                qtcProlonged: hasQTcProlongation,
+                manualReduction: manualReduction
+            )
         }
     }
 }
@@ -856,5 +801,25 @@ struct MethadoneStepwiseChart: View {
         .background(ClinicalTheme.backgroundCard)
         .cornerRadius(12)
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(ClinicalTheme.cardBorder, lineWidth: 1))
+    }
+}
+
+struct SectionHeader: View {
+    let icon: String
+    let title: String
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(ClinicalTheme.blue500)
+            
+            Text(title)
+                .font(.headline)
+                .foregroundColor(ClinicalTheme.textPrimary)
+            
+            Spacer()
+        }
+        .padding(.top, 8)
     }
 }

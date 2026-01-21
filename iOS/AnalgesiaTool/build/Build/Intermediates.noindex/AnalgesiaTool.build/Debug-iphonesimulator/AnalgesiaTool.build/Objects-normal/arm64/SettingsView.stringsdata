@@ -1,0 +1,184 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/Features/Settings/SettingsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Settings & Info",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 171
+        }
+      },
+      {
+        "comment": "",
+        "key": "This application is intended solely as an educational aid for qualified healthcare professionals. It is NOT a substitute for clinical judgment.",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 24
+        }
+      },
+      {
+        "comment": "",
+        "key": "Educational Use Only",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 19
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Full Legal Disclaimers & Terms",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "Evidence Base",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "CDC Clinical Practice Guideline for Prescribing Opioids for Pain (2022)",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 56
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dowell D, Ragan KR, Jones CM, Baldwin GT, Chou R. MMWR Recomm Rep 2022;71(No. RR-3):1–95.",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Guideline Source ↗",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 66
+        }
+      },
+      {
+        "comment": "",
+        "key": "Equianalgesic Dosing Data",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 74
+        }
+      },
+      {
+        "comment": "",
+        "key": "Compiled from CMS, FDA Prescribing Information, and peer-reviewed literature (McPherson 2018).",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 77
+        }
+      },
+      {
+        "comment": "",
+        "key": "About",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "Version",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 97
+        }
+      },
+      {
+        "comment": "",
+        "key": "1.0.0 (Release Candidate)",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 99
+        }
+      },
+      {
+        "comment": "",
+        "key": "Build",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 105
+        }
+      },
+      {
+        "comment": "",
+        "key": "2025.12.RC1",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 107
+        }
+      },
+      {
+        "comment": "",
+        "key": "Transparency",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 113
+        }
+      },
+      {
+        "comment": "",
+        "key": "Glass Box Policy (Reviewable)",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 115
+        }
+      },
+      {
+        "comment": "",
+        "key": "Powered by Lifeline Medical Technologies",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 125
+        }
+      },
+      {
+        "comment": "",
+        "key": "© 2025 Inpatient Opioid Tool",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 128
+        }
+      },
+      {
+        "comment": "",
+        "key": "Run Clinical Validation Engine (Full Stress Test)",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 133
+        }
+      },
+      {
+        "comment": "",
+        "key": "Interactive Logic Runner",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 144
+        }
+      },
+      {
+        "comment": "",
+        "key": "Validation Results",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 166
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,176 @@
+{
+  "source": "/Users/danielbergholz/Documents/Second Brain/03. Active Projects/Plugin Development/Inpatient Opioid Tool/iOS/AnalgesiaTool/AnalgesiaTool/Features/Library/Pharmacy/ReferenceView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Pharmacology",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 98
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search drug, metabolite, mechanism...",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 158
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clinical Algorithms",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "Neuropathic Efficacy Matrix",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 188
+        }
+      },
+      {
+        "comment": "",
+        "key": "Mechanism-based selection (NMDA/Kappa/Mu)",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 191
+        }
+      },
+      {
+        "comment": "",
+        "key": "Methodology & Evidence",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 209
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opioid Verification & Validation (CDC/FDA/PRODIGY/RIOSORD)",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 212
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clinical References",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 232
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opioid Precision v1.0",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 275
+        }
+      },
+      {
+        "comment": "",
+        "key": "© 2025 Clinical Tools Inc.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 278
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 295
+        }
+      },
+      {
+        "comment": "",
+        "key": "'Opioid Precision' is a clinical decision support tool intended for use by licensed healthcare professionals. The calculation of Morphine Milligram Equivalents (MME) is based on published equianalgesic tables (CDC 2022, ASCO 2023).",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 478
+        }
+      },
+      {
+        "comment": "",
+        "key": "This application does not replace clinical judgment. The treating physician is solely responsible for final dosing.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 504
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clinical Decision Support Disclaimer",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 472
+        }
+      },
+      {
+        "comment": "",
+        "key": "Important Safety Limitations:",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 483
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 489
+        }
+      },
+      {
+        "comment": "",
+        "key": "Estimates Only: Patient response varies due to genetics and organ function.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 490
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 494
+        }
+      },
+      {
+        "comment": "",
+        "key": "Non-Linear Drugs: Methadone & Buprenorphine linear conversion is suppressed to prevent overdose.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 495
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 499
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pediatric Exclusion: NOT validated for patients <18 years.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 500
+        }
+      }
+    ]
+  },
+  "version": 1
+}

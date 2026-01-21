@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OUDConsultWizardView: View {
-    @StateObject private var store = OUDConsultStore()
+    @ObservedObject var store: OUDConsultStore
     @EnvironmentObject var assessmentStore: AssessmentStore
     
     // Mismatch Logic
@@ -36,6 +36,12 @@ struct OUDConsultWizardView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("Reset") { store.reset() }
+                    }
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        NavigationLink(destination: AberrantBehaviorView()) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .foregroundColor(.orange)
+                        }
                     }
                 }
         }

@@ -57,6 +57,19 @@ struct MergedAlgorithmTransparencyAccordion: View {
                     .padding(12)
                     .background(ClinicalTheme.backgroundMain.opacity(0.5))
                     .cornerRadius(8)
+                    
+                    Divider().background(ClinicalTheme.divider)
+                    
+                    // Evidence Section (Moved from separate accordion)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Clinical Evidence")
+                            .font(.caption).bold()
+                            .foregroundColor(ClinicalTheme.textPrimary)
+                        Text(InfoContent.evidence)
+                            .font(.caption)
+                            .foregroundColor(ClinicalTheme.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
