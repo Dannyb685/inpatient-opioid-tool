@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Activity,
     AlertTriangle,
@@ -9,101 +9,66 @@ import {
     CheckCircle2,
     Users,
     Timer,
-    HeartPulse,
-    Wind
+    HeartPulse
 } from 'lucide-react';
-import { Badge, ClinicalCard, ParameterBtn } from './Shared';
+import { Badge, ParameterBtn } from './Shared';
+import { useAssessmentStore } from './stores/AssessmentStore';
 
 export const AssessmentView = () => {
-    // Clinical Parameters
-    const [renal, setRenal] = useState<string | null>(null);
-    const [hemo, setHemo] = useState<string | null>(null);
-    const [hepatic, setHepatic] = useState<string | null>(null);
-    const [painType, setPainType] = useState<string | null>(null);
-    const [indication, setIndication] = useState<string | null>(null);
-    const [route, setRoute] = useState<string | null>(null);
-    const [gi, setGi] = useState<string | null>(null);
-    const [organSupport, setOrganSupport] = useState(false); // New: Pressors/Vent?
+    // Global Store
+    const {
+        age, setAge,
+        sex, setSex,
+        opioidNaive, setOpioidNaive,
+        homeBuprenorphine, setHomeBuprenorphine,
 
-    // Demographics & PRODIGY Inputs
-    const [age, setAge] = useState<string>('');
-    const [sex, setSex] = useState<'male' | 'female' | null>(null);
-    const [naive, setNaive] = useState(false);
-    const [mat, setMat] = useState(false); // Home Buprenorphine
+        renalFunction, setRenalFunction,
+        hepaticFunction, setHepaticFunction,
+        hemoStatus, setHemoStatus,
+        painType, setPainType,
+        indication, setIndication,
+        routePreference, setRoutePreference,
+        giStatus, setGiStatus,
+        organSupport,
 
-    // Comorbidities / Risk Factors
-    const [sleepApnea, setSleepApnea] = useState(false);
-    const [chf, setChf] = useState(false);
-    const [copd, setCopd] = useState(false);
-    const [benzos, setBenzos] = useState(false);
-    const [psychHistory, setPsychHistory] = useState(false);
+        sleepApnea, setSleepApnea,
+        chf, setChf,
+        copd, setCopd,
+        benzos, setBenzos,
+        psychHistory, setPsychHistory,
 
-    // Outputs
+        prodigyScore,
+        prodigyRisk
+    } = useAssessmentStore();
+
+    // Local Computed Logic for Recommendations
+    // (We keep this in the view for now as it's purely derivation for display)
     const [recs, setRecs] = useState<any[]>([]);
     const [adjuvants, setAdjuvants] = useState<string[]>([]);
     const [warnings, setWarnings] = useState<string[]>([]);
-
-    // PRODIGY State
-    const [prodigyScore, setProdigyScore] = useState(0);
-    const [prodigyRisk, setProdigyRisk] = useState<'Low' | 'Intermediate' | 'High'>('Low');
     const [monitoringRecs, setMonitoringRecs] = useState<string[]>([]);
-
-    // Legacy Risk State (still useful for general stratification)
-    const [riskScore, setRiskScore] = useState<'Low' | 'Moderate' | 'High'>('Low');
-    const [riskReasons, setRiskReasons] = useState<string[]>([]);
 
     useEffect(() => {
         // --- RESET OUTPUTS ---
         let r: any[] = [];
         let adj: string[] = [];
         let w: string[] = [];
-        let rReasons: string[] = [];
-        let score: 'Low' | 'Moderate' | 'High' = 'Low';
-
-        // --- PRODIGY SCORING LOGIC (Always Runs) ---
-        let pScore = 0;
-        let pRisk: 'Low' | 'Intermediate' | 'High' = 'Low';
         let monitors: string[] = [];
 
-        // 1. Age Decades >= 60
-        // 1. Age (Validates PRODIGY Table)
-        const ageNum = parseInt(age);
-        if (!isNaN(ageNum)) {
-            if (ageNum >= 80) pScore += 16;
-            else if (ageNum >= 70) pScore += 12;
-            else if (ageNum >= 60) pScore += 8;
-        }
-
-        // 2. Male Sex
-        if (sex === 'male') pScore += 8;
-
-        // 3. Opioid Naivety
-        if (naive) pScore += 3;
-
-        // 4. Sleep Disorders
-        if (sleepApnea) pScore += 5;
-
-        // 5. CHF
-        if (chf) pScore += 7;
-
-        // Determine Risk Tier (PRODIGY Validated)
-        if (pScore >= 15) {
-            pRisk = 'High';
+        // --- PRODIGY MONITORING (from Store Score) ---
+        if (prodigyRisk === 'High') {
             monitors.push('⚠️ CONTINUOUS CAPNOGRAPHY + Pulse Oximetry REQUIRED.');
             monitors.push('Nursing assessment q1h x 6h, then q2h.');
-        } else if (pScore >= 8) {
-            pRisk = 'Intermediate';
+        } else if (prodigyRisk === 'Intermediate') {
             monitors.push('Consider Continuous Capnography.');
             monitors.push('Nursing assessment q4h.');
         } else {
-            pRisk = 'Low';
             monitors.push('Standard monitoring per protocol.');
         }
 
-        // Additional High Risk Modifiers
         if (benzos) {
             monitors.push('Warning: Concurrent Benzos increase overdose risk 3.8x.');
-            if (pRisk === 'Low' && pScore < 8) {
+            if (prodigyRisk === 'Low' && prodigyScore < 8) {
                 monitors.push('Risk elevated due to sedatives.');
             }
         }
@@ -111,14 +76,12 @@ export const AssessmentView = () => {
             monitors.push('COPD: Increased retention risk. Target SpO2 88-92%?');
         }
 
-        setProdigyScore(pScore);
-        setProdigyRisk(pRisk);
         setMonitoringRecs(monitors);
 
         // --- CLINICAL LOGIC (Refined) ---
-        const isRenalBad = renal === 'dialysis' || renal === 'impaired';
-        const isHepaticBad = hepatic === 'failure' || hepatic === 'impaired';
-        const isHepaticFailure = hepatic === 'failure';
+        const isRenalBad = renalFunction === 'dialysis' || renalFunction === 'impaired';
+        const isHepaticBad = hepaticFunction === 'failure' || hepaticFunction === 'impaired';
+        const isHepaticFailure = hepaticFunction === 'failure';
 
         // Helpers
         const addIVRecs = () => {
@@ -144,15 +107,12 @@ export const AssessmentView = () => {
         };
 
         // 1. HEMODYNAMICS (Override)
-        if (hemo === 'unstable') {
-            rReasons.push('Hemodynamic Instability');
-            score = 'High';
+        if (hemoStatus === 'unstable') {
             r.push({ name: 'Fentanyl', reason: 'Preferred.', detail: 'Cardiostable; no histamine release.', type: 'safe' });
             w.push('Morphine: Histamine release precipitates vasodilation/hypotension.');
         }
         // 2. MAT / BUPRENORPHINE
-        else if (mat) {
-            rReasons.push('Home MAT (Buprenorphine)');
+        else if (homeBuprenorphine) {
             r.push({ name: 'Home Buprenorphine', reason: 'Maintenance.', detail: 'Continue basal to prevent withdrawal.', type: 'safe' });
             r.push({ name: 'Breakthrough Agonist', reason: 'Acute Pain.', detail: 'Add high-affinity agonist (Fentanyl/Dilaudid) on top of MAT.', type: 'safe' });
 
@@ -161,34 +121,30 @@ export const AssessmentView = () => {
             }
 
             // Route Logic (Simpler for MAT breakthrough)
-            if (route === 'iv' || route === 'both' || route === 'either') addIVRecs();
-            if (route === 'po' || route === 'both' || route === 'either') addPORecs();
+            if (routePreference === 'iv' || routePreference === 'both' || routePreference === 'either') addIVRecs();
+            if (routePreference === 'po' || routePreference === 'both' || routePreference === 'either') addPORecs();
         }
         // 3. STANDARD LOGIC
-        else if (renal) {
+        else if (renalFunction) {
             if (isRenalBad) {
-                rReasons.push('Renal Insufficiency');
-                score = 'High';
                 w.push('Avoid: Morphine, Codeine, Tramadol, Meperidine (Active metabolites/Seizure risk).');
                 r.push({ name: 'Methadone', reason: 'Safe.', detail: 'Fecal excretion. Consult Pain Svc.', type: 'safe' });
             }
 
-            if (route === 'iv') addIVRecs();
-            else if (route === 'po') addPORecs();
-            else if (route === 'both' || route === 'either') {
+            if (routePreference === 'iv') addIVRecs();
+            else if (routePreference === 'po') addPORecs();
+            else if (routePreference === 'both' || routePreference === 'either') {
                 addIVRecs();
                 addPORecs();
-                if (route === 'either') adj.push('Route Preference: Determine based on GI tolerance.');
+                if (routePreference === 'either') adj.push('Route Preference: Determine based on GI tolerance.');
             } else {
                 addIVRecs(); // Default
             }
         }
 
         // 4. HEPATIC SAFETY GATES (Strict Filters)
-        if (hepatic) {
+        if (hepaticFunction) {
             if (isHepaticFailure) {
-                rReasons.push('Hepatic Failure');
-                score = 'High';
                 w.push('Liver Failure (Child-Pugh C): Avoid Methadone, Morphine, Codeine, and Oxycodone.');
 
                 // FILTER OUT TOXIC MEDS
@@ -200,18 +156,16 @@ export const AssessmentView = () => {
                     r.unshift({ name: 'Fentanyl', reason: 'Preferred.', detail: 'Safest choice in liver failure.', type: 'safe' });
                 }
                 r = r.map(x => ({ ...x, detail: x.detail + ' Reduce dose 50%.' }));
-            } else if (hepatic === 'impaired') {
-                rReasons.push('Hepatic Impairment');
-                if (score !== 'High') score = 'Moderate';
+            } else if (hepaticFunction === 'impaired') {
                 r = r.map(x => ({ ...x, detail: x.detail + ' Reduce initial dose 50%.' }));
             }
         }
 
         // 5. GI / NPO Logic
-        if (gi === 'npo') {
-            if (route === 'po' || route === 'both' || route === 'either') {
+        if (giStatus === 'npo') {
+            if (routePreference === 'po' || routePreference === 'both' || routePreference === 'either') {
                 const poNames = ['Oxycodone', 'Hydromorphone PO', 'Morphine PO'];
-                if (route === 'po') r = [];
+                if (routePreference === 'po') r = [];
                 else r = r.filter(x => !poNames.some(n => x.name.includes(n)));
                 w.push('PO Contraindicated: Patient is NPO. Switch to IV.');
             }
@@ -263,18 +217,14 @@ export const AssessmentView = () => {
 
         // 8. General Risk
         if (sleepApnea) {
-            rReasons.push('Sleep Apnea (OSA)');
-            score = score === 'High' ? 'High' : 'Moderate';
             w.push('OSA: Avoid basal infusions. Monitor SpO2/EtCO2.');
         }
 
         setRecs(r);
         setAdjuvants(adj);
         setWarnings(w);
-        setRiskScore(score);
-        setRiskReasons(rReasons);
 
-    }, [renal, hemo, route, gi, hepatic, painType, indication, sleepApnea, psychHistory, age, sex, naive, chf, copd, benzos, mat]);
+    }, [renalFunction, hemoStatus, routePreference, giStatus, hepaticFunction, painType, indication, sleepApnea, psychHistory, age, sex, opioidNaive, chf, copd, benzos, homeBuprenorphine, prodigyScore, prodigyRisk]);
 
     const handleCopy = () => {
         const note = `
@@ -285,10 +235,10 @@ Monitoring Plan:
 ${monitoringRecs.map(m => `- ${m}`).join('\n')}
 
 Risk Factors:
-${sleepApnea ? '- Sleep Apnea (+4)' : ''}
-${naive ? '- Opioid Naive (+5)' : ''}
-${chf ? '- Chronic Heart Failure (+3)' : ''}
-${sex === 'male' ? '- Male Sex (+3)' : ''}
+${sleepApnea ? '- Sleep Apnea (+5)' : ''}
+${opioidNaive ? '- Opioid Naive (+3)' : ''}
+${chf ? '- Chronic Heart Failure (+7)' : ''}
+${sex === 'male' ? '- Male Sex (+8)' : ''}
 
 Clinical Recommendations:
 ${recs.map(r => `- ${r.name}: ${r.reason} (${r.detail})`).join('\n')}
@@ -332,20 +282,20 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                             </div>
                         </div>
 
-                        <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${naive ? 'bg-action-bg border-action-border/30' : 'bg-surface-card border-border'}`}>
+                        <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${opioidNaive ? 'bg-action-bg border-action-border/30' : 'bg-surface-card border-border'}`}>
                             <div>
                                 <span className="text-xs font-bold text-text-primary block">Opioid Naive</span>
                                 <span className="text-[10px] text-text-tertiary font-medium">No exposure last 7 days</span>
                             </div>
-                            <input type="checkbox" checked={naive} onChange={e => setNaive(e.target.checked)} className="w-4 h-4 accent-action rounded" />
+                            <input type="checkbox" checked={opioidNaive} onChange={e => setOpioidNaive(e.target.checked)} className="w-4 h-4 accent-action rounded" />
                         </label>
 
-                        <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${mat ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200' : 'bg-surface-card border-border'}`}>
+                        <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${homeBuprenorphine ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200' : 'bg-surface-card border-border'}`}>
                             <div>
                                 <span className="text-xs font-bold text-text-primary block">Home Buprenorphine</span>
                                 <span className="text-[10px] text-text-tertiary font-medium">Suboxone / Subutex (MAT)</span>
                             </div>
-                            <input type="checkbox" checked={mat} onChange={e => setMat(e.target.checked)} className="w-4 h-4 accent-indigo-500 rounded" />
+                            <input type="checkbox" checked={homeBuprenorphine} onChange={e => setHomeBuprenorphine(e.target.checked)} className="w-4 h-4 accent-indigo-500 rounded" />
                         </label>
                     </div>
 
@@ -384,8 +334,8 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-bold text-text-tertiary uppercase ml-1">1. Hemodynamics</label>
                             <div className="space-y-1">
-                                <ParameterBtn active={hemo === 'stable'} onClick={() => setHemo('stable')} label="Hemodynamically Stable" />
-                                <ParameterBtn active={hemo === 'unstable'} onClick={() => setHemo('unstable')} label="Shock / Hypotensive" sub="MAP < 65 or Pressors" />
+                                <ParameterBtn active={hemoStatus === 'stable'} onClick={() => setHemoStatus('stable')} label="Hemodynamically Stable" />
+                                <ParameterBtn active={hemoStatus === 'unstable'} onClick={() => setHemoStatus('unstable')} label="Shock / Hypotensive" sub="MAP < 65 or Pressors" />
                             </div>
                         </div>
 
@@ -393,9 +343,9 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-bold text-text-tertiary uppercase ml-1">2. Renal Function</label>
                             <div className="space-y-1">
-                                <ParameterBtn active={renal === 'normal'} onClick={() => setRenal('normal')} label="Normal Function" sub="eGFR > 60" />
-                                <ParameterBtn active={renal === 'impaired'} onClick={() => setRenal('impaired')} label="Impaired / CKD" sub="eGFR < 30" />
-                                <ParameterBtn active={renal === 'dialysis'} onClick={() => setRenal('dialysis')} label="Dialysis Dependent" sub="HD / PD / CRRT" />
+                                <ParameterBtn active={renalFunction === 'normal'} onClick={() => setRenalFunction('normal')} label="Normal Function" sub="eGFR > 60" />
+                                <ParameterBtn active={renalFunction === 'impaired'} onClick={() => setRenalFunction('impaired')} label="Impaired / CKD" sub="eGFR < 30" />
+                                <ParameterBtn active={renalFunction === 'dialysis'} onClick={() => setRenalFunction('dialysis')} label="Dialysis Dependent" sub="HD / PD / CRRT" />
                             </div>
                         </div>
 
@@ -403,9 +353,9 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-bold text-text-tertiary uppercase ml-1">3. GI / Mental Status</label>
                             <div className="space-y-1">
-                                <ParameterBtn active={gi === 'intact'} onClick={() => setGi('intact')} label="Intact / Alert" />
-                                <ParameterBtn active={gi === 'tube'} onClick={() => setGi('tube')} label="Tube / Dysphagia" sub="NGT / OGT / PEG" />
-                                <ParameterBtn active={gi === 'npo'} onClick={() => setGi('npo')} label="NPO / GI Failure / AMS" sub="Ileus / Unresponsive" />
+                                <ParameterBtn active={giStatus === 'intact'} onClick={() => setGiStatus('intact')} label="Intact / Alert" />
+                                <ParameterBtn active={giStatus === 'tube'} onClick={() => setGiStatus('tube')} label="Tube / Dysphagia" sub="NGT / OGT / PEG" />
+                                <ParameterBtn active={giStatus === 'npo'} onClick={() => setGiStatus('npo')} label="NPO / GI Failure / AMS" sub="Ileus / Unresponsive" />
                             </div>
                         </div>
 
@@ -413,10 +363,10 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                         <div className="space-y-1.5 bg-action-bg/5 px-2 py-3 rounded-xl border border-action-border/10">
                             <label className="text-[10px] font-bold text-action uppercase ml-1">4. Desired Route</label>
                             <div className="grid grid-cols-2 gap-2 mt-1">
-                                <ParameterBtn active={route === 'iv'} onClick={() => setRoute('iv')} label="IV / SQ" />
-                                <ParameterBtn active={route === 'po'} onClick={() => setRoute('po')} label="Oral (PO)" />
-                                <ParameterBtn active={route === 'both'} onClick={() => setRoute('both')} label="Both" />
-                                <ParameterBtn active={route === 'either'} onClick={() => setRoute('either')} label="Either" />
+                                <ParameterBtn active={routePreference === 'iv'} onClick={() => setRoutePreference('iv')} label="IV / SQ" />
+                                <ParameterBtn active={routePreference === 'po'} onClick={() => setRoutePreference('po')} label="Oral (PO)" />
+                                <ParameterBtn active={routePreference === 'both'} onClick={() => setRoutePreference('both')} label="Both" />
+                                <ParameterBtn active={routePreference === 'either'} onClick={() => setRoutePreference('either')} label="Either" />
                             </div>
                         </div>
 
@@ -424,9 +374,9 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-bold text-text-tertiary uppercase ml-1">5. Hepatic Function</label>
                             <div className="space-y-1">
-                                <ParameterBtn active={hepatic === 'normal'} onClick={() => setHepatic('normal')} label="Normal Function" />
-                                <ParameterBtn active={hepatic === 'impaired'} onClick={() => setHepatic('impaired')} label="Impaired / Cirrhosis" sub="Child-Pugh A/B" />
-                                <ParameterBtn active={hepatic === 'failure'} onClick={() => setHepatic('failure')} label="Liver Failure" sub="Child-Pugh C" />
+                                <ParameterBtn active={hepaticFunction === 'normal'} onClick={() => setHepaticFunction('normal')} label="Normal Function" />
+                                <ParameterBtn active={hepaticFunction === 'impaired'} onClick={() => setHepaticFunction('impaired')} label="Impaired / Cirrhosis" sub="Child-Pugh A/B" />
+                                <ParameterBtn active={hepaticFunction === 'failure'} onClick={() => setHepaticFunction('failure')} label="Liver Failure" sub="Child-Pugh C" />
                             </div>
                         </div>
 
@@ -464,10 +414,10 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                             <Activity className="w-4 h-4 text-action mt-0.5" />
                             <div className="text-xs text-text-primary leading-relaxed font-medium">
                                 <strong>Non-Opioid Strategy:</strong>
-                                {(hepatic === 'impaired' || hepatic === 'failure' || (hepatic === 'normal' && renal === 'normal')) && (
+                                {(hepaticFunction === 'impaired' || hepaticFunction === 'failure' || (hepaticFunction === 'normal' && renalFunction === 'normal')) && (
                                     <p className="mt-0.5">• Avoid Tylenol {'>'} 4g daily (2g if liver failure).</p>
                                 )}
-                                {(renal === 'impaired' || renal === 'dialysis' || hepatic === 'failure' || (hepatic === 'normal' && renal === 'normal')) && (
+                                {(renalFunction === 'impaired' || renalFunction === 'dialysis' || hepaticFunction === 'failure' || (hepaticFunction === 'normal' && renalFunction === 'normal')) && (
                                     <p className="mt-0.5">• Avoid NSAIDs in HTN/CAD, GI Bleed, Renal Disease, Cirrhosis.</p>
                                 )}
                             </div>

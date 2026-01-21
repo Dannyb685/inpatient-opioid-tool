@@ -18,6 +18,8 @@ import { ReferenceView } from './ReferenceView';
 import { ToolkitView } from './ToolkitView';
 import { ProtocolsView } from './ProtocolsView';
 import { SBIRTView } from './SBIRTView';
+import { LoginView } from './LoginView';
+import { useAuth } from './contexts/AuthContext';
 import { trackPageView } from './analytics';
 
 // --- Shell ---
@@ -58,6 +60,12 @@ const OpioidPrecisionApp = () => {
     React.useEffect(() => {
         trackPageView(activeTab);
     }, [activeTab]);
+
+    const { session } = useAuth();
+
+    if (!session) {
+        return <LoginView />;
+    }
 
     return (
         <div className="flex flex-col md:flex-row h-screen bg-surface-base text-text-primary font-sans overflow-hidden transition-colors duration-300">

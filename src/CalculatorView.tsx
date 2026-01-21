@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {
     Activity,
     Calculator,
@@ -9,21 +9,55 @@ import {
 } from 'lucide-react';
 import { ClinicalCard } from './Shared';
 import { MethadoneCalculator } from './MethadoneCalculator';
+import { useCalculatorStore } from './stores/CalculatorStore';
 
 export const CalculatorView = () => {
-    const [ivMorphine, setIvMorphine] = useState<string | number>(10);
-    const [reduction, setReduction] = useState(30);
-    const [showInfusion, setShowInfusion] = useState(false);
-    const [infusionRate, setInfusionRate] = useState<string | number>(0);
-    const [showSafetyCheck, setShowSafetyCheck] = useState(false);
-    const [showMethadoneCalc, setShowMethadoneCalc] = useState(false);
+    // Ephemeral Store
+    const {
+        ivMorphine, setIvMorphine,
+        reduction, setReduction,
+        infusionRate, setInfusionRate,
+
+        showInfusion, toggleInfusion,
+        showSafetyCheck, toggleSafetyCheck,
+        showMethadoneCalc, toggleMethadoneCalc,
+
+        seedFromAssessment,
+        reset
+    } = useCalculatorStore();
+
+    // Auto-Seed on Mount (Entry into Tab)
+    useEffect(() => {
+        seedFromAssessment();
+
+        // Cleanup on unmount? Or keep state?
+        // iOS pattern: Session-Ephemeral. Reset on tab change?
+        // For now, we seed on entry. If user leaves and comes back, it re-seeds?
+        // Or we persist?
+        // Let's seed on entry to ensure fresh context if patient changed.
+        // Actually, seedFromAssessment pulls current global state.
+
+        // Analytics
+        const timeoutId = setTimeout(() => {
+            try {
+                const analytics = (window as any).posthog;
+                if (analytics) {
+                    analytics.capture('calculation_viewed', {
+                        iv_input: ivMorphine
+                    });
+                }
+            } catch (e) {
+                console.error('Analytics failed', e);
+            }
+        }, 1000);
+        return () => clearTimeout(timeoutId);
+    }, []); // Run ONCE on mount
 
     const convert = (factor: number) => {
         const val = typeof ivMorphine === 'string' ? parseFloat(ivMorphine) || 0 : ivMorphine;
         const raw = val * factor;
         const reduced = raw * (1 - (reduction / 100));
-        // Breakthrough = 10-15% of REDUCED total daily dose. Using ~12.5% (1/8th) or range.
-        // NCCN suggests 10-20%. Let's display 10%.
+        // Breakthrough = 10% of REDUCED total daily dose.
         const btd = reduced * 0.10;
         return {
             raw: raw.toFixed(1),
@@ -33,29 +67,9 @@ export const CalculatorView = () => {
     };
 
     const handleInfusionCalc = (val: string) => {
-        setInfusionRate(val);
         const rate = parseFloat(val) || 0;
-        setIvMorphine(rate * 24);
+        setInfusionRate(rate); // Store definition handles the setIvMorphine side effect
     };
-
-    React.useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            // Analytics integration from origin/main
-            try {
-                const analytics = (window as any).posthog;
-                if (analytics) {
-                    analytics.capture('calculation_updated', {
-                        iv_morphine_dose: ivMorphine,
-                        reduction_percentage: reduction
-                    });
-                }
-            } catch (e) {
-                console.error('Analytics failed', e);
-            }
-        }, 1000); // Debounce for 1 second
-
-        return () => clearTimeout(timeoutId);
-    }, [ivMorphine, reduction]);
 
     return (
         <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto p-4 md:p-0">
@@ -104,7 +118,7 @@ export const CalculatorView = () => {
                             *Include all scheduled doses AND breakthrough doses administered in the last 24 hours.
                         </p>
                         <button
-                            onClick={() => setShowInfusion(!showInfusion)}
+                            onClick={toggleInfusion}
                             className="text-[10px] font-bold text-action bg-action-bg px-2 py-1 rounded-xl border border-action-border/30 hover:bg-action-bg/80 transition-colors"
                         >
                             {showInfusion ? 'Close Helper' : 'Infusion Helper'}
@@ -125,7 +139,7 @@ export const CalculatorView = () => {
                                     <span className="text-xs text-text-tertiary">mg/hr</span>
                                 </div>
                                 <span className="text-xs font-bold text-text-secondary">× 24h =</span>
-                                <span className="text-sm font-bold text-action">{(parseFloat(infusionRate as string) || 0) * 24} mg/day</span>
+                                <span className="text-sm font-bold text-action">{(infusionRate || 0) * 24} mg/day</span>
                             </div>
                         </div>
                     )}
@@ -294,7 +308,7 @@ export const CalculatorView = () => {
                             </div>
                             {!showSafetyCheck && (
                                 <button
-                                    onClick={() => setShowSafetyCheck(true)}
+                                    onClick={toggleSafetyCheck}
                                     className="text-[10px] bg-surface-card border border-warning/30 px-2 py-1 rounded-xl text-warning hover:bg-warning-bg transition-colors font-bold"
                                 >
                                     Show Estimates
@@ -323,7 +337,7 @@ export const CalculatorView = () => {
                                     <div className="flex justify-between items-center">
                                         <h3 className="font-bold text-text-primary">Methadone</h3>
                                         <button
-                                            onClick={() => setShowMethadoneCalc(true)}
+                                            onClick={toggleMethadoneCalc}
                                             className="text-[10px] bg-action text-white px-2 py-1 rounded-lg font-bold hover:bg-action/90 transition-colors shadow-sm"
                                         >
                                             Open Calculator
@@ -334,7 +348,7 @@ export const CalculatorView = () => {
                                     </div>
                                 </div>
 
-                                <button onClick={() => setShowSafetyCheck(false)} className="w-full py-2 text-xs font-bold text-text-tertiary hover:text-text-secondary transition-all">Hide Complex Conversions</button>
+                                <button onClick={toggleSafetyCheck} className="w-full py-2 text-xs font-bold text-text-tertiary hover:text-text-secondary transition-all">Hide Complex Conversions</button>
                             </div>
                         ) : (
                             <div className="p-6 text-center text-text-tertiary text-xs">
@@ -350,13 +364,13 @@ export const CalculatorView = () => {
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
                         <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-surface-base rounded-2xl shadow-2xl relative">
                             <button
-                                onClick={() => setShowMethadoneCalc(false)}
+                                onClick={toggleMethadoneCalc}
                                 className="absolute top-4 right-4 p-2 bg-surface-card rounded-full hover:bg-surface-highlight z-50 text-text-tertiary"
                             >
                                 <X className="w-5 h-5" />
                             </button>
                             <MethadoneCalculator
-                                onClose={() => setShowMethadoneCalc(false)}
+                                onClose={toggleMethadoneCalc}
                                 initialMME={ivMorphine.toString()}
                             />
                         </div>

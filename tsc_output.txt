@@ -1,0 +1,75 @@
+inpatient-opioid-tool/src/analytics.ts(1,21): error TS2792: Cannot find module 'posthog-js'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+inpatient-opioid-tool/src/web.tsx(3,32): error TS2792: Cannot find module './OpioidPrecisionApp'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+main.ts(1,96): error TS2792: Cannot find module 'obsidian'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+main.ts(19,11): error TS2354: This syntax requires an imported helper but module 'tslib' cannot be found.
+main.ts(20,32): error TS2339: Property 'contentEl' does not exist on type 'OpioidView'.
+main.ts(40,14): error TS2339: Property 'registerView' does not exist on type 'OpioidPlugin'.
+main.ts(42,14): error TS7006: Parameter 'leaf' implicitly has an 'any' type.
+main.ts(45,14): error TS2339: Property 'addRibbonIcon' does not exist on type 'OpioidPlugin'.
+main.ts(50,14): error TS2339: Property 'addCommand' does not exist on type 'OpioidPlugin'.
+main.ts(59,14): error TS2339: Property 'addCommand' does not exist on type 'OpioidPlugin'.
+main.ts(99,27): error TS2339: Property 'app' does not exist on type 'OpioidPlugin'.
+main.ts(101,24): error TS2339: Property 'app' does not exist on type 'OpioidPlugin'.
+main.ts(127,39): error TS2339: Property 'app' does not exist on type 'OpioidPlugin'.
+main.ts(129,28): error TS2339: Property 'app' does not exist on type 'OpioidPlugin'.
+main.ts(131,28): error TS2339: Property 'app' does not exist on type 'OpioidPlugin'.
+main.ts(142,36): error TS2339: Property 'app' does not exist on type 'OpioidPlugin'.
+src/analytics.ts(1,21): error TS2792: Cannot find module 'posthog-js'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/AssessmentView.tsx(13,8): error TS2792: Cannot find module 'lucide-react'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/CalculatorView.tsx(9,8): error TS2792: Cannot find module 'lucide-react'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/contexts/AuthContext.tsx(3,31): error TS2792: Cannot find module '@supabase/supabase-js'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/contexts/AuthContext.tsx(18,52): error TS7031: Binding element 'session' implicitly has an 'any' type.
+src/contexts/AuthContext.tsx(25,46): error TS7006: Parameter '_event' implicitly has an 'any' type.
+src/contexts/AuthContext.tsx(25,54): error TS7006: Parameter 'session' implicitly has an 'any' type.
+src/lib/supabase.ts(1,30): error TS2792: Cannot find module '@supabase/supabase-js'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/LoginView.tsx(3,46): error TS2792: Cannot find module 'lucide-react'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/MethadoneCalculator.tsx(13,8): error TS2792: Cannot find module 'lucide-react'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/MethadoneCalculator.tsx(243,46): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/OpioidPrecisionApp.tsx(13,8): error TS2792: Cannot find module 'lucide-react'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/ProtocolsView.tsx(22,8): error TS2792: Cannot find module 'lucide-react'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/ReferenceView.tsx(8,8): error TS2792: Cannot find module 'lucide-react'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/SBIRTView.tsx(14,8): error TS2792: Cannot find module 'lucide-react'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/stores/AssessmentStore.ts(1,24): error TS2792: Cannot find module 'zustand'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/stores/AssessmentStore.ts(2,35): error TS2792: Cannot find module 'zustand/middleware'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/stores/AssessmentStore.ts(71,10): error TS7006: Parameter 'set' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(71,15): error TS7006: Parameter 'get' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(97,22): error TS7006: Parameter 'age' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(101,22): error TS7006: Parameter 'sex' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(105,30): error TS7006: Parameter 'opioidNaive' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(109,36): error TS7006: Parameter 'homeBuprenorphine' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(111,32): error TS7006: Parameter 'renalFunction' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(112,34): error TS7006: Parameter 'hepaticFunction' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(113,29): error TS7006: Parameter 'hemoStatus' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(114,27): error TS7006: Parameter 'painType' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(115,29): error TS7006: Parameter 'indication' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(116,34): error TS7006: Parameter 'routePreference' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(117,27): error TS7006: Parameter 'giStatus' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(118,31): error TS7006: Parameter 'organSupport' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(120,29): error TS7006: Parameter 'sleepApnea' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(124,22): error TS7006: Parameter 'chf' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(128,23): error TS7006: Parameter 'copd' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(129,25): error TS7006: Parameter 'benzos' implicitly has an 'any' type.
+src/stores/AssessmentStore.ts(130,31): error TS7006: Parameter 'psychHistory' implicitly has an 'any' type.
+src/stores/CalculatorStore.ts(1,24): error TS2792: Cannot find module 'zustand'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/stores/CalculatorStore.ts(2,26): error TS2792: Cannot find module 'zustand/middleware'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/stores/CalculatorStore.ts(40,10): error TS7006: Parameter 'set' implicitly has an 'any' type.
+src/stores/CalculatorStore.ts(40,15): error TS7006: Parameter 'get' implicitly has an 'any' type.
+src/stores/CalculatorStore.ts(53,29): error TS7006: Parameter 'ivMorphine' implicitly has an 'any' type.
+src/stores/CalculatorStore.ts(54,28): error TS7006: Parameter 'reduction' implicitly has an 'any' type.
+src/stores/CalculatorStore.ts(55,31): error TS7006: Parameter 'rate' implicitly has an 'any' type.
+src/stores/CalculatorStore.ts(59,40): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/stores/CalculatorStore.ts(60,43): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/stores/CalculatorStore.ts(61,45): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/stores/SBIRTStore.ts(1,24): error TS2792: Cannot find module 'zustand'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/stores/SBIRTStore.ts(2,35): error TS2792: Cannot find module 'zustand/middleware'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+src/stores/SBIRTStore.ts(82,14): error TS7006: Parameter 'set' implicitly has an 'any' type.
+src/stores/SBIRTStore.ts(82,19): error TS7006: Parameter 'get' implicitly has an 'any' type.
+src/stores/SBIRTStore.ts(85,37): error TS7006: Parameter 'id' implicitly has an 'any' type.
+src/stores/SBIRTStore.ts(86,26): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/stores/SBIRTStore.ts(94,28): error TS7006: Parameter 'category' implicitly has an 'any' type.
+src/stores/SBIRTStore.ts(105,35): error TS7006: Parameter 'category' implicitly has an 'any' type.
+src/stores/SBIRTStore.ts(105,45): error TS7006: Parameter 'score' implicitly has an 'any' type.
+src/ToolkitView.tsx(16,8): error TS2792: Cannot find module 'lucide-react'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+tsconfig.json(10,29): error TS6046: Argument for '--moduleResolution' option must be: 'node', 'classic', 'node16', 'nodenext'.
+vite.config.ts(2,30): error TS2792: Cannot find module 'vite'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?
+vite.config.ts(3,19): error TS2792: Cannot find module '@vitejs/plugin-react'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?

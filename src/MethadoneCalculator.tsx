@@ -12,6 +12,7 @@ import {
     CheckCircle2
 } from 'lucide-react';
 import { ClinicalCard } from './Shared';
+import { useAssessmentStore } from './stores/AssessmentStore';
 
 // --- Types ---
 
@@ -239,8 +240,23 @@ const MethadoneStepwiseChart = ({ schedule }: { schedule: MethadoneScheduleStep[
 };
 
 export const MethadoneCalculator = ({ onClose, initialMME }: { onClose: () => void, initialMME?: string }) => {
+    const assessmentAge = useAssessmentStore(state => state.age);
+
+    // Auto-seed local state from Global Store if available, else default to 50
     const [mme, setMme] = useState(initialMME || '');
-    const [age, setAge] = useState(50);
+    const [age, setAge] = useState(() => {
+        const parsed = parseInt(assessmentAge);
+        return !isNaN(parsed) ? parsed : 50;
+    });
+
+    // Update if global store changes while open
+    React.useEffect(() => {
+        const parsed = parseInt(assessmentAge);
+        if (!isNaN(parsed)) {
+            setAge(parsed);
+        }
+    }, [assessmentAge]);
+
     const [qtcIssue, setQtcIssue] = useState(false);
     const [method, setMethod] = useState<ConversionMethod>('Rapid');
 
