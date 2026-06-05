@@ -1,7 +1,0 @@
-build/
-*.o
-ValidationRunner
-validation_runner
-.DS_Store
-*.xcuserstate
-Model/

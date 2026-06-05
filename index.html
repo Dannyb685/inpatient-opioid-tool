@@ -3,30 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opioid Precision | Enterprise CDS Infrastructure</title>
-    <meta name="description" content="Advanced Clinical Decision Support (CDS) for inpatient opioid safety. EMR-integrated logic to mitigate the $95B burden of adverse events.">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        clinical: {
-                            teal: '#0d9488', // Primary
-                            rose: '#e11d48', // Danger
-                            amber: '#d97706', // Warning
-                            slate: '#0f172a',
-                            bg: '#f8fafc'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', '-apple-system', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Precision Analgesia | Enterprise CDS Infrastructure</title>
+    <meta name="description" content="Precision Analgesia — Advanced Clinical Decision Support (CDS) for inpatient opioid safety. EMR-integrated logic to mitigate the $95B burden of adverse events. A product of Lifeline Medical Technologies.">
+    <link rel="canonical" href="https://opioidprecision.com/">
+
+    <!-- Open Graph / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Precision Analgesia | The Logic Layer for Inpatient Stewardship">
+    <meta property="og:description" content="Advanced Clinical Decision Support (CDS) for inpatient opioid safety. EMR-integrated forcing functions to mitigate liability and cost.">
+    <meta property="og:image" content="assets/og_social_card.png">
+    <meta property="og:url" content="https://opioidprecision.com/">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Precision Analgesia | Enterprise CDS Infrastructure">
+    <meta name="twitter:description" content="Advanced Clinical Decision Support (CDS) for inpatient opioid safety. A product of Lifeline Medical Technologies.">
+    <meta name="twitter:image" content="assets/og_social_card.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Compiled Tailwind CSS -->
+    <link rel="stylesheet" href="assets/marketing.compiled.css">
+
+    <!-- Lucide Icons (pinned version) -->
+    <script src="https://unpkg.com/lucide@0.460.0"></script>
+
+    <!-- Instagram -->
+    <meta property="og:see_also" content="https://www.instagram.com/lifelinemedtech/">
 </head>
 <body class="bg-slate-50 text-slate-900 selection:bg-teal-100 font-sans">
 
@@ -43,40 +53,69 @@
                 <div class="w-8 h-8 bg-clinical-teal rounded-lg flex items-center justify-center text-white font-bold">
                     <i data-lucide="activity" class="w-5 h-5"></i>
                 </div>
-                <span class="font-bold text-slate-800 tracking-tight">Opioid Precision</span>
+                <span class="font-bold text-slate-800 tracking-tight">Precision Analgesia</span>
             </div>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
                 <a href="#impact" class="hover:text-clinical-teal transition">The $95B Liability</a>
                 <a href="#solution" class="hover:text-clinical-teal transition">Logic Engine</a>
                 <a href="#benchmarks" class="hover:text-clinical-teal transition">Strategic Benchmarks</a>
             </div>
-            <div class="flex gap-3">
+            <div class="flex gap-3 items-center">
                  <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="hidden sm:flex bg-clinical-slate text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition items-center gap-2">
                     <i data-lucide="smartphone" class="w-4 h-4"></i> Beta
+                </a>
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-slate-100 transition" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                    <i data-lucide="menu" class="w-5 h-5 text-slate-600"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white px-6 py-4">
+            <div class="flex flex-col gap-3 text-sm font-medium text-slate-600">
+                <a href="#impact" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">The $95B Liability</a>
+                <a href="#solution" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Logic Engine</a>
+                <a href="#benchmarks" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Strategic Benchmarks</a>
+                <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="sm:hidden bg-clinical-slate text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition text-center">
+                    Demo the iOS Beta
                 </a>
             </div>
         </div>
     </nav>
 
-    <section class="relative pt-20 pb-20 px-6 max-w-6xl mx-auto text-center">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 border border-teal-100 text-clinical-teal text-xs font-bold rounded-full mb-6 uppercase tracking-wider">
-            <span class="w-2 h-2 rounded-full bg-clinical-teal animate-pulse"></span>
-            Qualified Abatement Technology
-        </div>
-        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-slate-900 leading-tight">
-            The Logic Layer for <br>
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-clinical-teal to-cyan-500">Inpatient Stewardship</span>
-        </h1>
-        <p class="text-xl md:text-2xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed font-light">
-            We resolve the tension between pain management and safety. Replaces manual calculation with <strong>EMR-integrated forcing functions</strong> to mitigate liability and cost.
-        </p>
-        <div class="flex justify-center gap-4 flex-col sm:flex-row">
-            <a href="mailto:dan@opioidprecision.com?subject=Integration%20Guide%20Request" class="bg-clinical-teal text-white px-8 py-4 rounded-xl font-semibold hover:bg-teal-700 transition shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2">
-                <i data-lucide="server" class="w-5 h-5"></i> Request Integration Guide
-            </a>
-            <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-xl font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
-                <i data-lucide="smartphone" class="w-5 h-5"></i> Demo the iOS Beta
-            </a>
+    <section class="relative pt-20 pb-20 px-6 max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row items-center gap-12">
+            <!-- Left: Text -->
+            <div class="flex-1 text-center md:text-left">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 border border-teal-100 text-clinical-teal text-xs font-bold rounded-full mb-6 uppercase tracking-wider">
+                    <span class="w-2 h-2 rounded-full bg-clinical-teal animate-pulse"></span>
+                    Qualified Abatement Technology
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-slate-900 leading-tight">
+                    The Logic Layer for <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-clinical-teal to-cyan-500">Inpatient Stewardship</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-slate-600 mb-10 max-w-3xl leading-relaxed font-light">
+                    Precision Analgesia resolves the tension between pain management and safety. Replaces manual calculation with <strong>EMR-integrated forcing functions</strong> to mitigate liability and cost.
+                </p>
+                <div class="flex gap-4 flex-col sm:flex-row justify-center md:justify-start">
+                    <a href="mailto:dan@lifelinemedtech.org?subject=Integration%20Guide%20Request" class="bg-clinical-teal text-white px-8 py-4 rounded-xl font-semibold hover:bg-teal-700 transition shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2">
+                        <i data-lucide="server" class="w-5 h-5"></i> Request Integration Guide
+                    </a>
+                    <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-xl font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                        <i data-lucide="smartphone" class="w-5 h-5"></i> Demo the iOS Beta
+                    </a>
+                </div>
+                <!-- Social Proof -->
+                <div class="mt-8 flex items-center gap-3 justify-center md:justify-start text-sm text-slate-500">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-clinical-teal"></i>
+                    <span>Validated against <strong class="text-slate-700">CDC 2022 Clinical Practice Guidelines</strong></span>
+                </div>
+            </div>
+            <!-- Right: Product Mockup -->
+            <div class="flex-shrink-0 w-full md:w-auto flex justify-center">
+                <img src="assets/hero_product_mockup.png" alt="Precision Analgesia iOS app showing the Opioid Calculator" class="w-72 md:w-80 drop-shadow-2xl">
+            </div>
         </div>
     </section>
 
@@ -242,44 +281,37 @@
     <section class="py-24 px-6 bg-white border-b border-slate-200">
         <div class="max-w-6xl mx-auto">
              <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold mb-4 text-slate-900">Strategic Recommendations</h2>
-                <p class="text-slate-600 max-w-2xl mx-auto">A roadmap for hospital leadership to mitigate risk and utilize settlement funds.</p>
+                <h2 class="text-3xl font-bold mb-4 text-slate-900">How Precision Analgesia Delivers</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">Automated capabilities that transform clinical recommendations into enforceable EHR logic — no additional training required.</p>
             </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div class="p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-clinical-teal transition">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="bg-clinical-teal/10 p-2 rounded-lg text-clinical-teal"><i data-lucide="monitor" class="w-5 h-5"></i></div>
-                        <h4 class="font-bold text-slate-900">Invest in Monitoring</h4>
+                        <h4 class="font-bold text-slate-900">Continuous Monitoring</h4>
                     </div>
-                    <p class="text-sm text-slate-600">The ROI on continuous capnography for high-risk patients (identified via PRODIGY) is positive due to the extreme cost of treating OIRD.</p>
+                    <p class="text-sm text-slate-600">Identifies high-risk patients via PRODIGY-derived scoring and flags them for continuous capnography — turning positive ROI into automated workflow.</p>
                 </div>
                 <div class="p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-clinical-teal transition">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="bg-clinical-teal/10 p-2 rounded-lg text-clinical-teal"><i data-lucide="lock" class="w-5 h-5"></i></div>
-                        <h4 class="font-bold text-slate-900">Hardwire Stewardship</h4>
+                        <h4 class="font-bold text-slate-900">Hardwired Stewardship</h4>
                     </div>
-                    <p class="text-sm text-slate-600">Rely on EHR defaults, hard stops, and order sets rather than relying solely on provider education.</p>
+                    <p class="text-sm text-slate-600">Enforces EHR defaults, hard stops, and order set constraints automatically — eliminating reliance on provider memory or education alone.</p>
                 </div>
                 <div class="p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-clinical-teal transition">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="bg-clinical-teal/10 p-2 rounded-lg text-clinical-teal"><i data-lucide="message-square" class="w-5 h-5"></i></div>
-                        <h4 class="font-bold text-slate-900">Prioritize Communication</h4>
+                        <h4 class="font-bold text-slate-900">Communication Metrics</h4>
                     </div>
-                    <p class="text-sm text-slate-600">Train staff on the new HCAHPS "communication" metrics to maintain satisfaction while reducing MMEs.</p>
+                    <p class="text-sm text-slate-600">Built-in patient communication templates aligned with new HCAHPS scoring — maintain satisfaction while reducing MMEs.</p>
                 </div>
                  <div class="p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-clinical-teal transition">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-clinical-teal/10 p-2 rounded-lg text-clinical-teal"><i data-lucide="bot" class="w-5 h-5"></i></div>
-                        <h4 class="font-bold text-slate-900">Adopt AI</h4>
-                    </div>
-                    <p class="text-sm text-slate-600">Leverage new AI tools to find hidden risk in unstructured data, preventing costly readmissions.</p>
-                </div>
-                 <div class="p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-clinical-teal transition md:col-span-2 lg:col-span-2">
-                    <div class="flex items-center gap-3 mb-4">
                         <div class="bg-clinical-teal/10 p-2 rounded-lg text-clinical-teal"><i data-lucide="gavel" class="w-5 h-5"></i></div>
-                        <h4 class="font-bold text-slate-900">Prepare for Liability</h4>
+                        <h4 class="font-bold text-slate-900">Litigation Defense</h4>
                     </div>
-                    <p class="text-sm text-slate-600">Assume that "failure to monitor" and "corporate negligence" will be the primary legal theories in future opioid litigation. Build defenses (protocols, OSPs) accordingly.</p>
+                    <p class="text-sm text-slate-600">Generates auditable logs of every forcing function and override, building a defensible record against "failure to monitor" and "corporate negligence" claims.</p>
                 </div>
             </div>
         </div>
@@ -292,18 +324,43 @@
                 The era of unchecked opioid prescribing in hospitals is over, replaced by a data-driven, risk-aware approach. The most successful health systems are those that view opioid safety not as a compliance burden but as a quality and financial imperative. By balancing the moral imperative to treat pain with the ethical duty to do no harm, hospitals can navigate this complex landscape.
             </p>
             <div class="flex flex-col md:flex-row justify-center gap-4">
-                <a href="mailto:dan@opioidprecision.com" class="bg-clinical-teal text-white px-10 py-4 rounded-xl font-bold hover:bg-teal-700 transition shadow-lg shadow-teal-500/20">
+                <a href="mailto:dan@lifelinemedtech.org" class="bg-clinical-teal text-white px-10 py-4 rounded-xl font-bold hover:bg-teal-700 transition shadow-lg shadow-teal-500/20">
                     Contact for Licensing
                 </a>
                 <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-white text-slate-900 border border-slate-200 px-10 py-4 rounded-xl font-bold hover:bg-slate-50 transition">
                     Join iOS Beta
                 </a>
             </div>
-            <p class="mt-12 text-xs text-slate-500 uppercase tracking-widest">
-                Developed by Dan Bergholz, MD
-            </p>
         </div>
     </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 text-slate-400 py-12 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex flex-col items-center md:items-start gap-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-clinical-teal rounded-md flex items-center justify-center text-white">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
+                    </div>
+                    <span class="font-semibold text-slate-300 text-sm">Precision Analgesia</span>
+                    <span class="text-xs text-slate-500">by Lifeline Medical Technologies, LLC</span>
+                </div>
+                <p class="text-xs text-slate-500">
+                    Non-Device Clinical Decision Support Tool — Section 3060(o)(1)(E) of the 21st Century Cures Act.
+                </p>
+            </div>
+            <div class="flex flex-col items-center md:items-end gap-2">
+                <div class="flex gap-4 text-sm">
+                    <a href="privacy.html" class="hover:text-white transition">Privacy Policy</a>
+                    <a href="support.html" class="hover:text-white transition">Support</a>
+                    <a href="https://www.instagram.com/lifelinemedtech/" target="_blank" class="hover:text-white transition">Instagram</a>
+                </div>
+                <p class="text-xs text-slate-500">
+                    © 2026 Lifeline Medical Technologies, LLC. All rights reserved. | dan@lifelinemedtech.org
+                </p>
+            </div>
+        </div>
+    </footer>
 
     <script>
         lucide.createIcons();

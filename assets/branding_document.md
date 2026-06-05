@@ -1,11 +1,17 @@
-# Opioid Precision: Brand Identity Guidelines
+# Precision Analgesia: Brand Identity Guidelines
 
-![Opioid Precision Icon](./app_icon_medical_precision.png)
+![Precision Analgesia Icon](./app_icon_medical_precision.png)
 
 ## 1. Brand Overview
-**Name:** Opioid Precision  
+**Product Name:** Precision Analgesia  
+**Company:** Lifeline Medical Technologies, LLC  
 **Tagline:** Precision Safety for Clinical Care.  
 **Mission:** To equip inpatient clinicians with a modern, fast, and safety-centric tool for managing opioid therapy. We replace outdated paper tables with intelligent, context-aware precision.
+
+**Naming Convention:**
+- **Product Name (Primary):** Precision Analgesia — used on the website, app, App Store, and all product-facing materials.
+- **Holding Company:** Lifeline Medical Technologies, LLC — used in legal, footer attribution, and corporate contexts.
+- **Sales Subtitles:** "The Opioid Stewardship Engine" or "Qualified Opioid Abatement Technology" — used in marketing collateral directed at hospital executives seeking settlement funds.
 
 ## 2. Visual Identity
 
@@ -26,9 +32,10 @@ Our palette is chosen to convey calmness, clinical cleanliness, and urgent safet
 | **Background** | `#f8fafc` | App Background (Off-white/Slate-50) |
 
 ### Typography
-**Font Family:** System Default San-Serif (SF Pro / Inter).
+**Font Family:** Inter / System Default San-Serif (SF Pro on iOS).
 -   **Usage:** Clean, legible, and native-feeling.
 -   **Weights:** Heavy use of **Bold** for values and headers; *Regular* for explanatory text. Uppercase `text-xs` used for labels to maintain structure.
+-   **Web:** Loaded from Google Fonts (`Inter:wght@300;400;500;600;700;800;900`).
 
 ## 3. UI/UX Philosophy
 1.  **Safety First:** Warnings and contraindications are always red and prominent.
@@ -40,3 +47,8 @@ Our palette is chosen to convey calmness, clinical cleanliness, and urgent safet
 -   **Professional:** "Hemodynamically Stable" vs "Blood pressure is good".
 -   **Direct:** "Reduce dose 50%" vs "You might want to lower the dose".
 -   **Supportive:** "Consult Pain Specialist" is a tool, not a failure.
+
+## 5. Social Media & Contact
+-   **Website:** [opioidprecision.com](https://opioidprecision.com)
+-   **Instagram:** [@lifelinemedtech](https://www.instagram.com/lifelinemedtech/)
+-   **Email:** dan@lifelinemedtech.org
