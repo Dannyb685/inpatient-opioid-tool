@@ -59,8 +59,8 @@
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
                 <a href="#impact" class="hover:text-clinical-teal transition">The Problem</a>
                 <a href="#ios-app" class="hover:text-clinical-teal transition">The iOS App</a>
-                <a href="integration.html" class="hover:text-clinical-teal transition">EMR Integration</a>
-                <a href="appstore.html" class="hover:text-clinical-teal transition">Clinical Showcase</a>
+                <a href="#architecture" class="hover:text-clinical-teal transition">EMR Integration</a>
+                <a href="#benchmarks" class="hover:text-clinical-teal transition">Benchmarks</a>
             </div>
             <div class="flex gap-3 items-center">
                  <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="hidden sm:flex bg-clinical-slate text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition items-center gap-2">
@@ -77,8 +77,8 @@
             <div class="flex flex-col gap-3 text-sm font-medium text-slate-600">
                 <a href="#impact" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">The Problem</a>
                 <a href="#ios-app" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">The iOS App</a>
-                <a href="integration.html" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">EMR Integration</a>
-                <a href="appstore.html" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Clinical Showcase</a>
+                <a href="#architecture" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">EMR Integration</a>
+                <a href="#benchmarks" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Benchmarks</a>
                 <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="sm:hidden bg-clinical-slate text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition text-center">
                     Join iOS Beta
                 </a>
@@ -122,7 +122,7 @@
                     <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-clinical-teal text-white px-8 py-4 rounded-xl font-semibold hover:bg-teal-700 transition shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2">
                         <i data-lucide="smartphone" class="w-5 h-5"></i> Join iOS Beta
                     </a>
-                    <a href="integration.html" class="bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-xl font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                    <a href="#architecture" class="bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-xl font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
                         <i data-lucide="server" class="w-5 h-5"></i> EMR Integration Guide
                     </a>
                 </div>
@@ -301,8 +301,8 @@
                         <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-clinical-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-teal-700 transition shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2 text-sm">
                             <i data-lucide="smartphone" class="w-4 h-4"></i> Join TestFlight Beta
                         </a>
-                        <a href="appstore.html" class="bg-white text-slate-700 border border-slate-200 px-6 py-3 rounded-xl font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm">
-                            <i data-lucide="image" class="w-4 h-4"></i> View Full Feature Showcase →
+                        <a href="#architecture" class="bg-white text-slate-700 border border-slate-200 px-6 py-3 rounded-xl font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm">
+                            <i data-lucide="server" class="w-4 h-4"></i> View EMR Integration →
                         </a>
                     </div>
                 </div>
@@ -329,6 +329,212 @@
                         </button>
                     </div>
                     <p class="text-center text-xs text-slate-400 mt-2 font-medium">Swipe to view more screenshots</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+<!-- How It Works / Architecture -->
+    <section id="architecture" class="py-24 px-6 bg-white border-b border-slate-200">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <div class="inline-block px-3 py-1 bg-teal-50 text-clinical-teal text-xs font-bold rounded-full mb-4 uppercase tracking-wider border border-teal-100">
+                    SMART on FHIR + CDS Hooks
+                </div>
+                <h2 class="text-3xl font-bold mb-4 text-slate-900">How Integration Works</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">Three steps from clinician action to evidence-based recommendation — no additional training, no workflow disruption.</p>
+            </div>
+
+            <!-- 3-Step Flow -->
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-clinical-teal/10 rounded-2xl flex items-center justify-center text-clinical-teal mx-auto mb-6">
+                        <i data-lucide="mouse-pointer-click" class="w-8 h-8"></i>
+                    </div>
+                    <div class="text-sm font-bold text-clinical-teal uppercase tracking-wide mb-2">Step 1</div>
+                    <h3 class="text-xl font-bold mb-3 text-slate-900">Launch</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Physician clicks a button in Epic or Cerner. The EMR opens a secure SMART on FHIR session — either embedded in the chart or in a new window.
+                    </p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-clinical-teal/10 rounded-2xl flex items-center justify-center text-clinical-teal mx-auto mb-6">
+                        <i data-lucide="lock" class="w-8 h-8"></i>
+                    </div>
+                    <div class="text-sm font-bold text-clinical-teal uppercase tracking-wide mb-2">Step 2</div>
+                    <h3 class="text-xl font-bold mb-3 text-slate-900">Handshake</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        OAuth 2.0 token exchange authenticates the session. The app queries patient demographics, lab values (eGFR, LFTs, QTc), and current medications via FHIR R4.
+                    </p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-clinical-teal/10 rounded-2xl flex items-center justify-center text-clinical-teal mx-auto mb-6">
+                        <i data-lucide="sparkles" class="w-8 h-8"></i>
+                    </div>
+                    <div class="text-sm font-bold text-clinical-teal uppercase tracking-wide mb-2">Step 3</div>
+                    <h3 class="text-xl font-bold mb-3 text-slate-900">Result</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        App loads instantly with patient context pre-filled. Safety gates auto-execute, OIRD risk is scored, and the clinician receives gated, evidence-based recommendations.
+                    </p>
+                </div>
+            </div>
+
+            <!-- CDS Hooks Detail -->
+            <div class="bg-slate-900 rounded-2xl p-8 md:p-12 text-white mb-16">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="flex items-center gap-2 text-sm text-white bg-white/10 px-4 py-2 rounded-full border border-white/20">
+                                <i data-lucide="webhook" class="w-4 h-4"></i> CDS Hooks
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-purple-400 bg-purple-500/10 px-4 py-2 rounded-full border border-purple-500/20">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i> BPA Integration
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Real-Time Intervention at Point of Prescribing</h3>
+                        <p class="text-slate-400 leading-relaxed mb-6">
+                            When a clinician selects or signs an opioid order, Epic fires a CDS Hook to our service endpoint. The Precision Analgesia engine evaluates all 10 safety rules in real-time and returns actionable cards — warnings, dose adjustments, and alternative recommendations.
+                        </p>
+                        <p class="text-slate-400 leading-relaxed">
+                            For critical safety gates (renal contraindications, pediatric black box warnings), hospital Epic teams configure <strong class="text-white">Best Practice Advisories (BPAs)</strong> powered by our logic — creating true forcing functions that require clinical justification to override.
+                        </p>
+                    </div>
+                    <div class="flex-shrink-0 md:w-80">
+                        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 text-sm font-mono">
+                            <div class="text-slate-500 mb-3">// CDS Hook Trigger Points</div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-white">●</span>
+                                <span class="text-slate-300">order-select</span>
+                                <span class="text-slate-500 ml-auto text-xs">Pre-sign</span>
+                            </div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-white">●</span>
+                                <span class="text-slate-300">order-sign</span>
+                                <span class="text-slate-500 ml-auto text-xs">Final gate</span>
+                            </div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-white">●</span>
+                                <span class="text-slate-300">patient-view</span>
+                                <span class="text-slate-500 ml-auto text-xs">Risk display</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-purple-400">●</span>
+                                <span class="text-slate-300">encounter-discharge</span>
+                                <span class="text-slate-500 ml-auto text-xs">OUD follow-up</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FHIR Resources -->
+            <div>
+                <h3 class="text-xl font-bold mb-6 text-slate-900 text-center">FHIR R4 Resources Consumed</h3>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="user" class="w-4 h-4 text-clinical-teal"></i>
+                            <span class="font-bold text-sm text-slate-900">Patient</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Age, sex, demographics</p>
+                    </div>
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-clinical-teal"></i>
+                            <span class="font-bold text-sm text-slate-900">Condition</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Renal, hepatic, pregnancy, COPD, OSA, CHF (ICD-10)</p>
+                    </div>
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="flask-conical" class="w-4 h-4 text-clinical-teal"></i>
+                            <span class="font-bold text-sm text-slate-900">Observation</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Creatinine/eGFR, LFTs, QTc interval (LOINC)</p>
+                    </div>
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="pill" class="w-4 h-4 text-clinical-teal"></i>
+                            <span class="font-bold text-sm text-slate-900">MedicationRequest</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Active opioids, benzodiazepines, naltrexone (RxNorm)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- Implementation Timeline -->
+    <section id="timeline" class="py-24 px-6 bg-white border-b border-slate-200">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4 text-slate-900">Implementation Timeline</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">From sandbox validation to live clinical deployment — a structured, low-risk rollout designed for enterprise health systems.</p>
+            </div>
+
+            <div class="relative">
+                <!-- Timeline line -->
+                <div class="hidden md:block absolute left-1/2 transform -translate-x-px top-0 bottom-0 w-0.5 bg-slate-200"></div>
+
+                <!-- Phase 1 -->
+                <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
+                    <div class="md:w-1/2 md:text-right md:pr-12">
+                        <div class="inline-block px-3 py-1 bg-teal-50 text-clinical-teal text-xs font-bold rounded-full mb-3 uppercase">Phase 1 — Months 1–2</div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-900">Sandbox Validation</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Register on Epic's developer portal. Build SMART on FHIR launch flow, implement FHIR R4 queries, validate CDS Hooks service endpoint against synthetic patient data.
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 bg-clinical-teal rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-teal-500/30 z-10">
+                        <i data-lucide="code" class="w-5 h-5"></i>
+                    </div>
+                    <div class="md:w-1/2 md:pl-12"></div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
+                    <div class="md:w-1/2 md:pr-12 md:order-1 order-2"></div>
+                    <div class="w-10 h-10 bg-clinical-amber rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-amber-500/30 z-10 order-1 md:order-2" style="background-color:#F57C00">
+                        <i data-lucide="building-2" class="w-5 h-5"></i>
+                    </div>
+                    <div class="md:w-1/2 md:pl-12 order-3">
+                        <div class="inline-block px-3 py-1 bg-amber-50 text-clinical-amber text-xs font-bold rounded-full mb-3 uppercase" style="color:#F57C00">Phase 2 — Months 2–3</div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-900">Hospital Partner Onboarding</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Security risk assessment and HIPAA BAA execution with partner hospital. Epic staging environment configuration, clinical workflow review with pharmacy and nurse informaticists. Private SMART app registration — no Connection Hub listing required for pilot.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
+                    <div class="md:w-1/2 md:text-right md:pr-12">
+                        <div class="inline-block px-3 py-1 bg-purple-50 text-purple-600 text-xs font-bold rounded-full mb-3 uppercase">Phase 3 — Months 3–4</div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-900">Clinical Pilot</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Limited deployment on select medical-surgical floors. Real-world clinical validation with identified physician champions. Data collection and outcome tracking against baseline metrics.
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-purple-500/30 z-10">
+                        <i data-lucide="stethoscope" class="w-5 h-5"></i>
+                    </div>
+                    <div class="md:w-1/2 md:pl-12"></div>
+                </div>
+
+                <!-- Phase 4 -->
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="md:w-1/2 md:pr-12 md:order-1 order-2"></div>
+                    <div class="w-10 h-10 bg-clinical-teal rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-teal-500/30 z-10 order-1 md:order-2">
+                        <i data-lucide="rocket" class="w-5 h-5"></i>
+                    </div>
+                    <div class="md:w-1/2 md:pl-12 order-3">
+                        <div class="inline-block px-3 py-1 bg-teal-50 text-clinical-teal text-xs font-bold rounded-full mb-3 uppercase">Phase 4 — Months 5–10</div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-900">Enterprise Deployment</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Pilot expansion, Epic Connection Hub listing application, and broader system-wide availability. Continuous outcome tracking for ROI documentation and settlement fund reporting.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -466,8 +672,6 @@
             </div>
             <div class="flex flex-col items-center md:items-end gap-2">
                 <div class="flex gap-4 text-sm text-slate-400">
-                    <a href="appstore" class="hover:text-white transition">Clinical Showcase</a>
-                    <a href="integration.html" class="hover:text-white transition">EMR Integration</a>
                     <a href="privacy" class="hover:text-white transition">Privacy Policy</a>
                     <a href="support" class="hover:text-white transition">Support</a>
                     <a href="https://www.instagram.com/lifelinemedtech/" target="_blank" class="hover:text-white transition">Instagram</a>
