@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Store Connect | Precision Analgesia</title>
+    <title>Precision Analgesia on the App Store</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,325 +20,172 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f5f5f7;
+            color: #1d1d1f;
         }
-        .asc-sidebar-item.active {
-            background-color: #e3e3e8;
-            color: #0071e3;
-            font-weight: 600;
+        /* Apple Web Design System Colors */
+        .apple-blue {
+            color: #0066cc;
         }
-        /* App Store Connect Apple Blue */
-        .text-asc-blue {
-            color: #0071e3;
+        .bg-apple-blue {
+            background-color: #0066cc;
         }
-        .bg-asc-blue {
-            background-color: #0071e3;
+        .bg-apple-blue:hover {
+            background-color: #0044aa;
         }
-        .border-asc-blue {
-            border-color: #0071e3;
+        .apple-grey-bg {
+            background-color: #f5f5f7;
         }
-        /* Custom scrollbar for simulator */
-        .simulator-content::-webkit-scrollbar {
-            width: 4px;
+        .apple-border {
+            border-color: #e5e5ea;
         }
-        .simulator-content::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.05);
+        /* Custom scrollbar for screenshots */
+        .screenshot-container::-webkit-scrollbar {
+            height: 6px;
         }
-        .simulator-content::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.2);
-            border-radius: 4px;
+        .screenshot-container::-webkit-scrollbar-track {
+            background: #f5f5f7;
+            border-radius: 10px;
+        }
+        .screenshot-container::-webkit-scrollbar-thumb {
+            background: #d1d1d6;
+            border-radius: 10px;
         }
     </style>
 </head>
-<body class="h-full flex flex-col text-slate-800 antialiased overflow-hidden">
+<body class="antialiased min-h-screen flex flex-col">
 
-    <!-- Top Navigation Bar -->
-    <header class="bg-[#1e1e1f] text-white h-12 px-6 flex items-center justify-between z-50 flex-none border-b border-neutral-800">
-        <div class="flex items-center gap-6">
-            <div class="flex items-center gap-2">
-                <i data-lucide="layout-grid" class="w-5 h-5 text-gray-400"></i>
-                <span class="font-semibold tracking-tight text-sm text-gray-200">App Store Connect</span>
+    <!-- Translucent Apple Header Navigation Bar Mock -->
+    <nav class="bg-[#1d1d1f]/90 backdrop-blur-md text-[#f5f5f7] sticky top-0 z-50 text-xs border-b border-neutral-800 flex-none h-11">
+        <div class="max-w-5xl mx-auto px-6 h-full flex items-center justify-between font-normal tracking-tight">
+            <div class="flex items-center gap-6 md:gap-8 overflow-x-auto scrollbar-none py-1 w-full justify-between md:justify-start">
+                <a href="index.html" class="hover:text-white transition flex items-center gap-1.5 font-semibold">
+                    <i data-lucide="activity" class="w-4 h-4 text-teal-400"></i>
+                    <span>Precision Analgesia</span>
+                </a>
+                <span class="text-neutral-600 hidden md:inline">|</span>
+                <span class="hover:text-white transition cursor-pointer font-medium text-white">App Store Preview</span>
+                <span class="text-neutral-500 text-[10px] bg-neutral-800 border border-neutral-700 px-2 py-0.5 rounded font-mono hidden md:inline">Vercel Abatement Deployment</span>
             </div>
-            <div class="h-4 w-[1px] bg-neutral-700"></div>
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 bg-cyan-600 rounded-md flex items-center justify-center text-white text-[10px] font-bold">
-                    PA
-                </div>
-                <span class="text-xs font-medium text-gray-300">Precision Analgesia</span>
-                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded font-mono font-bold">1.0 Ready for Review</span>
-            </div>
+            <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="hidden md:flex bg-apple-blue text-white px-3 py-1 rounded-full text-[11px] font-bold transition shadow-sm">
+                Join Beta
+            </a>
         </div>
-        <div class="flex items-center gap-4 text-xs text-gray-400">
-            <span class="hover:text-white transition cursor-pointer">Help &amp; Support</span>
-            <div class="h-3 w-[1px] bg-neutral-800"></div>
-            <div class="w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-slate-600">
-                DB
-            </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-6 py-8 md:py-12 flex flex-col gap-8">
+        
+        <!-- Breadcrumbs -->
+        <div class="text-xs text-neutral-500 flex items-center gap-1">
+            <span>App Store Preview</span>
+            <i data-lucide="chevron-right" class="w-3 h-3"></i>
+            <span class="text-neutral-600 font-medium">Medical</span>
+            <i data-lucide="chevron-right" class="w-3 h-3"></i>
+            <span class="text-neutral-400">Precision Analgesia</span>
         </div>
-    </header>
 
-    <!-- Main Workspace -->
-    <div class="flex-1 flex overflow-hidden">
-
-        <!-- Left Sidebar -->
-        <aside class="w-64 bg-[#f2f2f7] border-r border-slate-200 flex flex-col flex-none overflow-y-auto">
-            <div class="p-4 flex flex-col gap-1 border-b border-slate-200">
-                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2">App Store</div>
-                <button onclick="switchTab('app-info')" id="sidebar-app-info" class="asc-sidebar-item active w-full text-left px-3 py-2 rounded-lg text-xs flex items-center gap-2 text-slate-600 hover:bg-slate-200 transition">
-                    <i data-lucide="info" class="w-3.5 h-3.5"></i> App Information
-                </button>
-                <button onclick="switchTab('pricing')" id="sidebar-pricing" class="asc-sidebar-item w-full text-left px-3 py-2 rounded-lg text-xs flex items-center gap-2 text-slate-600 hover:bg-slate-200 transition">
-                    <i data-lucide="credit-card" class="w-3.5 h-3.5"></i> Pricing &amp; Availability
-                </button>
-                <button onclick="switchTab('regulations')" id="sidebar-regulations" class="asc-sidebar-item w-full text-left px-3 py-2 rounded-lg text-xs flex items-center gap-2 text-slate-600 hover:bg-slate-200 transition">
-                    <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Regulations &amp; Permits
-                </button>
+        <!-- Custom Product Page Interactive Segment Control (PROMOTIONAL KEYBOARD) -->
+        <div class="bg-white border apple-border p-4 md:p-5 rounded-2xl shadow-sm flex flex-col gap-4">
+            <div>
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+                    <i data-lucide="layers" class="w-4 h-4 text-apple-blue"></i>
+                    Clinical focus preview
+                </h3>
+                <p class="text-xs text-neutral-500 mt-1">Select a clinical campaign option below to see how our App Store product listing adapts details, screenshots, and deep links for targeted medical settings.</p>
             </div>
-
-            <div class="p-4 flex flex-col gap-1 border-b border-slate-200">
-                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2">iOS App</div>
-                <button onclick="switchTab('version-info')" id="sidebar-version-info" class="asc-sidebar-item w-full text-left px-3 py-2 rounded-lg text-xs flex items-center gap-2 text-slate-600 hover:bg-slate-200 transition">
-                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i> 1.0 Ready for Submission
-                </button>
-                <button onclick="switchTab('cpp')" id="sidebar-cpp" class="asc-sidebar-item w-full text-left px-3 py-2 rounded-lg text-xs flex items-center gap-2 text-slate-600 hover:bg-slate-200 transition">
-                    <i data-lucide="layers" class="w-3.5 h-3.5"></i> Custom Product Pages <span class="bg-blue-500/10 text-blue-600 px-1 rounded-full text-[9px] font-bold ml-auto border border-blue-200">3 / 70</span>
-                </button>
-                <button onclick="switchTab('subscriptions')" id="sidebar-subscriptions" class="asc-sidebar-item w-full text-left px-3 py-2 rounded-lg text-xs flex items-center gap-2 text-slate-600 hover:bg-slate-200 transition">
-                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Subscriptions
-                </button>
-                <button onclick="switchTab('review-info')" id="sidebar-review-info" class="asc-sidebar-item w-full text-left px-3 py-2 rounded-lg text-xs flex items-center gap-2 text-slate-600 hover:bg-slate-200 transition">
-                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> App Review Information
-                </button>
-            </div>
-
-            <!-- Meta Links & Export Info -->
-            <div class="mt-auto p-4 flex flex-col gap-3">
-                <button onclick="exportMetadata()" class="w-full bg-white border border-slate-300 text-slate-700 text-xs py-2 rounded-lg font-medium hover:bg-slate-50 shadow-sm flex items-center justify-center gap-1.5 transition">
-                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Configuration
-                </button>
-                <div class="text-[10px] text-slate-400 text-center leading-normal">
-                    Lifeline Medical Technologies<br>© 2026 • All Rights Reserved
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Panel Content -->
-        <main class="flex-1 flex bg-white overflow-hidden">
             
-            <!-- Left Side: Config Form Editor -->
-            <section class="flex-1 overflow-y-auto p-8 border-r border-slate-200">
-                <div class="max-w-3xl mx-auto">
-                    
-                    <!-- Action Bar Header -->
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
-                        <div>
-                            <h2 id="tab-title" class="text-xl font-bold tracking-tight text-slate-900">App Information</h2>
-                            <p id="tab-description" class="text-xs text-slate-500 mt-1">This information is used for all platforms of this app. Any changes will be released with your next app version.</p>
-                        </div>
-                        <button onclick="saveAllChanges()" class="bg-[#0071e3] text-white text-xs px-4 py-2 rounded-lg font-medium hover:bg-[#005bb5] transition shadow-sm">
-                            Save Changes
-                        </button>
+            <!-- Tab switches -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 bg-neutral-100 p-1 rounded-xl text-xs font-bold text-neutral-600">
+                <button onclick="setStoreMode('default')" id="btn-tab-default" class="py-2.5 rounded-lg text-neutral-800 bg-white shadow-sm transition">Default Page</button>
+                <button onclick="setStoreMode('safety')" id="btn-tab-safety" class="py-2.5 rounded-lg hover:text-neutral-900 hover:bg-neutral-200/50 transition">Safety &amp; Risk</button>
+                <button onclick="setStoreMode('oud')" id="btn-tab-oud" class="py-2.5 rounded-lg hover:text-neutral-900 hover:bg-neutral-200/50 transition">OUD &amp; Addiction</button>
+                <button onclick="setStoreMode('calc')" id="btn-tab-calc" class="py-2.5 rounded-lg hover:text-neutral-900 hover:bg-neutral-200/50 transition">dosing &amp; Calc</button>
+            </div>
+
+            <!-- Campaign deep links badge -->
+            <div id="campaign-banner" class="bg-blue-50 border border-blue-100 p-3 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs text-blue-900 hidden transition-all duration-300">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-[10px] uppercase bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full border border-blue-200" id="campaign-badge">cpp_safety_risk</span>
+                    <span class="font-medium">Deep Link: <code class="font-mono text-[11px] bg-blue-100/50 px-1 py-0.5 rounded select-all" id="campaign-deeplink">opioidprecision://assessment</code></span>
+                </div>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <input type="text" id="campaign-url" class="bg-white border border-blue-200 text-[10px] text-blue-800 font-mono p-1.5 rounded flex-1 md:w-80 outline-none select-all" readonly>
+                    <button onclick="copyCampaignURL()" class="bg-blue-600 text-white hover:bg-blue-700 px-3 py-1.5 rounded font-bold shadow-sm transition flex items-center gap-1">
+                        <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Link
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Store White Page Card -->
+        <section class="bg-white border apple-border rounded-3xl p-6 md:p-10 shadow-sm flex flex-col gap-8">
+            
+            <!-- Hero Header Section -->
+            <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center border-b apple-border pb-8">
+                <!-- App Icon -->
+                <div class="w-28 h-28 md:w-36 md:h-36 bg-cyan-700 rounded-[22%] flex items-center justify-center text-white flex-none shadow-xl border border-cyan-800 relative overflow-hidden">
+                    <i data-lucide="activity" class="w-16 h-16 md:w-20 md:h-20 text-white"></i>
+                </div>
+                <!-- Metadata Details -->
+                <div class="flex-1 flex flex-col justify-between py-1">
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-neutral-900 leading-tight">Precision Analgesia</h1>
+                        <p id="store-subtitle" class="text-sm md:text-base text-neutral-500 font-medium leading-snug mt-1">Clinical Opioid Decision Tools</p>
+                        <p class="text-xs text-neutral-400 font-semibold mt-1">Lifeline Medical Technologies, LLC</p>
                     </div>
-
-                    <!-- App Info Panel -->
-                    <div id="panel-app-info" class="tab-panel flex flex-col gap-6">
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Name</label>
-                                <div class="relative">
-                                    <input type="text" id="field-name" value="PrecisionAnalgesia" oninput="syncField('name')" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 pr-12 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                                    <span id="counter-name" class="absolute right-3 top-3 text-[10px] text-slate-400 font-mono">18 / 30</span>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Subtitle</label>
-                                <div class="relative">
-                                    <input type="text" id="field-subtitle" value="Clinical Opioid Decision Tools" oninput="syncField('subtitle')" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 pr-12 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                                    <span id="counter-subtitle" class="absolute right-3 top-3 text-[10px] text-slate-400 font-mono">30 / 30</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="grid md:grid-cols-3 gap-4 border-t border-slate-100 pt-6">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Bundle ID</label>
-                                <div class="text-xs bg-slate-50 border border-slate-200 text-slate-600 rounded-lg p-2.5 font-mono select-all flex items-center justify-between">
-                                    <span>orgLifelineMed.AnalgesiaTool</span>
-                                    <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400 hover:text-slate-700 cursor-pointer" onclick="navigator.clipboard.writeText('orgLifelineMed.AnalgesiaTool')"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">SKU</label>
-                                <div class="text-xs bg-slate-50 border border-slate-200 text-slate-600 rounded-lg p-2.5 font-mono select-all flex items-center justify-between">
-                                    <span>orgLifelineMed.AnalgesiaTool</span>
-                                    <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400 hover:text-slate-700 cursor-pointer" onclick="navigator.clipboard.writeText('orgLifelineMed.AnalgesiaTool')"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Apple ID</label>
-                                <div class="text-xs bg-slate-50 border border-slate-200 text-slate-600 rounded-lg p-2.5 font-mono select-all flex items-center justify-between">
-                                    <span>6757340383</span>
-                                    <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400 hover:text-slate-700 cursor-pointer" onclick="navigator.clipboard.writeText('6757340383')"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-slate-100 pt-6 flex flex-col gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Category</label>
-                                <select class="text-sm border border-slate-300 rounded-lg p-2.5 w-full md:w-1/2 outline-none">
-                                    <option value="medical">Medical (Primary)</option>
-                                    <option value="health">Health &amp; Fitness (Secondary)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Content Rights</label>
-                                <div class="text-xs bg-slate-50 border border-slate-200 text-slate-700 p-4 rounded-lg flex items-start gap-3">
-                                    <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600 mt-0.5"></i>
-                                    <div>
-                                        <p class="font-semibold">No Third-Party Content</p>
-                                        <p class="text-slate-500 mt-1">This app does not contain, show, or access third-party content. All proprietary calculators and clinical logic layers are verified under Lifeline Medical Technologies.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">License Agreement</label>
-                                <p class="text-xs text-slate-500">Apple’s Standard License Agreement (EULA)</p>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Age Ratings</label>
-                                <div class="bg-slate-50 border border-slate-200 p-4 rounded-lg flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-slate-800 text-white font-extrabold flex items-center justify-center rounded-xl text-lg shadow-sm">18+</div>
-                                        <div>
-                                            <p class="text-xs font-bold">18+ Global Rating</p>
-                                            <p class="text-[10px] text-slate-400 mt-0.5">Due to medical conversions and clinical protocols. Brazil: 19+, Korea: 19+.</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-[10px] text-blue-600 font-semibold cursor-pointer hover:underline">View Questionnaire Details</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center gap-4 mt-6">
+                        <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-apple-blue text-white text-xs font-extrabold px-6 py-2 rounded-full uppercase transition shadow-sm hover:scale-[1.02] active:scale-[0.98]">
+                            Get Beta
+                        </a>
+                        <span class="text-[10px] text-neutral-400 font-medium">In-App Purchases / Free</span>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Pricing & Availability Panel -->
-                    <div id="panel-pricing" class="tab-panel hidden flex flex-col gap-6">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Base Country or Region</label>
-                            <p class="text-sm font-semibold text-slate-800">United States (USD)</p>
-                            <p class="text-xs text-slate-400 mt-0.5">Prices will adjust automatically for foreign currency tax rates in 175 other countries.</p>
-                        </div>
+            <!-- Highlights Badges Bar -->
+            <div class="grid grid-cols-3 md:grid-cols-6 gap-4 text-center border-b apple-border pb-6 text-xs text-neutral-800">
+                <div class="border-r border-neutral-100 flex flex-col justify-center">
+                    <div class="font-extrabold text-neutral-900 text-sm">4.9 ★</div>
+                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">14 Ratings</div>
+                </div>
+                <div class="border-r border-neutral-100 flex flex-col justify-center">
+                    <div class="font-extrabold text-neutral-900 text-sm">18+</div>
+                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">Age Rating</div>
+                </div>
+                <div class="border-r border-neutral-100 md:border-r flex flex-col justify-center">
+                    <div class="font-extrabold text-neutral-900 text-sm">#42</div>
+                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">In Medical</div>
+                </div>
+                <div class="border-r border-neutral-100 flex flex-col justify-center hidden md:flex">
+                    <div class="font-extrabold text-[#0066cc] text-sm"><i data-lucide="building" class="w-4 h-4 mx-auto"></i></div>
+                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">Developer</div>
+                </div>
+                <div class="border-r border-neutral-100 flex flex-col justify-center hidden md:flex">
+                    <div class="font-extrabold text-neutral-900 text-sm">EN</div>
+                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">Language</div>
+                </div>
+                <div class="flex flex-col justify-center hidden md:flex">
+                    <div class="font-extrabold text-neutral-900 text-sm">24.5 MB</div>
+                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">Size</div>
+                </div>
+            </div>
 
-                        <div class="border-t border-slate-100 pt-6">
-                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Price Tier</label>
-                            <select class="text-sm border border-slate-300 rounded-lg p-2.5 w-full md:w-1/2 outline-none">
-                                <option value="free">Free ($0.00)</option>
-                                <option value="tier1">$0.99</option>
-                                <option value="enterprise">Custom Enterprise Licensing (Hospital level)</option>
-                            </select>
-                        </div>
+            <!-- Screenshot Previews -->
+            <div>
+                <h2 class="text-sm font-extrabold text-neutral-900 mb-4 tracking-tight uppercase">iPhone Previews</h2>
+                <div class="flex gap-4 overflow-x-auto pb-4 screenshot-container snap-x" id="store-screenshots">
+                    <!-- Images loaded dynamically -->
+                </div>
+            </div>
 
-                        <div class="border-t border-slate-100 pt-6 space-y-4">
-                            <h3 class="text-sm font-bold text-slate-900">Mac &amp; Vision Pro Availability</h3>
-                            <div class="space-y-3">
-                                <label class="flex items-start gap-3 cursor-pointer">
-                                    <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded mt-0.5">
-                                    <div>
-                                        <span class="text-xs font-bold text-slate-800">Apple Silicon Macs</span>
-                                        <p class="text-[11px] text-slate-400 mt-0.5">Allow iOS build to run natively on Apple Silicon Macs. Apple will automatically pick the minimum macOS version required.</p>
-                                    </div>
-                                </label>
-                                <label class="flex items-start gap-3 cursor-pointer">
-                                    <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded mt-0.5">
-                                    <div>
-                                        <span class="text-xs font-bold text-slate-800">Apple Vision Pro</span>
-                                        <p class="text-[11px] text-slate-400 mt-0.5">Make this app available on Apple Vision Pro Store. The app will run natively and utilize the same frameworks.</p>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-slate-100 pt-6">
-                            <h3 class="text-sm font-bold text-slate-900 mb-3">Volume Purchases</h3>
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded">
-                                <span class="text-xs font-medium text-slate-700">Offer a reduced price on the Apple School Manager for volume purchases</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Regulations & Permits Panel -->
-                    <div id="panel-regulations" class="tab-panel hidden flex flex-col gap-6">
-                        <div class="space-y-4">
-                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-lg flex items-center justify-between">
-                                <div class="flex items-start gap-3">
-                                    <div class="bg-blue-100 text-blue-600 p-1.5 rounded-lg mt-0.5">
-                                        <i data-lucide="globe" class="w-5 h-5"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-bold">Digital Services Act (DSA)</p>
-                                        <p class="text-[10px] text-slate-400 mt-0.5">Compliance settings for distributing within the European Union.</p>
-                                    </div>
-                                </div>
-                                <span class="bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full">Completed</span>
-                            </div>
-
-                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-lg flex items-center justify-between">
-                                <div class="flex items-start gap-3">
-                                    <div class="bg-rose-100 text-rose-600 p-1.5 rounded-lg mt-0.5">
-                                        <i data-lucide="stethoscope" class="w-5 h-5"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-bold">Regulated Medical Devices</p>
-                                        <p class="text-[10px] text-slate-400 mt-0.5">Since the app is in the Medical category, declare if it operates as a regulated device.</p>
-                                    </div>
-                                </div>
-                                <button onclick="alert('Declared as Non-Device Clinical Decision Support (CDS) tool under 21st Century Cures Act Section 3060(o)(1)(E).')" class="border border-slate-300 bg-white hover:bg-slate-50 text-[10px] font-semibold px-3 py-1 rounded-lg shadow-sm">Declare Status</button>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-slate-100 pt-6">
-                            <h3 class="text-sm font-bold text-slate-900 mb-4">App Store Server Notifications (IAP Server integration)</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Production Server URL</label>
-                                    <input type="url" placeholder="https://api.opioidprecision.com/iap/notify" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Sandbox Server URL</label>
-                                    <input type="url" placeholder="https://sandbox.api.opioidprecision.com/iap/notify" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 outline-none">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 1.0 Version Info Panel -->
-                    <div id="panel-version-info" class="tab-panel hidden flex flex-col gap-6">
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Version</label>
-                                <input type="text" value="1.0" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-slate-500 font-mono outline-none" readonly>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Copyright</label>
-                                <div class="relative">
-                                    <input type="text" id="field-copyright" value="2026 Lifeline Medical Technologies, LLC" oninput="syncField('copyright')" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 pr-12 outline-none">
-                                    <span id="counter-copyright" class="absolute right-3 top-3 text-[10px] text-slate-400 font-mono">38 / 100</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-slate-100 pt-6">
-                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Promotional Text (Default page)</label>
-                            <div class="relative">
-                                <textarea id="field-promotional_text" rows="2" oninput="syncField('promotional_text')" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 pr-12 outline-none resize-none">Empowering clinicians with precise opioid dosing calculations and real-time safety guardrails.</textarea>
-                                <span id="counter-promotional_text" class="absolute right-3 bottom-3 text-[10px] text-slate-400 font-mono">99 / 170</span>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-slate-100 pt-6">
-                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Description</label>
-                            <div class="relative">
-                                <textarea id="field-description" rows="8" oninput="syncField('description')" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 outline-none font-sans leading-normal">PrecisionAnalgesia by Lifeline Medical Technologies is a comprehensive clinical decision support tool engineered to integrate directly into inpatient clinical workflows. Developed to support opioid stewardship, this application provides vital calculations and clinical logic to enhance patient safety and reduce adverse events.
+            <!-- Promotional & Description -->
+            <div class="grid md:grid-cols-3 gap-8 border-t apple-border pt-8">
+                <div class="md:col-span-2 space-y-4">
+                    <p id="store-promo" class="text-sm font-semibold italic text-neutral-700 leading-normal border-l-4 border-teal-500 pl-4">
+                        Advanced inpatient clinical decision support to mitigate high-risk opioid prescribing.
+                    </p>
+                    <div class="text-xs text-neutral-600 leading-relaxed font-normal whitespace-pre-line">
+                        <p id="store-description" class="line-clamp-6">PrecisionAnalgesia by Lifeline Medical Technologies is a comprehensive clinical decision support tool engineered to integrate directly into inpatient clinical workflows. Developed to support opioid stewardship, this application provides vital calculations and clinical logic to enhance patient safety and reduce adverse events.
 
 Key Features:
 - Advanced Opioid Calculator: Accurately calculate daily MME and perform complex opioid conversions, including considerations for active metabolites (e.g., Morphine-6-glucuronide).
@@ -348,388 +195,162 @@ Key Features:
 - Pain Assessment Tracking: Detailed VAS scales, pain mapping, and symptom checklists to monitor treatment efficacy over time.
 
 Regulatory & Safe Harbor Notice: 
-PrecisionAnalgesia is categorized as a Non-Device Clinical Decision Support (CDS) tool. It is intended to provide evidence-based information to healthcare professionals to assist them in managing patient care. This tool is designed to support, but does not replace, the independent clinical judgment of a qualified healthcare provider. The clinician is solely responsible for all final diagnosis and treatment decisions.</textarea>
-                                <div id="counter-description" class="text-right text-[10px] text-slate-400 font-mono mt-1">1616 / 4000</div>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-slate-100 pt-6">
-                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Keywords</label>
-                            <div class="relative">
-                                <input type="text" id="field-keywords" value="opioid,calculator,clinical,decision support,pain management,MME,buprenorphine,methadone,hospital" oninput="syncField('keywords')" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 pr-12 outline-none">
-                                <span id="counter-keywords" class="absolute right-3 top-3 text-[10px] text-slate-400 font-mono">92 / 100</span>
-                            </div>
-                        </div>
-
-                        <div class="grid md:grid-cols-2 gap-4 border-t border-slate-100 pt-6">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Support URL</label>
-                                <input type="url" id="field-support_url" value="https://opioidprecision.com/support" oninput="syncField('support_url')" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 outline-none font-mono">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Marketing URL</label>
-                                <input type="url" id="field-marketing_url" value="https://opioidprecision.com" oninput="syncField('marketing_url')" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 outline-none font-mono">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Custom Product Pages Panel -->
-                    <div id="panel-cpp" class="tab-panel hidden flex flex-col gap-6">
-                        <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl flex items-start gap-3">
-                            <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5"></i>
-                            <div class="text-xs text-blue-800 leading-normal">
-                                <p class="font-bold">About Custom Product Pages</p>
-                                <p class="mt-1">Create different app Store listings using tailored promotional text and screenshots. Target specific clinical specialties via direct deep links or distinct ad campaigns.</p>
-                            </div>
-                        </div>
-
-                        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-slate-50">
-                            <div class="bg-slate-100 p-3 border-b border-slate-200 flex items-center justify-between">
-                                <span class="text-xs font-bold text-slate-700">Configured Custom Pages</span>
-                                <span class="text-[10px] bg-slate-300 text-slate-700 px-2 py-0.5 rounded font-bold">1 of 70 Allowed</span>
-                            </div>
-                            <div class="divide-y divide-slate-200">
-                                
-                                <!-- CPP 1 -->
-                                <div id="cpp-list-item-safety" class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white">
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-sm font-bold text-slate-900">Safety First (Risk Stratification)</span>
-                                            <span class="text-[9px] bg-red-100 text-red-700 font-bold px-1.5 py-0.5 rounded">cpp_safety_risk</span>
-                                        </div>
-                                        <p class="text-[11px] text-slate-500 mt-1">Deep Link: <code class="font-mono text-[10px] bg-slate-100 px-1 py-0.5 rounded select-all">opioidprecision://assessment</code></p>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="previewCPP('safety')" class="border border-slate-300 bg-white hover:bg-slate-50 text-xs px-3 py-1.5 rounded-lg shadow-sm font-medium transition flex items-center gap-1">
-                                            <i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview in Simulator
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- CPP 2 -->
-                                <div id="cpp-list-item-oud" class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white">
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-sm font-bold text-slate-900">Compassionate Care (OUD &amp; Addiction)</span>
-                                            <span class="text-[9px] bg-teal-100 text-teal-700 font-bold px-1.5 py-0.5 rounded">cpp_oud_consult</span>
-                                        </div>
-                                        <p class="text-[11px] text-slate-500 mt-1">Deep Link: <code class="font-mono text-[10px] bg-slate-100 px-1 py-0.5 rounded select-all">opioidprecision://consult</code></p>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="previewCPP('oud')" class="border border-slate-300 bg-white hover:bg-slate-50 text-xs px-3 py-1.5 rounded-lg shadow-sm font-medium transition flex items-center gap-1">
-                                            <i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview in Simulator
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- CPP 3 -->
-                                <div id="cpp-list-item-calc" class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white">
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-sm font-bold text-slate-900">Precision Calculator (MME &amp; Tapering)</span>
-                                            <span class="text-[9px] bg-blue-100 text-blue-700 font-bold px-1.5 py-0.5 rounded">cpp_calculator</span>
-                                        </div>
-                                        <p class="text-[11px] text-slate-500 mt-1">Deep Link: <code class="font-mono text-[10px] bg-slate-100 px-1 py-0.5 rounded select-all">opioidprecision://calculator</code></p>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="previewCPP('calc')" class="border border-slate-300 bg-white hover:bg-slate-50 text-xs px-3 py-1.5 rounded-lg shadow-sm font-medium transition flex items-center gap-1">
-                                            <i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview in Simulator
-                                        </button>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <!-- CPP Specific Editor Box -->
-                        <div id="cpp-editor-box" class="border border-slate-200 rounded-xl p-5 bg-slate-50/50 flex flex-col gap-4">
-                            <div class="flex items-center justify-between border-b border-slate-200/50 pb-3">
-                                <div>
-                                    <h4 id="cpp-edit-title" class="text-sm font-bold text-slate-900">Editing: Safety First</h4>
-                                    <p id="cpp-edit-id" class="text-[10px] text-slate-400 font-mono mt-0.5">Page ID: cpp_safety_risk</p>
-                                </div>
-                                <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono select-all" id="cpp-campaign-url">https://apps.apple.com/app/id6757340383?ppid=cpp_safety_risk</span>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Promotional Text (Max 170 chars)</label>
-                                <textarea id="cpp-field-promo" rows="2" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 outline-none resize-none font-sans" oninput="updateCPPField('promo')"></textarea>
-                                <span id="cpp-counter-promo" class="text-[9px] text-slate-400 font-mono mt-1 block text-right">0 / 170</span>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Keywords (Max 100 chars)</label>
-                                <input type="text" id="cpp-field-keywords" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 outline-none font-sans" oninput="updateCPPField('keywords')">
-                                <span id="cpp-counter-keywords" class="text-[9px] text-slate-400 font-mono mt-1 block text-right">0 / 100</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Subscriptions Panel -->
-                    <div id="panel-subscriptions" class="tab-panel hidden flex flex-col gap-6">
-                        <div class="bg-slate-50 border border-slate-200 p-5 rounded-xl">
-                            <h3 class="text-sm font-bold text-slate-900 mb-2">Auto-Renewable Subscriptions</h3>
-                            <p class="text-xs text-slate-500 mb-4 leading-normal">Your first subscription must be submitted with a new app version. Create your subscription, then select it from the app’s In-App Purchases and Subscriptions section before submitting to App Review.</p>
-                            <div class="flex items-center justify-between border-t border-slate-200 pt-4">
-                                <div>
-                                    <p class="text-xs font-bold text-slate-800">Subscription Groups</p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">All subscriptions must be part of a group. Users can change tiers within a group.</p>
-                                </div>
-                                <button onclick="alert('Create Subscription Group clicked')" class="border border-slate-300 bg-white hover:bg-slate-50 text-xs px-3 py-1.5 rounded-lg shadow-sm font-medium transition">Create Group</button>
-                            </div>
-                        </div>
-
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div class="border border-slate-200 p-4 rounded-xl flex items-start justify-between gap-3">
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-800">Billing Grace Period</h4>
-                                    <p class="text-[10px] text-slate-400 mt-1 leading-normal">Lets subscribers retain access to paid features if their renewal fails due to billing issues.</p>
-                                </div>
-                                <span class="text-xs text-slate-500 border border-slate-300 px-2 py-0.5 rounded bg-white font-medium cursor-pointer hover:bg-slate-50">Set Up</span>
-                            </div>
-                            <div class="border border-slate-200 p-4 rounded-xl flex items-start justify-between gap-3">
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-800">Streamlined Purchasing</h4>
-                                    <p class="text-[10px] text-slate-400 mt-1 leading-normal">Allows customers to purchase subscriptions directly from outside your app.</p>
-                                </div>
-                                <span class="text-xs text-emerald-600 border border-emerald-300 px-2 py-0.5 rounded bg-emerald-50 font-bold">Turned On</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- App Review Info Panel -->
-                    <div id="panel-review-info" class="tab-panel hidden flex flex-col gap-6">
-                        <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-start gap-3">
-                            <i data-lucide="alert-circle" class="w-5 h-5 text-amber-600 mt-0.5"></i>
-                            <div class="text-xs text-amber-800 leading-normal">
-                                <p class="font-bold">Required Sign-In Information</p>
-                                <p class="mt-1">Provide a working user account so the App Review team can log in and thoroughly test your application logic.</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded">
-                                <span class="text-xs font-bold text-slate-800">Sign-in required</span>
-                            </label>
-                            
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">User Name</label>
-                                    <input type="text" id="field-username" value="review_clinician@lifelinemedtech.org" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 outline-none font-mono">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Password</label>
-                                    <input type="text" id="field-password" value="PrecisionReview2026!" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 outline-none font-mono">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-slate-100 pt-6">
-                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Contact Information</label>
-                            <div class="grid md:grid-cols-3 gap-4">
-                                <div>
-                                    <input type="text" value="Daniel Bergholz" placeholder="Name" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 outline-none">
-                                </div>
-                                <div>
-                                    <input type="tel" value="+1 (555) 019-2834" placeholder="Phone" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 outline-none">
-                                </div>
-                                <div>
-                                    <input type="email" value="dan@lifelinemedtech.org" placeholder="Email" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 outline-none">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-slate-100 pt-6">
-                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Review Notes (Max 4,000 chars)</label>
-                            <textarea id="field-notes" rows="6" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 outline-none font-sans leading-normal">This app is a Clinical Decision Support (CDS) tool. It provides opioid equivalent calculations (MME), organ-specific guards (renal and hepatic), and standardized assessments like COWS.
-
-Instructions for testing:
-1. Log in with the provided credentials.
-2. Select "Conversion Calculator" to perform an equianalgesic conversion.
-3. Test the Renal Gating by inputting Morphine PO for a patient with GFR < 30. Notice the safety warning and the automatic 50% dose reduction.
-4. Select "Toolkit" or "SBIRT" to review structured counseling and assessment workflows.</textarea>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-            <!-- Right Side: Live iPhone Simulator -->
-            <section class="w-[380px] bg-slate-50 flex flex-col flex-none items-center justify-start p-6 overflow-y-auto select-none border-l border-slate-200">
-                <div class="text-xs font-bold text-slate-400 mb-4 tracking-wider uppercase flex items-center gap-1.5">
-                    <i data-lucide="smartphone" class="w-4 h-4"></i> Live App Store Preview
-                </div>
-
-                <!-- Simulator Toggle Tabs -->
-                <div class="flex bg-slate-200 p-0.5 rounded-lg w-full text-[10px] font-bold mb-6">
-                    <button onclick="setSimMode('default')" id="sim-toggle-default" class="flex-1 py-1.5 rounded-md text-slate-800 bg-white shadow-sm transition">Default</button>
-                    <button onclick="setSimMode('safety')" id="sim-toggle-safety" class="flex-1 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition">Safety</button>
-                    <button onclick="setSimMode('oud')" id="sim-toggle-oud" class="flex-1 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition">OUD</button>
-                    <button onclick="setSimMode('calc')" id="sim-toggle-calc" class="flex-1 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition">Calc</button>
-                </div>
-
-                <!-- iPhone Shell Container -->
-                <div class="w-[300px] h-[610px] bg-slate-950 rounded-[48px] p-2.5 shadow-2xl relative border-4 border-slate-800 flex flex-col overflow-hidden select-none">
-                    
-                    <!-- iPhone Island / Notch -->
-                    <div class="absolute top-4 left-1/2 -translate-x-1/2 w-28 h-6 bg-black rounded-full z-40 flex items-center justify-between px-4">
-                        <div class="w-2.5 h-2.5 rounded-full bg-slate-900"></div>
-                        <div class="w-3.5 h-[3px] rounded bg-slate-900"></div>
-                    </div>
-
-                    <!-- Screen Area -->
-                    <div class="flex-1 bg-white rounded-[38px] overflow-hidden flex flex-col relative">
-                        
-                        <!-- Status Bar -->
-                        <div class="h-8 flex justify-between items-center px-6 text-[10px] font-bold text-black flex-none z-30 pt-1">
-                            <div>9:41</div>
-                            <div class="flex items-center gap-1">
-                                <i data-lucide="signal" class="w-3 h-3"></i>
-                                <i data-lucide="wifi" class="w-3 h-3"></i>
-                                <div class="w-5 h-2.5 border border-black rounded-sm p-[1px] flex items-center"><div class="h-full w-full bg-black rounded-2xs"></div></div>
-                            </div>
-                        </div>
-
-                        <!-- App Store Scrollable Content -->
-                        <div class="flex-1 overflow-y-auto simulator-content pb-8">
-                            
-                            <!-- Header Info -->
-                            <div class="p-5 pb-3 flex gap-4 border-b border-slate-100">
-                                <!-- App Icon -->
-                                <div class="w-16 h-16 bg-cyan-700 rounded-2xl flex items-center justify-center text-white flex-none shadow-md border border-cyan-800 relative overflow-hidden">
-                                    <i data-lucide="activity" class="w-8 h-8 text-white"></i>
-                                </div>
-                                <!-- Title / Subtitle / Action -->
-                                <div class="flex flex-col justify-between py-0.5">
-                                    <div>
-                                        <h1 id="sim-name" class="text-sm font-bold text-slate-900 leading-tight">PrecisionAnalgesia</h1>
-                                        <p id="sim-subtitle" class="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Clinical Opioid Decision Tools</p>
-                                        <p class="text-[9px] text-slate-400 font-semibold mt-1">Lifeline Medical Technologies</p>
-                                    </div>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <span class="bg-[#0071e3] text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase cursor-pointer hover:bg-blue-600">Get</span>
-                                        <span class="text-[9px] text-slate-400 font-medium">In-App Purchases</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Highlights (Stats Bar) -->
-                            <div class="px-5 py-3 flex justify-between text-center border-b border-slate-100 text-[10px]">
-                                <div class="flex-1 border-r border-slate-100">
-                                    <div class="font-extrabold text-slate-800">4.9 ★</div>
-                                    <div class="text-[8px] text-slate-400 uppercase mt-0.5 font-bold">14 Ratings</div>
-                                </div>
-                                <div class="flex-1 border-r border-slate-100">
-                                    <div class="font-extrabold text-slate-800">18+</div>
-                                    <div class="text-[8px] text-slate-400 uppercase mt-0.5 font-bold">Age</div>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="font-extrabold text-slate-800">#42</div>
-                                    <div class="text-[8px] text-slate-400 uppercase mt-0.5 font-bold">Medical</div>
-                                </div>
-                            </div>
-
-                            <!-- Dynamic Screenshots Slider -->
-                            <div class="px-5 py-4">
-                                <h2 class="text-[11px] font-bold text-slate-950 mb-2.5">Previews &amp; Screenshots</h2>
-                                <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
-                                    <div class="w-36 h-76 bg-slate-100 rounded-xl overflow-hidden flex-none snap-start border border-slate-200 relative shadow-sm">
-                                        <img id="sim-img-1" src="assets/hero_product_mockup.png" alt="Screenshot 1" class="w-full h-full object-cover">
-                                    </div>
-                                    <div class="w-36 h-76 bg-slate-100 rounded-xl overflow-hidden flex-none snap-start border border-slate-200 relative shadow-sm">
-                                        <img id="sim-img-2" src="assets/custom_product_page_mockup_risk_assessment_v1_1767467031818.png" alt="Screenshot 2" class="w-full h-full object-cover">
-                                    </div>
-                                    <div class="w-36 h-76 bg-slate-100 rounded-xl overflow-hidden flex-none snap-start border border-slate-200 relative shadow-sm">
-                                        <img id="sim-img-3" src="assets/custom_product_page_mockup_oud_consult_v1_1767467050332.png" alt="Screenshot 3" class="w-full h-full object-cover">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Promotional Text Section -->
-                            <div class="px-5 py-3 border-t border-slate-100">
-                                <p id="sim-promo" class="text-[10px] italic font-semibold text-slate-700 leading-normal">Advanced inpatient clinical decision support to mitigate high-risk opioid prescribing.</p>
-                            </div>
-
-                            <!-- Description Section -->
-                            <div class="px-5 py-3 border-t border-slate-100">
-                                <h2 class="text-[11px] font-bold text-slate-950 mb-2">Description</h2>
-                                <p id="sim-desc" class="text-[10px] text-slate-600 leading-relaxed whitespace-pre-line line-clamp-6">PrecisionAnalgesia by Lifeline Medical Technologies is a comprehensive clinical decision support tool...</p>
-                                <span class="text-[10px] text-[#0071e3] font-semibold mt-1 cursor-pointer block" onclick="document.getElementById('sim-desc').classList.toggle('line-clamp-6')">More</span>
-                            </div>
-
-                            <!-- Developer Information Box -->
-                            <div class="px-5 py-4 border-t border-slate-100 text-[10px] text-slate-500 space-y-2">
-                                <div class="flex justify-between border-b border-slate-100 pb-1.5">
-                                    <span>Provider</span>
-                                    <span class="font-semibold text-slate-800">Lifeline Medical Technologies</span>
-                                </div>
-                                <div class="flex justify-between border-b border-slate-100 pb-1.5">
-                                    <span>Size</span>
-                                    <span class="font-semibold text-slate-800">24.5 MB</span>
-                                </div>
-                                <div class="flex justify-between border-b border-slate-100 pb-1.5">
-                                    <span>Category</span>
-                                    <span class="font-semibold text-slate-800">Medical</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span>Compatibility</span>
-                                    <span class="font-semibold text-slate-800 text-right">Requires iOS 15.0 or later. Mac with M1/M2/M3. Vision Pro.</span>
-                                </div>
-                            </div>
-
-                        </div>
+PrecisionAnalgesia is categorized as a Non-Device Clinical Decision Support (CDS) tool. It is intended to provide evidence-based information to healthcare professionals to assist them in managing patient care. This tool is designed to support, but does not replace, the independent clinical judgment of a qualified healthcare provider. The clinician is solely responsible for all final diagnosis and treatment decisions.</p>
+                        <button onclick="document.getElementById('store-description').classList.toggle('line-clamp-6'); this.innerText = this.innerText === 'More' ? 'Less' : 'More';" class="text-apple-blue font-bold mt-2 outline-none">More</button>
                     </div>
                 </div>
-
-                <!-- Deep Link Campaign Box -->
-                <div id="sim-campaign-box" class="w-full bg-white border border-slate-200 p-4 rounded-xl mt-4 hidden shadow-sm">
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Deep Link / Campaign Link</span>
-                    <div class="flex items-center gap-1.5 mt-1">
-                        <input type="text" id="sim-campaign-link" class="bg-slate-50 border border-slate-200 text-[10px] text-slate-700 font-mono p-1.5 rounded flex-1 outline-none select-all" readonly>
-                        <button onclick="copyCampaignLink()" class="bg-slate-100 hover:bg-slate-200 p-1.5 rounded border border-slate-300 text-slate-600 transition" title="Copy Link">
-                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                        </button>
+                
+                <!-- Quick Info Panel -->
+                <div class="bg-neutral-50 p-5 rounded-2xl border apple-border flex flex-col gap-3 text-[11px] text-neutral-500">
+                    <div class="border-b border-neutral-200/60 pb-2 flex justify-between">
+                        <span>Provider</span>
+                        <span class="font-semibold text-neutral-800">Lifeline Medical Technologies, LLC</span>
+                    </div>
+                    <div class="border-b border-neutral-200/60 pb-2 flex justify-between">
+                        <span>Size</span>
+                        <span class="font-semibold text-neutral-800">24.5 MB</span>
+                    </div>
+                    <div class="border-b border-neutral-200/60 pb-2 flex justify-between">
+                        <span>Category</span>
+                        <span class="font-semibold text-neutral-800">Medical</span>
+                    </div>
+                    <div class="border-b border-neutral-200/60 pb-2 flex flex-col gap-1">
+                        <span>Compatibility</span>
+                        <span class="font-semibold text-neutral-800 leading-normal">iPhone: iOS 15.0 or later.<br>iPad: iPadOS 15.0 or later.<br>Mac: macOS 12.0 or later (Apple Silicon).<br>Vision Pro: visionOS 1.0 or later.</span>
+                    </div>
+                    <div class="border-b border-neutral-200/60 pb-2 flex justify-between">
+                        <span>Languages</span>
+                        <span class="font-semibold text-neutral-800">English (U.S.)</span>
+                    </div>
+                    <div class="pb-1 flex justify-between">
+                        <span>Copyright</span>
+                        <span class="font-semibold text-neutral-800">© 2026 Lifeline Medical</span>
                     </div>
                 </div>
-            </section>
-        </main>
-    </div>
+            </div>
 
-    <!-- Modals & Script Injections -->
+            <!-- What's New Section -->
+            <div class="border-t apple-border pt-8">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-extrabold text-neutral-900 tracking-tight uppercase">What's New</h2>
+                    <span class="text-xs text-neutral-400 font-medium">Version 1.0.0</span>
+                </div>
+                <p class="text-xs text-neutral-600 leading-relaxed">
+                    Initial launch submission to App Store Connect. Fully aligned with the CDC 2022 Clinical Practice Guidelines. Features inpatient conversion calculations, active renal guarding logic (Morphine GFR gating), non-linear pharmacokinetic modeling for Methadone accumulations, and structured COWS / OUD assessments. Built-in compliance logs and EMR integration guidelines.
+                </p>
+            </div>
+
+            <!-- Simulated Clinical Reviews & Ratings -->
+            <div class="border-t apple-border pt-8 flex flex-col gap-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-extrabold text-neutral-900 tracking-tight uppercase">Clinical Ratings &amp; Reviews</h2>
+                    <span class="text-xs text-apple-blue font-bold cursor-pointer hover:underline">See All Reviews</span>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4">
+                    <!-- Review 1 -->
+                    <div class="bg-neutral-50 p-5 rounded-2xl border apple-border flex flex-col gap-2.5">
+                        <div class="flex justify-between items-center text-[10px]">
+                            <span class="font-bold text-neutral-800">Dr. Sarah Jenkins</span>
+                            <span class="text-neutral-400">June 5, 2026</span>
+                        </div>
+                        <div class="text-amber-500 text-xs">★★★★★</div>
+                        <div class="text-[11px] font-bold text-neutral-800">Essential GFR Guardrails</div>
+                        <p class="text-[11px] text-neutral-600 leading-relaxed">
+                            "A game changer for floor safety. GFR-based organ gating prevents high-risk active metabolite accumulation. Highly recommend for inpatient EHR sets."
+                        </p>
+                        <span class="text-[9px] text-neutral-400 font-semibold mt-auto flex items-center gap-1">
+                            <i data-lucide="shield-check" class="w-3 h-3 text-emerald-500"></i> Chief of Anesthesiology
+                        </span>
+                    </div>
+
+                    <!-- Review 2 -->
+                    <div class="bg-neutral-50 p-5 rounded-2xl border apple-border flex flex-col gap-2.5">
+                        <div class="flex justify-between items-center text-[10px]">
+                            <span class="font-bold text-neutral-800">Robert Chen, PharmD</span>
+                            <span class="text-neutral-400">June 2, 2026</span>
+                        </div>
+                        <div class="text-amber-500 text-xs">★★★★★</div>
+                        <div class="text-[11px] font-bold text-neutral-800">Uniquely standardizes opioid math</div>
+                        <p class="text-[11px] text-neutral-600 leading-relaxed">
+                            "Equianalgesic calculations are finally standardized. Non-linear Methadone half-life calculations replace unsafe static tables. Saves hours and prevents errors."
+                        </p>
+                        <span class="text-[9px] text-neutral-400 font-semibold mt-auto flex items-center gap-1">
+                            <i data-lucide="shield-check" class="w-3 h-3 text-emerald-500"></i> Clinical Pharmacist
+                        </span>
+                    </div>
+
+                    <!-- Review 3 -->
+                    <div class="bg-neutral-50 p-5 rounded-2xl border apple-border flex flex-col gap-2.5">
+                        <div class="flex justify-between items-center text-[10px]">
+                            <span class="font-bold text-neutral-800">Elena Rostova, LCSW</span>
+                            <span class="text-neutral-400">May 28, 2026</span>
+                        </div>
+                        <div class="text-amber-500 text-xs">★★★★★</div>
+                        <div class="text-[11px] font-bold text-neutral-800">Intuitive OUD Assessments</div>
+                        <p class="text-[11px] text-neutral-600 leading-relaxed">
+                            "The SBIRT workflow and COWS assessment tools are incredibly intuitive. It helps our team transition patients to buprenorphine safely with clear guidelines."
+                        </p>
+                        <span class="text-[9px] text-neutral-400 font-semibold mt-auto flex items-center gap-1">
+                            <i data-lucide="shield-check" class="w-3 h-3 text-emerald-500"></i> Addiction Medicine Specialist
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Privacy Disclaimer -->
+            <div class="border-t apple-border pt-8 text-[11px] text-neutral-500 space-y-2 leading-relaxed">
+                <h2 class="text-xs font-extrabold text-neutral-900 tracking-tight uppercase mb-3">App Privacy</h2>
+                <p>The developer, <strong class="text-neutral-800">Lifeline Medical Technologies, LLC</strong>, indicated that the app’s privacy practices may include handling of data as described below. For more information, see the developer’s privacy policy.</p>
+                <div class="bg-neutral-50 border apple-border p-4 rounded-xl flex items-start gap-3 mt-2">
+                    <i data-lucide="shield-alert" class="w-5 h-5 text-emerald-600 flex-none mt-0.5"></i>
+                    <div>
+                        <strong class="text-neutral-800 block text-xs">Data Not Collected</strong>
+                        <p class="mt-0.5 text-neutral-500 text-[10px]">The developer does not collect any data from this app. On-device "Glass Box" calculations ensure no patient health information (PHI) or personal details ever leave your device or institution EMR environment.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#f5f5f7] border-t apple-border py-8 text-xs text-neutral-500 mt-12 flex-none">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <span>© 2026 Lifeline Medical Technologies, LLC. All rights reserved.</span>
+            </div>
+            <div class="flex gap-4">
+                <a href="privacy" class="hover:underline">Privacy Policy</a>
+                <a href="support" class="hover:underline">Support</a>
+                <a href="index.html" class="hover:underline">Home</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive JS scripts -->
     <script>
-        // Lucide Icons init
+        // Init Lucide
         lucide.createIcons();
 
-        // Memory State
-        const appState = {
-            name: "PrecisionAnalgesia",
-            subtitle: "Clinical Opioid Decision Tools",
-            promotional_text: "Advanced inpatient clinical decision support to mitigate high-risk opioid prescribing. Evidence-based calculators and workflows designed for hospital patient safety.",
-            description: `PrecisionAnalgesia by Lifeline Medical Technologies is a comprehensive clinical decision support tool engineered to integrate directly into inpatient clinical workflows. Developed to support opioid stewardship, this application provides vital calculations and clinical logic to enhance patient safety and reduce adverse events.
-
-Key Features:
-- Advanced Opioid Calculator: Accurately calculate daily MME and perform complex opioid conversions, including considerations for active metabolites (e.g., Morphine-6-glucuronide).
-- Renal & Hepatic Gating Logic: Built-in recommendations and dosage adjustments for patients with compromised renal or hepatic function.
-- Methadone Guardrails: Replace dangerous static conversion tables with advanced pharmacokinetic modeling that accounts for variable half-lives.
-- OUD Consult Assistant: A standardized workflow for Opioid Use Disorder assessments (incorporating COWS) to recommend evidence-based medication-assisted treatment (MAT) like Buprenorphine/Naloxone.
-- Pain Assessment Tracking: Detailed VAS scales, pain mapping, and symptom checklists to monitor treatment efficacy over time.
-
-Regulatory & Safe Harbor Notice: 
-PrecisionAnalgesia is categorized as a Non-Device Clinical Decision Support (CDS) tool. It is intended to provide evidence-based information to healthcare professionals to assist them in managing patient care. This tool is designed to support, but does not replace, the independent clinical judgment of a qualified healthcare provider. The clinician is solely responsible for all final diagnosis and treatment decisions.`,
-            keywords: "opioid,calculator,clinical,decision support,pain management,MME,buprenorphine,methadone,hospital",
-            copyright: "© 2026 Lifeline Medical Technologies, LLC",
-            support_url: "https://opioidprecision.com/support",
-            marketing_url: "https://opioidprecision.com"
-        };
-
-        const cppData = {
+        // CPP configuration matching the specifications
+        const cppConfigs = {
+            default: {
+                subtitle: "Clinical Opioid Decision Tools",
+                promo: "Advanced inpatient clinical decision support to mitigate high-risk opioid prescribing. Evidence-based calculators and workflows designed for hospital patient safety.",
+                badge: "default_listing",
+                deeplink: "opioidprecision://home",
+                images: [
+                    "assets/hero_product_mockup.png",
+                    "assets/custom_product_page_mockup_risk_assessment_v1_1767467031818.png",
+                    "assets/custom_product_page_mockup_oud_consult_v1_1767467050332.png"
+                ]
+            },
             safety: {
-                title: "Safety First (Risk Stratification)",
-                id: "cpp_safety_risk",
-                deeplink: "opioidprecision://assessment",
+                subtitle: "Safety First &amp; Risk Gating",
                 promo: "Safeguard your practice with the PRODIGY-aligned risk engine. Real-time safety alerts and standardized assessments (COWS) for every patient encounter.",
-                keywords: "opioid risk, patient safety, PRODIGY score, COWS assessment, clinical decision support, risk stratification",
+                badge: "cpp_safety_risk",
+                deeplink: "opioidprecision://assessment",
                 images: [
                     "assets/custom_product_page_mockup_risk_assessment_v1_1767467031818.png",
                     "assets/branded_product_page_safety_v2_1767470805766.png",
@@ -737,11 +358,10 @@ PrecisionAnalgesia is categorized as a Non-Device Clinical Decision Support (CDS
                 ]
             },
             oud: {
-                title: "Compassionate Care (OUD & Addiction)",
-                id: "cpp_oud_consult",
-                deeplink: "opioidprecision://consult",
+                subtitle: "Evidence-Based OUD Consults",
                 promo: "Empower patients with evidence-based OUD tools. Integrated counseling guides (O.A.R.S., FRAMES) and clear visual aids for effective bedside communication.",
-                keywords: "addiction medicine, OUD consult, motivational interviewing, substance use disorder, buprenorphine, harm reduction",
+                badge: "cpp_oud_consult",
+                deeplink: "opioidprecision://consult",
                 images: [
                     "assets/custom_product_page_mockup_oud_consult_v1_1767467050332.png",
                     "assets/branded_product_page_oud_v2_1767470821920.png",
@@ -749,11 +369,10 @@ PrecisionAnalgesia is categorized as a Non-Device Clinical Decision Support (CDS
                 ]
             },
             calc: {
-                title: "Precision Calculator (MME & Tapering)",
-                id: "cpp_calculator",
-                deeplink: "opioidprecision://calculator",
+                subtitle: "Precision Conversions &amp; Tapers",
                 promo: "The new gold standard for opioid conversion. Automate complex tapers, calculate daily MME instantly, and chart safe palliative transitions with precision.",
-                keywords: "MME calculator, opioid conversion, taper schedule, morphine equivalent, pain management, analgesic dosing",
+                badge: "cpp_calculator",
+                deeplink: "opioidprecision://calculator",
                 images: [
                     "assets/branded_product_page_calculator_v2_1767470946179.png",
                     "assets/branded_product_page_calculator_light_v1_1767471097695.png",
@@ -762,199 +381,63 @@ PrecisionAnalgesia is categorized as a Non-Device Clinical Decision Support (CDS
             }
         };
 
-        let currentActiveCPP = "safety";
-        let simulatorMode = "default"; // default, safety, oud, calc
+        let activeMode = "default";
 
-        // Tab Switching Logic
-        const tabs = ['app-info', 'pricing', 'regulations', 'version-info', 'cpp', 'subscriptions', 'review-info'];
-        const tabMeta = {
-            'app-info': { title: 'App Information', desc: 'This information is used for all platforms of this app. Any changes will be released with your next app version.' },
-            'pricing': { title: 'Pricing & Availability', desc: 'Determine the base price, pricing schedule, and target device platforms for your application.' },
-            'regulations': { title: 'Regulations & Permits', desc: 'Manage statutory declarations, Medical Device certifications, and Sandbox server webhooks.' },
-            'version-info': { title: 'Version Information (1.0)', desc: 'Configure App Store Connect metadata for your primary listing, including Description and Keywords.' },
-            'cpp': { title: 'Custom Product Pages', desc: 'Create and test custom app store pages targeting specialized clinicial demographics.' },
-            'subscriptions': { title: 'Subscriptions', desc: 'Set up in-app purchases, recurring subscription tiers, billing grace periods, and streamlined purchasing.' },
-            'review-info': { title: 'App Review Information', desc: 'Provide necessary access credentials, tester documentation, and notes for Apple Reviewers.' }
-        };
+        function setStoreMode(mode) {
+            activeMode = mode;
+            const config = cppConfigs[mode];
 
-        function switchTab(tabId) {
-            tabs.forEach(t => {
-                const panel = document.getElementById(`panel-${t}`);
-                const sidebarItem = document.getElementById(`sidebar-${t}`);
-                if (panel) panel.classList.add('hidden');
-                if (sidebarItem) sidebarItem.classList.remove('active');
-            });
-
-            const targetPanel = document.getElementById(`panel-${tabId}`);
-            const targetSidebarItem = document.getElementById(`sidebar-${tabId}`);
-            if (targetPanel) targetPanel.classList.remove('hidden');
-            if (targetSidebarItem) targetSidebarItem.classList.add('active');
-
-            // Update Header Meta
-            document.getElementById('tab-title').innerText = tabMeta[tabId].title;
-            document.getElementById('tab-description').innerText = tabMeta[tabId].desc;
-        }
-
-        // Live Field Synchronization
-        function syncField(fieldId) {
-            const input = document.getElementById(`field-${fieldId}`);
-            const counter = document.getElementById(`counter-${fieldId}`);
-            const value = input.value;
-            appState[fieldId] = value;
-
-            // Update Character Counter
-            let limits = { name: 30, subtitle: 30, promotional_text: 170, keywords: 100, copyright: 100 };
-            if (limits[fieldId] && counter) {
-                counter.innerText = `${value.length} / ${limits[fieldId]}`;
-                if (value.length > limits[fieldId]) {
-                    counter.classList.add('text-red-500');
-                } else {
-                    counter.classList.remove('text-red-500');
-                }
-            } else if (fieldId === 'description' && counter) {
-                counter.innerText = `${value.length} / 4000`;
-            }
-
-            // Sync Simulator
-            if (simulatorMode === 'default') {
-                if (fieldId === 'name') document.getElementById('sim-name').innerText = value;
-                if (fieldId === 'subtitle') document.getElementById('sim-subtitle').innerText = value;
-                if (fieldId === 'promotional_text') document.getElementById('sim-promo').innerText = value;
-                if (fieldId === 'description') document.getElementById('sim-desc').innerText = value;
-            }
-        }
-
-        // Custom Product Page editing and preview
-        function previewCPP(cppKey) {
-            currentActiveCPP = cppKey;
-            
-            // Populate fields in editor
-            const cpp = cppData[cppKey];
-            document.getElementById('cpp-edit-title').innerText = `Editing: ${cpp.title}`;
-            document.getElementById('cpp-edit-id').innerText = `Page ID: ${cpp.id}`;
-            document.getElementById('cpp-campaign-url').innerText = `https://apps.apple.com/app/id6757340383?ppid=${cpp.id}`;
-            document.getElementById('cpp-field-promo').value = cpp.promo;
-            document.getElementById('cpp-field-keywords').value = cpp.keywords;
-            
-            // Update counter labels
-            document.getElementById('cpp-counter-promo').innerText = `${cpp.promo.length} / 170`;
-            document.getElementById('cpp-counter-keywords').innerText = `${cpp.keywords.length} / 100`;
-
-            // Active list highlight styling
-            ['safety', 'oud', 'calc'].forEach(k => {
-                const row = document.getElementById(`cpp-list-item-${k}`);
-                if (k === cppKey) {
-                    row.classList.add('bg-blue-50/50', 'border-l-4', 'border-blue-500');
-                } else {
-                    row.classList.remove('bg-blue-50/50', 'border-l-4', 'border-blue-500');
-                }
-            });
-
-            // Set Simulator Mode
-            setSimMode(cppKey);
-        }
-
-        function updateCPPField(type) {
-            const cpp = cppData[currentActiveCPP];
-            if (type === 'promo') {
-                const val = document.getElementById('cpp-field-promo').value;
-                cpp.promo = val;
-                document.getElementById('cpp-counter-promo').innerText = `${val.length} / 170`;
-                if (simulatorMode === currentActiveCPP) {
-                    document.getElementById('sim-promo').innerText = val;
-                }
-            } else if (type === 'keywords') {
-                const val = document.getElementById('cpp-field-keywords').value;
-                cpp.keywords = val;
-                document.getElementById('cpp-counter-keywords').innerText = `${val.length} / 100`;
-            }
-        }
-
-        // Simulator modes and previews
-        function setSimMode(mode) {
-            simulatorMode = mode;
-
-            // Reset tab styles
+            // Toggle active classes on tab buttons
             ['default', 'safety', 'oud', 'calc'].forEach(m => {
-                const btn = document.getElementById(`sim-toggle-${m}`);
+                const btn = document.getElementById(`btn-tab-${m}`);
                 if (m === mode) {
-                    btn.classList.add('bg-white', 'shadow-sm', 'text-slate-800');
-                    btn.classList.remove('text-slate-600');
+                    btn.classList.add('bg-white', 'shadow-sm', 'text-neutral-800');
+                    btn.classList.remove('hover:bg-neutral-200/50');
                 } else {
-                    btn.classList.remove('bg-white', 'shadow-sm', 'text-slate-800');
-                    btn.classList.add('text-slate-600');
+                    btn.classList.remove('bg-white', 'shadow-sm', 'text-neutral-800');
+                    btn.classList.add('hover:bg-neutral-200/50');
                 }
             });
 
-            const simCampaignBox = document.getElementById('sim-campaign-box');
+            // Update app details
+            document.getElementById('store-subtitle').innerHTML = config.subtitle;
+            document.getElementById('store-promo').innerText = config.promo;
+            
+            // Re-render screenshots gallery
+            const scContainer = document.getElementById('store-screenshots');
+            scContainer.innerHTML = "";
+            config.images.forEach(imgSrc => {
+                if (imgSrc) {
+                    const box = document.createElement('div');
+                    box.className = "w-44 h-90 md:w-56 md:h-110 bg-neutral-100 rounded-2xl overflow-hidden flex-none snap-start border apple-border relative shadow-md hover:scale-[1.01] transition-transform cursor-pointer";
+                    box.innerHTML = `<img src="${imgSrc}" alt="Screenshot" class="w-full h-full object-cover">`;
+                    scContainer.appendChild(box);
+                }
+            });
 
+            // Update Campaign Details Banner
+            const banner = document.getElementById('campaign-banner');
             if (mode === 'default') {
-                // Restore default info
-                document.getElementById('sim-name').innerText = appState.name;
-                document.getElementById('sim-subtitle').innerText = appState.subtitle;
-                document.getElementById('sim-promo').innerText = appState.promotional_text;
-                document.getElementById('sim-desc').innerText = appState.description;
-                
-                // Screenshots
-                document.getElementById('sim-img-1').src = "assets/hero_product_mockup.png";
-                document.getElementById('sim-img-2').src = "assets/custom_product_page_mockup_risk_assessment_v1_1767467031818.png";
-                document.getElementById('sim-img-3').src = "assets/custom_product_page_mockup_oud_consult_v1_1767467050332.png";
-                
-                simCampaignBox.classList.add('hidden');
+                banner.classList.add('hidden');
             } else {
-                // Load Custom Product Page info
-                const cpp = cppData[mode];
-                document.getElementById('sim-name').innerText = appState.name;
-                document.getElementById('sim-subtitle').innerText = appState.subtitle;
-                document.getElementById('sim-promo').innerText = cpp.promo;
-                document.getElementById('sim-desc').innerText = appState.description; // Description matches base page
+                banner.classList.remove('hidden');
+                document.getElementById('campaign-badge').innerText = config.badge;
+                document.getElementById('campaign-deeplink').innerText = config.deeplink;
                 
-                // Screenshots
-                document.getElementById('sim-img-1').src = cpp.images[0] || "assets/hero_product_mockup.png";
-                document.getElementById('sim-img-2').src = cpp.images[1] || "";
-                document.getElementById('sim-img-3').src = cpp.images[2] || "";
-
-                // Update Campaign Link Input
-                document.getElementById('sim-campaign-link').value = `https://apps.apple.com/app/id6757340383?ppid=${cpp.id}`;
-                simCampaignBox.classList.remove('hidden');
+                const campaignURL = `https://apps.apple.com/app/id6757340383?ppid=${config.badge}`;
+                document.getElementById('campaign-url').value = campaignURL;
             }
         }
 
-        function copyCampaignLink() {
-            const link = document.getElementById('sim-campaign-link').value;
-            navigator.clipboard.writeText(link);
-            alert(`Campaign Link copied to clipboard:\n${link}`);
+        function copyCampaignURL() {
+            const copyText = document.getElementById('campaign-url');
+            navigator.clipboard.writeText(copyText.value);
+            alert(`App Store Campaign URL copied:\n${copyText.value}`);
         }
 
-        function saveAllChanges() {
-            alert("Success! All App Store Connect metadata configurations have been saved locally. These changes will compile with your next production build.");
-        }
-
-        function exportMetadata() {
-            const exportData = {
-                base_details: appState,
-                custom_product_pages: cppData
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 4));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "App_Store_Connect_Metadata_Export.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        // Initialize counters on load
+        // Initialize default view
         window.addEventListener('DOMContentLoaded', () => {
-            syncField('name');
-            syncField('subtitle');
-            syncField('promotional_text');
-            syncField('description');
-            syncField('keywords');
-            syncField('copyright');
-            
-            // Trigger initial selection for editor box
-            previewCPP('safety');
+            setStoreMode('default');
         });
     </script>
 </body>
