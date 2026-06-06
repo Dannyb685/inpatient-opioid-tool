@@ -34,6 +34,7 @@
         "Web_Version",
         "node_modules",
         "web-dist",
-        "_Archive"
+        "_Archive",
+        "vite.config.ts"
     ]
 }
