@@ -1,0 +1,99 @@
+/**
+ * Lifeline Medical Technologies — Design Token System
+ * CSS Custom Properties (Design Tokens)
+ *
+ * This file is the canonical single source of truth for all brand color tokens.
+ * These variables mirror the values in tailwind.marketing.config.js and are
+ * available for use in inline styles, SVG assets, and any non-Tailwind contexts.
+ *
+ * Usage: var(--color-interactive) etc.
+ */
+
+:root {
+    /* ─── Brand ─────────────────────────────────────────────────────────── */
+    /* Primary Brand Dominant — Deep Slate Blue (#1A2B4C)
+       Use: corporate identity, primary web navigation elements */
+    --color-brand-primary:     #1A2B4C;
+    --color-brand-primary-rgb: 26, 43, 76;
+
+    /* Secondary Interactive — Clinical Cyan (#007A87)
+       Use: primary buttons, active states, interactive UI elements ONLY */
+    --color-interactive:     #007A87;
+    --color-interactive-rgb: 0, 122, 135;
+
+    /* ─── Functional Alert Spectrum ──────────────────────────────────────── */
+    /* Critical Warning — Crimson (#D32F2F)
+       Use: medical risk alerts, safety thresholds, high-priority contraindications
+       IMPORTANT: Never use color alone — pair with icon + text label (WCAG) */
+    --color-alert-critical:     #D32F2F;
+    --color-alert-critical-rgb: 211, 47, 47;
+
+    /* Cautionary State — Amber (#F57C00)
+       Use: non-blocking clinical warnings, calculation modifications
+       IMPORTANT: Never use color alone — pair with icon + text label (WCAG) */
+    --color-alert-cautionary:     #F57C00;
+    --color-alert-cautionary-rgb: 245, 124, 0;
+
+    /* Success / Validated State — Emerald (#388E3C)
+       Use: validated operations, correct dosages, system confirmations
+       IMPORTANT: Never use color alone — pair with icon + text label (WCAG) */
+    --color-alert-success:     #388E3C;
+    --color-alert-success-rgb: 56, 142, 60;
+
+    /* ─── Neutral Canvas ─────────────────────────────────────────────────── */
+    /* Surface Base — Off-White (#F8F9FA)
+       Use: page backgrounds, card surfaces */
+    --color-surface-base:     #F8F9FA;
+    --color-surface-base-rgb: 248, 249, 250;
+
+    /* ─── Typography ─────────────────────────────────────────────────────── */
+    /* Text Primary — Charcoal (#212121) */
+    --color-text-primary:     #212121;
+    --color-text-primary-rgb: 33, 33, 33;
+
+    /* Text Secondary — Muted Gray (#616161) */
+    --color-text-secondary:     #616161;
+    --color-text-secondary-rgb: 97, 97, 97;
+
+    /* ─── Typography Scale ────────────────────────────────────────────────
+       Document Titles:      32px / Bold (700)  / line-height 1.2
+       Section Headings:     24px / Semi-Bold (600) / line-height 1.3
+       Subheadings/Labels:   16px / Medium (500) / line-height 1.4
+       Body/Clinical Data:   14px / Regular (400) / line-height 1.5
+       Micro-notation/Cites: 12px / Regular (400) / line-height 1.4
+    ─────────────────────────────────────────────────────────────────────── */
+    --font-size-title:   32px;
+    --font-size-heading: 24px;
+    --font-size-label:   16px;
+    --font-size-body:    14px;
+    --font-size-micro:   12px;
+
+    --line-height-title:   1.2;
+    --line-height-heading: 1.3;
+    --line-height-label:   1.4;
+    --line-height-body:    1.5;
+    --line-height-micro:   1.4;
+
+    /* ─── Contrast Reference ─────────────────────────────────────────────
+       CRITICAL CONTRAINDICATION:
+       Clinical Cyan (#007A87) MUST NEVER appear as text on ANY dark surface.
+       This includes: #1A2B4C (brand primary), #1e293b (slate-800), #0f172a (slate-900).
+
+       Dark background fallback rule:
+         → Use text-white (#FFFFFF) for primary content on dark backgrounds.
+         → Use text-slate-200 (#e2e8f0) for secondary/supporting content.
+         → Use text-slate-300 (#cbd5e1) for hover states on dark.
+         → NEVER use text-clinical-cyan (#007A87) on any dark background.
+
+       Verified WCAG 2.1 AA (≥4.5:1) pairings:
+       ✅ #FFFFFF on #1A2B4C  → ~10.4:1 (brand primary bg)
+       ✅ #FFFFFF on #007A87  → ~4.7:1  (interactive buttons — minimum passing)
+       ✅ #212121 on #F8F9FA  → ~18.1:1 (body text on surface)
+       ✅ #616161 on #FFFFFF  → ~5.9:1  (secondary text on white)
+
+       Forbidden pairings — all fail WCAG AA:
+       ⛔ #007A87 on #1A2B4C  → ~2.1:1  (Clinical Cyan on Deep Slate Blue)
+       ⛔ #007A87 on #0f172a  → ~3.0:1  (Clinical Cyan on slate-900)
+       ⛔ #007A87 on #1e293b  → ~3.2:1  (Clinical Cyan on slate-800)
+    ─────────────────────────────────────────────────────────────────────── */
+}

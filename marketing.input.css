@@ -1,3 +1,71 @@
+/* Lifeline Medical Technologies — Marketing CSS Entry Point */
+
+/* Import canonical design tokens (CSS custom properties) */
+@import url('./assets/design-tokens.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ─── Typography Scale Utilities ─────────────────────────────────────────────
+   These @layer components enforce the brand typographic spec in contexts
+   where inline Tailwind scale classes are insufficient.
+─────────────────────────────────────────────────────────────────────────────── */
+@layer components {
+    /* Document Titles — 32px, Bold (700), line-height 1.2 */
+    .text-doc-title {
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--color-text-primary);
+    }
+
+    /* Section Headings — 24px, Semi-Bold (600), line-height 1.3 */
+    .text-section-heading {
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.3;
+        color: var(--color-text-primary);
+    }
+
+    /* Subheadings / UI Labels — 16px, Medium (500), line-height 1.4 */
+    .text-ui-label {
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.4;
+        color: var(--color-text-primary);
+    }
+
+    /* Body Text / Clinical Data — 14px, Regular (400), line-height 1.5 */
+    .text-clinical-body {
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--color-text-primary);
+    }
+
+    /* Micro-notation / Source Citations — 12px, Regular (400), line-height 1.4 */
+    .text-citation {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.4;
+        color: var(--color-text-secondary);
+    }
+
+    /* ─── Alert Component Guardrails ─────────────────────────────────────
+       These classes enforce the accessibility rule: color MUST be paired
+       with a distinct icon or text signifier — never color alone.
+    ──────────────────────────────────────────────────────────────────────── */
+    .alert-critical {
+        color: #D32F2F;
+        /* Pair with: data-lucide="alert-triangle" or text prefix "⚠ CRITICAL:" */
+    }
+    .alert-cautionary {
+        color: #F57C00;
+        /* Pair with: data-lucide="alert-circle" or text prefix "⚠ CAUTION:" */
+    }
+    .alert-success {
+        color: #388E3C;
+        /* Pair with: data-lucide="check-circle" or text prefix "✓ VALIDATED:" */
+    }
+}
