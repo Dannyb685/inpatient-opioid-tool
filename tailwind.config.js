@@ -3,6 +3,17 @@ module.exports = {
     content: ["./src/**/*.{js,jsx,ts,tsx}"],
     darkMode: 'class',
     theme: {
+        screens: {
+            'md': '768px',   // Tablet Portrait
+            'lg': '1024px',  // Tablet Landscape
+            'xl': '1280px',  // Max Desktop Container
+        },
+        container: {
+            center: true,
+            screens: {
+                'xl': '1280px',
+            }
+        },
         extend: {
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],

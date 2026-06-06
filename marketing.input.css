@@ -57,15 +57,15 @@
        with a distinct icon or text signifier — never color alone.
     ──────────────────────────────────────────────────────────────────────── */
     .alert-critical {
-        color: #D32F2F;
+        color: #E11D48; /* Rose 600 */
         /* Pair with: data-lucide="alert-triangle" or text prefix "⚠ CRITICAL:" */
     }
     .alert-cautionary {
-        color: #F57C00;
+        color: #D97706; /* Amber 600 */
         /* Pair with: data-lucide="alert-circle" or text prefix "⚠ CAUTION:" */
     }
     .alert-success {
-        color: #388E3C;
+        color: #10B981; /* Emerald 500 */
         /* Pair with: data-lucide="check-circle" or text prefix "✓ VALIDATED:" */
     }
 }

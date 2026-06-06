@@ -1,53 +1,38 @@
 /** @type {import('tailwindcss').Config} */
-// Design Token System — Lifeline Medical Technologies
-// Exact hex values per the approved brand specification document.
+// Canonical Design Token System — Lifeline Medical Technologies
+// Colors directly match the iOS app's src/input.css to ensure complete visual consistency.
 module.exports = {
     content: ["./index.html", "./privacy.html", "./support.html", "./integration.html"],
     theme: {
+        screens: {
+            'md': '768px',   // Tablet Portrait
+            'lg': '1024px',  // Tablet Landscape
+            'xl': '1280px',  // Max Desktop Container
+        },
+        container: {
+            center: true,
+            screens: {
+                'xl': '1280px',
+            }
+        },
         extend: {
             colors: {
                 clinical: {
-                    // Primary Brand Dominant — Deep Slate Blue
-                    // Anchors corporate identity and primary web navigation elements.
-                    slate:   '#1A2B4C',
-
-                    // Secondary Interactive — Clinical Cyan
-                    // Exclusive use: primary buttons, active states, interactive UI elements.
-                    cyan:    '#007A87',
-
-                    // Functional Alert Spectrum
-                    // Critical Warning — Crimson (medical risk alerts, safety thresholds, high-priority contraindications)
-                    crimson: '#D32F2F',
-                    // Cautionary State — Amber (non-blocking clinical warnings, calculation modifications)
-                    amber:   '#F57C00',
-                    // Success State — Emerald (validated operations, correct dosages, system confirmations)
-                    emerald: '#388E3C',
-
-                    // Neutral Canvas
-                    // Surface Base — Off-White
-                    bg:      '#F8F9FA',
-                    // Text Primary — Charcoal
-                    charcoal:'#212121',
-                    // Text Secondary — Muted Gray
-                    muted:   '#616161',
+                    // Primary Brand Dominant — Slate 900
+                    slate:   '#0F172A',
+                    // Secondary Interactive — Teal 600
+                    teal:    '#0D9488',
+                    // Critical Warning — Rose 600
+                    rose:    '#E11D48',
+                    // Cautionary State — Amber 600
+                    amber:   '#D97706',
+                    // Surface Base — Slate 50
+                    bg:      '#F8FAFC',
                 }
             },
             fontFamily: {
                 // Primary typeface: Inter (geometric sans-serif for clinical legibility)
                 sans: ['Inter', '-apple-system', 'system-ui', 'sans-serif'],
-            },
-            fontSize: {
-                // Typographic scale per brand specification
-                // Document Titles: 32px, Bold (700), line-height 1.2
-                'title':     ['32px', { lineHeight: '1.2', fontWeight: '700' }],
-                // Section Headings: 24px, Semi-Bold (600), line-height 1.3
-                'heading':   ['24px', { lineHeight: '1.3', fontWeight: '600' }],
-                // Subheadings / UI Labels: 16px, Medium (500), line-height 1.4
-                'sublabel':  ['16px', { lineHeight: '1.4', fontWeight: '500' }],
-                // Body Text / Clinical Data: 14px, Regular (400), line-height 1.5
-                'body':      ['14px', { lineHeight: '1.5', fontWeight: '400' }],
-                // Micro-notation / Source Citations: 12px, Regular (400), line-height 1.4
-                'micro':     ['12px', { lineHeight: '1.4', fontWeight: '400' }],
             },
         }
     },
