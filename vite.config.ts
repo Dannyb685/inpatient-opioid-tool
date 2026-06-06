@@ -16,8 +16,6 @@ export default defineConfig({
                 main: path.resolve(__dirname, 'index.html'),
                 privacy: path.resolve(__dirname, 'privacy.html'),
                 support: path.resolve(__dirname, 'support.html'),
-                integration: path.resolve(__dirname, 'integration.html'),
-                appstore: path.resolve(__dirname, 'appstore.html'),
             },
         },
     },
