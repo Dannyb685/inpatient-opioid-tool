@@ -1,9 +1,0 @@
-@tailwind components;
-@tailwind utilities;
-
-/* Standard Web App Resets - No Scoping Needed (Iframe Isolated) */
-body {
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-}

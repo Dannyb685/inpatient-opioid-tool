@@ -59,6 +59,7 @@
                 <a href="#impact" class="hover:text-clinical-teal transition">The $95B Liability</a>
                 <a href="#solution" class="hover:text-clinical-teal transition">Logic Engine</a>
                 <a href="#benchmarks" class="hover:text-clinical-teal transition">Strategic Benchmarks</a>
+                <a href="integration.html" class="hover:text-clinical-teal transition">EHR Integration</a>
             </div>
             <div class="flex gap-3 items-center">
                  <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="hidden sm:flex bg-clinical-slate text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition items-center gap-2">
@@ -76,6 +77,7 @@
                 <a href="#impact" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">The $95B Liability</a>
                 <a href="#solution" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Logic Engine</a>
                 <a href="#benchmarks" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Strategic Benchmarks</a>
+                <a href="integration.html" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu').classList.add('hidden')">EHR Integration</a>
                 <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="sm:hidden bg-clinical-slate text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition text-center">
                     Demo the iOS Beta
                 </a>
@@ -99,8 +101,8 @@
                     Precision Analgesia resolves the tension between pain management and safety. Replaces manual calculation with <strong>EMR-integrated forcing functions</strong> to mitigate liability and cost.
                 </p>
                 <div class="flex gap-4 flex-col sm:flex-row justify-center md:justify-start">
-                    <a href="mailto:dan@lifelinemedtech.org?subject=Integration%20Guide%20Request" class="bg-clinical-teal text-white px-8 py-4 rounded-xl font-semibold hover:bg-teal-700 transition shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2">
-                        <i data-lucide="server" class="w-5 h-5"></i> Request Integration Guide
+                    <a href="integration.html" class="bg-clinical-teal text-white px-8 py-4 rounded-xl font-semibold hover:bg-teal-700 transition shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2">
+                        <i data-lucide="server" class="w-5 h-5"></i> View Integration Guide
                     </a>
                     <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-xl font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
                         <i data-lucide="smartphone" class="w-5 h-5"></i> Demo the iOS Beta
@@ -194,7 +196,7 @@
                     </div>
                     <h3 class="text-xl font-bold mb-3">Renal Gating (Hard Stop)</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Passive alerts are ignored 90% of the time. Our engine <strong>hard-blocks</strong> active metabolites (e.g., Morphine) when GFR < 30, requiring clinical justification to proceed.
+                        Passive alerts are ignored 90% of the time. Our engine <strong>hard-blocks</strong> active metabolites (e.g., Morphine) when GFR &lt; 30, requiring clinical justification to proceed.
                     </p>
                 </div>
                 <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-2xl hover:border-clinical-amber transition group">
@@ -350,9 +352,9 @@
                 </p>
             </div>
             <div class="flex flex-col items-center md:items-end gap-2">
-                <div class="flex gap-4 text-sm">
-                    <a href="privacy.html" class="hover:text-white transition">Privacy Policy</a>
-                    <a href="support.html" class="hover:text-white transition">Support</a>
+                <div class="flex gap-4 text-sm text-slate-400">
+                    <button onclick="document.getElementById('privacy-modal').classList.remove('hidden')" class="hover:text-white transition cursor-pointer">Privacy Policy</button>
+                    <button onclick="document.getElementById('support-modal').classList.remove('hidden')" class="hover:text-white transition cursor-pointer">Support</button>
                     <a href="https://www.instagram.com/lifelinemedtech/" target="_blank" class="hover:text-white transition">Instagram</a>
                 </div>
                 <p class="text-xs text-slate-500">
@@ -362,8 +364,63 @@
         </div>
     </footer>
 
+    <!-- Modals -->
+    <div id="privacy-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden text-left relative">
+            <button onclick="document.getElementById('privacy-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="p-8 overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-4 text-slate-900">Privacy Policy</h2>
+                <p class="text-sm text-slate-500 mb-6">Effective Date: June 5, 2026</p>
+                
+                <h3 class="font-semibold text-lg mb-2 text-slate-900">1. No User Data Collection</h3>
+                <p class="text-slate-600 mb-6 text-sm">Lifeline Medical Technologies, LLC respects your privacy. The PrecisionAnalgesia application and associated clinical decision support tools do <strong>not</strong> collect, store, transmit, or share any personal user data, patient health information (PHI), or analytics data.</p>
+                
+                <h3 class="font-semibold text-lg mb-2 text-slate-900">2. "Glass Box" Architecture</h3>
+                <p class="text-slate-600 mb-6 text-sm">Our applications operate completely on-device or within the secure confines of your institution's EHR. No data ever leaves your device or EHR environment.</p>
+                
+                <h3 class="font-semibold text-lg mb-2 text-slate-900">3. Contact Us</h3>
+                <p class="text-slate-600 text-sm">Questions? Contact us at <a href="mailto:dan@lifelinemedtech.org" class="text-teal-600 hover:underline">dan@lifelinemedtech.org</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="support-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden text-left relative">
+            <button onclick="document.getElementById('support-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="p-8 overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-4 text-slate-900">Support & Contact</h2>
+                <p class="text-slate-600 mb-8 text-sm">If you encounter any issues or need assistance with EHR integration, our team is here to help.</p>
+                
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 mb-4">
+                    <h3 class="font-bold mb-1 text-slate-900">Technical & Clinical Support</h3>
+                    <p class="text-slate-600 text-sm mb-3">For application bugs, clinical logic questions, or general inquiries.</p>
+                    <a href="mailto:dan@lifelinemedtech.org" class="text-teal-600 font-semibold hover:underline text-sm">dan@lifelinemedtech.org</a>
+                </div>
+
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <h3 class="font-bold mb-1 text-slate-900">EHR Integration</h3>
+                    <p class="text-slate-600 text-sm mb-3">If you are an institution looking to integrate our logic engine, view our Integration Guide.</p>
+                    <a href="integration.html" class="text-teal-600 font-semibold hover:underline text-sm">View Integration Guide</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Ensure lucide icons in modals are drawn
         lucide.createIcons();
+        
+        // Add click outside to close functionality
+        document.getElementById('privacy-modal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.add('hidden');
+        });
+        document.getElementById('support-modal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.add('hidden');
+        });
     </script>
 </body>
 </html>
