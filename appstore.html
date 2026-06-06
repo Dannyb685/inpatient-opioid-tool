@@ -3,446 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Precision Analgesia on the App Store</title>
+    <title>Precision Analgesia | Clinical Feature Showcase</title>
+    <meta name="description" content="In-depth clinical showcase of Precision Analgesia by Lifeline Medical Technologies. Explore GFR gating, pharmacokinetic conversions, OUD tools, and CDS compliance.">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Compiled Tailwind CSS -->
     <link rel="stylesheet" href="assets/marketing.compiled.css">
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@0.460.0"></script>
-    
-    <style>
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f5f5f7;
-            color: #1d1d1f;
-        }
-        /* Apple Web Design System Colors */
-        .apple-blue {
-            color: #0066cc;
-        }
-        .bg-apple-blue {
-            background-color: #0066cc;
-        }
-        .bg-apple-blue:hover {
-            background-color: #0044aa;
-        }
-        .apple-grey-bg {
-            background-color: #f5f5f7;
-        }
-        .apple-border {
-            border-color: #e5e5ea;
-        }
-        /* Custom scrollbar for screenshots */
-        .screenshot-container::-webkit-scrollbar {
-            height: 6px;
-        }
-        .screenshot-container::-webkit-scrollbar-track {
-            background: #f5f5f7;
-            border-radius: 10px;
-        }
-        .screenshot-container::-webkit-scrollbar-thumb {
-            background: #d1d1d6;
-            border-radius: 10px;
-        }
-    </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col">
+<body class="bg-clinical-bg text-clinical-slate selection:bg-teal-100 font-sans min-h-screen flex flex-col">
 
-    <!-- Translucent Apple Header Navigation Bar Mock -->
-    <nav class="bg-[#1d1d1f]/90 backdrop-blur-md text-[#f5f5f7] sticky top-0 z-50 text-xs border-b border-neutral-800 flex-none h-11">
-        <div class="max-w-5xl mx-auto px-6 h-full flex items-center justify-between font-normal tracking-tight">
-            <div class="flex items-center gap-6 md:gap-8 overflow-x-auto scrollbar-none py-1 w-full justify-between md:justify-start">
-                <a href="index.html" class="hover:text-white transition flex items-center gap-1.5 font-semibold">
-                    <i data-lucide="activity" class="w-4 h-4 text-teal-400"></i>
-                    <span>Precision Analgesia</span>
-                </a>
-                <span class="text-neutral-600 hidden md:inline">|</span>
-                <span class="hover:text-white transition cursor-pointer font-medium text-white">App Store Preview</span>
-                <span class="text-neutral-500 text-[10px] bg-neutral-800 border border-neutral-700 px-2 py-0.5 rounded font-mono hidden md:inline">Vercel Abatement Deployment</span>
-            </div>
-            <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="hidden md:flex bg-apple-blue text-white px-3 py-1 rounded-full text-[11px] font-bold transition shadow-sm">
-                Join Beta
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 bg-clinical-teal rounded-lg flex items-center justify-center text-white font-bold group-hover:bg-teal-700 transition">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-slate-800 tracking-tight">Precision Analgesia</span>
             </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
+                <a href="#safety" class="hover:text-clinical-teal transition">Safety &amp; Risk</a>
+                <a href="#dosing" class="hover:text-clinical-teal transition">Precision dosing</a>
+                <a href="#oud" class="hover:text-clinical-teal transition">OUD Consults</a>
+                <a href="#compliance" class="hover:text-clinical-teal transition">CDS Compliance</a>
+            </div>
+            <div class="flex gap-3 items-center">
+                <a href="index.html" class="text-xs text-slate-500 hover:text-slate-800 font-semibold transition hidden sm:inline">Back to Home</a>
+                <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-clinical-teal text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-teal-700 transition shadow-md shadow-teal-500/10 flex items-center gap-1.5">
+                    <i data-lucide="smartphone" class="w-4 h-4"></i> Join iOS Beta
+                </a>
+            </div>
         </div>
     </nav>
 
-    <!-- Main Container -->
-    <main class="flex-1 max-w-5xl w-full mx-auto px-6 py-8 md:py-12 flex flex-col gap-8">
-        
-        <!-- Breadcrumbs -->
-        <div class="text-xs text-neutral-500 flex items-center gap-1">
-            <span>App Store Preview</span>
-            <i data-lucide="chevron-right" class="w-3 h-3"></i>
-            <span class="text-neutral-600 font-medium">Medical</span>
-            <i data-lucide="chevron-right" class="w-3 h-3"></i>
-            <span class="text-neutral-400">Precision Analgesia</span>
-        </div>
-
-        <!-- Custom Product Page Interactive Segment Control (PROMOTIONAL KEYBOARD) -->
-        <div class="bg-white border apple-border p-4 md:p-5 rounded-2xl shadow-sm flex flex-col gap-4">
-            <div>
-                <h3 class="text-xs font-extrabold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
-                    <i data-lucide="layers" class="w-4 h-4 text-apple-blue"></i>
-                    Clinical focus preview
-                </h3>
-                <p class="text-xs text-neutral-500 mt-1">Select a clinical campaign option below to see how our App Store product listing adapts details, screenshots, and deep links for targeted medical settings.</p>
+    <!-- Header Section -->
+    <header class="bg-white border-b border-slate-200 py-12 md:py-16 px-6">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row gap-8 items-center">
+            <!-- App Icon Frame -->
+            <div class="w-24 h-24 md:w-32 md:h-32 bg-clinical-teal rounded-3xl flex items-center justify-center text-white flex-none shadow-xl shadow-teal-600/10 border border-teal-500/20">
+                <i data-lucide="activity" class="w-12 h-12 md:w-16 md:h-16 text-white"></i>
             </div>
-            
-            <!-- Tab switches -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 bg-neutral-100 p-1 rounded-xl text-xs font-bold text-neutral-600">
-                <button onclick="setStoreMode('default')" id="btn-tab-default" class="py-2.5 rounded-lg text-neutral-800 bg-white shadow-sm transition">Default Page</button>
-                <button onclick="setStoreMode('safety')" id="btn-tab-safety" class="py-2.5 rounded-lg hover:text-neutral-900 hover:bg-neutral-200/50 transition">Safety &amp; Risk</button>
-                <button onclick="setStoreMode('oud')" id="btn-tab-oud" class="py-2.5 rounded-lg hover:text-neutral-900 hover:bg-neutral-200/50 transition">OUD &amp; Addiction</button>
-                <button onclick="setStoreMode('calc')" id="btn-tab-calc" class="py-2.5 rounded-lg hover:text-neutral-900 hover:bg-neutral-200/50 transition">dosing &amp; Calc</button>
-            </div>
-
-            <!-- Campaign deep links badge -->
-            <div id="campaign-banner" class="bg-blue-50 border border-blue-100 p-3 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs text-blue-900 hidden transition-all duration-300">
-                <div class="flex items-center gap-2">
-                    <span class="font-bold text-[10px] uppercase bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full border border-blue-200" id="campaign-badge">cpp_safety_risk</span>
-                    <span class="font-medium">Deep Link: <code class="font-mono text-[11px] bg-blue-100/50 px-1 py-0.5 rounded select-all" id="campaign-deeplink">opioidprecision://assessment</code></span>
+            <!-- Showcase Header Content -->
+            <div class="flex-1 text-center md:text-left">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 border border-teal-100 text-clinical-teal text-xs font-bold rounded-full mb-4 uppercase tracking-wider">
+                    <span class="w-1.5 h-1.5 rounded-full bg-clinical-teal animate-pulse"></span>
+                    Clinical Showcase
                 </div>
-                <div class="flex items-center gap-2 w-full md:w-auto">
-                    <input type="text" id="campaign-url" class="bg-white border border-blue-200 text-[10px] text-blue-800 font-mono p-1.5 rounded flex-1 md:w-80 outline-none select-all" readonly>
-                    <button onclick="copyCampaignURL()" class="bg-blue-600 text-white hover:bg-blue-700 px-3 py-1.5 rounded font-bold shadow-sm transition flex items-center gap-1">
-                        <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Link
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- App Store White Page Card -->
-        <section class="bg-white border apple-border rounded-3xl p-6 md:p-10 shadow-sm flex flex-col gap-8">
-            
-            <!-- Hero Header Section -->
-            <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center border-b apple-border pb-8">
-                <!-- App Icon -->
-                <div class="w-28 h-28 md:w-36 md:h-36 bg-cyan-700 rounded-[22%] flex items-center justify-center text-white flex-none shadow-xl border border-cyan-800 relative overflow-hidden">
-                    <i data-lucide="activity" class="w-16 h-16 md:w-20 md:h-20 text-white"></i>
-                </div>
-                <!-- Metadata Details -->
-                <div class="flex-1 flex flex-col justify-between py-1">
-                    <div>
-                        <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-neutral-900 leading-tight">Precision Analgesia</h1>
-                        <p id="store-subtitle" class="text-sm md:text-base text-neutral-500 font-medium leading-snug mt-1">Clinical Opioid Decision Tools</p>
-                        <p class="text-xs text-neutral-400 font-semibold mt-1">Lifeline Medical Technologies, LLC</p>
-                    </div>
-                    <div class="flex items-center gap-4 mt-6">
-                        <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-apple-blue text-white text-xs font-extrabold px-6 py-2 rounded-full uppercase transition shadow-sm hover:scale-[1.02] active:scale-[0.98]">
-                            Get Beta
-                        </a>
-                        <span class="text-[10px] text-neutral-400 font-medium">In-App Purchases / Free</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Highlights Badges Bar -->
-            <div class="grid grid-cols-3 md:grid-cols-6 gap-4 text-center border-b apple-border pb-6 text-xs text-neutral-800">
-                <div class="border-r border-neutral-100 flex flex-col justify-center">
-                    <div class="font-extrabold text-neutral-900 text-sm">4.9 ★</div>
-                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">14 Ratings</div>
-                </div>
-                <div class="border-r border-neutral-100 flex flex-col justify-center">
-                    <div class="font-extrabold text-neutral-900 text-sm">18+</div>
-                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">Age Rating</div>
-                </div>
-                <div class="border-r border-neutral-100 md:border-r flex flex-col justify-center">
-                    <div class="font-extrabold text-neutral-900 text-sm">#42</div>
-                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">In Medical</div>
-                </div>
-                <div class="border-r border-neutral-100 flex flex-col justify-center hidden md:flex">
-                    <div class="font-extrabold text-[#0066cc] text-sm"><i data-lucide="building" class="w-4 h-4 mx-auto"></i></div>
-                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">Developer</div>
-                </div>
-                <div class="border-r border-neutral-100 flex flex-col justify-center hidden md:flex">
-                    <div class="font-extrabold text-neutral-900 text-sm">EN</div>
-                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">Language</div>
-                </div>
-                <div class="flex flex-col justify-center hidden md:flex">
-                    <div class="font-extrabold text-neutral-900 text-sm">24.5 MB</div>
-                    <div class="text-[9px] text-neutral-400 uppercase mt-1 font-bold">Size</div>
-                </div>
-            </div>
-
-            <!-- Screenshot Previews -->
-            <div>
-                <h2 class="text-sm font-extrabold text-neutral-900 mb-4 tracking-tight uppercase">iPhone Previews</h2>
-                <div class="flex gap-4 overflow-x-auto pb-4 screenshot-container snap-x" id="store-screenshots">
-                    <!-- Images loaded dynamically -->
-                </div>
-            </div>
-
-            <!-- Promotional & Description -->
-            <div class="grid md:grid-cols-3 gap-8 border-t apple-border pt-8">
-                <div class="md:col-span-2 space-y-4">
-                    <p id="store-promo" class="text-sm font-semibold italic text-neutral-700 leading-normal border-l-4 border-teal-500 pl-4">
-                        Advanced inpatient clinical decision support to mitigate high-risk opioid prescribing.
-                    </p>
-                    <div class="text-xs text-neutral-600 leading-relaxed font-normal whitespace-pre-line">
-                        <p id="store-description" class="line-clamp-6">PrecisionAnalgesia by Lifeline Medical Technologies is a comprehensive clinical decision support tool engineered to integrate directly into inpatient clinical workflows. Developed to support opioid stewardship, this application provides vital calculations and clinical logic to enhance patient safety and reduce adverse events.
-
-Key Features:
-- Advanced Opioid Calculator: Accurately calculate daily MME and perform complex opioid conversions, including considerations for active metabolites (e.g., Morphine-6-glucuronide).
-- Renal & Hepatic Gating Logic: Built-in recommendations and dosage adjustments for patients with compromised renal or hepatic function.
-- Methadone Guardrails: Replace dangerous static conversion tables with advanced pharmacokinetic modeling that accounts for variable half-lives.
-- OUD Consult Assistant: A standardized workflow for Opioid Use Disorder assessments (incorporating COWS) to recommend evidence-based medication-assisted treatment (MAT) like Buprenorphine/Naloxone.
-- Pain Assessment Tracking: Detailed VAS scales, pain mapping, and symptom checklists to monitor treatment efficacy over time.
-
-Regulatory & Safe Harbor Notice: 
-PrecisionAnalgesia is categorized as a Non-Device Clinical Decision Support (CDS) tool. It is intended to provide evidence-based information to healthcare professionals to assist them in managing patient care. This tool is designed to support, but does not replace, the independent clinical judgment of a qualified healthcare provider. The clinician is solely responsible for all final diagnosis and treatment decisions.</p>
-                        <button onclick="document.getElementById('store-description').classList.toggle('line-clamp-6'); this.innerText = this.innerText === 'More' ? 'Less' : 'More';" class="text-apple-blue font-bold mt-2 outline-none">More</button>
-                    </div>
-                </div>
-                
-                <!-- Quick Info Panel -->
-                <div class="bg-neutral-50 p-5 rounded-2xl border apple-border flex flex-col gap-3 text-[11px] text-neutral-500">
-                    <div class="border-b border-neutral-200/60 pb-2 flex justify-between">
-                        <span>Provider</span>
-                        <span class="font-semibold text-neutral-800">Lifeline Medical Technologies, LLC</span>
-                    </div>
-                    <div class="border-b border-neutral-200/60 pb-2 flex justify-between">
-                        <span>Size</span>
-                        <span class="font-semibold text-neutral-800">24.5 MB</span>
-                    </div>
-                    <div class="border-b border-neutral-200/60 pb-2 flex justify-between">
-                        <span>Category</span>
-                        <span class="font-semibold text-neutral-800">Medical</span>
-                    </div>
-                    <div class="border-b border-neutral-200/60 pb-2 flex flex-col gap-1">
-                        <span>Compatibility</span>
-                        <span class="font-semibold text-neutral-800 leading-normal">iPhone: iOS 15.0 or later.<br>iPad: iPadOS 15.0 or later.<br>Mac: macOS 12.0 or later (Apple Silicon).<br>Vision Pro: visionOS 1.0 or later.</span>
-                    </div>
-                    <div class="border-b border-neutral-200/60 pb-2 flex justify-between">
-                        <span>Languages</span>
-                        <span class="font-semibold text-neutral-800">English (U.S.)</span>
-                    </div>
-                    <div class="pb-1 flex justify-between">
-                        <span>Copyright</span>
-                        <span class="font-semibold text-neutral-800">© 2026 Lifeline Medical</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- What's New Section -->
-            <div class="border-t apple-border pt-8">
-                <div class="flex items-center justify-between mb-3">
-                    <h2 class="text-sm font-extrabold text-neutral-900 tracking-tight uppercase">What's New</h2>
-                    <span class="text-xs text-neutral-400 font-medium">Version 1.0.0</span>
-                </div>
-                <p class="text-xs text-neutral-600 leading-relaxed">
-                    Initial launch submission to App Store Connect. Fully aligned with the CDC 2022 Clinical Practice Guidelines. Features inpatient conversion calculations, active renal guarding logic (Morphine GFR gating), non-linear pharmacokinetic modeling for Methadone accumulations, and structured COWS / OUD assessments. Built-in compliance logs and EMR integration guidelines.
+                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-clinical-slate leading-tight">
+                    Precision Analgesia Feature Portfolio
+                </h1>
+                <p class="text-base md:text-lg text-slate-600 mt-3 max-w-3xl leading-relaxed font-light">
+                    Explore the clinical mechanics, organ-specific gating logic, and standardized workflows behind our inpatient equianalgesic decision support system.
                 </p>
-            </div>
-
-            <!-- Simulated Clinical Reviews & Ratings -->
-            <div class="border-t apple-border pt-8 flex flex-col gap-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-sm font-extrabold text-neutral-900 tracking-tight uppercase">Clinical Ratings &amp; Reviews</h2>
-                    <span class="text-xs text-apple-blue font-bold cursor-pointer hover:underline">See All Reviews</span>
-                </div>
-
-                <div class="grid md:grid-cols-3 gap-4">
-                    <!-- Review 1 -->
-                    <div class="bg-neutral-50 p-5 rounded-2xl border apple-border flex flex-col gap-2.5">
-                        <div class="flex justify-between items-center text-[10px]">
-                            <span class="font-bold text-neutral-800">Dr. Sarah Jenkins</span>
-                            <span class="text-neutral-400">June 5, 2026</span>
-                        </div>
-                        <div class="text-amber-500 text-xs">★★★★★</div>
-                        <div class="text-[11px] font-bold text-neutral-800">Essential GFR Guardrails</div>
-                        <p class="text-[11px] text-neutral-600 leading-relaxed">
-                            "A game changer for floor safety. GFR-based organ gating prevents high-risk active metabolite accumulation. Highly recommend for inpatient EHR sets."
-                        </p>
-                        <span class="text-[9px] text-neutral-400 font-semibold mt-auto flex items-center gap-1">
-                            <i data-lucide="shield-check" class="w-3 h-3 text-emerald-500"></i> Chief of Anesthesiology
-                        </span>
-                    </div>
-
-                    <!-- Review 2 -->
-                    <div class="bg-neutral-50 p-5 rounded-2xl border apple-border flex flex-col gap-2.5">
-                        <div class="flex justify-between items-center text-[10px]">
-                            <span class="font-bold text-neutral-800">Robert Chen, PharmD</span>
-                            <span class="text-neutral-400">June 2, 2026</span>
-                        </div>
-                        <div class="text-amber-500 text-xs">★★★★★</div>
-                        <div class="text-[11px] font-bold text-neutral-800">Uniquely standardizes opioid math</div>
-                        <p class="text-[11px] text-neutral-600 leading-relaxed">
-                            "Equianalgesic calculations are finally standardized. Non-linear Methadone half-life calculations replace unsafe static tables. Saves hours and prevents errors."
-                        </p>
-                        <span class="text-[9px] text-neutral-400 font-semibold mt-auto flex items-center gap-1">
-                            <i data-lucide="shield-check" class="w-3 h-3 text-emerald-500"></i> Clinical Pharmacist
-                        </span>
-                    </div>
-
-                    <!-- Review 3 -->
-                    <div class="bg-neutral-50 p-5 rounded-2xl border apple-border flex flex-col gap-2.5">
-                        <div class="flex justify-between items-center text-[10px]">
-                            <span class="font-bold text-neutral-800">Elena Rostova, LCSW</span>
-                            <span class="text-neutral-400">May 28, 2026</span>
-                        </div>
-                        <div class="text-amber-500 text-xs">★★★★★</div>
-                        <div class="text-[11px] font-bold text-neutral-800">Intuitive OUD Assessments</div>
-                        <p class="text-[11px] text-neutral-600 leading-relaxed">
-                            "The SBIRT workflow and COWS assessment tools are incredibly intuitive. It helps our team transition patients to buprenorphine safely with clear guidelines."
-                        </p>
-                        <span class="text-[9px] text-neutral-400 font-semibold mt-auto flex items-center gap-1">
-                            <i data-lucide="shield-check" class="w-3 h-3 text-emerald-500"></i> Addiction Medicine Specialist
-                        </span>
-                    </div>
+                <div class="flex gap-3 flex-wrap justify-center md:justify-start mt-6">
+                    <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-xs font-semibold hover:bg-slate-800 transition flex items-center gap-1.5 shadow-md">
+                        <i data-lucide="smartphone" class="w-4 h-4"></i> Test on iOS Simulator
+                    </a>
+                    <a href="integration.html" class="bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-lg text-xs font-semibold hover:bg-slate-50 transition flex items-center gap-1.5">
+                        <i data-lucide="server" class="w-4 h-4"></i> EMR Integration Guide
+                    </a>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <!-- App Privacy Disclaimer -->
-            <div class="border-t apple-border pt-8 text-[11px] text-neutral-500 space-y-2 leading-relaxed">
-                <h2 class="text-xs font-extrabold text-neutral-900 tracking-tight uppercase mb-3">App Privacy</h2>
-                <p>The developer, <strong class="text-neutral-800">Lifeline Medical Technologies, LLC</strong>, indicated that the app’s privacy practices may include handling of data as described below. For more information, see the developer’s privacy policy.</p>
-                <div class="bg-neutral-50 border apple-border p-4 rounded-xl flex items-start gap-3 mt-2">
-                    <i data-lucide="shield-alert" class="w-5 h-5 text-emerald-600 flex-none mt-0.5"></i>
-                    <div>
-                        <strong class="text-neutral-800 block text-xs">Data Not Collected</strong>
-                        <p class="mt-0.5 text-neutral-500 text-[10px]">The developer does not collect any data from this app. On-device "Glass Box" calculations ensure no patient health information (PHI) or personal details ever leave your device or institution EMR environment.</p>
+    <!-- Main Content: The Three Clinical Pillars -->
+    <div class="max-w-5xl w-full mx-auto px-6 py-12 flex flex-col gap-16 md:gap-24">
+
+        <!-- Pillar 1: Safety First & Risk Stratification -->
+        <section id="safety" class="scroll-mt-20">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <div class="flex-1 space-y-5">
+                    <div class="flex items-center gap-2.5 text-clinical-rose font-bold text-xs uppercase tracking-wider">
+                        <i data-lucide="shield-alert" class="w-5 h-5 text-clinical-rose"></i>
+                        Pillar 01: Safety &amp; Risk Stratification
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-clinical-slate tracking-tight">
+                        Flagging Vulnerability &amp; Enforcing GFR Limits
+                    </h2>
+                    <p class="text-sm text-slate-600 leading-relaxed font-light">
+                        Manual opioid safety assessments are often missed or inconsistent on busy hospital floors. Precision Analgesia automates risk scoring to safeguard patients before scripts are active.
+                    </p>
+                    
+                    <div class="space-y-4 pt-2">
+                        <!-- Bullet 1 -->
+                        <div class="flex gap-3 items-start">
+                            <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">PRODIGY-Aligned Scoring</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Calculates Opioid-Induced Respiratory Depression (OIRD) scores based on age, sleep disorders, cardiac, and pulmonary comorbidities.</p>
+                            </div>
+                        </div>
+                        <!-- Bullet 2 -->
+                        <div class="flex gap-3 items-start">
+                            <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Organ-Specific Guardrails (Renal Gating)</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5">GFR-gating logic flags active metabolites (e.g. Morphine accumulation). The system automatically enforces a 50% dose reduction warning for compromised renal clearance.</p>
+                            </div>
+                        </div>
+                        <!-- Bullet 3 -->
+                        <div class="flex gap-3 items-start">
+                            <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Informed Consent Disclaimers</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Every login enforces a clinical responsibility toggle, ensuring the software operates strictly as a decision support aid.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screenshots Gallery for Pillar 1 -->
+                <div class="w-full md:w-[360px] flex flex-col gap-4 flex-none">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                        <i data-lucide="image" class="w-3.5 h-3.5"></i> App Interfaces: Safety
+                    </span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white hover:scale-[1.02] transition cursor-pointer" onclick="openLightbox('assets/screenshot_disclaimer.jpg')">
+                            <img src="assets/screenshot_disclaimer.jpg" alt="Informed Consent disclaimer" class="w-full h-auto">
+                            <div class="p-2 border-t border-slate-100 text-[10px] font-medium text-slate-500 text-center">Informed Consent</div>
+                        </div>
+                        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white hover:scale-[1.02] transition cursor-pointer" onclick="openLightbox('assets/screenshot_risk_assessment_naive.jpg')">
+                            <img src="assets/screenshot_risk_assessment_naive.jpg" alt="OIRD Risk Assessment Screen" class="w-full h-auto">
+                            <div class="p-2 border-t border-slate-100 text-[10px] font-medium text-slate-500 text-center">Risk Assessment</div>
+                        </div>
+                    </div>
+                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white hover:scale-[1.02] transition cursor-pointer" onclick="openLightbox('assets/screenshot_clinical_analysis_hydromorphone.jpg')">
+                        <img src="assets/screenshot_clinical_analysis_hydromorphone.jpg" alt="Hydromorphone GFR Gating Warning" class="w-full h-auto">
+                        <div class="p-2 border-t border-slate-100 text-[10px] font-medium text-slate-500 text-center">GFR Organ Gating Alert</div>
                     </div>
                 </div>
             </div>
-
         </section>
-    </main>
+
+        <!-- Pillar 2: Precision Dosing & Tapering -->
+        <section id="dosing" class="scroll-mt-20">
+            <div class="flex flex-col md:flex-row-reverse gap-8 items-start">
+                <div class="flex-1 space-y-5">
+                    <div class="flex items-center gap-2.5 text-clinical-teal font-bold text-xs uppercase tracking-wider">
+                        <i data-lucide="calculator" class="w-5 h-5 text-clinical-teal"></i>
+                        Pillar 02: Precision dosing &amp; Tapering
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-clinical-slate tracking-tight">
+                        Replacing Static Tables with Pharmacokinetic Modeling
+                    </h2>
+                    <p class="text-sm text-slate-600 leading-relaxed font-light">
+                        Standard equianalgesic conversion charts fail to model variable half-lives, incomplete cross-tolerance, or slow patch accumulations. Precision Analgesia replaces static formulas with dynamic math.
+                    </p>
+                    
+                    <div class="space-y-4 pt-2">
+                        <!-- Bullet 1 -->
+                        <div class="flex gap-3 items-start">
+                            <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Dynamic Cross-Tolerance Controls</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Allows the clinician to dynamically slide and adjust cross-tolerance reductions (defaulting to safe CDC parameters of 30-50%).</p>
+                            </div>
+                        </div>
+                        <!-- Bullet 2 -->
+                        <div class="flex gap-3 items-start">
+                            <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Complex Conversion Matrices</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Built-in algorithms for variable half-life Methadone titrations, Fentanyl and Buprenorphine patch conversions, and continuous IV infusions.</p>
+                            </div>
+                        </div>
+                        <!-- Bullet 3 -->
+                        <div class="flex gap-3 items-start">
+                            <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">CDC-Aligned 2-Phase Tapering</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Automatically charts exponential and linear step-downs, plotting a clean step-down graph to prepare safe outpatient discharge tapers.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screenshots Gallery for Pillar 2 -->
+                <div class="w-full md:w-[360px] flex flex-col gap-4 flex-none">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                        <i data-lucide="image" class="w-3.5 h-3.5"></i> App Interfaces: Calculator
+                    </span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white hover:scale-[1.02] transition cursor-pointer" onclick="openLightbox('assets/screenshot_mme_calc_reduction.jpg')">
+                            <img src="assets/screenshot_mme_calc_reduction.jpg" alt="MME Reduction strategies" class="w-full h-auto">
+                            <div class="p-2 border-t border-slate-100 text-[10px] font-medium text-slate-500 text-center">dosing Reductions</div>
+                        </div>
+                        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white hover:scale-[1.02] transition cursor-pointer" onclick="openLightbox('assets/screenshot_mme_calc_complex.jpg')">
+                            <img src="assets/screenshot_mme_calc_complex.jpg" alt="Complex Conversion Options" class="w-full h-auto">
+                            <div class="p-2 border-t border-slate-100 text-[10px] font-medium text-slate-500 text-center">Complex Conversions</div>
+                        </div>
+                    </div>
+                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white hover:scale-[1.02] transition cursor-pointer" onclick="openLightbox('assets/screenshot_taper_schedule.jpg')">
+                        <img src="assets/screenshot_taper_schedule.jpg" alt="Taper Schedule step graph" class="w-full h-auto">
+                        <div class="p-2 border-t border-slate-100 text-[10px] font-medium text-slate-500 text-center">Taper step-Down Graph</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pillar 3: Addiction & Compassionate Care (OUD) -->
+        <section id="oud" class="scroll-mt-20">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <div class="flex-1 space-y-5">
+                    <div class="flex items-center gap-2.5 text-clinical-amber font-bold text-xs uppercase tracking-wider">
+                        <i data-lucide="clipboard-check" class="w-5 h-5 text-clinical-amber"></i>
+                        Pillar 03: Addiction &amp; Compassionate Care
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-clinical-slate tracking-tight">
+                        Standardizing OUD Pathways &amp; Screening
+                    </h2>
+                    <p class="text-sm text-slate-600 leading-relaxed font-light">
+                        Inpatient admission is a critical window to address substance use. Precision Analgesia provides bedside tools to screen patients and guide transitions to Medication-Assisted Treatment (MAT).
+                    </p>
+                    
+                    <div class="space-y-4 pt-2">
+                        <!-- Bullet 1 -->
+                        <div class="flex gap-3 items-start">
+                            <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Integrated Screener Batteries</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Access validated screeners (DAST-10, ASSIST-Lite, Opioid Risk Tool, PEG Pain &amp; Function Scale) directly at the point of care.</p>
+                            </div>
+                        </div>
+                        <!-- Bullet 2 -->
+                        <div class="flex gap-3 items-start">
+                            <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">COWS &amp; Induction Protocols</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Clinical workflows for buprenorphine inductions based on live Clinical Opiate Withdrawal Scale (COWS) scores.</p>
+                            </div>
+                        </div>
+                        <!-- Bullet 3 -->
+                        <div class="flex gap-3 items-start">
+                            <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Multimodal Sparing Options</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Recommends evidence-based adjuvants (such as Suzetrigine, Acetaminophen) and non-pharmacological options to spare MME exposure.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screenshots Gallery for Pillar 3 -->
+                <div class="w-full md:w-[360px] flex flex-col gap-4 flex-none">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                        <i data-lucide="image" class="w-3.5 h-3.5"></i> App Interfaces: OUD
+                    </span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white hover:scale-[1.02] transition cursor-pointer" onclick="openLightbox('assets/screenshot_risk_assessment_low.jpg')">
+                            <img src="assets/screenshot_risk_assessment_low.jpg" alt="Methadone Baseline assessment" class="w-full h-auto">
+                            <div class="p-2 border-t border-slate-100 text-[10px] font-medium text-slate-500 text-center">Methadone Baseline</div>
+                        </div>
+                        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white hover:scale-[1.02] transition cursor-pointer" onclick="openLightbox('assets/screenshot_oud_screeners.jpg')">
+                            <img src="assets/screenshot_oud_screeners.jpg" alt="Clinical Screeners List" class="w-full h-auto">
+                            <div class="p-2 border-t border-slate-100 text-[10px] font-medium text-slate-500 text-center">Screening Tools</div>
+                        </div>
+                    </div>
+                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white hover:scale-[1.02] transition cursor-pointer" onclick="openLightbox('assets/screenshot_adjuvant_options.jpg')">
+                        <img src="assets/screenshot_adjuvant_options.jpg" alt="Adjuvant options list" class="w-full h-auto">
+                        <div class="p-2 border-t border-slate-100 text-[10px] font-medium text-slate-500 text-center">Non-Opioid Options</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compliance & Regulatory Safe Harbor Section -->
+        <section id="compliance" class="bg-white border border-slate-200 rounded-3xl p-8 md:p-10 shadow-sm scroll-mt-20">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <div class="flex-1 space-y-4">
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="scale" class="text-clinical-teal w-5 h-5"></i>
+                        Regulatory &amp; Compliance Specifications
+                    </h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Precision Analgesia operates strictly under clear regulatory guardrails to verify it operates as an informational logic layer rather than an active medical device.
+                    </p>
+                    
+                    <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-3">
+                        <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <i data-lucide="shield-check" class="text-emerald-600 w-4 h-4"></i>
+                            Non-Device Clinical Decision Support (CDS)
+                        </h4>
+                        <p class="text-[11px] text-slate-600 leading-relaxed font-light">
+                            Precision Analgesia is classified as a Non-Device Clinical Decision Support software tool under <strong>Section 3060(o)(1)(E) of the 21st Century Cures Act</strong>. The software presents clinical guidelines (CDC 2022, NCCN 2025, and FDA guidelines) transparently, displaying all formulas, equianalgesic ratios, and sources directly in the application's "Algorithm Transparency" and "Citations" interfaces.
+                        </p>
+                        <p class="text-[11px] text-slate-600 leading-relaxed font-light">
+                            It does not directly control, configure, or administer patient dosing hardware (such as infusion pumps), nor does it replace the diagnostic or treatment path decided by the licensed practitioner.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-80 space-y-4">
+                    <div class="bg-amber-50 border border-amber-200 text-amber-900 p-5 rounded-2xl text-[11px] space-y-2">
+                        <div class="font-bold uppercase tracking-wider text-[9px] text-amber-800 flex items-center gap-1">
+                            <i data-lucide="alert-triangle" class="w-4 h-4"></i> Clinician Safe Harbor Notice
+                        </div>
+                        <p class="leading-relaxed">
+                            This software is an educational support tool. The clinician retains full, final responsibility for patient care, diagnoses, and prescription quantities. All conversions and calculations should be manually verified against institutional protocols before ordering.
+                        </p>
+                    </div>
+                    <div class="text-[10px] text-slate-400 space-y-2 leading-relaxed">
+                        <p class="font-semibold">References used in development:</p>
+                        <ul class="list-disc pl-4 space-y-1">
+                            <li>CDC Clinical Practice Guideline for Prescribing Opioids (2022)</li>
+                            <li>PRODIGY Clinical Trial (OIRD Respiratory Depression risk factors)</li>
+                            <li>ASAM National Practice Guideline for OUD treatment (2020)</li>
+                            <li>NCCN Guidelines for Adult Cancer Pain Management (2025)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Image Lightbox Modal -->
+    <div id="lightbox" class="fixed inset-0 bg-slate-900/90 z-50 hidden flex items-center justify-center p-4" onclick="closeLightbox()">
+        <div class="relative max-w-lg w-full max-h-[90vh] flex flex-col items-center">
+            <button class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <img id="lightbox-img" src="" alt="Lightbox image" class="max-w-full max-h-[80vh] rounded-2xl shadow-2xl object-contain border border-white/10">
+        </div>
+    </div>
 
     <!-- Footer -->
-    <footer class="bg-[#f5f5f7] border-t apple-border py-8 text-xs text-neutral-500 mt-12 flex-none">
-        <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-                <span>© 2026 Lifeline Medical Technologies, LLC. All rights reserved.</span>
+    <footer class="bg-slate-900 text-slate-400 py-12 px-6 mt-auto border-t border-slate-800">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex flex-col items-center md:items-start gap-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-clinical-teal rounded-md flex items-center justify-center text-white">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
+                    </div>
+                    <span class="font-semibold text-slate-300 text-sm">Precision Analgesia</span>
+                    <span class="text-xs text-slate-500">by Lifeline Medical Technologies, LLC</span>
+                </div>
+                <p class="text-xs text-slate-500">
+                    Non-Device Clinical Decision Support Tool — Section 3060(o)(1)(E) of the 21st Century Cures Act.
+                </p>
             </div>
-            <div class="flex gap-4">
-                <a href="privacy" class="hover:underline">Privacy Policy</a>
-                <a href="support" class="hover:underline">Support</a>
-                <a href="index.html" class="hover:underline">Home</a>
+            <div class="flex flex-col items-center md:items-end gap-2 text-xs">
+                <div class="flex gap-4">
+                    <a href="privacy" class="hover:text-white transition">Privacy Policy</a>
+                    <a href="support" class="hover:text-white transition">Support</a>
+                    <a href="index.html" class="hover:text-white transition">Main Site</a>
+                </div>
+                <p class="text-xs text-slate-600">
+                    © 2026 Lifeline Medical Technologies, LLC. All rights reserved. | dan@lifelinemedtech.org
+                </p>
             </div>
         </div>
     </footer>
 
-    <!-- Interactive JS scripts -->
     <script>
         // Init Lucide
         lucide.createIcons();
 
-        // CPP configuration matching the specifications
-        const cppConfigs = {
-            default: {
-                subtitle: "Clinical Opioid Decision Tools",
-                promo: "Advanced inpatient clinical decision support to mitigate high-risk opioid prescribing. Evidence-based calculators and workflows designed for hospital patient safety.",
-                badge: "default_listing",
-                deeplink: "opioidprecision://home",
-                images: [
-                    "assets/screenshot_disclaimer.jpg",
-                    "assets/screenshot_mme_calc_reduction.jpg",
-                    "assets/screenshot_taper_schedule.jpg",
-                    "assets/screenshot_oud_screeners.jpg"
-                ]
-            },
-            safety: {
-                subtitle: "Safety First &amp; Risk Gating",
-                promo: "Safeguard your practice with the PRODIGY-aligned risk engine. Real-time safety alerts and standardized assessments (COWS) for every patient encounter.",
-                badge: "cpp_safety_risk",
-                deeplink: "opioidprecision://assessment",
-                images: [
-                    "assets/screenshot_disclaimer.jpg",
-                    "assets/screenshot_risk_assessment_naive.jpg",
-                    "assets/screenshot_clinical_analysis_hydromorphone.jpg",
-                    "assets/screenshot_mme_calc_reduction.jpg"
-                ]
-            },
-            oud: {
-                subtitle: "Evidence-Based OUD Consults",
-                promo: "Empower patients with evidence-based OUD tools. Integrated counseling guides (O.A.R.S., FRAMES) and clear visual aids for effective bedside communication.",
-                badge: "cpp_oud_consult",
-                deeplink: "opioidprecision://consult",
-                images: [
-                    "assets/screenshot_risk_assessment_low.jpg",
-                    "assets/screenshot_oud_screeners.jpg",
-                    "assets/screenshot_adjuvant_options.jpg",
-                    "assets/screenshot_disclaimer.jpg"
-                ]
-            },
-            calc: {
-                subtitle: "Precision Conversions &amp; Tapers",
-                promo: "The new gold standard for opioid conversion. Automate complex tapers, calculate daily MME instantly, and chart safe palliative transitions with precision.",
-                badge: "cpp_calculator",
-                deeplink: "opioidprecision://calculator",
-                images: [
-                    "assets/screenshot_mme_calc_reduction.jpg",
-                    "assets/screenshot_taper_schedule.jpg",
-                    "assets/screenshot_mme_calc_complex.jpg",
-                    "assets/screenshot_clinical_analysis_hydromorphone.jpg"
-                ]
-            }
-        };
-
-        let activeMode = "default";
-
-        function setStoreMode(mode) {
-            activeMode = mode;
-            const config = cppConfigs[mode];
-
-            // Toggle active classes on tab buttons
-            ['default', 'safety', 'oud', 'calc'].forEach(m => {
-                const btn = document.getElementById(`btn-tab-${m}`);
-                if (m === mode) {
-                    btn.classList.add('bg-white', 'shadow-sm', 'text-neutral-800');
-                    btn.classList.remove('hover:bg-neutral-200/50');
-                } else {
-                    btn.classList.remove('bg-white', 'shadow-sm', 'text-neutral-800');
-                    btn.classList.add('hover:bg-neutral-200/50');
-                }
-            });
-
-            // Update app details
-            document.getElementById('store-subtitle').innerHTML = config.subtitle;
-            document.getElementById('store-promo').innerText = config.promo;
-            
-            // Re-render screenshots gallery
-            const scContainer = document.getElementById('store-screenshots');
-            scContainer.innerHTML = "";
-            config.images.forEach(imgSrc => {
-                if (imgSrc) {
-                    const box = document.createElement('div');
-                    box.className = "w-44 h-90 md:w-56 md:h-110 bg-neutral-100 rounded-2xl overflow-hidden flex-none snap-start border apple-border relative shadow-md hover:scale-[1.01] transition-transform cursor-pointer";
-                    box.innerHTML = `<img src="${imgSrc}" alt="Screenshot" class="w-full h-full object-cover">`;
-                    scContainer.appendChild(box);
-                }
-            });
-
-            // Update Campaign Details Banner
-            const banner = document.getElementById('campaign-banner');
-            if (mode === 'default') {
-                banner.classList.add('hidden');
-            } else {
-                banner.classList.remove('hidden');
-                document.getElementById('campaign-badge').innerText = config.badge;
-                document.getElementById('campaign-deeplink').innerText = config.deeplink;
-                
-                const campaignURL = `https://apps.apple.com/app/id6757340383?ppid=${config.badge}`;
-                document.getElementById('campaign-url').value = campaignURL;
-            }
+        // Lightbox toggle
+        function openLightbox(imgSrc) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = imgSrc;
+            lightbox.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
         }
 
-        function copyCampaignURL() {
-            const copyText = document.getElementById('campaign-url');
-            navigator.clipboard.writeText(copyText.value);
-            alert(`App Store Campaign URL copied:\n${copyText.value}`);
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
         }
-
-        // Initialize default view
-        window.addEventListener('DOMContentLoaded', () => {
-            setStoreMode('default');
-        });
     </script>
 </body>
 </html>
