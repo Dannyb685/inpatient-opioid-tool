@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Demo: The Taper Engine | Precision Analgesia</title>
+    <meta name="description" content="Interactive demonstration of the Precision Analgesia deterministic taper engine. The same CDC 2022-derived logic that ships in the iOS app — running in your browser. Educational use only.">
+    <link rel="canonical" href="https://opioidprecision.com/demo.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Live Demo: The Taper Engine | Precision Analgesia">
+    <meta property="og:description" content="Generate a CDC-protocol opioid taper schedule with glass-box traceable math. Every number verifiable. No data leaves your browser.">
+    <meta property="og:url" content="https://opioidprecision.com/demo.html">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.460.0"></script>
+
+    <style>
+        /* ============ Clinical Theme — mirrors the iOS app design system ============ */
+        :root {
+            --teal: #0d9488;        /* ClinicalTheme.teal500 (light) */
+            --teal-dark: #0f766e;
+            --teal-soft: #f0fdfa;
+            --amber: #d97706;       /* ClinicalTheme.amber500 (light) */
+            --amber-soft: #fffbeb;
+            --rose: #e11d48;        /* ClinicalTheme.rose500 (light) */
+            --rose-soft: #fff1f2;
+            --bg-grouped: #f1f5f9;  /* systemGroupedBackground analog */
+            --card: #ffffff;
+            --label: #0f172a;
+            --label-2: #475569;
+            --label-3: #94a3b8;
+            --separator: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-grouped);
+            color: var(--label);
+            -webkit-font-smoothing: antialiased;
+        }
+        a { text-decoration: none; color: inherit; }
+
+        /* ============ Nav (consistent with marketing pages) ============ */
+        .site-nav {
+            position: sticky; top: 0; z-index: 40;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--separator);
+        }
+        .nav-inner {
+            max-width: 80rem; margin: 0 auto; padding: 0 1.5rem;
+            height: 4rem; display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; letter-spacing: -0.01em; }
+        .nav-brand .logo {
+            width: 2rem; height: 2rem; background: var(--teal); border-radius: 0.5rem;
+            display: flex; align-items: center; justify-content: center; color: #fff;
+        }
+        .nav-links { display: none; gap: 1.5rem; font-size: 0.875rem; font-weight: 500; color: var(--label-2); }
+        .nav-links a:hover { color: var(--teal); }
+        .nav-links a.active { color: var(--teal); font-weight: 600; }
+        @media (min-width: 768px) { .nav-links { display: flex; } }
+        .nav-cta {
+            background: #1e293b; color: #fff; padding: 0.5rem 1rem; border-radius: 0.5rem;
+            font-size: 0.875rem; font-weight: 500; transition: background 0.2s;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .nav-cta:hover { background: #0f172a; }
+
+        /* ============ Hero ============ */
+        .hero { max-width: 64rem; margin: 0 auto; padding: 4rem 1.5rem 2.5rem; text-align: center; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.25rem 0.75rem; border-radius: 9999px; margin-bottom: 1.5rem;
+            background: var(--teal-soft); border: 1px solid #ccfbf1;
+            color: var(--teal); font-size: 0.75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .pulse-dot { width: 0.5rem; height: 0.5rem; border-radius: 9999px; background: var(--teal); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+        .hero h1 { font-size: clamp(2.25rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; margin-bottom: 1rem; }
+        .hero h1 .grad {
+            background: linear-gradient(90deg, var(--teal), #06b6d4);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .hero p.sub { font-size: 1.125rem; color: var(--label-2); max-width: 42rem; margin: 0 auto 1.5rem; font-weight: 300; line-height: 1.6; }
+
+        .disclaimer {
+            max-width: 56rem; margin: 0 auto 2rem; padding: 0.875rem 1.25rem;
+            background: var(--amber-soft); border: 1px solid #fde68a; border-radius: 0.75rem;
+            display: flex; gap: 0.75rem; align-items: flex-start; text-align: left;
+            font-size: 0.8125rem; color: #92400e; line-height: 1.5;
+        }
+        .disclaimer i { flex-shrink: 0; margin-top: 0.1rem; }
+
+        /* ============ App layout ============ */
+        .app-wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem 5rem; }
+        .app-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        @media (min-width: 960px) { .app-grid { grid-template-columns: 380px 1fr; align-items: start; } }
+        .app-grid > div { min-width: 0; }
+        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        .card {
+            background: var(--card); border: 1px solid var(--separator);
+            border-radius: 1.25rem; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
+            overflow: hidden;
+        }
+        .card + .card { margin-top: 1.5rem; }
+        .card-header {
+            padding: 1rem 1.25rem 0.75rem;
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--label-3);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .card-body { padding: 0 1.25rem 1.25rem; }
+
+        /* iOS-style form rows */
+        .form-row { padding: 0.75rem 0; border-bottom: 1px solid var(--separator); }
+        .form-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .form-row label.row-label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--label); margin-bottom: 0.5rem; }
+
+        input[type="number"], select {
+            width: 100%; padding: 0.625rem 0.75rem;
+            font: inherit; font-size: 0.9375rem;
+            background: var(--bg-grouped); color: var(--label);
+            border: 1px solid var(--separator); border-radius: 0.625rem;
+            outline: none; appearance: none; -webkit-appearance: none;
+        }
+        input[type="number"]:focus, select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.12); }
+        .select-wrap { position: relative; }
+        .select-wrap::after {
+            content: ''; position: absolute; right: 0.875rem; top: 50%;
+            width: 0.5rem; height: 0.5rem; border-right: 2px solid var(--label-3); border-bottom: 2px solid var(--label-3);
+            transform: translateY(-70%) rotate(45deg); pointer-events: none;
+        }
+
+        /* iOS segmented control */
+        .segmented {
+            display: flex; background: var(--bg-grouped); border-radius: 0.625rem; padding: 0.1875rem;
+        }
+        .segmented button {
+            flex: 1; padding: 0.4375rem 0.5rem; border: none; background: transparent;
+            font: inherit; font-size: 0.8125rem; font-weight: 600; color: var(--label-2);
+            border-radius: 0.5rem; cursor: pointer; transition: all 0.15s;
+        }
+        .segmented button.on { background: #fff; color: var(--label); box-shadow: 0 1px 3px rgba(15,23,42,0.12); }
+
+        /* Slider */
+        .slider-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.375rem; }
+        .slider-val { font-size: 1rem; font-weight: 700; color: var(--teal); }
+        .slider-val.fast { color: var(--amber); }
+        input[type="range"] {
+            width: 100%; appearance: none; -webkit-appearance: none; height: 0.375rem;
+            border-radius: 9999px; background: var(--separator); outline: none; margin: 0.375rem 0 0.125rem;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none; -webkit-appearance: none; width: 1.5rem; height: 1.5rem; border-radius: 9999px;
+            background: #fff; border: 1px solid var(--separator); box-shadow: 0 1px 4px rgba(15,23,42,0.25); cursor: pointer;
+        }
+        .slider-scale { display: flex; justify-content: space-between; font-size: 0.6875rem; color: var(--label-3); }
+
+        /* Warnings */
+        .warn { display: flex; gap: 0.625rem; align-items: flex-start; padding: 0.75rem 1rem; border-radius: 0.75rem; font-size: 0.8125rem; line-height: 1.5; margin-top: 0.875rem; }
+        .warn i { flex-shrink: 0; margin-top: 0.0625rem; }
+        .warn.amber { background: var(--amber-soft); border: 1px solid #fde68a; color: #92400e; }
+        .warn.rose { background: var(--rose-soft); border: 1px solid #fecdd3; color: #9f1239; font-weight: 600; }
+        .warn.teal { background: var(--teal-soft); border: 1px solid #ccfbf1; color: var(--teal-dark); }
+
+        /* Results */
+        .empty-state { padding: 3rem 1.5rem; text-align: center; color: var(--label-3); font-size: 0.875rem; }
+        .empty-state i { width: 2.5rem; height: 2.5rem; margin: 0 auto 0.75rem; display: block; color: var(--separator); }
+
+        .summary-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.125rem; }
+        .summary-cell { background: var(--bg-grouped); border-radius: 0.875rem; padding: 0.875rem 1rem; }
+        .summary-cell .k { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--label-3); margin-bottom: 0.25rem; }
+        .summary-cell .v { font-size: 1.25rem; font-weight: 800; color: var(--label); letter-spacing: -0.02em; }
+        .summary-cell .v small { font-size: 0.75rem; font-weight: 600; color: var(--label-3); }
+
+        #chart-box { margin-bottom: 1.125rem; }
+        #chart-box svg { display: block; width: 100%; height: auto; }
+
+        table.schedule { width: 100%; border-collapse: collapse; font-size: 0.8438rem; }
+        table.schedule th {
+            text-align: left; padding: 0.5rem 0.75rem;
+            font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+            color: var(--label-3); border-bottom: 1px solid var(--separator);
+        }
+        table.schedule td { padding: 0.625rem 0.75rem; border-bottom: 1px solid var(--separator); color: var(--label-2); vertical-align: top; }
+        table.schedule tr:last-child td { border-bottom: none; }
+        table.schedule td.period { font-weight: 700; color: var(--label); white-space: nowrap; }
+        table.schedule td.mme { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--teal-dark); white-space: nowrap; }
+        table.schedule td.drug { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        table.schedule td .instr { display: inline-block; font-size: 0.6875rem; font-weight: 600; padding: 0.125rem 0.5rem; border-radius: 9999px; background: var(--bg-grouped); color: var(--label-2); }
+        table.schedule td .instr.stop { background: var(--rose-soft); color: var(--rose); }
+        table.schedule td .instr.hold { background: var(--amber-soft); color: var(--amber); }
+
+        .copy-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem;
+            padding: 0.625rem 1.125rem; border: none; border-radius: 0.625rem; cursor: pointer;
+            background: var(--teal); color: #fff; font: inherit; font-size: 0.8125rem; font-weight: 600;
+            transition: background 0.15s;
+        }
+        .copy-btn:hover { background: var(--teal-dark); }
+
+        /* Transparency / glass box */
+        details.glass { border-top: 1px solid var(--separator); }
+        details.glass summary {
+            list-style: none; cursor: pointer; padding: 1rem 1.25rem;
+            display: flex; align-items: center; gap: 0.625rem;
+            font-size: 0.8125rem; font-weight: 700; color: var(--label);
+        }
+        details.glass summary::-webkit-details-marker { display: none; }
+        details.glass summary .chev { margin-left: auto; transition: transform 0.2s; color: var(--label-3); }
+        details.glass[open] summary .chev { transform: rotate(180deg); }
+        .glass-body { padding: 0 1.25rem 1.25rem; font-size: 0.8125rem; color: var(--label-2); line-height: 1.65; }
+        .glass-body .ledger {
+            background: #0f172a; color: #5eead4; border-radius: 0.75rem; padding: 1rem 1.125rem;
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.75rem; line-height: 1.8;
+            overflow-x: auto; margin-top: 0.75rem; white-space: pre;
+        }
+        .glass-body ul { margin: 0.5rem 0 0 1.125rem; }
+        .glass-body li { margin-bottom: 0.375rem; }
+
+        /* Citations */
+        .citations { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem 4rem; }
+        .citations .cite-card { background: var(--card); border: 1px solid var(--separator); border-radius: 1rem; padding: 1.25rem 1.5rem; font-size: 0.75rem; color: var(--label-3); line-height: 1.7; }
+        .citations strong { color: var(--label-2); }
+
+        /* Footer */
+        footer { background: #0f172a; color: #94a3b8; padding: 3rem 1.5rem; font-size: 0.8125rem; }
+        .footer-inner { max-width: 72rem; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; justify-content: space-between; }
+        .footer-links { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+        .footer-links a:hover { color: #5eead4; }
+    </style>
+</head>
+<body>
+
+    <nav class="site-nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">
+                <span class="logo"><i data-lucide="activity" style="width:1.25rem;height:1.25rem;"></i></span>
+                <span>Precision Analgesia</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="integration.html">Integration Guide</a>
+                <a href="regulatory.html">Regulatory</a>
+                <a href="appstore.html">Clinical Showcase</a>
+                <a href="demo.html" class="active">Live Demo</a>
+            </div>
+            <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="nav-cta">
+                <i data-lucide="smartphone" style="width:1rem;height:1rem;"></i> Beta
+            </a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-badge"><span class="pulse-dot"></span> Live Interactive Demo</div>
+        <h1>The Taper Engine,<br><span class="grad">Running in Your Browser</span></h1>
+        <p class="sub">
+            This is the same deterministic CDC-protocol logic that ships in the Precision Analgesia iOS app.
+            Every number below is computed locally, in the open — expand the glass box to verify the math yourself.
+        </p>
+    </section>
+
+    <div class="app-wrap">
+        <div class="disclaimer">
+            <i data-lucide="alert-triangle" style="width:1.125rem;height:1.125rem;"></i>
+            <span><strong>Educational demonstration only.</strong> This demo is not a medical device and must not be used to make clinical decisions. Opioid tapers require individualized clinical judgment and patient monitoring. No data entered here leaves your browser.</span>
+        </div>
+
+        <div class="app-grid">
+            <!-- ============ INPUTS ============ -->
+            <div>
+                <div class="card">
+                    <div class="card-header"><i data-lucide="sliders-horizontal" style="width:0.875rem;height:0.875rem;"></i> Clinical Inputs</div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <label class="row-label" for="startMME">Current Opioid Dose (MME/day)</label>
+                            <input type="number" id="startMME" value="90" min="1" max="2000" step="1" inputmode="decimal">
+                            <div id="dose-warnings"></div>
+                        </div>
+                        <div class="form-row">
+                            <label class="row-label" for="drug">Target Medication</label>
+                            <div class="select-wrap">
+                                <select id="drug">
+                                    <option value="morphine">Morphine PO</option>
+                                    <option value="oxycodone">Oxycodone PO</option>
+                                    <option value="hydrocodone">Hydrocodone PO</option>
+                                    <option value="hydromorphone">Hydromorphone PO</option>
+                                    <option value="tramadol">Tramadol PO</option>
+                                    <option value="mme">MME Only (No Conversion)</option>
+                                </select>
+                            </div>
+                            <div id="drug-warnings"></div>
+                        </div>
+                        <div class="form-row">
+                            <label class="row-label">Therapy Duration</label>
+                            <div class="segmented" id="duration-seg">
+                                <button type="button" data-val="short" class="on">Short-Term (&lt;1 yr)</button>
+                                <button type="button" data-val="long">Long-Term (&ge;1 yr)</button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="slider-head">
+                                <label class="row-label" for="rate" style="margin-bottom:0;">Reduction per Step</label>
+                                <span class="slider-val" id="rate-display">10%</span>
+                            </div>
+                            <input type="range" id="rate" min="1" max="50" step="1" value="10">
+                            <div class="slider-scale"><span>1% (Gentle)</span><span>50% (Rapid)</span></div>
+                            <div id="rate-warnings"></div>
+                        </div>
+                        <div class="form-row">
+                            <label class="row-label">Renal Function</label>
+                            <div class="segmented" id="renal-seg">
+                                <button type="button" data-val="normal" class="on">Normal</button>
+                                <button type="button" data-val="impaired">Impaired</button>
+                                <button type="button" data-val="dialysis">Dialysis</button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label class="row-label">Hepatic Function</label>
+                            <div class="segmented" id="hepatic-seg">
+                                <button type="button" data-val="normal" class="on">Normal</button>
+                                <button type="button" data-val="impaired">Impaired</button>
+                                <button type="button" data-val="failure">Failure</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <details class="glass" open>
+                        <summary>
+                            <i data-lucide="box" style="width:1rem;height:1rem;color:var(--teal);"></i>
+                            Glass Box — Show the Math
+                            <span class="chev"><i data-lucide="chevron-down" style="width:1rem;height:1rem;"></i></span>
+                        </summary>
+                        <div class="glass-body">
+                            <p>No machine learning. No black box. The engine applies these published rules, in this order:</p>
+                            <ul>
+                                <li><strong>Phase 1 (short-term):</strong> linear reduction — a fixed step of <em>Start &times; rate%</em> each week, until the dose reaches 30% of start.</li>
+                                <li><strong>Phase 2:</strong> exponential reduction — <em>Current &times; (1 &minus; rate%)</em> per step, softening the landing.</li>
+                                <li><strong>Long-term mode:</strong> pure exponential reduction applied monthly (CDC slow-taper logic).</li>
+                                <li><strong>Minimum decrement:</strong> drops &lt;1 MME alternate Hold / Force (&minus;2 MME) to keep the taper moving.</li>
+                                <li><strong>Jump-off:</strong> below 10 MME, extend dosing interval; below 5 MME, discontinue.</li>
+                                <li><strong>Organ gates:</strong> conversion factors adjust — or hard-stop — for renal and hepatic impairment.</li>
+                            </ul>
+                            <div class="ledger" id="ledger">—</div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- ============ RESULTS ============ -->
+            <div>
+                <div class="card" id="results-card">
+                    <div class="card-header"><i data-lucide="calendar-clock" style="width:0.875rem;height:0.875rem;"></i> Generated Taper Schedule</div>
+                    <div class="card-body" id="results-body">
+                        <div class="empty-state">
+                            <i data-lucide="calculator"></i>
+                            Adjust the inputs to generate a schedule.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="citations">
+        <div class="cite-card">
+            <strong>Evidence Base:</strong>
+            CDC Clinical Practice Guideline for Prescribing Opioids for Pain — United States, 2022 (MMWR Recomm Rep 2022;71) — conversion factors, dose-risk thresholds, and taper protocols
+            &nbsp;&middot;&nbsp; HHS Guide for Clinicians on the Appropriate Dosage Reduction or Discontinuation of Long-Term Opioid Analgesics (2019)
+            &nbsp;&middot;&nbsp; Conversion factors and organ-impairment adjustments mirror the production drug database shipped in the Precision Analgesia iOS application.
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-inner">
+            <span>&copy; 2026 Lifeline Medical Technologies LLC &middot; Precision Analgesia</span>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="integration.html">Integration Guide</a>
+                <a href="regulatory.html">Regulatory</a>
+                <a href="appstore.html">Clinical Showcase</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function () {
+        'use strict';
+
+        /* ===== Drug database (mirrors drug_database.json, CDC 2022 PO factors) ===== */
+        var DRUGS = {
+            mme:           { name: 'MME Only',          unit: 'MME', base: 1.0 },
+            morphine:      { name: 'Morphine',          unit: 'mg',  base: 1.0 },
+            oxycodone:     { name: 'Oxycodone',         unit: 'mg',  base: 1.5 },
+            hydrocodone:   { name: 'Hydrocodone',       unit: 'mg',  base: 1.0 },
+            hydromorphone: { name: 'Hydromorphone',     unit: 'mg',  base: 5.0 },
+            tramadol:      { name: 'Tramadol',          unit: 'mg',  base: 0.2 }
+        };
+
+        var state = { startMME: 90, drug: 'morphine', duration: 'short', rate: 10, renal: 'normal', hepatic: 'normal' };
+
+        /* ===== Conversion factor with organ adjustments (mirrors TaperDrug.conversionFactor) ===== */
+        function getConversion(s) {
+            var d = DRUGS[s.drug];
+            var factor = d.base;
+            var ledger = ['Base factor (CDC 2022): 1 ' + d.unit + ' ' + d.name + ' = ' + d.base.toFixed(1) + ' MME'];
+            var warnings = [];
+            var contra = null;
+
+            switch (s.drug) {
+                case 'mme':
+                    ledger = ['No conversion: schedule expressed directly in MME/day'];
+                    break;
+                case 'morphine':
+                    if (s.renal === 'dialysis') { contra = 'CONTRAINDICATED: Avoid Morphine in Dialysis (Neurotoxic Metabolites)'; }
+                    if (s.hepatic === 'failure') { factor *= 2.0; ledger.push('Hepatic failure: factor ×2.0 → dose −50%'); warnings.push('Hepatic Failure: Dose reduced 50%'); }
+                    else if (s.renal === 'impaired') { warnings.push('Renal Impairment: monitor for metabolite accumulation'); }
+                    break;
+                case 'oxycodone':
+                case 'hydrocodone':
+                    if (s.hepatic === 'failure') { factor *= 2.0; ledger.push('Hepatic failure: factor ×2.0 → dose −50%'); warnings.push('Hepatic Failure: Dose reduced 50%'); }
+                    if (s.renal !== 'normal') { factor /= 0.75; ledger.push('Renal impairment: factor ÷0.75 → dose −25%'); warnings.push('Renal Impairment: Dose reduced 25%'); }
+                    break;
+                case 'hydromorphone':
+                    if (s.hepatic === 'failure') { contra = 'CONTRAINDICATED: Avoid Hydromorphone in Liver Failure (Shunt Risk)'; }
+                    if (s.renal === 'dialysis') { factor *= 2.0; ledger.push('Dialysis: factor ×2.0 → dose −50%'); warnings.push('Dialysis: Dose reduced 50%'); }
+                    else if (s.renal === 'impaired') { factor *= 2.0; ledger.push('Renal impairment: factor ×2.0 → dose −50%'); warnings.push('Renal Impairment: Dose reduced 50%'); }
+                    break;
+                case 'tramadol':
+                    if (s.hepatic === 'failure') { factor *= 2.0; ledger.push('Hepatic failure: factor ×2.0 → dose −50%'); }
+                    if (s.renal !== 'normal') { factor *= 2.0; ledger.push('Renal impairment: factor ×2.0 → dose −50%'); }
+                    if (s.hepatic === 'failure' || s.renal !== 'normal') { warnings.push('Organ Impairment: Dose reduced 50%'); }
+                    break;
+            }
+            if (!contra && s.drug !== 'mme') {
+                ledger.push('Effective factor: ' + factor.toFixed(2) + '  →  Drug dose = MME ÷ ' + factor.toFixed(2));
+            }
+            return { factor: contra ? 0 : factor, ledger: ledger, warnings: warnings, contra: contra };
+        }
+
+        /* ===== Schedule generator (mirrors TaperScheduleView.generateSchedule) ===== */
+        function generateSchedule(start, ratePct, useLong, conv) {
+            if (conv.factor <= 0) return { steps: [], series: [] };
+            var rate = ratePct / 100;
+            var threshold30 = start * 0.30;
+            var linearStep = start * rate;
+            var current = start;
+            var steps = [];
+            var series = [{ week: 0, dose: start }];
+
+            var pendingDose = null, pendingStart = 1, pendingInstr = '', lastWeek = 0;
+            var heldPrev = false;
+
+            function flush(endWeek) {
+                if (pendingDose === null) return;
+                var unit = useLong ? 'Month' : 'Week';
+                var label = endWeek > pendingStart ? unit + 's ' + pendingStart + '–' + endWeek : unit + ' ' + pendingStart;
+                steps.push({
+                    label: label,
+                    dose: pendingDose,
+                    drugDose: pendingDose / conv.factor,
+                    instruction: (pendingDose < 0.1 && !pendingInstr) ? 'Discontinue' : pendingInstr
+                });
+            }
+
+            for (var week = 1; week <= 1000; week++) {
+                lastWeek = week;
+                var next, instruction = '';
+
+                if (!useLong && current > threshold30) next = current - linearStep;
+                else next = current * (1 - rate);
+
+                var drop = current - next;
+                if (drop < 1.0 && current > 5.0) {
+                    if (!heldPrev && week > 1) { next = current; instruction = 'Hold Dose'; heldPrev = true; }
+                    else { next = Math.max(0, current - 2.0); heldPrev = false; }
+                } else { heldPrev = false; }
+
+                if (next < 5.0) {
+                    next = 0;
+                    instruction = 'Discontinue (Jump-off)';
+                } else if (next < 10.0) {
+                    instruction = 'Extend Interval (e.g. Daily)';
+                    if ((state.drug === 'oxycodone' || state.drug === 'hydrocodone' || state.drug === 'tramadol') && state.renal !== 'normal') {
+                        instruction += ' | Renal Caution: Consider −25%';
+                    }
+                }
+
+                series.push({ week: week, dose: next });
+
+                if (pendingDose !== null) {
+                    if (Math.abs(next - pendingDose) < 0.001) { /* coalesce */ }
+                    else { flush(week - 1); pendingDose = next; pendingStart = week; pendingInstr = instruction; }
+                } else {
+                    pendingDose = next; pendingStart = week; pendingInstr = instruction;
+                }
+
+                if (next < 0.1) break;
+                current = next;
+            }
+            if (pendingDose !== null) flush(lastWeek);
+            return { steps: steps, series: series };
+        }
+
+        /* ===== Rendering ===== */
+        function esc(t) {
+            return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function warnHTML(kind, icon, text) {
+            return '<div class="warn ' + kind + '"><i data-lucide="' + icon + '" style="width:1rem;height:1rem;"></i><span>' + esc(text) + '</span></div>';
+        }
+
+        function renderChart(series, useLong) {
+            if (series.length < 2) return '';
+            var W = 640, H = 200, padL = 44, padR = 14, padT = 14, padB = 28;
+            var maxDose = series[0].dose;
+            var maxWeek = series[series.length - 1].week;
+            function x(w) { return padL + (w / maxWeek) * (W - padL - padR); }
+            function y(d) { return padT + (1 - d / maxDose) * (H - padT - padB); }
+
+            var path = '';
+            series.forEach(function (p, i) { path += (i === 0 ? 'M' : 'L') + x(p.week).toFixed(1) + ' ' + y(p.dose).toFixed(1) + ' '; });
+            var area = path + 'L' + x(maxWeek).toFixed(1) + ' ' + y(0) + ' L' + x(0) + ' ' + y(0) + ' Z';
+
+            var gridlines = '', labels = '';
+            [0, 0.25, 0.5, 0.75, 1].forEach(function (f) {
+                var d = maxDose * f, yy = y(d);
+                gridlines += '<line x1="' + padL + '" y1="' + yy + '" x2="' + (W - padR) + '" y2="' + yy + '" stroke="#e2e8f0" stroke-width="1"/>';
+                labels += '<text x="' + (padL - 8) + '" y="' + (yy + 3.5) + '" text-anchor="end" font-size="10" fill="#94a3b8">' + Math.round(d) + '</text>';
+            });
+            var unit = useLong ? 'Months' : 'Weeks';
+            var jumpY = y(5);
+
+            return '<div id="chart-box"><svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Taper dose curve">' +
+                gridlines + labels +
+                '<line x1="' + padL + '" y1="' + jumpY + '" x2="' + (W - padR) + '" y2="' + jumpY + '" stroke="#e11d48" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>' +
+                '<text x="' + (W - padR) + '" y="' + (jumpY - 5) + '" text-anchor="end" font-size="9" fill="#e11d48" opacity="0.8">5 MME jump-off</text>' +
+                '<path d="' + area + '" fill="#0d9488" opacity="0.08"/>' +
+                '<path d="' + path + '" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linejoin="round"/>' +
+                '<text x="' + ((padL + W - padR) / 2) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="10" fill="#94a3b8">' + unit + '</text>' +
+                '<text x="12" y="' + (H / 2) + '" text-anchor="middle" font-size="10" fill="#94a3b8" transform="rotate(-90 12 ' + (H / 2) + ')">MME/day</text>' +
+                '</svg></div>';
+        }
+
+        function render() {
+            var s = state;
+            var conv = getConversion(s);
+            var d = DRUGS[s.drug];
+
+            /* Dose-level CDC warnings */
+            var dw = document.getElementById('dose-warnings');
+            var dwh = '';
+            if (s.startMME >= 90) dwh = warnHTML('rose', 'octagon-alert', 'High Risk (≥90 MME/day): CDC 2022 — avoid or carefully justify; taper indicated.');
+            else if (s.startMME > 50) dwh = warnHTML('amber', 'alert-triangle', 'Caution (>50 MME/day): risk of harm increases without additional analgesic benefit.');
+            dw.innerHTML = dwh;
+
+            /* Drug warnings */
+            var dr = document.getElementById('drug-warnings');
+            var drh = '';
+            if (conv.contra) drh += warnHTML('rose', 'octagon-alert', conv.contra);
+            conv.warnings.forEach(function (w) { drh += warnHTML('amber', 'alert-triangle', w); });
+            dr.innerHTML = drh;
+
+            /* Rate */
+            var rd = document.getElementById('rate-display');
+            rd.textContent = s.rate + '%' + (s.rate > 25 ? ' (Fast)' : '');
+            rd.className = 'slider-val' + (s.rate > 25 ? ' fast' : '');
+            document.getElementById('rate-warnings').innerHTML =
+                s.rate > 25 ? warnHTML('amber', 'alert-triangle', 'Rapid taper (>25%/step): elevated withdrawal risk. CDC suggests ≤10% per step for most patients.') : '';
+
+            /* Ledger */
+            var ledgerLines = conv.contra ? ['SAFETY GATE: factor = 0 — schedule blocked', conv.contra] : conv.ledger.slice();
+            ledgerLines.push('Strategy: ' + (s.duration === 'long'
+                ? 'Long-Term → pure exponential, ' + s.rate + '% of current dose per month'
+                : 'Short-Term → CDC 2-phase: linear (' + s.rate + '% of start/week) until 30% of start, then exponential'));
+            document.getElementById('ledger').textContent = ledgerLines.join('\n');
+
+            /* Results */
+            var body = document.getElementById('results-body');
+            if (!s.startMME || s.startMME <= 0) {
+                body.innerHTML = '<div class="empty-state"><i data-lucide="calculator"></i>Enter a starting dose to generate a schedule.</div>';
+                lucide.createIcons(); return;
+            }
+            if (conv.contra) {
+                body.innerHTML = warnHTML('rose', 'octagon-alert', conv.contra + ' — Select a different target medication. The engine refuses to generate an unsafe schedule.');
+                lucide.createIcons(); return;
+            }
+
+            var result = generateSchedule(s.startMME, s.rate, s.duration === 'long', conv);
+            var unitLabel = s.duration === 'long' ? 'months' : 'weeks';
+            var totalPeriods = result.series.length - 1;
+
+            var html = '<div class="summary-strip">' +
+                '<div class="summary-cell"><div class="k">Starting Dose</div><div class="v">' + s.startMME + ' <small>MME/day</small></div></div>' +
+                '<div class="summary-cell"><div class="k">Duration</div><div class="v">' + totalPeriods + ' <small>' + unitLabel + '</small></div></div>' +
+                '<div class="summary-cell"><div class="k">Target</div><div class="v">' + (s.drug === 'mme' ? 'MME' : esc(d.name)) + ' <small>' + (s.drug === 'mme' ? '' : 'PO') + '</small></div></div>' +
+                '</div>';
+
+            html += renderChart(result.series, s.duration === 'long');
+
+            html += '<div class="table-wrap"><table class="schedule"><thead><tr><th>Period</th><th>MME/day</th>' +
+                (s.drug !== 'mme' ? '<th>' + esc(d.name) + ' (' + d.unit + '/day)</th>' : '') +
+                '<th>Instruction</th></tr></thead><tbody>';
+
+            result.steps.forEach(function (st) {
+                var stop = st.dose < 0.1;
+                var instrClass = stop ? 'instr stop' : (st.instruction === 'Hold Dose' ? 'instr hold' : 'instr');
+                html += '<tr><td class="period">' + esc(st.label) + '</td>' +
+                    '<td class="mme">' + (stop ? 'Discontinue' : st.dose.toFixed(1)) + '</td>' +
+                    (s.drug !== 'mme' ? '<td class="drug">' + (stop ? '—' : st.drugDose.toFixed(1)) + '</td>' : '') +
+                    '<td>' + (st.instruction ? '<span class="' + instrClass + '">' + esc(st.instruction) + '</span>' : '') + '</td></tr>';
+            });
+            html += '</tbody></table></div>';
+
+            html += '<button type="button" class="copy-btn" id="copy-btn"><i data-lucide="clipboard-copy" style="width:1rem;height:1rem;"></i> Copy Plan as Text</button>';
+            body.innerHTML = html;
+
+            document.getElementById('copy-btn').addEventListener('click', function () {
+                var lines = ['Opioid Taper Plan (DEMO — Educational Only)',
+                    'Starting Dose: ' + s.startMME + ' MME/day',
+                    'Target: ' + d.name + (s.drug === 'mme' ? '' : ' PO'),
+                    'Renal: ' + s.renal + ' | Hepatic: ' + s.hepatic,
+                    'Strategy: ' + (s.duration === 'long' ? 'Slow Taper (' + s.rate + '% monthly, exponential)' : 'CDC 2-Phase Protocol (' + s.rate + '%/step)'),
+                    ''];
+                result.steps.forEach(function (st) {
+                    lines.push(st.label + ': ' + (st.dose < 0.1 ? 'Discontinue' : st.dose.toFixed(1) + ' MME/day' +
+                        (s.drug !== 'mme' ? ' (' + st.drugDose.toFixed(1) + ' ' + d.unit + ' ' + d.name + ')' : '')) +
+                        (st.instruction ? ' — ' + st.instruction : ''));
+                });
+                lines.push('', 'Generated by the Precision Analgesia Taper Engine demo — opioidprecision.com');
+                navigator.clipboard.writeText(lines.join('\n')).then(function () {
+                    var b = document.getElementById('copy-btn');
+                    b.innerHTML = '<i data-lucide="check" style="width:1rem;height:1rem;"></i> Copied';
+                    lucide.createIcons();
+                });
+            });
+
+            lucide.createIcons();
+        }
+
+        /* ===== Wiring ===== */
+        function wireSegment(id, key) {
+            var seg = document.getElementById(id);
+            seg.addEventListener('click', function (e) {
+                var btn = e.target.closest('button'); if (!btn) return;
+                seg.querySelectorAll('button').forEach(function (b) { b.classList.remove('on'); });
+                btn.classList.add('on');
+                state[key] = btn.dataset.val;
+                render();
+            });
+        }
+        wireSegment('duration-seg', 'duration');
+        wireSegment('renal-seg', 'renal');
+        wireSegment('hepatic-seg', 'hepatic');
+
+        document.getElementById('startMME').addEventListener('input', function () {
+            var v = parseFloat(this.value);
+            state.startMME = isFinite(v) ? Math.min(Math.max(v, 0), 2000) : 0;
+            render();
+        });
+        document.getElementById('drug').addEventListener('change', function () { state.drug = this.value; render(); });
+        document.getElementById('rate').addEventListener('input', function () { state.rate = parseInt(this.value, 10); render(); });
+
+        render();
+        lucide.createIcons();
+    })();
+    </script>
+</body>
+</html>
