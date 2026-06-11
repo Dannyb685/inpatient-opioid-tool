@@ -225,10 +225,10 @@
                         <i data-lucide="hand-metal" class="w-6 h-6" aria-hidden="true"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">
-                        <span class="sr-only">⚠ CRITICAL GATE: </span>Renal Gating (Hard Stop)
+                        <span class="sr-only">⚠ CRITICAL GATE: </span>Renal Gating (Documented Override)
                     </h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Passive alerts are ignored 90% of the time. Our engine <strong>hard-blocks</strong> active metabolites (e.g., Morphine) when GFR &lt; 30, requiring clinical justification to proceed.
+                        Passive alerts are ignored 90% of the time. Our engine <strong>defaults to AVOID</strong> for active metabolites (e.g., Morphine) when GFR &lt; 30 — proceeding requires an explicit, documented acknowledgment of the evidence.
                     </p>
                 </div>
                 <!-- Cautionary — Amber + icon (WCAG: never color alone) -->
@@ -586,7 +586,7 @@
                         <tr class="hover:bg-slate-50 transition">
                             <td class="p-4 font-semibold text-clinical-teal">Opioid Safety</td>
                             <td class="p-4 text-slate-900 font-medium">High-Risk Prescribing</td>
-                            <td class="p-4">Reduction via "Hard Stop" logic (vs. soft alerts)</td>
+                            <td class="p-4">Reduction via active safety gates + required acknowledgment (vs. passive alerts)</td>
                             <td class="p-4 text-xs text-slate-400">Study 42</td>
                         </tr>
                         <tr class="hover:bg-slate-50 transition">
@@ -620,7 +620,7 @@
                         <div class="bg-clinical-teal/10 p-2 rounded-lg text-clinical-teal"><i data-lucide="lock" class="w-5 h-5"></i></div>
                         <h4 class="font-bold text-slate-900">Hardwired Stewardship</h4>
                     </div>
-                    <p class="text-sm text-slate-600">Enforces EHR defaults, hard stops, and order set constraints automatically — eliminating reliance on provider memory or education alone.</p>
+                    <p class="text-sm text-slate-600">Enforces EHR defaults, safety acknowledgments, and order set constraints automatically — eliminating reliance on provider memory or education alone.</p>
                 </div>
                 <div class="p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-clinical-teal transition">
                     <div class="flex items-center gap-3 mb-4">

@@ -118,7 +118,7 @@
                 </div>
                 <h2 class="text-3xl font-bold mb-4 text-slate-900">Four-Criteria FDA Analysis</h2>
                 <p class="text-slate-600 max-w-2xl mx-auto">
-                    Software is exempt from device regulation if it meets all four criteria. A caution finding requires additional counsel review; it does not automatically disqualify classification.
+                    Software is exempt from device regulation if it meets all four criteria. As of June 2026, the engine is designed to pass all four: the former hard-stop features were converted to advisory recommendations with documented overrides, eliminating the one open Criterion D question.
                 </p>
             </div>
 
@@ -194,16 +194,16 @@
                 </div>
 
                 <!-- Criterion D -->
-                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-8 hover:border-amber-300 transition">
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-8 hover:border-emerald-200 transition">
                     <div class="flex flex-col md:flex-row gap-6 items-start">
                         <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-800 font-extrabold text-lg">D</div>
+                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-700 font-extrabold text-lg">D</div>
                         </div>
                         <div class="flex-1">
                             <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
                                 <h3 class="text-lg font-bold text-slate-900">HCP can independently verify the basis without relying on the software</h3>
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-200 w-fit">
-                                    <i data-lucide="alert-triangle" class="w-3 h-3"></i> ACTIVE REVIEW
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200 w-fit">
+                                    <i data-lucide="check" class="w-3 h-3"></i> PASS — BY DESIGN
                                 </span>
                             </div>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">
@@ -222,19 +222,20 @@
                                         <li>• One-click link to every source guideline</li>
                                     </ul>
                                 </div>
-                                <div class="bg-white border border-amber-200 rounded-lg p-4">
-                                    <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wide mb-2 flex items-center gap-1">
-                                        <i data-lucide="alert-triangle" class="w-3 h-3"></i> Requires Counsel Review
+                                <div class="bg-white border border-emerald-200 rounded-lg p-4">
+                                    <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2 flex items-center gap-1">
+                                        <i data-lucide="check" class="w-3 h-3"></i> Resolved by Design (June 2026)
                                     </h4>
                                     <ul class="space-y-1 text-xs text-slate-600">
-                                        <li>• Renal hard stop: can block order without override</li>
-                                        <li>• Pediatric hard stop: constrains prescribing pathway</li>
-                                        <li>• COWS gate: blocks MOUD induction if COWS &lt; 8</li>
+                                        <li>• Renal gate: advisory + documented override — AVOID is the default recommendation; acknowledged override reveals the labeled reference dose</li>
+                                        <li>• Pediatric gate: advisory + documented override — adult-reference mode behind a two-step acknowledgment</li>
+                                        <li>• COWS gate: routes to the safer evidence-based pathway with the clinician-discretion alternative stated explicitly</li>
+                                        <li>• Every override is recorded in the generated clinical note and the zero-PHI safety log</li>
                                     </ul>
                                 </div>
                             </div>
-                            <div class="bg-amber-50 border border-amber-100 rounded-lg p-3">
-                                <p class="text-xs text-amber-800 font-medium">The "block vs. support" distinction requires formal regulatory counsel review before EHR deployment. Pre-deployment counsel engagement is planned as part of Stage 3 of our clinical validation roadmap.</p>
+                            <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3">
+                                <p class="text-xs text-emerald-800 font-medium">No blocking behavior remains in the engine: every safety gate is an advisory recommendation with a documented override. The only enforced constraints are FDA-mandated contraindications (codeine/tramadol under age 12), which are regulator-originated, not engine judgment. A confirmatory classification memo from specialized health IT counsel is planned as Stage 3 — confirming a clean design rather than arguing an ambiguous one.</p>
                             </div>
                         </div>
                     </div>
@@ -294,7 +295,7 @@
                     </div>
                     <h3 class="text-xl font-bold mb-3">Clinician Retains Full Autonomy</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        The software presents information; the clinician decides. The mandatory disclaimer on every session launch reinforces this. For features with blocking behavior, clinical override pathways are documented, and formal counsel review precedes EHR deployment.
+                        The software presents information; the clinician decides. The mandatory disclaimer on every session launch reinforces this. No safety gate blocks the workflow: each one is an advisory with a two-step documented override, recorded in the generated clinical note and the zero-PHI safety log. Only FDA-mandated contraindications (codeine/tramadol under 12) are enforced without override.
                     </p>
                 </div>
             </div>
@@ -353,69 +354,69 @@
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-4 text-slate-900">Regulatory Risk Surface</h2>
                 <p class="text-slate-600 max-w-2xl mx-auto">
-                    Three features require specific attention before EHR deployment. We treat these as known risks with defined mitigations — not liabilities to obscure.
+                    Three features were identified as Criterion D risks and resolved by design in June 2026 — converted from blocking behavior to advisory recommendations with documented overrides. They are kept here as the record of how each risk was retired, verified by the 264-scenario validation suite.
                 </p>
             </div>
 
             <div class="space-y-6 mb-12">
-                <!-- Risk 1: Renal Hard Stop -->
+                <!-- Risk 1: Renal Gate (resolved) -->
                 <div class="bg-slate-50 border border-slate-200 rounded-2xl p-8">
                     <div class="flex flex-col md:flex-row gap-6 items-start">
                         <div class="flex-shrink-0">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg border border-amber-200">
-                                <i data-lucide="alert-triangle" class="w-3 h-3"></i> MEDIUM RISK
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-200">
+                                <i data-lucide="check" class="w-3 h-3"></i> RESOLVED
                             </span>
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-lg font-bold text-slate-900 mb-2">Renal Hard Stop — GFR-Gated Active Metabolites</h3>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Renal Gate — GFR-Gated Active Metabolites</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                                When GFR &lt; 30 for morphine or GFR &lt; 15 for hydromorphone, the engine blocks the prescribing pathway for active metabolites. This is evidence-based (accumulation toxicity risk is well-documented) but creates a "blocking" behavior that may invite Criterion D scrutiny.
+                                <strong>The risk:</strong> for morphine in dialysis, the engine replaced the dose with a terminal AVOID — evidence-based (M3G/M6G accumulation toxicity), but blocking behavior that invited Criterion D scrutiny.
                             </p>
                             <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                                <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2">Mitigation</h4>
-                                <p class="text-xs text-emerald-700">Blocks are accompanied by full evidence display (source: Practical Pain Management, NKF guidelines). Clinical override pathway allows documented exception. This mirrors existing EHR-native hard stops for renally-cleared drugs (e.g., NSAIDs in AKI). Formal counsel review before EHR BPA implementation.</p>
+                                <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2">Resolution — Implemented June 2026</h4>
+                                <p class="text-xs text-emerald-700">AVOID remains the default recommendation with full evidence display (NKF guidelines; M3G/M6G neurotoxicity). A two-step "Review Contraindication &amp; Override" pathway reveals the unadjusted equianalgesic reference, explicitly labeled OVERRIDE — CONTRAINDICATED. The override is recorded in the generated clinical note, logged (zero-PHI), and resets whenever renal status changes. This mirrors how EHR-native advisories handle renally-cleared drugs.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Risk 2: Pediatric Hard Stop -->
+                <!-- Risk 2: Pediatric Gate (resolved) -->
                 <div class="bg-slate-50 border border-slate-200 rounded-2xl p-8">
                     <div class="flex flex-col md:flex-row gap-6 items-start">
                         <div class="flex-shrink-0">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg border border-amber-200">
-                                <i data-lucide="alert-triangle" class="w-3 h-3"></i> MEDIUM RISK
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-200">
+                                <i data-lucide="check" class="w-3 h-3"></i> RESOLVED
                             </span>
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-lg font-bold text-slate-900 mb-2">Pediatric Hard Stop — Black Box Warning Gate</h3>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Pediatric Gate — Adult-Validation Boundary</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                                For patients under 18, several opioids carry FDA black box warnings that the engine enforces as hard stops (e.g., codeine/tramadol contraindication in pediatric patients under 12 per 2013 FDA Safety Communication). These are FDA-mandated warnings, not engine-originated judgments.
+                                <strong>The risk:</strong> for patients under 18, the calculator locked its entire interface — a constraint that went beyond the underlying FDA mandates and constituted engine-originated blocking.
                             </p>
                             <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                                <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2">Mitigation</h4>
-                                <p class="text-xs text-emerald-700">Blocks directly reference FDA black box warning text. These constraints mirror standard hospital pharmacy policy. The engine does not add clinical judgment beyond the FDA mandate. Counsel review to confirm that "enforcing FDA warnings" does not itself constitute regulatory classification as a device.</p>
+                                <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2">Resolution — Implemented June 2026</h4>
+                                <p class="text-xs text-emerald-700">The pediatric advisory now offers a two-step documented override into adult-reference mode: calculations proceed with a persistent warning that conversion factors are adult-validated (CDC 2022) and weight-based formulary verification is required. The override resets when the age changes. The narrow FDA-mandated contraindication — codeine/tramadol under age 12 (FDA Drug Safety Communication 2017) — remains enforced without override, because it is regulator-originated, not engine judgment.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Risk 3: COWS Gate -->
+                <!-- Risk 3: COWS Gate (resolved) -->
                 <div class="bg-slate-50 border border-slate-200 rounded-2xl p-8">
                     <div class="flex flex-col md:flex-row gap-6 items-start">
                         <div class="flex-shrink-0">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-300">
-                                <i data-lucide="minus-circle" class="w-3 h-3"></i> LOW RISK
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-200">
+                                <i data-lucide="check" class="w-3 h-3"></i> RESOLVED
                             </span>
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-lg font-bold text-slate-900 mb-2">COWS Gate — Buprenorphine Induction Gating</h3>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">COWS Gate — Buprenorphine Induction Routing</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                                The OUD Consult pathway requires COWS ≥ 8 before initiating buprenorphine induction (ASAM 2020 + SAMHSA guidelines). This "gate" prevents premature induction that could precipitate acute opioid withdrawal. However, it structures the workflow in a way that may be characterized as restricting clinical judgment.
+                                <strong>The risk:</strong> the OUD Consult pathway routes by COWS score (ASAM 2020 + SAMHSA thresholds) to prevent precipitated withdrawal. The engine never blocked — it always produced an actionable plan — but the routing could be characterized as restricting clinical judgment.
                             </p>
                             <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                                <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2">Mitigation</h4>
-                                <p class="text-xs text-emerald-700">COWS gate is a safety-information display, not a locked EHR order block. The clinician retains ability to proceed; the gate presents evidence and requires acknowledgment. ASAM 2020 source displayed inline. Classified as lower risk because it is the clinician's own tool, not an EHR-enforced BPA.</p>
+                                <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2">Resolution — Implemented June 2026</h4>
+                                <p class="text-xs text-emerald-700">Every below-threshold plan now states explicitly that the routing is an evidence-based recommendation, names the alternative (standard/high-dose induction per clinical judgment, with re-scoring and precipitated-withdrawal management guidance), and cites its sources inline (ASAM 2020; Herring 2021; SAMHSA 2021). "Wait and Assess" lists the Low-Dose Initiation alternative rather than a bare instruction to wait.</p>
                             </div>
                         </div>
                     </div>
@@ -432,7 +433,7 @@
                     <div>
                         <h3 class="text-xl font-bold mb-2">Regulatory Counsel Engagement — Stage 3</h3>
                         <p class="text-slate-400 text-sm leading-relaxed">
-                            Before any EHR BPA integration with a hospital partner, Lifeline Medical Technologies will commission a formal FDA regulatory classification memo from specialized health IT counsel. This memo will address the "block vs. support" boundary for all three risk features and document the company's Non-Device CDS rationale. This is standard practice — not an obstacle — for responsible clinical software deployment.
+                            Before any EHR BPA integration with a hospital partner, Lifeline Medical Technologies will commission a formal FDA classification memo from specialized health IT counsel. With the advisory-override design in place, this is a confirmatory memo on a clean Non-Device CDS profile — not a defense of ambiguous blocking behavior — which materially reduces its cost and timeline. Hospital compliance teams and Epic certification reviewers expect counsel-signed classification documentation; this memo is that artifact.
                         </p>
                     </div>
                 </div>
@@ -496,7 +497,7 @@
                         <div class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full mb-3 uppercase">Stage 3 — Planned</div>
                         <h3 class="text-xl font-bold mb-2 text-slate-900">Regulatory Counsel Review</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
-                            Commission formal FDA regulatory classification memo from specialized health IT counsel. Address Non-Device CDS boundary analysis for the three identified risk features. Establish Quality Management System documentation and pre-deployment checklist for EHR partners.
+                            Commission a confirmatory FDA classification memo from specialized health IT counsel on the advisory-override architecture (all former hard stops resolved by design, June 2026). Establish Quality Management System documentation and pre-deployment checklist for EHR partners.
                         </p>
                     </div>
                     <div class="w-10 h-10 bg-slate-300 rounded-full flex items-center justify-center text-slate-600 flex-shrink-0 shadow-sm z-10">
@@ -515,7 +516,7 @@
                         <div class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full mb-3 uppercase">Stage 4 — Planned</div>
                         <h3 class="text-xl font-bold mb-2 text-slate-900">IRB-Exempt QI Pilot</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
-                            90-day observational quality improvement study at a partner academic medical center. Collect safety metrics: OIRD rate, high-MME prescribing rate, hard-stop trigger rate, clinician override documentation. IRB exemption pathway via QI designation (no PHI retained, no experimental intervention).
+                            90-day observational quality improvement study at a partner academic medical center. Collect safety metrics: OIRD rate, high-MME prescribing rate, safety-gate trigger rate, documented override rate. IRB exemption pathway via QI designation (no PHI retained, no experimental intervention).
                         </p>
                     </div>
                 </div>
