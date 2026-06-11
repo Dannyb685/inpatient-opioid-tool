@@ -11,7 +11,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/marketing.compiled.css">
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans p-8">
+<body class="bg-slate-50 text-slate-900 font-sans">
+    <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-clinical-teal rounded-lg flex items-center justify-center text-white font-bold">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-slate-800 tracking-tight">Precision Analgesia</span>
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
+                <a href="index.html" class="hover:text-clinical-teal transition">Home</a>
+                <a href="integration.html" class="hover:text-clinical-teal transition">Integration Guide</a>
+                <a href="appstore.html" class="hover:text-clinical-teal transition">Clinical Showcase</a>
+                <a href="regulatory.html" class="hover:text-clinical-teal transition">Regulatory</a>
+                <a href="demo.html" class="hover:text-clinical-teal transition">Live Demo</a>
+                <a href="investors.html" class="hover:text-clinical-teal transition">Investor Portal</a>
+            </div>
+            <div class="flex gap-3 items-center">
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-slate-100 transition" onclick="document.getElementById('mobile-menu-legal').classList.toggle('hidden')">
+                    <i data-lucide="menu" class="w-5 h-5 text-slate-600"></i>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu-legal" class="hidden md:hidden border-t border-slate-200 bg-white px-6 py-4">
+            <div class="flex flex-col gap-3 text-sm font-medium text-slate-600">
+                <a href="index.html" class="hover:text-clinical-teal transition py-2">Home</a>
+                <a href="integration.html" class="hover:text-clinical-teal transition py-2">Integration Guide</a>
+                <a href="appstore.html" class="hover:text-clinical-teal transition py-2">Clinical Showcase</a>
+                <a href="regulatory.html" class="hover:text-clinical-teal transition py-2">Regulatory</a>
+                <a href="demo.html" class="hover:text-clinical-teal transition py-2">Live Demo</a>
+                <a href="investors.html" class="hover:text-clinical-teal transition py-2">Investor Portal</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="p-8">
     <div class="max-w-3xl mx-auto bg-white p-10 rounded-2xl shadow-sm border border-slate-200">
         <h1 class="text-3xl font-bold mb-6">Support &amp; Contact</h1>
         <p class="text-slate-600 mb-8">
@@ -48,6 +83,41 @@
             <a href="index.html" class="inline-block text-clinical-teal font-semibold hover:underline">&larr; Back to Home</a>
         </div>
     </div>
+    </div>
+
+    <footer class="bg-slate-950 text-slate-400 py-12 px-6 mt-12">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex flex-col items-center md:items-start gap-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-clinical-teal rounded-md flex items-center justify-center text-white">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
+                    </div>
+                    <span class="font-semibold text-slate-300 text-sm">Precision Analgesia</span>
+                    <span class="text-xs text-slate-500">by Lifeline Medical Technologies, LLC</span>
+                </div>
+                <p class="text-xs text-slate-500">
+                    Non-Device Clinical Decision Support Tool — Section 3060(o)(1)(E) of the 21st Century Cures Act.
+                </p>
+            </div>
+            <div class="flex flex-col items-center md:items-end gap-2">
+                <div class="flex flex-wrap justify-center gap-4 text-sm text-slate-400">
+                    <a href="index.html" class="hover:text-white transition">Home</a>
+                    <a href="integration.html" class="hover:text-white transition">Integration Guide</a>
+                    <a href="appstore.html" class="hover:text-white transition">Clinical Showcase</a>
+                    <a href="regulatory.html" class="hover:text-white transition">Regulatory</a>
+                    <a href="demo.html" class="hover:text-white transition">Live Demo</a>
+                    <a href="investors.html" class="hover:text-white transition">Investor Portal</a>
+                    <a href="privacy" class="hover:text-white transition">Privacy</a>
+                    <a href="support" class="hover:text-white transition">Support</a>
+                    <a href="https://www.instagram.com/lifelinemedtech/" target="_blank" class="hover:text-white transition">Instagram</a>
+                </div>
+                <p class="text-xs text-slate-500">
+                    © 2026 Lifeline Medical Technologies, LLC. All rights reserved. | dan@lifelinemedtech.org
+                </p>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://unpkg.com/lucide@0.460.0"></script>
     <script>lucide.createIcons();</script>
 </body>

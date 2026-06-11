@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Precision Analgesia — Seed Round 2026 | Lifeline Medical Technologies</title>
+
+
+
+  <meta name="description" content="Executive investor one-pager for Precision Analgesia by Lifeline Medical Technologies. Raising $2.5M Seed." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+
+      /* Base NextJS variables (Light Theme) */
+      --background: #f8fafc;
+      --foreground: #0f172a;
+      --card-bg: #ffffff;
+      --card-border: rgba(203, 213, 225, 0.6);
+      --input-bg: #f1f5f9;
+      --divider: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --brand: #059453;
+      --brand-10: rgba(5, 148, 83, 0.1);
+      --brand-15: rgba(5, 148, 83, 0.15);
+      --danger: #e11d48;
+      --danger-5: rgba(225, 29, 72, 0.05);
+      --warning: #d97706;
+      --shadow-card: 0 2px 4px rgba(0,0,0,0.1);
+
+      /* Pitch Deck Legacy Mappings */
+      --teal: var(--brand);
+      --rose: var(--danger);
+      --amber: var(--warning);
+      --emerald: var(--brand);
+      --slate-900: var(--background);
+      --slate-800: var(--card-bg);
+      --slate-700: var(--input-bg);
+      --slate-600: var(--text-muted);
+      --slate-400: var(--text-secondary);
+      --white: var(--foreground);
+      
+      --bg-primary: var(--background);
+      --bg-secondary: var(--card-bg);
+      --accent: var(--brand);
+      --accent-glow: var(--brand-15);
+      --border: var(--card-border);
+    }
+
+    html.dark {
+      --background: var(--background);
+      --foreground: #f8fafc;
+      --card-bg: #0f172a;
+      --card-border: rgba(51, 65, 85, 0.6);
+      --input-bg: #1e293b;
+      --divider: #1e293b;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --brand: #10d1c2;
+      --brand-10: rgba(16, 209, 194, 0.1);
+      --brand-15: rgba(16, 209, 194, 0.15);
+      --danger: #fa7085;
+      --danger-5: rgba(250, 112, 133, 0.05);
+      --warning: #fcd961;
+      --shadow-card: 0 2px 8px rgba(0,0,0,0.3);
+
+}
+
+    html, body {
+      width: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      font-size: 11px;
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body { padding: 18px 22px 14px; }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 23px; flex-shrink: 0;
+      box-shadow: var(--shadow-card);
+    }
+    .header-text h1 {
+      font-size: 9.5px; font-weight: 600; color: var(--text-secondary);
+      letter-spacing: 0.09em; text-transform: uppercase;
+    }
+    .header-text h2 {
+      font-size: 20px; font-weight: 800; line-height: 1.1;
+      color: var(--foreground);
+    }
+    .header-text .tagline {
+      font-size: 10px; color: var(--brand); font-weight: 500; letter-spacing: 0.02em;
+    }
+    .header-badge {
+      background: var(--brand-10);
+      border: 1px solid var(--brand-15);
+      border-radius: 9px; padding: 8px 16px; text-align: right; flex-shrink: 0;
+    }
+    .header-badge .raise {
+      font-size: 20px; font-weight: 900; color: var(--brand); line-height: 1;
+    }
+    .header-badge .raise-label {
+      font-size: 8.5px; color: var(--text-secondary); font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.09em;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--divider);
+      margin-bottom: 11px;
+    }
+
+    /* ── STAT ROW ── */
+    .stat-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px; margin-bottom: 10px;
+    }
+    .stat-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 9px 10px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .stat-box::before {
+      content: ''; position: absolute; inset: 0;
+      background: none;
+    }
+    .stat-box .stat-value {
+      font-size: 17px; font-weight: 800; line-height: 1.1;
+      color: var(--foreground);
+    }
+    .stat-box .stat-label {
+      font-size: 8px; color: var(--text-secondary); font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.07em; margin-top: 2px;
+    }
+
+    /* ── TWO-COL ── */
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-bottom: 10px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 10px 11px;
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--brand);
+    }
+    .card-title {
+      font-size: 8.5px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--brand); margin-bottom: 7px;
+    }
+
+    .section-label {
+      font-size: 8px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--warning); margin-top: 7px; margin-bottom: 3px;
+    }
+    .section-label.teal { color: var(--brand); }
+
+    .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 2.5px; }
+    .bullet-list li {
+      display: flex; align-items: flex-start; gap: 5px;
+      font-size: 9.5px; color: var(--text-secondary); line-height: 1.35;
+    }
+    .bullet-list li::before {
+      content: '▸'; color: var(--brand); flex-shrink: 0; font-size: 8px; margin-top: 1px;
+    }
+
+    /* Moats */
+    .moat-list { display: flex; flex-direction: column; gap: 5px; }
+    .moat-item {
+      display: flex; align-items: flex-start; gap: 7px;
+      padding: 5px 7px;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+    }
+    .moat-num { font-size: 9px; font-weight: 800; color: var(--brand); min-width: 14px; flex-shrink: 0; }
+    .moat-text { font-size: 9px; color: var(--foreground); font-weight: 500; line-height: 1.35; }
+    .moat-text strong { color: var(--foreground); font-weight: 700; display: block; font-size: 9.5px; }
+
+    /* ── MARKET ROW ── */
+    .market-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 8px; margin-bottom: 10px;
+    }
+    .market-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 8px 9px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .market-box::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: var(--brand);
+    }
+    .market-box .market-label {
+      font-size: 8px; font-weight: 600; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .market-box .market-value {
+      font-size: 16px; font-weight: 800; line-height: 1.2; margin: 1px 0;
+      color: var(--foreground);
+    }
+    .market-box .market-sub { font-size: 8px; color: var(--text-secondary); }
+
+    /* Traction */
+    .traction-row { display: flex; flex-direction: column; gap: 3.5px; }
+    .traction-item { display: flex; align-items: center; gap: 7px; font-size: 9.5px; color: var(--text-secondary); }
+    .traction-badge {
+      background: var(--brand-10);
+      border: 1px solid var(--brand-15);
+      border-radius: 3px; padding: 1px 5px;
+      font-size: 9px; font-weight: 700; color: var(--brand);
+      flex-shrink: 0; min-width: 58px; text-align: center;
+    }
+
+    /* Ask */
+    .ask-amount {
+      font-size: 23px; font-weight: 900; line-height: 1; margin-bottom: 2px;
+      color: var(--foreground);
+    }
+    .ask-sub { font-size: 9px; color: var(--text-secondary); margin-bottom: 7px; }
+    .use-bar-wrap {
+      height: 3px; background: var(--divider);
+      border-radius: 2px; overflow: hidden; margin-bottom: 6px;
+    }
+    .use-bar {
+      height: 100%; width: 100%; border-radius: 2px;
+      background: var(--brand);
+    }
+    .use-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5px; }
+    .use-item { display: flex; align-items: center; gap: 4px; }
+    .use-pct { font-size: 10px; font-weight: 700; color: var(--brand); min-width: 28px; }
+    .use-label { font-size: 8.5px; color: var(--text-secondary); }
+
+    /* ── FOOTER ── */
+    .footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 8px; border-top: 1px solid var(--divider);
+    }
+    .footer-left { display: flex; align-items: center; gap: 12px; }
+    .footer-link { font-size: 9px; color: var(--brand); font-weight: 600; text-decoration: none; }
+    .footer-company { font-size: 9px; color: var(--text-secondary); }
+    .footer-conf { font-size: 8.5px; color: rgba(148,163,184,0.55); font-style: italic; }
+
+    /* ── PRINT ── */
+    @media print {
+      html, body {
+        width: 8.5in; padding: 0.33in 0.38in 0.28in;
+        background: var(--background) !important; color: var(--foreground) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+      @page { size: letter portrait; margin: 0; }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+      .header-text h2,
+      .stat-box .stat-value,
+      .market-box .market-value,
+      .ask-amount {
+        -webkit-text-fill-color: var(--brand) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-icon">⚕</div>
+      <div class="header-text">
+        <h1>Lifeline Medical Technologies</h1>
+        <h2>Precision Analgesia</h2>
+        <div class="tagline">The Active Safety Net for Inpatient Opioid Prescribing</div>
+      </div>
+    </div>
+    <div class="header-badge">
+      <div class="raise">$2.5M</div>
+      <div class="raise-label">Seed Round · 2026</div>
+    </div>
+  </header>
+
+  <div class="divider"></div>
+
+  <!-- ROW 1 — 3 STATS -->
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="stat-value">$95B</div>
+      <div class="stat-label">Hospital Liability Exposure</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">$651M</div>
+      <div class="stat-label">Settlement Abatement Fund</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">46%</div>
+      <div class="stat-label">OIRD Rate — PRODIGY Trial</div>
+    </div>
+  </div>
+
+  <!-- ROW 2 — PROBLEM/SOLUTION + MOATS -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">The Problem &amp; Solution</div>
+      <div class="section-label">⚠ The Problem</div>
+      <ul class="bullet-list">
+        <li>95% of Epic's native CDS alerts are dismissed by clinicians</li>
+        <li>Doctors click past Boolean warnings — alert fatigue is endemic</li>
+        <li>MDCalc requires 45 seconds of manual entry; utilization &lt;5%</li>
+        <li>Opioid-induced respiratory depression kills silently post-order</li>
+      </ul>
+      <div class="section-label teal">✦ The Solution</div>
+      <ul class="bullet-list">
+        <li>SMART on FHIR CDS Hook engine — zero manual data entry</li>
+        <li>Auto-pulls patient data; intercepts orders before signing</li>
+        <li>16 deterministic safety rules (PRODIGY + CDC 2022 validated)</li>
+        <li>&lt;100ms response latency — specific, actionable guidance</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">4 Defensible Moats</div>
+      <div class="moat-list">
+        <div class="moat-item">
+          <div class="moat-num">①</div>
+          <div class="moat-text"><strong>FDA Non-Device CDS Exempt</strong>Saves $2M+ and 2 years vs. regulated software competitors</div>
+        </div>
+        <div class="moat-item">
+          <div class="moat-num">②</div>
+          <div class="moat-text"><strong>Zero-PHI Architecture</strong>No database. CISO-approved in weeks, not quarters</div>
+        </div>
+        <div class="moat-item">
+          <div class="moat-num">③</div>
+          <div class="moat-text"><strong>SMART on FHIR / Epic Lock-In</strong>Native EHR integration creates high switching costs at go-live</div>
+        </div>
+        <div class="moat-item">
+          <div class="moat-num">④</div>
+          <div class="moat-text"><strong>$651M Settlement Funding Wedge</strong>Abatement funds earmarked for exactly this spend category</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3 — MARKET -->
+  <div class="market-row">
+    <div class="market-box">
+      <div class="market-label">TAM</div>
+      <div class="market-value">$6.8B</div>
+      <div class="market-sub">U.S. Hospital CDS Market</div>
+    </div>
+    <div class="market-box">
+      <div class="market-label">SAM</div>
+      <div class="market-value">$1.4B</div>
+      <div class="market-sub">Epic-Affiliated Hospitals</div>
+    </div>
+    <div class="market-box">
+      <div class="market-label">ACV</div>
+      <div class="market-value">$250K</div>
+      <div class="market-sub">Per Hospital System</div>
+    </div>
+    <div class="market-box">
+      <div class="market-label">Year 3 ARR</div>
+      <div class="market-value">$13.5M</div>
+      <div class="market-sub">54 contracts @ $250K</div>
+    </div>
+  </div>
+
+  <!-- ROW 4 — TRACTION + ASK -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Traction &amp; Build Status</div>
+      <div class="traction-row">
+        <div class="traction-item">
+          <div class="traction-badge">22,991 LOC</div>
+          Production codebase — TypeScript / Swift / Python
+        </div>
+        <div class="traction-item">
+          <div class="traction-badge">14/14 ✓</div>
+          All integration tests passing (CDS Hooks + FHIR)
+        </div>
+        <div class="traction-item">
+          <div class="traction-badge">iOS Beta</div>
+          TestFlight deployed — physician review underway
+        </div>
+        <div class="traction-item">
+          <div class="traction-badge">16 APIs</div>
+          Full FHIR R4 + CDS Hooks 2.0 endpoint coverage
+        </div>
+        <div class="traction-item">
+          <div class="traction-badge">Epic Ready</div>
+          SMART on FHIR OAuth 2.0 launch flow complete
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">The Ask</div>
+      <div class="ask-amount">$2.5M</div>
+      <div class="ask-sub">Seed · 18-Month Runway · Milestone: 5 Signed Hospital Contracts</div>
+      <div class="use-bar-wrap"><div class="use-bar"></div></div>
+      <div class="use-grid">
+        <div class="use-item">
+          <div class="use-pct">30%</div>
+          <div class="use-label">Engineering &amp; Infrastructure</div>
+        </div>
+        <div class="use-item">
+          <div class="use-pct">28%</div>
+          <div class="use-label">Clinical Validation &amp; PharmD</div>
+        </div>
+        <div class="use-item">
+          <div class="use-pct">24%</div>
+          <div class="use-label">Epic Integration &amp; Cert.</div>
+        </div>
+        <div class="use-item">
+          <div class="use-pct">18%</div>
+          <div class="use-label">Sales, GTM &amp; HIMSS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-left">
+      <a class="footer-link" href="https://lifeline-med-tech.vercel.app">lifeline-med-tech.vercel.app</a>
+      <span class="footer-company">Lifeline Medical Technologies, Inc.</span>
+    </div>
+    <div class="footer-conf">Confidential — For Accredited Investor Review Only · Seed Round 2026</div>
+  </footer>
+
+
+<button id="theme-toggle" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-card); transition: all 0.2s;" aria-label="Toggle Theme">
+  <span id="theme-icon-light" style="display: none; font-size: 20px;">🌞</span>
+  <span id="theme-icon-dark" style="display: block; font-size: 20px;">🌙</span>
+</button>
+<script>
+  (function() {
+    const toggleBtn = document.getElementById('theme-toggle');
+    const iconLight = document.getElementById('theme-icon-light');
+    const iconDark = document.getElementById('theme-icon-dark');
+    
+    function updateIcon() {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (isDark) {
+        iconLight.style.display = 'block';
+        iconDark.style.display = 'none';
+      } else {
+        iconLight.style.display = 'none';
+        iconDark.style.display = 'block';
+      }
+    }
+    
+    var stored = localStorage.getItem('theme');
+    var isDarkPref = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (stored === 'dark' || (!stored && isDarkPref)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    updateIcon();
+
+    toggleBtn.addEventListener('click', function() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+      updateIcon();
+    });
+  })();
+</script>
+</body>
+
+</html>

@@ -2,7 +2,7 @@
 // Canonical Design Token System — Lifeline Medical Technologies
 // Colors directly match the iOS app's src/input.css to ensure complete visual consistency.
 module.exports = {
-    content: ["./index.html", "./privacy.html", "./support.html", "./integration.html", "./appstore.html"],
+    content: ["./index.html", "./privacy.html", "./support.html", "./public/*.html"],
     theme: {
         screens: {
             'md': '768px',   // Tablet Portrait

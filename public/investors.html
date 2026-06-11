@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Data Room | Lifeline Medical Technologies</title>
+
+
+
+    <meta name="description" content="Confidential investor materials for Precision Analgesia by Lifeline Medical Technologies.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+
+      /* Base NextJS variables (Light Theme) */
+      --background: #f8fafc;
+      --foreground: #0f172a;
+      --card-bg: #ffffff;
+      --card-border: rgba(203, 213, 225, 0.6);
+      --input-bg: #f1f5f9;
+      --divider: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --brand: #059453;
+      --brand-10: rgba(5, 148, 83, 0.1);
+      --brand-15: rgba(5, 148, 83, 0.15);
+      --danger: #e11d48;
+      --danger-5: rgba(225, 29, 72, 0.05);
+      --warning: #d97706;
+      --shadow-card: 0 2px 4px rgba(0,0,0,0.1);
+
+      /* Pitch Deck Legacy Mappings */
+      --teal: var(--brand);
+      --rose: var(--danger);
+      --amber: var(--warning);
+      --emerald: var(--brand);
+      --slate-900: var(--background);
+      --slate-800: var(--card-bg);
+      --slate-700: var(--input-bg);
+      --slate-600: var(--text-muted);
+      --slate-400: var(--text-secondary);
+      --white: var(--foreground);
+      
+      --bg-primary: var(--background);
+      --bg-secondary: var(--card-bg);
+      --accent: var(--brand);
+      --accent-glow: var(--brand-15);
+      --border: var(--card-border);
+    }
+
+    html.dark {
+      --background: #020617;
+      --foreground: #f8fafc;
+      --card-bg: #0f172a;
+      --card-border: rgba(51, 65, 85, 0.6);
+      --input-bg: #1e293b;
+      --divider: #1e293b;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --brand: #10d1c2;
+      --brand-10: rgba(16, 209, 194, 0.1);
+      --brand-15: rgba(16, 209, 194, 0.15);
+      --danger: #fa7085;
+      --danger-5: rgba(250, 112, 133, 0.05);
+      --warning: #fcd961;
+      --shadow-card: 0 2px 8px rgba(0,0,0,0.3);
+
+}
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(14, 165, 233, 0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(99, 102, 241, 0.04) 0%, transparent 50%);
+            z-index: 0;
+            animation: ambientShift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes ambientShift {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-3%, -3%) rotate(2deg); }
+        }
+
+        /* ===== PASSWORD GATE ===== */
+        #password-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+        }
+
+        .gate-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            padding: 0 24px;
+        }
+
+        .gate-logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .gate-logo .icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, var(--accent), #6366F1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .gate-logo h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .gate-logo p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .gate-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 36px 32px;
+            backdrop-filter: blur(20px);
+        }
+
+        .gate-card label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 48px 14px 16px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-group .lock-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .gate-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent), #6366F1);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .gate-btn:hover { opacity: 0.9; }
+        .gate-btn:active { transform: scale(0.98); }
+
+        .gate-error {
+            margin-top: 14px;
+            padding: 10px 14px;
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            border-radius: 8px;
+            color: var(--danger);
+            font-size: 13px;
+            display: none;
+        }
+
+        .gate-footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ===== DATA ROOM (hidden until auth) ===== */
+        #data-room {
+            display: none;
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .dr-header {
+            padding: 32px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .dr-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .dr-header .icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--accent), #6366F1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .dr-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .dr-header .subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-confidential {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: var(--danger);
+        }
+
+        .badge-confidential::before {
+            content: '🔒';
+            font-size: 11px;
+        }
+
+        /* Content */
+        .dr-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .dr-section {
+            margin-bottom: 48px;
+        }
+
+        .dr-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dr-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .dr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        /* Document Cards */
+        .doc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .doc-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(14, 165, 233, 0.08);
+        }
+
+        .doc-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .doc-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .doc-icon.pitch { background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(99, 102, 241, 0.15)); }
+        .doc-icon.finance { background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(14, 165, 233, 0.15)); }
+        .doc-icon.summary { background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(14, 165, 233, 0.15)); }
+
+        .doc-format {
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .doc-format.html { background: rgba(14, 165, 233, 0.1); color: var(--accent); }
+        .doc-format.pdf { background: rgba(244, 63, 94, 0.1); color: var(--danger); }
+
+        .doc-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .doc-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .doc-card-footer {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .doc-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .doc-open {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .doc-open::after {
+            content: '→';
+            transition: transform 0.2s;
+        }
+
+        .doc-card:hover .doc-open::after {
+            transform: translateX(3px);
+        }
+
+        /* Footer */
+        .dr-footer {
+            padding: 32px 40px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .dr-footer p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .dr-footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .dr-footer .nda-notice {
+            margin-top: 12px;
+            padding: 10px 20px;
+            background: rgba(245, 158, 11, 0.06);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            border-radius: 8px;
+            display: inline-block;
+            font-size: 12px;
+            color: var(--warning);
+        }
+
+        /* Logout button */
+        .logout-btn {
+            padding: 6px 16px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .logout-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dr-header { padding: 20px; }
+            .dr-content { padding: 24px 20px; }
+            .dr-grid { grid-template-columns: 1fr; }
+            .gate-card { padding: 28px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== PASSWORD GATE ===== -->
+    <div id="password-gate">
+        <div class="gate-container">
+            <div class="gate-logo">
+                <div class="icon">⚕</div>
+                <h1>Investor Data Room</h1>
+                <p>Lifeline Medical Technologies — Precision Analgesia</p>
+            </div>
+            <div class="gate-card">
+                <label for="password-input">Access Code</label>
+                <div class="input-group">
+                    <input
+                        type="password"
+                        id="password-input"
+                        placeholder="Enter investor access code"
+                        autocomplete="off"
+                        autofocus
+                    >
+                    <span class="lock-icon">🔒</span>
+                </div>
+                <button class="gate-btn" id="gate-submit">Access Data Room</button>
+                <div class="gate-error" id="gate-error">
+                    Invalid access code. Please contact <strong>dan@lifelinemedtech.org</strong> for access.
+                </div>
+            </div>
+            <div class="gate-footer">
+                Confidential — Seed Round 2026 &nbsp;|&nbsp; <a href="index.html" style="color: var(--accent); text-decoration: none;">← lifeline-med-tech.vercel.app</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DATA ROOM (hidden until auth) ===== -->
+    <div id="data-room">
+        <header class="dr-header">
+            <div class="dr-header-left">
+                <div class="icon">⚕</div>
+                <div>
+                    <h1>Investor Data Room</h1>
+                    <span class="subtitle">Lifeline Medical Technologies — Precision Analgesia</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="badge badge-confidential">Confidential</span>
+                <button class="logout-btn" id="logout-btn">Sign Out</button>
+            </div>
+        </header>
+
+        <main class="dr-content">
+
+            <!-- Pitch Materials -->
+            <section class="dr-section">
+                <div class="dr-section-title">Pitch Materials</div>
+                <div class="dr-grid">
+                    <a class="doc-card" href="investor/pitch-deck.html" target="_blank" id="card-pitch-html">
+                        <div class="doc-card-header">
+                            <div class="doc-icon pitch">📊</div>
+                            <span class="doc-format html">Interactive</span>
+                        </div>
+                        <h3>Pitch Deck</h3>
+                        <p>15-slide investor presentation with animated transitions. Navigate with arrow keys or click.</p>
+                        <div class="doc-card-footer">
+                            <span class="doc-date">June 2026</span>
+                            <span class="doc-open">Open</span>
+                        </div>
+                    </a>
+
+                    <a class="doc-card" href="pitch_deck.pdf" target="_blank" id="card-pitch-pdf">
+                        <div class="doc-card-header">
+                            <div class="doc-icon pitch">📊</div>
+                            <span class="doc-format pdf">PDF</span>
+                        </div>
+                        <h3>Pitch Deck — Print</h3>
+                        <p>Print-ready PDF version for offline review and sharing.</p>
+                        <div class="doc-card-footer">
+                            <span class="doc-date">June 2026</span>
+                            <span class="doc-open">Download</span>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Executive Summary -->
+            <section class="dr-section">
+                <div class="dr-section-title">Executive Summary</div>
+                <div class="dr-grid">
+                    <a class="doc-card" href="investor/one-pager.html" target="_blank" id="card-one-pager">
+                        <div class="doc-card-header">
+                            <div class="doc-icon summary">📋</div>
+                            <span class="doc-format html">HTML</span>
+                        </div>
+                        <h3>Investor One-Pager</h3>
+                        <p>Single-page executive summary with TAM/SAM, moats, traction metrics, and the ask. Print to PDF.</p>
+                        <div class="doc-card-footer">
+                            <span class="doc-date">June 2026</span>
+                            <span class="doc-open">Open</span>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Financial Model -->
+            <section class="dr-section">
+                <div class="dr-section-title">Financial Model</div>
+                <div class="dr-grid">
+                    <a class="doc-card" href="investor/financial-model.html" target="_blank" id="card-financial">
+                        <div class="doc-card-header">
+                            <div class="doc-icon finance">💰</div>
+                            <span class="doc-format html">Interactive</span>
+                        </div>
+                        <h3>3-Year Financial Model</h3>
+                        <p>Live-editable P&L with sliders for ACV, churn, logos, margins. Bear / Base / Bull scenarios. 18-month cash flow waterfall.</p>
+                        <div class="doc-card-footer">
+                            <span class="doc-date">June 2026</span>
+                            <span class="doc-open">Open</span>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="dr-footer">
+            <p>Lifeline Medical Technologies, Inc. &nbsp;|&nbsp; <a href="index.html">lifeline-med-tech.vercel.app</a> &nbsp;|&nbsp; dan@lifelinemedtech.org</p>
+            <div class="nda-notice">
+                ⚠️ These materials are confidential and provided under NDA. Do not distribute without written authorization.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ====================================================
+        // PASSWORD PROTECTION
+        //
+        // Uses SHA-256 hash comparison so the password is never
+        // visible in source code.
+        //
+        // To change the password:
+        //   1. Open browser console
+        //   2. Run: crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_NEW_PASSWORD')).then(b => console.log(Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('')))
+        //   3. Replace VALID_HASH below with the output
+        // ====================================================
+
+        const VALID_HASH = '314a20c3f4ea54b8e755eec1c40da188395ea49e367be753a2e5da52e0e7798d';
+
+        const SESSION_KEY = 'pa_investor_auth';
+        const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function checkSession() {
+            try {
+                const session = JSON.parse(sessionStorage.getItem(SESSION_KEY));
+                if (session && session.expires > Date.now()) {
+                    showDataRoom();
+                    return true;
+                }
+            } catch {}
+            return false;
+        }
+
+        function createSession() {
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+                authenticated: true,
+                expires: Date.now() + SESSION_DURATION
+            }));
+        }
+
+        function showDataRoom() {
+            document.getElementById('password-gate').style.display = 'none';
+            document.getElementById('data-room').style.display = 'block';
+        }
+
+        function showGate() {
+            document.getElementById('password-gate').style.display = 'flex';
+            document.getElementById('data-room').style.display = 'none';
+            sessionStorage.removeItem(SESSION_KEY);
+        }
+
+        async function handleLogin() {
+            const input = document.getElementById('password-input');
+            const error = document.getElementById('gate-error');
+            const password = input.value.trim();
+
+            if (!password) return;
+
+            const hash = await sha256(password);
+
+            // Compare against stored hash
+            // Also accept plaintext match as fallback during development
+            if (hash === VALID_HASH) {
+                error.style.display = 'none';
+                createSession();
+                showDataRoom();
+            } else {
+                error.style.display = 'block';
+                input.value = '';
+                input.focus();
+                input.style.borderColor = 'var(--danger)';
+                setTimeout(() => { input.style.borderColor = ''; }, 2000);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('gate-submit').addEventListener('click', handleLogin);
+        document.getElementById('password-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+        document.getElementById('logout-btn').addEventListener('click', showGate);
+
+        // Check for existing session on load
+        checkSession();
+    </script>
+
+<button id="theme-toggle" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-card); transition: all 0.2s;" aria-label="Toggle Theme">
+  <span id="theme-icon-light" style="display: none; font-size: 20px;">🌞</span>
+  <span id="theme-icon-dark" style="display: block; font-size: 20px;">🌙</span>
+</button>
+<script>
+  (function() {
+    const toggleBtn = document.getElementById('theme-toggle');
+    const iconLight = document.getElementById('theme-icon-light');
+    const iconDark = document.getElementById('theme-icon-dark');
+    
+    function updateIcon() {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (isDark) {
+        iconLight.style.display = 'block';
+        iconDark.style.display = 'none';
+      } else {
+        iconLight.style.display = 'none';
+        iconDark.style.display = 'block';
+      }
+    }
+    
+    var stored = localStorage.getItem('theme');
+    var isDarkPref = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (stored === 'dark' || (!stored && isDarkPref)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    updateIcon();
+
+    toggleBtn.addEventListener('click', function() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+      updateIcon();
+    });
+  })();
+</script>
+</body>
+
+</html>

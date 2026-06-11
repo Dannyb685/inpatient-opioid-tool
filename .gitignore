@@ -12,3 +12,4 @@ test_vault
 DerivedData/
 *.xcodeproj/project.xcworkspace/xcuserdata/
 .generated/
+.vercel
