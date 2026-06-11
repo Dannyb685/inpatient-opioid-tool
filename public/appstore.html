@@ -29,18 +29,30 @@
                 <span class="font-bold text-slate-800 tracking-tight">Precision Analgesia</span>
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
-                <a href="#safety" class="hover:text-clinical-teal transition">Safety &amp; Risk</a>
-                <a href="#dosing" class="hover:text-clinical-teal transition">Precision Dosing</a>
-                <a href="#oud" class="hover:text-clinical-teal transition">OUD Consults</a>
+                <a href="index.html" class="hover:text-clinical-teal transition">Home</a>
                 <a href="integration.html" class="hover:text-clinical-teal transition">Integration Guide</a>
+                <a href="appstore.html" class="text-clinical-teal font-semibold">Clinical Showcase</a>
                 <a href="regulatory.html" class="hover:text-clinical-teal transition">Regulatory</a>
                 <a href="demo.html" class="hover:text-clinical-teal transition">Live Demo</a>
             </div>
             <div class="flex gap-3 items-center">
-                <a href="index.html" class="text-xs text-slate-500 hover:text-slate-800 font-semibold transition hidden sm:inline">Back to Home</a>
-                <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-clinical-teal text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-teal-700 transition shadow-md shadow-teal-500/10 flex items-center gap-1.5">
+                <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="hidden sm:flex bg-clinical-teal text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-teal-700 transition shadow-md shadow-teal-500/10 items-center gap-1.5">
                     <i data-lucide="smartphone" class="w-4 h-4"></i> Join iOS Beta
                 </a>
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-slate-100 transition" onclick="document.getElementById('mobile-menu-app').classList.toggle('hidden')">
+                    <i data-lucide="menu" class="w-5 h-5 text-slate-600"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu-app" class="hidden md:hidden border-t border-slate-200 bg-white px-6 py-4">
+            <div class="flex flex-col gap-3 text-sm font-medium text-slate-600">
+                <a href="index.html" class="hover:text-clinical-teal transition py-2">Home</a>
+                <a href="integration.html" class="hover:text-clinical-teal transition py-2">Integration Guide</a>
+                <a href="appstore.html" class="text-clinical-teal font-semibold py-2">Clinical Showcase</a>
+                <a href="regulatory.html" class="hover:text-clinical-teal transition py-2">Regulatory</a>
+                <a href="demo.html" class="hover:text-clinical-teal transition py-2">Live Demo</a>
+                <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="bg-clinical-teal text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition text-center">Join iOS Beta</a>
             </div>
         </div>
     </nav>
@@ -353,10 +365,15 @@
                 </p>
             </div>
             <div class="flex flex-col items-center md:items-end gap-2 text-xs">
-                <div class="flex gap-4">
-                    <a href="privacy" class="hover:text-white transition">Privacy Policy</a>
+                <div class="flex flex-wrap justify-center gap-4 text-sm text-slate-400">
+                    <a href="index.html" class="hover:text-white transition">Home</a>
+                    <a href="integration.html" class="hover:text-white transition">Integration Guide</a>
+                    <a href="appstore.html" class="hover:text-white transition">Clinical Showcase</a>
+                    <a href="regulatory.html" class="hover:text-white transition">Regulatory</a>
+                    <a href="demo.html" class="hover:text-white transition">Live Demo</a>
+                    <a href="privacy" class="hover:text-white transition">Privacy</a>
                     <a href="support" class="hover:text-white transition">Support</a>
-                    <a href="index.html" class="hover:text-white transition">Main Site</a>
+                    <a href="https://www.instagram.com/lifelinemedtech/" target="_blank" class="hover:text-white transition">Instagram</a>
                 </div>
                 <p class="text-xs text-slate-600">
                     © 2026 Lifeline Medical Technologies, LLC. All rights reserved. | dan@lifelinemedtech.org

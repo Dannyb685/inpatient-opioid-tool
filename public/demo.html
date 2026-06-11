@@ -68,9 +68,27 @@
         .nav-cta {
             background: #1e293b; color: #fff; padding: 0.5rem 1rem; border-radius: 0.5rem;
             font-size: 0.875rem; font-weight: 500; transition: background 0.2s;
-            display: flex; align-items: center; gap: 0.5rem;
+            display: none; align-items: center; gap: 0.5rem;
         }
         .nav-cta:hover { background: #0f172a; }
+        @media (min-width: 640px) { .nav-cta { display: flex; } }
+        .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-burger {
+            display: flex; align-items: center; justify-content: center;
+            width: 2.25rem; height: 2.25rem; border: none; border-radius: 0.5rem;
+            background: transparent; color: var(--label-2); cursor: pointer;
+        }
+        .nav-burger:hover { background: var(--bg-grouped); }
+        @media (min-width: 768px) { .nav-mobile { display: none; } }
+        .mobile-menu {
+            display: none; border-top: 1px solid var(--separator);
+            background: #fff; padding: 1rem 1.5rem;
+        }
+        .mobile-menu.open { display: block; }
+        @media (min-width: 768px) { .mobile-menu.open { display: none; } }
+        .mobile-menu a { display: block; padding: 0.5rem 0; font-size: 0.875rem; font-weight: 500; color: var(--label-2); }
+        .mobile-menu a:hover { color: var(--teal); }
+        .mobile-menu a.active { color: var(--teal); font-weight: 600; }
 
         /* ============ Hero ============ */
         .hero { max-width: 64rem; margin: 0 auto; padding: 4rem 1.5rem 2.5rem; text-align: center; }
@@ -249,13 +267,28 @@
             <div class="nav-links">
                 <a href="index.html">Home</a>
                 <a href="integration.html">Integration Guide</a>
-                <a href="regulatory.html">Regulatory</a>
                 <a href="appstore.html">Clinical Showcase</a>
+                <a href="regulatory.html">Regulatory</a>
                 <a href="demo.html" class="active">Live Demo</a>
             </div>
-            <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="nav-cta">
-                <i data-lucide="smartphone" style="width:1rem;height:1rem;"></i> Beta
-            </a>
+            <div class="nav-right">
+                <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank" class="nav-cta">
+                    <i data-lucide="smartphone" style="width:1rem;height:1rem;"></i> Beta
+                </a>
+                <div class="nav-mobile">
+                    <button type="button" class="nav-burger" aria-label="Open navigation menu" onclick="document.getElementById('mobile-menu-demo').classList.toggle('open')">
+                        <i data-lucide="menu" style="width:1.25rem;height:1.25rem;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu-demo" class="mobile-menu">
+            <a href="index.html">Home</a>
+            <a href="integration.html">Integration Guide</a>
+            <a href="appstore.html">Clinical Showcase</a>
+            <a href="regulatory.html">Regulatory</a>
+            <a href="demo.html" class="active">Live Demo</a>
+            <a href="https://testflight.apple.com/join/wnNw14QZ" target="_blank">Join iOS Beta</a>
         </div>
     </nav>
 
@@ -387,8 +420,12 @@
             <div class="footer-links">
                 <a href="index.html">Home</a>
                 <a href="integration.html">Integration Guide</a>
-                <a href="regulatory.html">Regulatory</a>
                 <a href="appstore.html">Clinical Showcase</a>
+                <a href="regulatory.html">Regulatory</a>
+                <a href="demo.html">Live Demo</a>
+                <a href="privacy">Privacy</a>
+                <a href="support">Support</a>
+                <a href="https://www.instagram.com/lifelinemedtech/" target="_blank">Instagram</a>
             </div>
         </div>
     </footer>
