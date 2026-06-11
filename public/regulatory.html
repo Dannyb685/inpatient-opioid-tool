@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regulatory Framework | Precision Analgesia — Non-Device CDS Classification</title>
+    <meta name="description" content="Precision Analgesia's FDA Non-Device CDS classification under the 21st Century Cures Act. Four-criteria analysis, Glass Box design philosophy, and clinical validation roadmap anchored at Yale.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32-D-wZsHuZ.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon-DpNOnda_.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0.460.0"></script>
+    <link rel="stylesheet" crossorigin href="./assets/marketing-DryKV1e6.css">
+</head>
+<body class="bg-slate-50 text-slate-900 selection:bg-teal-100 font-sans">
+
+    <!-- Nav -->
+    <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <a href="index.html" class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-clinical-teal rounded-lg flex items-center justify-center text-white font-bold">
+                        <i data-lucide="activity" class="w-5 h-5"></i>
+                    </div>
+                    <span class="font-bold text-slate-800 tracking-tight">Precision Analgesia</span>
+                </a>
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
+                <a href="#fda-criteria" class="hover:text-clinical-teal transition">FDA Criteria</a>
+                <a href="#glass-box" class="hover:text-clinical-teal transition">Glass Box Design</a>
+                <a href="#risk-surface" class="hover:text-clinical-teal transition">Risk Analysis</a>
+                <a href="#validation" class="hover:text-clinical-teal transition">Clinical Validation</a>
+            </div>
+            <div class="flex gap-3 items-center">
+                <a href="mailto:dan@lifelinemedtech.org?subject=Regulatory%20Inquiry" class="hidden sm:flex bg-clinical-teal text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition items-center gap-2">
+                    <i data-lucide="mail" class="w-4 h-4"></i> Contact
+                </a>
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-slate-100 transition" onclick="document.getElementById('mobile-menu-reg').classList.toggle('hidden')">
+                    <i data-lucide="menu" class="w-5 h-5 text-slate-600"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu-reg" class="hidden md:hidden border-t border-slate-200 bg-white px-6 py-4">
+            <div class="flex flex-col gap-3 text-sm font-medium text-slate-600">
+                <a href="#fda-criteria" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu-reg').classList.add('hidden')">FDA Criteria</a>
+                <a href="#glass-box" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu-reg').classList.add('hidden')">Glass Box Design</a>
+                <a href="#risk-surface" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu-reg').classList.add('hidden')">Risk Analysis</a>
+                <a href="#validation" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu-reg').classList.add('hidden')">Clinical Validation</a>
+                <a href="integration.html" class="hover:text-clinical-teal transition py-2" onclick="document.getElementById('mobile-menu-reg').classList.add('hidden')">Integration Guide</a>
+                <a href="mailto:dan@lifelinemedtech.org?subject=Regulatory%20Inquiry" class="bg-clinical-teal text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition text-center">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="relative pt-20 pb-16 px-6">
+        <div class="max-w-5xl mx-auto text-center">
+            <a href="index.html" class="inline-flex items-center gap-2 text-sm text-clinical-teal font-medium hover:underline mb-8">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+            </a>
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 border border-teal-100 text-clinical-teal text-xs font-bold rounded-full mb-6 uppercase tracking-wider">
+                <i data-lucide="scale" class="w-3 h-3"></i>
+                21st Century Cures Act · Section 3060
+            </div>
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 text-slate-900 leading-tight">
+                Non-Device CDS<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-clinical-teal to-cyan-500">Regulatory Framework</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed font-light">
+                Precision Analgesia is designed from the ground up to meet all four FDA criteria for Non-Device Clinical Decision Support — eliminating 510(k) clearance requirements while maintaining the highest standard of clinical transparency.
+            </p>
+
+            <!-- Key facts strip -->
+            <div class="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-left">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                        <span class="text-xs font-bold text-emerald-800 uppercase tracking-wide">Classification</span>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-800">Non-Device CDS</p>
+                    <p class="text-xs text-slate-500">21 C.F.R. § 520(o)</p>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-left">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i data-lucide="shield-off" class="w-4 h-4 text-blue-600"></i>
+                        <span class="text-xs font-bold text-blue-800 uppercase tracking-wide">510(k) Required?</span>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-800">No Clearance Needed</p>
+                    <p class="text-xs text-slate-500">Exempted by statute</p>
+                </div>
+                <div class="bg-purple-50 border border-purple-200 p-4 rounded-xl text-left">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i data-lucide="graduation-cap" class="w-4 h-4 text-purple-600"></i>
+                        <span class="text-xs font-bold text-purple-800 uppercase tracking-wide">Validation</span>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-800">Yale — Active</p>
+                    <p class="text-xs text-slate-500">Addiction Medicine, 2026</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 1: Four FDA Criteria -->
+    <section id="fda-criteria" class="py-24 px-6 bg-white border-y border-slate-200 scroll-mt-20">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <div class="inline-block px-3 py-1 bg-teal-50 text-clinical-teal text-xs font-bold rounded-full mb-4 uppercase tracking-wider border border-teal-100">
+                    21 C.F.R. § 520(o) / 21st Century Cures Act
+                </div>
+                <h2 class="text-3xl font-bold mb-4 text-slate-900">Four-Criteria FDA Analysis</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">
+                    Software is exempt from device regulation if it meets all four criteria. A caution finding requires additional counsel review; it does not automatically disqualify classification.
+                </p>
+            </div>
+
+            <div class="space-y-6">
+
+                <!-- Criterion A -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-8 hover:border-emerald-200 transition">
+                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-700 font-extrabold text-lg">A</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                                <h3 class="text-lg font-bold text-slate-900">Not a medical image or signal processor</h3>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200 w-fit">
+                                    <i data-lucide="check" class="w-3 h-3"></i> PASS
+                                </span>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+                                The software does not acquire, process, or analyze medical images (X-ray, MRI, CT), in vitro diagnostic signals, or physiological signals from a connected device. All inputs are entered manually by the clinician or pulled from structured EHR fields.
+                            </p>
+                            <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3">
+                                <p class="text-xs text-emerald-800 font-medium">No image processing. No waveform analysis. No device connectivity. All inputs are discretized clinical parameters.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Criterion B -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-8 hover:border-emerald-200 transition">
+                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-700 font-extrabold text-lg">B</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                                <h3 class="text-lg font-bold text-slate-900">Intended for use by licensed healthcare professionals</h3>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200 w-fit">
+                                    <i data-lucide="check" class="w-3 h-3"></i> PASS
+                                </span>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+                                The product is explicitly designed for, and marketed exclusively to, licensed healthcare professionals — attending physicians, nurse practitioners, physician assistants, and clinical pharmacists operating within institutional EHR environments.
+                            </p>
+                            <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3">
+                                <p class="text-xs text-emerald-800 font-medium">HCP-only design. Mandatory clinical responsibility acknowledgment on every launch. No consumer-facing features.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Criterion C -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-8 hover:border-emerald-200 transition">
+                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-700 font-extrabold text-lg">C</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                                <h3 class="text-lg font-bold text-slate-900">Displays clinical information for independent HCP review</h3>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200 w-fit">
+                                    <i data-lucide="check" class="w-3 h-3"></i> PASS
+                                </span>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+                                Every recommendation is accompanied by the full formula, data inputs, intermediate calculations, and the source guideline (CDC 2022, NCCN 2025, AGS Beers Criteria). The "Algorithm Transparency" and "Citations" interfaces show the complete derivation — not just the output.
+                            </p>
+                            <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3">
+                                <p class="text-xs text-emerald-800 font-medium">Full derivation displayed. Every recommendation hyperlinked to published source. Zero black-box outputs.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Criterion D -->
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-8 hover:border-amber-300 transition">
+                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-800 font-extrabold text-lg">D</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                                <h3 class="text-lg font-bold text-slate-900">HCP can independently verify the basis without relying on the software</h3>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-200 w-fit">
+                                    <i data-lucide="alert-triangle" class="w-3 h-3"></i> ACTIVE REVIEW
+                                </span>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                                The primary classification criterion. The statute requires that the software "enables such health care professional to independently review the basis for such recommendations so that it is not the intent that such health care professional rely primarily on any such recommendations to make a clinical diagnosis or treatment decision."
+                            </p>
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div class="bg-white border border-emerald-200 rounded-lg p-4">
+                                    <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2 flex items-center gap-1">
+                                        <i data-lucide="check" class="w-3 h-3"></i> Strongly Supportive Features
+                                    </h4>
+                                    <ul class="space-y-1 text-xs text-slate-600">
+                                        <li>• MME calculations: full formula shown inline</li>
+                                        <li>• GFR gating: threshold and rationale displayed</li>
+                                        <li>• Methadone PK: tiered ratios with APS/NCCN source</li>
+                                        <li>• OIRD scoring: all 14 factors individually shown</li>
+                                        <li>• One-click link to every source guideline</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white border border-amber-200 rounded-lg p-4">
+                                    <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wide mb-2 flex items-center gap-1">
+                                        <i data-lucide="alert-triangle" class="w-3 h-3"></i> Requires Counsel Review
+                                    </h4>
+                                    <ul class="space-y-1 text-xs text-slate-600">
+                                        <li>• Renal hard stop: can block order without override</li>
+                                        <li>• Pediatric hard stop: constrains prescribing pathway</li>
+                                        <li>• COWS gate: blocks MOUD induction if COWS &lt; 8</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-100 rounded-lg p-3">
+                                <p class="text-xs text-amber-800 font-medium">The "block vs. support" distinction requires formal regulatory counsel review before EHR deployment. Pre-deployment counsel engagement is planned as part of Stage 3 of our clinical validation roadmap.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Glass Box Design -->
+    <section id="glass-box" class="py-24 px-6 bg-slate-900 text-white relative overflow-hidden scroll-mt-20">
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20 pointer-events-none">
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-clinical-teal rounded-full blur-3xl"></div>
+            <div class="absolute top-1/2 right-0 w-64 h-64 bg-purple-600 rounded-full blur-3xl"></div>
+        </div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="text-center mb-16">
+                <div class="inline-block px-3 py-1 bg-white/10 text-white text-xs font-bold rounded-full mb-4 uppercase tracking-wider border border-white/20">
+                    Criterion D Compliance Strategy
+                </div>
+                <h2 class="text-3xl md:text-5xl font-bold mb-6">The "Glass Box" Design Philosophy</h2>
+                <p class="text-slate-400 text-lg max-w-3xl mx-auto">
+                    Why deterministic, traceable logic enables Non-Device classification while AI/ML approaches cannot.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-2xl">
+                    <div class="w-12 h-12 bg-clinical-teal/20 rounded-xl flex items-center justify-center text-white mb-6">
+                        <i data-lucide="eye" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Full Formula Transparency</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Every MME conversion uses the published equianalgesic ratio from the CDC 2022 guideline. The formula, input values, and intermediate steps are displayed inline — not hidden behind a result card. A clinician can perform the same calculation on paper and arrive at the same answer.
+                    </p>
+                </div>
+                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-2xl">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-purple-400 mb-6">
+                        <i data-lucide="link" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">One-Click Source Citations</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Every clinical recommendation is hyperlinked to its source guideline. CDC 2022 for opioid dosing. NCCN 2025 for cancer pain. AGS Beers Criteria 2023 for geriatric thresholds. ASAM 2020 for OUD protocols. A clinician can independently verify any recommendation against primary literature in under 30 seconds.
+                    </p>
+                </div>
+                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-2xl">
+                    <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 mb-6">
+                        <i data-lucide="check-circle" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Deterministic — Not AI/ML</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        No machine learning. No neural networks. No probabilistic inference. Every output is fully deterministic — given the same inputs, the same calculation runs every time. This eliminates the "black box" problem that prevents AI/ML CDS tools from achieving Non-Device classification.
+                    </p>
+                </div>
+                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-2xl">
+                    <div class="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center text-amber-400 mb-6">
+                        <i data-lucide="user-check" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Clinician Retains Full Autonomy</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        The software presents information; the clinician decides. The mandatory disclaimer on every session launch reinforces this. For features with blocking behavior, clinical override pathways are documented, and formal counsel review precedes EHR deployment.
+                    </p>
+                </div>
+            </div>
+
+            <!-- vs SaMD comparison -->
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+                <div class="p-6 border-b border-slate-700">
+                    <h3 class="text-lg font-bold text-white">Non-Device CDS vs. SaMD 510(k) — Why This Matters</h3>
+                    <p class="text-slate-400 text-sm mt-1">The classification decision is not just regulatory — it is strategic.</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-700 text-slate-200 text-xs uppercase font-bold">
+                            <tr>
+                                <th class="p-4 text-left">Dimension</th>
+                                <th class="p-4 text-left text-clinical-teal">Non-Device CDS (Our Path)</th>
+                                <th class="p-4 text-left text-slate-400">SaMD 510(k)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-700 text-slate-300">
+                            <tr>
+                                <td class="p-4 font-semibold">Time to Market</td>
+                                <td class="p-4 text-emerald-400 font-medium">Deploy now (post-counsel review)</td>
+                                <td class="p-4 text-slate-400">12–24 months</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-semibold">Regulatory Cost</td>
+                                <td class="p-4 text-emerald-400 font-medium">$10–25K (counsel + memo)</td>
+                                <td class="p-4 text-slate-400">$800K–$2M</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-semibold">Clinical Changes</td>
+                                <td class="p-4 text-emerald-400 font-medium">Rapid update on evidence</td>
+                                <td class="p-4 text-slate-400">New 510(k) submission per change</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-semibold">Ongoing Compliance</td>
+                                <td class="p-4 text-emerald-400 font-medium">Internal QMS documentation</td>
+                                <td class="p-4 text-slate-400">FDA post-market surveillance</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-semibold">AI/ML Features</td>
+                                <td class="p-4 text-amber-400 font-medium">Not available (by design)</td>
+                                <td class="p-4 text-slate-400">Permitted under 510(k)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Risk Surface -->
+    <section id="risk-surface" class="py-24 px-6 bg-white border-b border-slate-200 scroll-mt-20">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4 text-slate-900">Regulatory Risk Surface</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">
+                    Three features require specific attention before EHR deployment. We treat these as known risks with defined mitigations — not liabilities to obscure.
+                </p>
+            </div>
+
+            <div class="space-y-6 mb-12">
+                <!-- Risk 1: Renal Hard Stop -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-8">
+                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg border border-amber-200">
+                                <i data-lucide="alert-triangle" class="w-3 h-3"></i> MEDIUM RISK
+                            </span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Renal Hard Stop — GFR-Gated Active Metabolites</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                                When GFR &lt; 30 for morphine or GFR &lt; 15 for hydromorphone, the engine blocks the prescribing pathway for active metabolites. This is evidence-based (accumulation toxicity risk is well-documented) but creates a "blocking" behavior that may invite Criterion D scrutiny.
+                            </p>
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                                <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2">Mitigation</h4>
+                                <p class="text-xs text-emerald-700">Blocks are accompanied by full evidence display (source: Practical Pain Management, NKF guidelines). Clinical override pathway allows documented exception. This mirrors existing EHR-native hard stops for renally-cleared drugs (e.g., NSAIDs in AKI). Formal counsel review before EHR BPA implementation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk 2: Pediatric Hard Stop -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-8">
+                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg border border-amber-200">
+                                <i data-lucide="alert-triangle" class="w-3 h-3"></i> MEDIUM RISK
+                            </span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Pediatric Hard Stop — Black Box Warning Gate</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                                For patients under 18, several opioids carry FDA black box warnings that the engine enforces as hard stops (e.g., codeine/tramadol contraindication in pediatric patients under 12 per 2013 FDA Safety Communication). These are FDA-mandated warnings, not engine-originated judgments.
+                            </p>
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                                <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2">Mitigation</h4>
+                                <p class="text-xs text-emerald-700">Blocks directly reference FDA black box warning text. These constraints mirror standard hospital pharmacy policy. The engine does not add clinical judgment beyond the FDA mandate. Counsel review to confirm that "enforcing FDA warnings" does not itself constitute regulatory classification as a device.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk 3: COWS Gate -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-8">
+                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-300">
+                                <i data-lucide="minus-circle" class="w-3 h-3"></i> LOW RISK
+                            </span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">COWS Gate — Buprenorphine Induction Gating</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                                The OUD Consult pathway requires COWS ≥ 8 before initiating buprenorphine induction (ASAM 2020 + SAMHSA guidelines). This "gate" prevents premature induction that could precipitate acute opioid withdrawal. However, it structures the workflow in a way that may be characterized as restricting clinical judgment.
+                            </p>
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                                <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-2">Mitigation</h4>
+                                <p class="text-xs text-emerald-700">COWS gate is a safety-information display, not a locked EHR order block. The clinician retains ability to proceed; the gate presents evidence and requires acknowledgment. ASAM 2020 source displayed inline. Classified as lower risk because it is the clinician's own tool, not an EHR-enforced BPA.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 text-white rounded-2xl p-8">
+                <div class="flex flex-col md:flex-row gap-6 items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-14 h-14 bg-clinical-teal/20 rounded-xl flex items-center justify-center text-clinical-teal">
+                            <i data-lucide="scale" class="w-7 h-7"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Regulatory Counsel Engagement — Stage 3</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Before any EHR BPA integration with a hospital partner, Lifeline Medical Technologies will commission a formal FDA regulatory classification memo from specialized health IT counsel. This memo will address the "block vs. support" boundary for all three risk features and document the company's Non-Device CDS rationale. This is standard practice — not an obstacle — for responsible clinical software deployment.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Clinical Validation Roadmap -->
+    <section id="validation" class="py-24 px-6 bg-slate-50 border-b border-slate-200 scroll-mt-20">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <div class="inline-block px-3 py-1 bg-purple-50 text-purple-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider border border-purple-100">
+                    Physician-Founded · Yale School of Medicine
+                </div>
+                <h2 class="text-3xl font-bold mb-4 text-slate-900">Clinical Validation Roadmap</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">
+                    Five stages from internal development to live hospital deployment. The founder's Yale addiction medicine fellowship (July 2026) anchors the academic validation pathway.
+                </p>
+            </div>
+
+            <div class="relative">
+                <!-- Timeline line -->
+                <div class="hidden md:block absolute left-1/2 transform -translate-x-px top-0 bottom-0 w-0.5 bg-slate-200"></div>
+
+                <!-- Stage 1: Complete -->
+                <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
+                    <div class="md:w-1/2 md:text-right md:pr-12">
+                        <div class="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full mb-3 uppercase">Stage 1 — Complete</div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-900">Internal Engine Development</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            22,000+ lines of clinical logic (Swift 6, iOS 17+). 167 automated test scenarios across 10 validation suites. All 10 safety gate rules verified. 24-drug MME database. AGS Beers Criteria 2023 geriatric thresholds implemented.
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-emerald-500/30 z-10">
+                        <i data-lucide="check" class="w-5 h-5"></i>
+                    </div>
+                    <div class="md:w-1/2 md:pl-12"></div>
+                </div>
+
+                <!-- Stage 2: Active -->
+                <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
+                    <div class="md:w-1/2 md:pr-12 md:order-1 order-2"></div>
+                    <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-purple-500/30 z-10 order-1 md:order-2 ring-4 ring-purple-100">
+                        <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                    </div>
+                    <div class="md:w-1/2 md:pl-12 order-3">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full mb-3 uppercase">
+                            <span class="w-2 h-2 rounded-full bg-purple-600 animate-pulse"></span>
+                            Stage 2 — Active · July 2026
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-900">Independent Clinical Review — Yale</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Founder enters Yale School of Medicine addiction medicine fellowship — the app's core clinical domain (OUD consult, MOUD induction, COWS, buprenorphine protocols). Yale's addiction medicine faculty serve as natural co-investigators for IRB-exempt quality improvement validation. Clinical logic review against institutional protocol standards.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Stage 3 -->
+                <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
+                    <div class="md:w-1/2 md:text-right md:pr-12">
+                        <div class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full mb-3 uppercase">Stage 3 — Planned</div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-900">Regulatory Counsel Review</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Commission formal FDA regulatory classification memo from specialized health IT counsel. Address Non-Device CDS boundary analysis for the three identified risk features. Establish Quality Management System documentation and pre-deployment checklist for EHR partners.
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 bg-slate-300 rounded-full flex items-center justify-center text-slate-600 flex-shrink-0 shadow-sm z-10">
+                        <i data-lucide="scale" class="w-5 h-5"></i>
+                    </div>
+                    <div class="md:w-1/2 md:pl-12"></div>
+                </div>
+
+                <!-- Stage 4 -->
+                <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
+                    <div class="md:w-1/2 md:pr-12 md:order-1 order-2"></div>
+                    <div class="w-10 h-10 bg-slate-300 rounded-full flex items-center justify-center text-slate-600 flex-shrink-0 shadow-sm z-10 order-1 md:order-2">
+                        <i data-lucide="clipboard-check" class="w-5 h-5"></i>
+                    </div>
+                    <div class="md:w-1/2 md:pl-12 order-3">
+                        <div class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full mb-3 uppercase">Stage 4 — Planned</div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-900">IRB-Exempt QI Pilot</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            90-day observational quality improvement study at a partner academic medical center. Collect safety metrics: OIRD rate, high-MME prescribing rate, hard-stop trigger rate, clinician override documentation. IRB exemption pathway via QI designation (no PHI retained, no experimental intervention).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Stage 5 -->
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="md:w-1/2 md:text-right md:pr-12">
+                        <div class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full mb-3 uppercase">Stage 5 — Planned</div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-900">Epic Integration Certification</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Full SMART on FHIR + CDS Hooks live deployment. Epic sandbox validation → hospital staging environment → limited floor pilot → system-wide rollout. Epic App Orchard listing application for broader institutional discovery.
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 bg-slate-300 rounded-full flex items-center justify-center text-slate-600 flex-shrink-0 shadow-sm z-10">
+                        <i data-lucide="rocket" class="w-5 h-5"></i>
+                    </div>
+                    <div class="md:w-1/2 md:pl-12"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-24 px-6 bg-slate-900 text-white text-center">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold mb-6">Questions About Regulatory Fit?</h2>
+            <p class="text-slate-400 mb-10 max-w-3xl mx-auto leading-relaxed text-lg">
+                Whether you're evaluating integration from a compliance, legal, or clinical informatics perspective — we have detailed documentation on our classification rationale, HIPAA architecture, and quality management approach.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="mailto:dan@lifelinemedtech.org?subject=Regulatory%20Documentation%20Request" class="bg-clinical-teal text-white px-10 py-4 rounded-xl font-bold hover:bg-teal-700 transition shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2">
+                    <i data-lucide="mail" class="w-5 h-5"></i> Request Regulatory Documentation
+                </a>
+                <a href="integration.html" class="bg-white text-slate-900 border border-slate-200 px-10 py-4 rounded-xl font-bold hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                    <i data-lucide="server" class="w-5 h-5"></i> View Integration Guide
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 text-slate-400 py-12 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex flex-col items-center md:items-start gap-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-clinical-teal rounded-md flex items-center justify-center text-white">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
+                    </div>
+                    <span class="font-semibold text-slate-300 text-sm">Precision Analgesia</span>
+                    <span class="text-xs text-slate-500">by Lifeline Medical Technologies, LLC</span>
+                </div>
+                <p class="text-xs text-slate-500">
+                    Non-Device Clinical Decision Support Tool — Section 3060(o)(1)(E) of the 21st Century Cures Act.
+                </p>
+            </div>
+            <div class="flex flex-col items-center md:items-end gap-2">
+                <div class="flex gap-4 text-sm text-slate-400">
+                    <a href="index.html" class="hover:text-white transition">Home</a>
+                    <a href="integration.html" class="hover:text-white transition">Integration Guide</a>
+                    <a href="appstore.html" class="hover:text-white transition">Clinical Showcase</a>
+                    <a href="https://www.instagram.com/lifelinemedtech/" target="_blank" class="hover:text-white transition">Instagram</a>
+                </div>
+                <p class="text-xs text-slate-500">
+                    © 2026 Lifeline Medical Technologies, LLC. All rights reserved. | dan@lifelinemedtech.org
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
