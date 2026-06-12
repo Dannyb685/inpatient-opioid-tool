@@ -29,7 +29,7 @@ graph TD
 
 ```mermaid
 graph LR
-    HOME["index.html<br/><strong>Homepage</strong><br/>The $95B Liability pitch"] --> INT["integration.html<br/><strong>EMR Integration Guide</strong><br/>The Business Case"]
+    HOME["index.html<br/><strong>Homepage</strong><br/>The opioid liability pitch"] --> INT["integration.html<br/><strong>EMR Integration Guide</strong><br/>The Business Case"]
     HOME --> APP["appstore.html<br/><strong>Clinical Showcase</strong><br/>App feature portfolio"]
     HOME --> PRIV["privacy.html<br/><strong>Privacy Policy</strong>"]
     HOME --> SUPP["support.html<br/><strong>Support & Contact</strong>"]
@@ -49,7 +49,7 @@ graph LR
 
 | Page | File | Purpose | Primary Audience |
 |------|------|---------|-----------------|
-| **Homepage** | [index.html](file:///Users/danielbergholz/Documents/Second%20Brain/02.%20General/08.%20LifelineMedTech/Analgesia%20Precision/Analgesia%20Precision%20Website/index.html) | Main landing — the $95B opioid liability pitch, logic engine overview, benchmarks table | Hospital executives, CMIOs |
+| **Homepage** | [index.html](file:///Users/danielbergholz/Documents/Second%20Brain/02.%20General/08.%20LifelineMedTech/Analgesia%20Precision/Analgesia%20Precision%20Website/index.html) | Main landing — the opioid liability pitch ($78.5B economic burden, Florence 2016), logic engine overview, benchmarks table | Hospital executives, CMIOs |
 | **EMR Integration** | [integration.html](file:///Users/danielbergholz/Documents/Second%20Brain/02.%20General/08.%20LifelineMedTech/Analgesia%20Precision/Analgesia%20Precision%20Website/integration.html) | Deep-dive enterprise pitch — business case, 6 clinical modules, SMART on FHIR architecture, 4-phase timeline | Hospital IT, CMIOs, CFOs |
 | **Clinical Showcase** | [appstore.html](file:///Users/danielbergholz/Documents/Second%20Brain/02.%20General/08.%20LifelineMedTech/Analgesia%20Precision/Analgesia%20Precision%20Website/appstore.html) | iOS app feature portfolio with real screenshots organized by 3 clinical pillars | Clinicians via App Store link |
 | **Privacy Policy** | [privacy.html](file:///Users/danielbergholz/Documents/Second%20Brain/02.%20General/08.%20LifelineMedTech/Analgesia%20Precision/Analgesia%20Precision%20Website/privacy.html) | Required for App Store — zero data collection policy | Apple Review, users |
@@ -76,7 +76,7 @@ graph LR
 ### 1. The Two Audiences Are Muddled
 
 > [!IMPORTANT]
-> The homepage opens with enterprise/executive language ("The Logic Layer for Inpatient Stewardship", "$95B Liability", "EMR-integrated forcing functions") but the primary CTA is "Demo the iOS Beta." A CMIO won't download TestFlight. A resident looking for a calculator will bounce from the $95B headline.
+> The homepage opens with enterprise/executive language ("The Logic Layer for Inpatient Stewardship", "$78.5B economic burden", "EMR-integrated forcing functions") but the primary CTA is "Demo the iOS Beta." A CMIO won't download TestFlight. A resident looking for a calculator will bounce from the liability headline.
 
 **The site doesn't clearly answer:** *"Is this a phone app I can use right now, or is this something my hospital needs to buy?"*
 
