@@ -20,14 +20,16 @@
     <style>
         /* ============ Clinical Theme — mirrors the iOS app design system ============ */
         :root {
-            --teal: #0d9488;        /* ClinicalTheme.teal500 (light) */
+            --teal: #0d9488;
             --teal-dark: #0f766e;
             --teal-soft: #f0fdfa;
-            --amber: #d97706;       /* ClinicalTheme.amber500 (light) */
+            --amber: #d97706;
             --amber-soft: #fffbeb;
-            --rose: #e11d48;        /* ClinicalTheme.rose500 (light) */
+            --rose: #e11d48;
             --rose-soft: #fff1f2;
-            --bg-grouped: #f1f5f9;  /* systemGroupedBackground analog */
+            --purple: #8b5cf6;
+            --purple-soft: #f5f3ff;
+            --bg-grouped: #f1f5f9;
             --card: #ffffff;
             --label: #0f172a;
             --label-2: #475569;
@@ -44,7 +46,7 @@
         }
         a { text-decoration: none; color: inherit; }
 
-        /* ============ Nav (consistent with marketing pages) ============ */
+        /* ============ Nav ============ */
         .site-nav {
             position: sticky; top: 0; z-index: 40;
             background: rgba(255,255,255,0.85);
@@ -119,7 +121,7 @@
         /* ============ App layout ============ */
         .app-wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem 5rem; }
         .app-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-        @media (min-width: 960px) { .app-grid { grid-template-columns: 380px 1fr; align-items: start; } }
+        @media (min-width: 960px) { .app-grid { grid-template-columns: 420px 1fr; align-items: start; } }
         .app-grid > div { min-width: 0; }
         .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
@@ -140,7 +142,7 @@
         /* iOS-style form rows */
         .form-row { padding: 0.75rem 0; border-bottom: 1px solid var(--separator); }
         .form-row:last-child { border-bottom: none; padding-bottom: 0; }
-        .form-row label.row-label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--label); margin-bottom: 0.5rem; }
+        .form-row label.row-label, .form-row .row-label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--label); margin-bottom: 0.5rem; }
 
         input[type="number"], select {
             width: 100%; padding: 0.625rem 0.75rem;
@@ -168,6 +170,46 @@
         }
         .segmented button.on { background: #fff; color: var(--label); box-shadow: 0 1px 3px rgba(15,23,42,0.12); }
 
+        /* iOS SelectionView-style option grid (color-mapped, mirrors the app) */
+        .option-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.375rem; }
+        .option-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .option-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+        .option-grid button {
+            padding: 0.5rem 0.375rem; border: 1.5px solid var(--separator); background: var(--bg-grouped);
+            border-radius: 0.625rem; font: inherit; font-size: 0.75rem; font-weight: 600;
+            color: var(--label-2); cursor: pointer; transition: all 0.15s; white-space: nowrap;
+        }
+        .option-grid button.on.c-teal   { background: var(--teal-soft);   border-color: var(--teal);   color: var(--teal-dark); }
+        .option-grid button.on.c-amber  { background: var(--amber-soft);  border-color: var(--amber);  color: var(--amber); }
+        .option-grid button.on.c-rose   { background: var(--rose-soft);   border-color: var(--rose);   color: var(--rose); }
+        .option-grid button.on.c-purple { background: var(--purple-soft); border-color: var(--purple); color: var(--purple); }
+        .option-grid button.on.c-gray   { background: #f8fafc;            border-color: var(--label-3); color: var(--label-2); }
+
+        /* iOS-style switch toggles */
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; cursor: pointer; }
+        .toggle-row .t-title { font-size: 0.8438rem; font-weight: 700; color: var(--label); }
+        .toggle-row .t-sub { font-size: 0.6875rem; color: var(--label-3); }
+        .switch { position: relative; flex-shrink: 0; width: 3.1875rem; height: 1.9375rem; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch .knob {
+            position: absolute; inset: 0; background: var(--separator);
+            border-radius: 9999px; transition: background 0.2s;
+        }
+        .switch .knob::after {
+            content: ''; position: absolute; width: 1.6875rem; height: 1.6875rem;
+            left: 0.125rem; top: 0.125rem; background: #fff; border-radius: 9999px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.2s;
+        }
+        .switch input:checked + .knob.rose { background: var(--rose); }
+        .switch input:checked + .knob.purple { background: var(--purple); }
+        .switch input:checked + .knob::after { transform: translateX(1.25rem); }
+
+        /* Inline field footnotes (mirrors iOS SelectionView footers) */
+        .field-note { font-size: 0.6875rem; line-height: 1.5; margin-top: 0.5rem; }
+        .field-note.rose { color: var(--rose); }
+        .field-note.gray { color: var(--label-3); }
+        .field-note.italic { font-style: italic; color: var(--label-3); }
+
         /* Slider */
         .slider-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.375rem; }
         .slider-val { font-size: 1rem; font-weight: 700; color: var(--teal); }
@@ -188,6 +230,7 @@
         .warn.amber { background: var(--amber-soft); border: 1px solid #fde68a; color: #92400e; }
         .warn.rose { background: var(--rose-soft); border: 1px solid #fecdd3; color: #9f1239; font-weight: 600; }
         .warn.teal { background: var(--teal-soft); border: 1px solid #ccfbf1; color: var(--teal-dark); }
+        .warn.purple { background: var(--purple-soft); border: 1px solid #ddd6fe; color: #6d28d9; }
 
         /* Results */
         .empty-state { padding: 3rem 1.5rem; text-align: center; color: var(--label-3); font-size: 0.875rem; }
@@ -201,6 +244,14 @@
 
         #chart-box { margin-bottom: 1.125rem; }
         #chart-box svg { display: block; width: 100%; height: auto; }
+        details.viz summary {
+            list-style: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+            font-size: 0.8125rem; font-weight: 700; color: var(--label); padding: 0.25rem 0 0.75rem;
+        }
+        details.viz summary::-webkit-details-marker { display: none; }
+        details.viz summary .chev { margin-left: auto; transition: transform 0.2s; color: var(--label-3); }
+        details.viz[open] summary .chev { transform: rotate(180deg); }
+        .viz-caption { font-size: 0.6875rem; font-weight: 700; color: var(--label-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.375rem; }
 
         table.schedule { width: 100%; border-collapse: collapse; font-size: 0.8438rem; }
         table.schedule th {
@@ -208,14 +259,17 @@
             font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
             color: var(--label-3); border-bottom: 1px solid var(--separator);
         }
-        table.schedule td { padding: 0.625rem 0.75rem; border-bottom: 1px solid var(--separator); color: var(--label-2); vertical-align: top; }
+        table.schedule td { padding: 0.625rem 0.75rem; border-bottom: 1px solid var(--separator); vertical-align: top; }
         table.schedule tr:last-child td { border-bottom: none; }
+        table.schedule tr:nth-child(odd) td { background: rgba(241,245,249,0.5); }
         table.schedule td.period { font-weight: 700; color: var(--label); white-space: nowrap; }
-        table.schedule td.mme { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--teal-dark); white-space: nowrap; }
-        table.schedule td.drug { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        table.schedule td.dose-cell { font-variant-numeric: tabular-nums; }
+        table.schedule td.dose-cell .dose-primary { font-weight: 700; color: var(--label); }
+        table.schedule td.dose-cell .dose-sub { font-size: 0.75rem; color: var(--label-3); display: block; }
         table.schedule td .instr { display: inline-block; font-size: 0.6875rem; font-weight: 600; padding: 0.125rem 0.5rem; border-radius: 9999px; background: var(--bg-grouped); color: var(--label-2); }
         table.schedule td .instr.stop { background: var(--rose-soft); color: var(--rose); }
         table.schedule td .instr.hold { background: var(--amber-soft); color: var(--amber); }
+        table.schedule td .instr.extend { background: var(--teal-soft); color: var(--teal-dark); }
 
         .copy-btn {
             display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem;
@@ -236,6 +290,10 @@
         details.glass summary .chev { margin-left: auto; transition: transform 0.2s; color: var(--label-3); }
         details.glass[open] summary .chev { transform: rotate(180deg); }
         .glass-body { padding: 0 1.25rem 1.25rem; font-size: 0.8125rem; color: var(--label-2); line-height: 1.65; }
+        .glass-body .formula {
+            display: inline-block; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.75rem;
+            background: var(--bg-grouped); border-radius: 0.375rem; padding: 0.25rem 0.5rem; margin: 0.375rem 0;
+        }
         .glass-body .ledger {
             background: #0f172a; color: #5eead4; border-radius: 0.75rem; padding: 1rem 1.125rem;
             font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.75rem; line-height: 1.8;
@@ -243,6 +301,7 @@
         }
         .glass-body ul { margin: 0.5rem 0 0 1.125rem; }
         .glass-body li { margin-bottom: 0.375rem; }
+        .glass-body h4 { font-size: 0.8125rem; color: var(--label); margin-top: 0.875rem; }
 
         /* Citations */
         .citations { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem 4rem; }
@@ -254,16 +313,30 @@
         .footer-inner { max-width: 72rem; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; justify-content: space-between; }
         .footer-links { display: flex; flex-wrap: wrap; gap: 1.25rem; }
         .footer-links a:hover { color: #5eead4; }
+
+        /* Clinical note cards */
+        .clinical-note {
+            display: flex; gap: 0.75rem; align-items: flex-start;
+            padding: 0.875rem 1rem; border-radius: 0.875rem;
+            font-size: 0.8125rem; line-height: 1.5; margin-top: 0.875rem;
+        }
+        .clinical-note i { flex-shrink: 0; margin-top: 0.0625rem; }
+        .clinical-note.teal { background: var(--teal-soft); border: 1px solid #ccfbf1; color: var(--teal-dark); }
+        .clinical-note.amber { background: var(--amber-soft); border: 1px solid #fde68a; color: #92400e; }
+        .clinical-note.rose { background: var(--rose-soft); border: 1px solid #fecdd3; color: #9f1239; }
     </style>
 </head>
 <body>
 
     <nav class="site-nav">
         <div class="nav-inner">
-            <a href="index.html" class="nav-brand">
-                <span class="logo"><i data-lucide="activity" style="width:1.25rem;height:1.25rem;"></i></span>
-                <span>Precision Analgesia</span>
-            </a>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <a href="index.html" class="nav-brand">
+                    <span class="logo"><i data-lucide="activity" style="width:1.25rem;height:1.25rem;"></i></span>
+                    <span>Precision Analgesia</span>
+                </a>
+                <a href="https://lifelinemedtech.org" target="_blank" rel="noopener noreferrer" style="font-size:0.65rem;color:#94a3b8;text-decoration:none;white-space:nowrap;" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='#94a3b8'">by Lifeline ↗</a>
+            </div>
             <div class="nav-links">
                 <a href="index.html">Home</a>
                 <a href="integration.html">Integration Guide</a>
@@ -296,8 +369,9 @@
         <div class="hero-badge"><span class="pulse-dot"></span> Live Interactive Demo</div>
         <h1>The Taper Engine,<br><span class="grad">Running in Your Browser</span></h1>
         <p class="sub">
-            This is the same deterministic CDC-protocol logic that ships in the Precision Analgesia iOS app.
-            Every number below is computed locally, in the open — expand the glass box to verify the math yourself.
+            This is the same deterministic CDC-protocol logic that ships in the Precision Analgesia iOS app —
+            ported control-for-control from the production taper screen. Every number is computed locally,
+            in the open. Expand the glass box to verify the math yourself.
         </p>
     </section>
 
@@ -308,83 +382,177 @@
         </div>
 
         <div class="app-grid">
-            <!-- ============ INPUTS ============ -->
+            <!-- ============ INPUTS (mirrors TaperScheduleView card order) ============ -->
             <div>
+                <!-- 1. TAPER TARGET -->
                 <div class="card">
-                    <div class="card-header"><i data-lucide="sliders-horizontal" style="width:0.875rem;height:0.875rem;"></i> Clinical Inputs</div>
+                    <div class="card-header"><i data-lucide="clipboard-list" style="width:0.875rem;height:0.875rem;"></i> Taper Target</div>
                     <div class="card-body">
                         <div class="form-row">
-                            <label class="row-label" for="startMME">Current Opioid Dose (MME/day)</label>
+                            <label class="row-label" for="startMME">Starting daily dose (MME/day)</label>
                             <input type="number" id="startMME" value="90" min="1" max="2000" step="1" inputmode="decimal">
-                            <div id="dose-warnings"></div>
-                        </div>
-                        <div class="form-row">
-                            <label class="row-label" for="drug">Target Medication</label>
-                            <div class="select-wrap">
-                                <select id="drug">
-                                    <option value="morphine">Morphine PO</option>
-                                    <option value="oxycodone">Oxycodone PO</option>
-                                    <option value="hydrocodone">Hydrocodone PO</option>
-                                    <option value="hydromorphone">Hydromorphone PO</option>
-                                    <option value="tramadol">Tramadol PO</option>
-                                    <option value="mme">MME Only (No Conversion)</option>
-                                </select>
-                            </div>
-                            <div id="drug-warnings"></div>
-                        </div>
-                        <div class="form-row">
-                            <label class="row-label">Therapy Duration</label>
-                            <div class="segmented" id="duration-seg">
-                                <button type="button" data-val="short" class="on">Short-Term (&lt;1 yr)</button>
-                                <button type="button" data-val="long">Long-Term (&ge;1 yr)</button>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="slider-head">
-                                <label class="row-label" for="rate" style="margin-bottom:0;">Reduction per Step</label>
-                                <span class="slider-val" id="rate-display">10%</span>
-                            </div>
-                            <input type="range" id="rate" min="1" max="50" step="1" value="10">
-                            <div class="slider-scale"><span>1% (Gentle)</span><span>50% (Rapid)</span></div>
-                            <div id="rate-warnings"></div>
-                        </div>
-                        <div class="form-row">
-                            <label class="row-label">Renal Function</label>
-                            <div class="segmented" id="renal-seg">
-                                <button type="button" data-val="normal" class="on">Normal</button>
-                                <button type="button" data-val="impaired">Impaired</button>
-                                <button type="button" data-val="dialysis">Dialysis</button>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <label class="row-label">Hepatic Function</label>
-                            <div class="segmented" id="hepatic-seg">
-                                <button type="button" data-val="normal" class="on">Normal</button>
-                                <button type="button" data-val="impaired">Impaired</button>
-                                <button type="button" data-val="failure">Failure</button>
-                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- 2. CLINICAL CONTEXT (mirrors SharedClinicalContextView) -->
+                <div class="card">
+                    <div class="card-header"><i data-lucide="briefcase-medical" style="width:0.875rem;height:0.875rem;"></i> Clinical Context</div>
+                    <div class="card-body">
+
+                        <div class="form-row">
+                            <label class="row-label" for="age">Patient Age</label>
+                            <input type="number" id="age" placeholder="Age" min="0" max="120" step="1" inputmode="numeric">
+                            <div class="field-note gray">Carried in the global assessment; does not alter taper math.</div>
+                        </div>
+
+                        <div class="form-row">
+                            <span class="row-label">Opioid Profile</span>
+                            <div class="option-grid" id="profile-grid">
+                                <button type="button" data-val="naive" data-color="c-teal" class="on c-teal">Naive</button>
+                                <button type="button" data-val="chronicRx" data-color="c-amber">Chronic Rx</button>
+                                <button type="button" data-val="highPotency" data-color="c-rose">High-Potency</button>
+                                <button type="button" data-val="buprenorphine" data-color="c-purple">Buprenorphine</button>
+                                <button type="button" data-val="methadone" data-color="c-purple">Methadone</button>
+                                <button type="button" data-val="naltrexone" data-color="c-gray">Naltrexone</button>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="toggle-row" for="pregnant">
+                                <span>
+                                    <span class="t-title">Pregnant Person</span><br>
+                                    <span class="t-sub">Shows warnings / gates logic</span>
+                                </span>
+                                <span class="switch">
+                                    <input type="checkbox" id="pregnant">
+                                    <span class="knob rose"></span>
+                                </span>
+                            </label>
+                            <div id="pregnant-warnings"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="toggle-row" for="breastfeeding">
+                                <span>
+                                    <span class="t-title">Breastfeeding</span><br>
+                                    <span class="t-sub">Logic for infant monitoring</span>
+                                </span>
+                                <span class="switch">
+                                    <input type="checkbox" id="breastfeeding">
+                                    <span class="knob purple"></span>
+                                </span>
+                            </label>
+                            <div id="breastfeeding-warnings"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <span class="row-label">Renal Function (CrCl, mL/min)</span>
+                            <div class="option-grid cols-3" id="renal-grid">
+                                <button type="button" data-val="normal" data-color="c-teal" class="on c-teal">&gt;60</button>
+                                <button type="button" data-val="impaired" data-color="c-amber">30&ndash;60</button>
+                                <button type="button" data-val="dialysis" data-color="c-rose">&lt;30</button>
+                            </div>
+                            <div id="renal-footer"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <span class="row-label">Hepatic Function (Child-Pugh)</span>
+                            <div class="option-grid cols-4" id="hepatic-grid">
+                                <button type="button" data-val="none" data-color="c-teal" class="on c-teal">N/A</button>
+                                <button type="button" data-val="normal" data-color="c-teal">A</button>
+                                <button type="button" data-val="impaired" data-color="c-amber">B</button>
+                                <button type="button" data-val="failure" data-color="c-rose">C</button>
+                            </div>
+                            <div id="hepatic-footer"></div>
+                        </div>
+
+                        <div id="safety-logic-footer"></div>
+                    </div>
+                </div>
+
+                <!-- Analgesic profile warning banners (iOS places these after Clinical Context) -->
+                <div id="profile-warnings" style="margin-top:0.875rem;"></div>
+
+                <!-- 3. TARGET MEDICATION -->
+                <div class="card">
+                    <div class="card-header"><i data-lucide="pill" style="width:0.875rem;height:0.875rem;"></i> Target Medication</div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="select-wrap">
+                                <select id="drug">
+                                    <option value="mme">MME Only (No Conversion)</option>
+                                    <option value="morphine" selected>Morphine PO</option>
+                                    <option value="oxycodone">Oxycodone PO</option>
+                                    <option value="hydrocodone">Hydrocodone PO</option>
+                                    <option value="hydromorphone">Hydromorphone PO</option>
+                                    <option value="tramadol">Tramadol PO</option>
+                                </select>
+                            </div>
+                            <div id="drug-warnings"></div>
+                            <div id="drug-caption"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. TAPER STRATEGY -->
+                <div class="card">
+                    <div class="card-header"><i data-lucide="sliders-horizontal" style="width:0.875rem;height:0.875rem;"></i> Taper Strategy</div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <span class="row-label">Duration of Therapy</span>
+                            <div class="segmented" id="duration-seg">
+                                <button type="button" data-val="short" class="on">Short (&lt;1 Year)</button>
+                                <button type="button" data-val="long">Long (&ge;1 Year)</button>
+                            </div>
+                            <div class="field-note italic" id="strategy-caption"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="slider-head">
+                                <label class="row-label" for="rate" style="margin-bottom:0;">Reduction Rate</label>
+                                <span class="slider-val" id="rate-display">10%</span>
+                            </div>
+                            <input type="range" id="rate" min="1" max="50" step="1" value="10">
+                            <div class="slider-scale"><span>Slower</span><span>Faster</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. ALGORITHM & EVIDENCE (mirrors iOS transparency card) -->
                 <div class="card">
                     <details class="glass" open>
                         <summary>
-                            <i data-lucide="box" style="width:1rem;height:1rem;color:var(--teal);"></i>
-                            Glass Box — Show the Math
+                            <i data-lucide="sigma" style="width:1rem;height:1rem;color:var(--teal);"></i>
+                            Algorithm &amp; Evidence — Glass Box
                             <span class="chev"><i data-lucide="chevron-down" style="width:1rem;height:1rem;"></i></span>
                         </summary>
                         <div class="glass-body">
-                            <p>No machine learning. No black box. The engine applies these published rules, in this order:</p>
+                            <h4 style="margin-top:0;">Tapering Protocol (CDC 2022)</h4>
                             <ul>
-                                <li><strong>Phase 1 (short-term):</strong> linear reduction — a fixed step of <em>Start &times; rate%</em> each week, until the dose reaches 30% of start.</li>
-                                <li><strong>Phase 2:</strong> exponential reduction — <em>Current &times; (1 &minus; rate%)</em> per step, softening the landing.</li>
-                                <li><strong>Long-term mode:</strong> pure exponential reduction applied monthly (CDC slow-taper logic).</li>
+                                <li><strong>Short-Term (&lt;1yr):</strong> uses 2-Phase logic. Phase 1 is Linear (rate% of <em>baseline</em> dose) until 30% remains. Phase 2 is Exponential (rate% of <em>current</em> dose) to prevent withdrawal at low thresholds.</li>
+                                <li><strong>Long-Term (&ge;1yr):</strong> uses Slow Taper logic. Pure Exponential reduction (rate% of <em>current</em> dose) performed monthly.</li>
                                 <li><strong>Minimum decrement:</strong> drops &lt;1 MME alternate Hold / Force (&minus;2 MME) to keep the taper moving.</li>
                                 <li><strong>Jump-off:</strong> below 10 MME, extend dosing interval; below 5 MME, discontinue.</li>
-                                <li><strong>Organ gates:</strong> conversion factors adjust — or default to AVOID pending documented acknowledgment — for renal and hepatic impairment.</li>
+                                <li><strong>Organ gates:</strong> conversion factors adjust — or block entirely — for renal and hepatic impairment.</li>
+                                <li><strong>Dispensable rounding:</strong> drug doses snap to the nearest practical tablet increment (morphine 7.5 mg &middot; oxycodone 2.5 mg &middot; hydrocodone 2.5 mg &middot; hydromorphone 2 mg &middot; tramadol 25 mg), never below one increment until jump-off. Weeks that round to the same dose merge into a single step.</li>
+                            </ul>
+                            <h4>Reverse Conversion Logic</h4>
+                            <span class="formula">Drug Dose = Target MME &divide; Factor</span>
+                            <div style="font-size:0.75rem;"><strong style="color:var(--label);">Factors used:</strong></div>
+                            <ul style="font-size:0.75rem;" id="factors-list">
+                                <li>Oxycodone: 1.5</li>
+                                <li id="factor-hm">Hydromorphone: 5.0 (CDC 2022)</li>
+                                <li>Tramadol: 0.2</li>
                             </ul>
                             <div class="ledger" id="ledger">—</div>
+                            <hr style="border:none;border-top:1px solid var(--separator);margin:1rem 0;">
+                            <div style="font-size:0.7rem;color:var(--label-3);line-height:1.7;">
+                                <strong style="color:var(--label-2);">Clinical References</strong><br>
+                                1. Dowell D, et al. <em>CDC Clinical Practice Guideline for Prescribing Opioids for Pain.</em> MMWR Recomm Rep 2022;71(3):1–95 — 2-phase taper protocol, conversion factors, dose thresholds. <a href="https://www.cdc.gov/mmwr/volumes/71/rr/rr7103a1.htm" target="_blank" style="color:var(--teal);">View ↗</a><br>
+                                2. CMS. <em>Opioid Oral Morphine Milligram Equivalent (MME) Conversion Factors</em>, 2024 — standard factors for Medicare/Medicaid claims processing.<br>
+                                3. Conversion factors and organ-impairment adjustments mirror <em>drug_database.json v2.1.0</em>, the production drug database shipped in the Precision Analgesia iOS application.
+                            </div>
                         </div>
                     </details>
                 </div>
@@ -402,15 +570,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="citations">
-        <div class="cite-card">
-            <strong>Evidence Base:</strong>
-            CDC Clinical Practice Guideline for Prescribing Opioids for Pain — United States, 2022 (MMWR Recomm Rep 2022;71) — conversion factors, dose-risk thresholds, and taper protocols
-            &nbsp;&middot;&nbsp; HHS Guide for Clinicians on the Appropriate Dosage Reduction or Discontinuation of Long-Term Opioid Analgesics (2019)
-            &nbsp;&middot;&nbsp; Conversion factors and organ-impairment adjustments mirror the production drug database shipped in the Precision Analgesia iOS application.
         </div>
     </div>
 
@@ -434,24 +593,43 @@
     (function () {
         'use strict';
 
-        /* ===== Drug database (mirrors drug_database.json, CDC 2022 PO factors) ===== */
+        /* ===== Drug database (mirrors drug_database.json v2.1.0, CDC 2022 PO factors) =====
+           Runtime-verified against the iOS ConversionService:
+           morphine_po_ir 1.0 · oxycodone 1.5 · hydrocodone 1.0 · hydromorphone(_generic) po 5.0 · tramadol 0.2
+           `round` = smallest practical dispensable DAILY-dose increment (US oral IR products);
+           schedule doses snap to the nearest multiple, never below one increment until jump-off. */
         var DRUGS = {
-            mme:           { name: 'MME Only',          unit: 'MME', base: 1.0 },
-            morphine:      { name: 'Morphine',          unit: 'mg',  base: 1.0 },
-            oxycodone:     { name: 'Oxycodone',         unit: 'mg',  base: 1.5 },
-            hydrocodone:   { name: 'Hydrocodone',       unit: 'mg',  base: 1.0 },
-            hydromorphone: { name: 'Hydromorphone',     unit: 'mg',  base: 5.0 },
-            tramadol:      { name: 'Tramadol',          unit: 'mg',  base: 0.2 }
+            mme:           { name: 'MME Only',      raw: 'MME Only (No Conversion)', unit: 'MME', base: 1.0, round: null },
+            morphine:      { name: 'Morphine',      raw: 'Morphine PO',              unit: 'mg',  base: 1.0, round: 7.5,  roundNote: '15 mg scored IR tab halves' },
+            oxycodone:     { name: 'Oxycodone',     raw: 'Oxycodone PO',             unit: 'mg',  base: 1.5, round: 2.5,  roundNote: '5 mg scored IR tab halves' },
+            hydrocodone:   { name: 'Hydrocodone',   raw: 'Hydrocodone PO',           unit: 'mg',  base: 1.0, round: 2.5,  roundNote: '2.5 mg combination tab' },
+            hydromorphone: { name: 'Hydromorphone', raw: 'Hydromorphone PO',         unit: 'mg',  base: 5.0, round: 2.0,  roundNote: '2 mg tab' },
+            tramadol:      { name: 'Tramadol',      raw: 'Tramadol PO',              unit: 'mg',  base: 0.2, round: 25,   roundNote: '50 mg scored tab halves' }
         };
 
-        var state = { startMME: 90, drug: 'morphine', duration: 'short', rate: 10, renal: 'normal', hepatic: 'normal' };
+        var RENAL_RAW   = { normal: '>60', impaired: '30-60', dialysis: '<30' };
+        var HEPATIC_RAW = { none: 'N/A', normal: 'Child-Pugh A', impaired: 'Child-Pugh B', failure: 'Child-Pugh C' };
+        var PROFILE_RAW = { naive: 'Naive', chronicRx: 'Chronic Rx', highPotency: 'High-Potency', buprenorphine: 'Buprenorphine', methadone: 'Methadone', naltrexone: 'Naltrexone' };
 
-        /* ===== Conversion factor with organ adjustments (mirrors TaperDrug.conversionFactor) ===== */
+        /* Defaults mirror AssessmentStore: .naive / .normal renal / .none hepatic */
+        var state = {
+            startMME: 90,
+            drug: 'morphine',
+            duration: 'short',
+            rate: 10,
+            profile: 'naive',
+            pregnant: false,
+            breastfeeding: false,
+            renal: 'normal',
+            hepatic: 'none'
+        };
+
+        /* ===== Conversion factor — exact port of TaperDrug.conversionFactor(assessment:) ===== */
         function getConversion(s) {
             var d = DRUGS[s.drug];
             var factor = d.base;
             var ledger = ['Base factor (CDC 2022): 1 ' + d.unit + ' ' + d.name + ' = ' + d.base.toFixed(1) + ' MME'];
-            var warnings = [];
+            var warning = null; /* single banner, iOS priority order */
             var contra = null;
 
             switch (s.drug) {
@@ -459,54 +637,76 @@
                     ledger = ['No conversion: schedule expressed directly in MME/day'];
                     break;
                 case 'morphine':
+                    if (s.hepatic === 'failure') { factor *= 2.0; ledger.push('Hepatic failure: factor ×2.0 → dose −50%'); }
                     if (s.renal === 'dialysis') { contra = 'CONTRAINDICATED: Avoid Morphine in Dialysis (Neurotoxic Metabolites)'; }
-                    if (s.hepatic === 'failure') { factor *= 2.0; ledger.push('Hepatic failure: factor ×2.0 → dose −50%'); warnings.push('Hepatic Failure: Dose reduced 50%'); }
-                    else if (s.renal === 'impaired') { warnings.push('Renal Impairment: monitor for metabolite accumulation'); }
+                    if (s.renal === 'dialysis') warning = { kind: 'rose', text: contra };
+                    else if (s.hepatic === 'failure') warning = { kind: 'amber', text: 'Hepatic Failure: Dose reduced 50%' };
+                    else if (s.renal === 'impaired') warning = { kind: 'amber', text: 'Renal Impairment: Monitor for neurotoxic metabolite accumulation (M3G/M6G)' };
                     break;
                 case 'oxycodone':
                 case 'hydrocodone':
-                    if (s.hepatic === 'failure') { factor *= 2.0; ledger.push('Hepatic failure: factor ×2.0 → dose −50%'); warnings.push('Hepatic Failure: Dose reduced 50%'); }
-                    if (s.renal !== 'normal') { factor /= 0.75; ledger.push('Renal impairment: factor ÷0.75 → dose −25%'); warnings.push('Renal Impairment: Dose reduced 25%'); }
+                    if (s.hepatic === 'failure') { factor *= 2.0; ledger.push('Hepatic failure: factor ×2.0 → dose −50%'); }
+                    if (s.renal !== 'normal') { factor /= 0.75; ledger.push('Renal impairment: factor ÷0.75 → dose −25%'); }
+                    if (s.hepatic === 'failure') warning = { kind: 'amber', text: 'Hepatic Failure: Dose reduced 50%' };
+                    else if (s.renal !== 'normal') warning = { kind: 'amber', text: 'Renal Impairment: Dose reduced 25%' };
                     break;
                 case 'hydromorphone':
                     if (s.hepatic === 'failure') { contra = 'CONTRAINDICATED: Avoid Hydromorphone in Liver Failure (Shunt Risk)'; }
-                    if (s.renal === 'dialysis') { factor *= 2.0; ledger.push('Dialysis: factor ×2.0 → dose −50%'); warnings.push('Dialysis: Dose reduced 50%'); }
-                    else if (s.renal === 'impaired') { factor *= 2.0; ledger.push('Renal impairment: factor ×2.0 → dose −50%'); warnings.push('Renal Impairment: Dose reduced 50%'); }
+                    if (s.renal === 'dialysis') { factor *= 2.0; ledger.push('Dialysis: factor ×2.0 → dose −50%'); }
+                    if (s.hepatic === 'failure') warning = { kind: 'rose', text: contra };
+                    else if (s.renal === 'dialysis') warning = { kind: 'amber', text: 'Renal Impairment: Dose reduced 50%' };
+                    else if (s.renal === 'impaired') warning = { kind: 'amber', text: 'Renal Impairment: Use caution — H3G metabolite accumulation' };
                     break;
                 case 'tramadol':
                     if (s.hepatic === 'failure') { factor *= 2.0; ledger.push('Hepatic failure: factor ×2.0 → dose −50%'); }
                     if (s.renal !== 'normal') { factor *= 2.0; ledger.push('Renal impairment: factor ×2.0 → dose −50%'); }
-                    if (s.hepatic === 'failure' || s.renal !== 'normal') { warnings.push('Organ Impairment: Dose reduced 50%'); }
+                    if (s.hepatic === 'failure' || s.renal !== 'normal') {
+                        var pct = Math.round((1 - d.base / factor) * 100);
+                        warning = { kind: 'amber', text: 'Organ Impairment: Dose reduced ' + pct + '%' };
+                    }
                     break;
             }
             if (!contra && s.drug !== 'mme') {
                 ledger.push('Effective factor: ' + factor.toFixed(2) + '  →  Drug dose = MME ÷ ' + factor.toFixed(2));
+                ledger.push('Rounding: nearest ' + d.round + ' ' + d.unit + ' (' + d.roundNote + '), min 1 increment until jump-off');
             }
-            return { factor: contra ? 0 : factor, ledger: ledger, warnings: warnings, contra: contra };
+            return { factor: contra ? 0 : factor, ledger: ledger, warning: warning, contra: contra };
         }
 
-        /* ===== Schedule generator (mirrors TaperScheduleView.generateSchedule) ===== */
-        function generateSchedule(start, ratePct, useLong, conv) {
-            if (conv.factor <= 0) return { steps: [], series: [] };
+        /* ===== Schedule generator — exact port of TaperScheduleView.generateSchedule =====
+           Doses snap to dispensable tablet increments; weeks rounding to the same dose merge
+           into one step (an instruction change breaks the run so guidance is never lost). */
+        function generateSchedule(start, ratePct, useLong, conv, s) {
+            if (conv.factor <= 0) return { steps: [], series: [], weeksTotal: 0 };
+            var d = DRUGS[s.drug];
             var rate = ratePct / 100;
             var threshold30 = start * 0.30;
             var linearStep = start * rate;
             var current = start;
             var steps = [];
-            var series = [{ week: 0, dose: start }];
 
-            var pendingDose = null, pendingStart = 1, pendingInstr = '', lastWeek = 0;
+            function dispensable(mme) {
+                var raw = mme / conv.factor;
+                if (!d.round || mme < 0.1) return raw;
+                return Math.max(d.round, Math.round(raw / d.round) * d.round);
+            }
+
+            var pendingDose = null, pendingDisp = 0, pendingStart = 1, pendingInstr = '', lastWeek = 0;
             var heldPrev = false;
 
             function flush(endWeek) {
                 if (pendingDose === null) return;
                 var unit = useLong ? 'Month' : 'Week';
-                var label = endWeek > pendingStart ? unit + 's ' + pendingStart + '–' + endWeek : unit + ' ' + pendingStart;
+                var label = endWeek > pendingStart ? unit + 's ' + pendingStart + '-' + endWeek : unit + ' ' + pendingStart;
+                var stop = pendingDose < 0.1;
                 steps.push({
                     label: label,
+                    startWeek: pendingStart,
+                    endWeek: endWeek,
                     dose: pendingDose,
-                    drugDose: pendingDose / conv.factor,
-                    instruction: (pendingDose < 0.1 && !pendingInstr) ? 'Discontinue' : pendingInstr
+                    displayMME: (s.drug === 'mme' || stop) ? pendingDose : pendingDisp * conv.factor,
+                    drugDose: pendingDisp,
+                    instruction: (stop && !pendingInstr) ? 'Discontinue' : pendingInstr
                 });
             }
 
@@ -528,47 +728,69 @@
                     instruction = 'Discontinue (Jump-off)';
                 } else if (next < 10.0) {
                     instruction = 'Extend Interval (e.g. Daily)';
-                    if ((state.drug === 'oxycodone' || state.drug === 'hydrocodone' || state.drug === 'tramadol') && state.renal !== 'normal') {
-                        instruction += ' | Renal Caution: Consider −25%';
+                    if ((s.drug === 'oxycodone' || s.drug === 'hydrocodone' || s.drug === 'tramadol') && s.renal !== 'normal') {
+                        instruction += ' | Renal Caution: Consider -25% (Metabolite Accumulation)';
+                    }
+                    if (s.breastfeeding) {
+                        instruction += ' | Lactation: Monitor infant for sedation/poor feeding.';
                     }
                 }
 
-                series.push({ week: week, dose: next });
-
+                var nextDisp = dispensable(next);
                 if (pendingDose !== null) {
-                    if (Math.abs(next - pendingDose) < 0.001) { /* coalesce */ }
-                    else { flush(week - 1); pendingDose = next; pendingStart = week; pendingInstr = instruction; }
+                    if (Math.abs(nextDisp - pendingDisp) < 0.001 && instruction === pendingInstr) { /* coalesce */ }
+                    else { flush(week - 1); pendingDose = next; pendingDisp = nextDisp; pendingStart = week; pendingInstr = instruction; }
                 } else {
-                    pendingDose = next; pendingStart = week; pendingInstr = instruction;
+                    pendingDose = next; pendingDisp = nextDisp; pendingStart = week; pendingInstr = instruction;
                 }
 
                 if (next < 0.1) break;
                 current = next;
             }
             if (pendingDose !== null) flush(lastWeek);
-            return { steps: steps, series: series };
+
+            /* Staircase boundary points (dispensed MME): start anchor + each step's start
+               boundary + terminal extent of the final tread. */
+            var series = [{ week: 0, dose: start }];
+            steps.forEach(function (st) {
+                series.push({ week: st.startWeek, dose: st.dose < 0.1 ? 0 : st.displayMME });
+            });
+            var lastStep = steps[steps.length - 1];
+            if (lastStep && lastStep.endWeek > lastStep.startWeek) {
+                series.push({ week: lastStep.endWeek, dose: lastStep.dose < 0.1 ? 0 : lastStep.displayMME });
+            }
+            return { steps: steps, series: series, weeksTotal: lastWeek };
         }
 
-        /* ===== Rendering ===== */
+        /* ===== Rendering helpers ===== */
         function esc(t) {
             return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
-
         function warnHTML(kind, icon, text) {
             return '<div class="warn ' + kind + '"><i data-lucide="' + icon + '" style="width:1rem;height:1rem;"></i><span>' + esc(text) + '</span></div>';
         }
+        function warnTitledHTML(kind, icon, title, body) {
+            return '<div class="warn ' + kind + '"><i data-lucide="' + icon + '" style="width:1rem;height:1rem;"></i><span><strong>' + esc(title) + '</strong><br>' + esc(body) + '</span></div>';
+        }
+        function fmtDose(v) {
+            return Math.abs(v - Math.round(v)) < 0.001 ? String(Math.round(v)) : v.toFixed(1);
+        }
 
+        /* ===== Step/staircase SVG chart (mirrors iOS .stepEnd + per-point symbols) ===== */
         function renderChart(series, useLong) {
             if (series.length < 2) return '';
-            var W = 640, H = 200, padL = 44, padR = 14, padT = 14, padB = 28;
-            var maxDose = series[0].dose;
+            var W = 640, H = 210, padL = 44, padR = 14, padT = 16, padB = 28;
+            var maxDose = series.reduce(function (m, p) { return Math.max(m, p.dose); }, 0);
             var maxWeek = series[series.length - 1].week;
             function x(w) { return padL + (w / maxWeek) * (W - padL - padR); }
             function y(d) { return padT + (1 - d / maxDose) * (H - padT - padB); }
 
-            var path = '';
-            series.forEach(function (p, i) { path += (i === 0 ? 'M' : 'L') + x(p.week).toFixed(1) + ' ' + y(p.dose).toFixed(1) + ' '; });
-            var area = path + 'L' + x(maxWeek).toFixed(1) + ' ' + y(0) + ' L' + x(0) + ' ' + y(0) + ' Z';
+            // Staircase path (step-end: hold current dose, then drop)
+            var path = 'M' + x(series[0].week).toFixed(1) + ' ' + y(series[0].dose).toFixed(1);
+            for (var i = 1; i < series.length; i++) {
+                path += ' H' + x(series[i].week).toFixed(1);
+                path += ' V' + y(series[i].dose).toFixed(1);
+            }
 
             var gridlines = '', labels = '';
             [0, 0.25, 0.5, 0.75, 1].forEach(function (f) {
@@ -576,106 +798,258 @@
                 gridlines += '<line x1="' + padL + '" y1="' + yy + '" x2="' + (W - padR) + '" y2="' + yy + '" stroke="#e2e8f0" stroke-width="1"/>';
                 labels += '<text x="' + (padL - 8) + '" y="' + (yy + 3.5) + '" text-anchor="end" font-size="10" fill="#94a3b8">' + Math.round(d) + '</text>';
             });
-            var unit = useLong ? 'Months' : 'Weeks';
-            var jumpY = y(5);
 
-            return '<div id="chart-box"><svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Taper dose curve">' +
-                gridlines + labels +
-                '<line x1="' + padL + '" y1="' + jumpY + '" x2="' + (W - padR) + '" y2="' + jumpY + '" stroke="#e11d48" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>' +
-                '<text x="' + (W - padR) + '" y="' + (jumpY - 5) + '" text-anchor="end" font-size="9" fill="#e11d48" opacity="0.8">5 MME jump-off</text>' +
-                '<path d="' + area + '" fill="#0d9488" opacity="0.08"/>' +
-                '<path d="' + path + '" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linejoin="round"/>' +
+            // Threshold rule + amber/teal split at 10 MME (iOS colors sub-10 steps amber)
+            var rule = '', clips = '', strokes = '';
+            if (maxDose > 10) {
+                var y10 = y(10);
+                rule = '<line x1="' + padL + '" y1="' + y10 + '" x2="' + (W - padR) + '" y2="' + y10 + '" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>' +
+                       '<text x="' + (padL + 4) + '" y="' + (y10 - 5) + '" font-size="9" fill="#94a3b8">Extend Interval (&lt;10)</text>';
+                clips = '<defs>' +
+                    '<clipPath id="clip-hi"><rect x="0" y="0" width="' + W + '" height="' + y10 + '"/></clipPath>' +
+                    '<clipPath id="clip-lo"><rect x="0" y="' + y10 + '" width="' + W + '" height="' + (H - y10) + '"/></clipPath>' +
+                    '</defs>';
+                strokes = '<path d="' + path + '" fill="none" stroke="#0d9488" stroke-width="2" stroke-linejoin="round" clip-path="url(#clip-hi)"/>' +
+                          '<path d="' + path + '" fill="none" stroke="#d97706" stroke-width="2" stroke-linejoin="round" clip-path="url(#clip-lo)"/>';
+            } else {
+                strokes = '<path d="' + path + '" fill="none" stroke="#d97706" stroke-width="2" stroke-linejoin="round"/>';
+            }
+
+            // Per-point symbols (iOS Chart symbols: circle, amber < 10 MME else teal)
+            var dots = '';
+            series.forEach(function (p) {
+                var c = p.dose < 10 ? '#d97706' : '#0d9488';
+                dots += '<circle cx="' + x(p.week).toFixed(1) + '" cy="' + y(p.dose).toFixed(1) + '" r="3" fill="' + c + '"/>';
+            });
+
+            var unit = useLong ? 'Months' : 'Weeks';
+            return '<details class="viz" open><summary>' +
+                '<i data-lucide="line-chart" style="width:1rem;height:1rem;color:var(--teal);"></i> Visualize Plan' +
+                '<span class="chev"><i data-lucide="chevron-down" style="width:1rem;height:1rem;"></i></span></summary>' +
+                '<div id="chart-box"><div class="viz-caption">Step-Down Visualization</div>' +
+                '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Taper dose step-down chart">' +
+                clips + gridlines + labels + rule + strokes + dots +
                 '<text x="' + ((padL + W - padR) / 2) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="10" fill="#94a3b8">' + unit + '</text>' +
                 '<text x="12" y="' + (H / 2) + '" text-anchor="middle" font-size="10" fill="#94a3b8" transform="rotate(-90 12 ' + (H / 2) + ')">MME/day</text>' +
-                '</svg></div>';
+                '</svg></div></details>';
         }
 
+        /* ===== Main render ===== */
         function render() {
             var s = state;
             var conv = getConversion(s);
             var d = DRUGS[s.drug];
 
-            /* Dose-level CDC warnings */
-            var dw = document.getElementById('dose-warnings');
-            var dwh = '';
-            if (s.startMME >= 90) dwh = warnHTML('rose', 'octagon-alert', 'High Risk (≥90 MME/day): CDC 2022 — avoid or carefully justify; taper indicated.');
-            else if (s.startMME > 50) dwh = warnHTML('amber', 'alert-triangle', 'Caution (>50 MME/day): risk of harm increases without additional analgesic benefit.');
-            dw.innerHTML = dwh;
+            /* — Pregnancy inline warning (mirrors SharedClinicalContextView) — */
+            document.getElementById('pregnant-warnings').innerHTML = s.pregnant
+                ? warnTitledHTML('rose', 'alert-triangle', 'Safety Warning', 'Opioid management in pregnancy requires specialist consultation (OB/GYN / Addiction Medicine).')
+                : '';
 
-            /* Drug warnings */
+            /* — Breastfeeding lactation note — */
+            document.getElementById('breastfeeding-warnings').innerHTML = s.breastfeeding
+                ? warnTitledHTML('purple', 'info', 'Lactation Note', 'Monitor infant for sedation/respiratory depression if patient is using opioids.')
+                : '';
+
+            /* — Renal / hepatic selection footers — */
+            document.getElementById('renal-footer').innerHTML = s.renal === 'dialysis'
+                ? '<div class="field-note rose">Dialysis status requires strict avoidance of Morphine/Codeine/Meperidine due to neurotoxic metabolite accumulation.</div>'
+                : '';
+            document.getElementById('hepatic-footer').innerHTML = s.hepatic === 'failure'
+                ? '<div class="field-note rose">Liver Failure (Child-Pugh C) increases Hydromorphone PO bioavailability 4x via portosystemic shunting.</div>'
+                : '';
+            document.getElementById('safety-logic-footer').innerHTML =
+                (s.renal !== 'normal' || s.hepatic === 'impaired' || s.hepatic === 'failure')
+                ? '<div class="field-note gray" style="display:flex;gap:0.375rem;align-items:flex-start;padding-top:0.75rem;"><i data-lucide="shield-half" style="width:0.875rem;height:0.875rem;color:var(--teal);flex-shrink:0;"></i><span>Safety Logic: Renal/Hepatic restrictions applied IN ADDITION to the taper math.</span></div>'
+                : '';
+
+            /* — Analgesic profile warning banners — suppressed when schedule is already blocked — */
+            var pw = document.getElementById('profile-warnings');
+            var scheduleBlocked = s.pregnant || s.profile === 'naltrexone';
+            var pwh = '';
+            if (!scheduleBlocked) {
+                if (s.profile === 'buprenorphine' || s.profile === 'methadone') {
+                    pwh = warnTitledHTML('amber', 'alert-triangle', 'MAT Taper Warning', 'Tapering Buprenorphine/Methadone requires specialized protocols not covered by standard CDC logic. Consult specialist.');
+                } else if (s.profile === 'highPotency') {
+                    pwh = warnTitledHTML('rose', 'droplet', 'Lipophilic Storage Warning', "Patient’s prior opioid has prolonged tissue elimination (e.g., fentanyl). Withdrawal onset may be delayed regardless of the taper drug selected. Taper more slowly than standard.");
+                }
+            }
+            pw.innerHTML = pwh;
+            pw.style.marginTop = pwh ? '0.875rem' : '0';
+
+            /* — Drug safety banner (single, iOS priority order) + caption — */
             var dr = document.getElementById('drug-warnings');
-            var drh = '';
-            if (conv.contra) drh += warnHTML('rose', 'octagon-alert', conv.contra);
-            conv.warnings.forEach(function (w) { drh += warnHTML('amber', 'alert-triangle', w); });
-            dr.innerHTML = drh;
+            dr.innerHTML = conv.warning
+                ? warnHTML(conv.warning.kind, conv.warning.kind === 'rose' ? 'octagon-x' : 'alert-triangle', conv.warning.text)
+                : '';
+            document.getElementById('drug-caption').innerHTML = s.drug !== 'mme'
+                ? '<div class="field-note italic">Schedule will show estimated ' + d.unit + ' dose based on MME.</div>'
+                : '';
 
-            /* Rate */
+            /* — Strategy caption (verbatim iOS copy) — */
+            document.getElementById('strategy-caption').textContent = s.duration === 'long'
+                ? 'Strategy: Slow Taper (10% Monthly). Better tolerated for long-term use.'
+                : 'Strategy: CDC 2-Phase (10% Weekly Linear → 10% Exponential).';
+
+            /* — Rate display — */
             var rd = document.getElementById('rate-display');
             rd.textContent = s.rate + '%' + (s.rate > 25 ? ' (Fast)' : '');
             rd.className = 'slider-val' + (s.rate > 25 ? ' fast' : '');
-            document.getElementById('rate-warnings').innerHTML =
-                s.rate > 25 ? warnHTML('amber', 'alert-triangle', 'Rapid taper (>25%/step): elevated withdrawal risk. CDC suggests ≤10% per step for most patients.') : '';
 
-            /* Ledger */
+            /* — Dynamic hydromorphone factor line (mirrors iOS transparency card) — */
+            var hmConv = getConversion({ drug: 'hydromorphone', renal: s.renal, hepatic: s.hepatic });
+            var hmEl = document.getElementById('factor-hm');
+            if (hmConv.factor < 5.0) {
+                hmEl.innerHTML = '<strong style="color:var(--amber);">Hydromorphone: ' + hmConv.factor.toFixed(1) + ' (SAFETY REDUCED)</strong>';
+            } else {
+                hmEl.textContent = 'Hydromorphone: 5.0 (CDC 2022)';
+            }
+
+            /* — Ledger — */
             var ledgerLines = conv.contra ? ['SAFETY GATE: factor = 0 — schedule blocked', conv.contra] : conv.ledger.slice();
             ledgerLines.push('Strategy: ' + (s.duration === 'long'
                 ? 'Long-Term → pure exponential, ' + s.rate + '% of current dose per month'
                 : 'Short-Term → CDC 2-phase: linear (' + s.rate + '% of start/week) until 30% of start, then exponential'));
+            if (s.pregnant) ledgerLines.push('⛔ Pregnancy: schedule blocked — specialist consultation required');
+            if (s.breastfeeding) ledgerLines.push('⚠ Breastfeeding: lactation monitoring note appended to <10 MME steps');
+            if (s.profile === 'naltrexone') ledgerLines.push('⛔ Naltrexone: schedule blocked — opioid blockade active');
+            if (s.profile === 'buprenorphine' || s.profile === 'methadone') ledgerLines.push('⚠ MAT profile: standard CDC taper logic may not apply — consult specialist');
+            if (s.profile === 'highPotency') ledgerLines.push('⚠ High-Potency: lipophilic storage — withdrawal may be delayed');
             document.getElementById('ledger').textContent = ledgerLines.join('\n');
 
-            /* Results */
+            /* — Results — */
             var body = document.getElementById('results-body');
+
             if (!s.startMME || s.startMME <= 0) {
                 body.innerHTML = '<div class="empty-state"><i data-lucide="calculator"></i>Enter a starting dose to generate a schedule.</div>';
                 lucide.createIcons(); return;
             }
-            if (conv.contra) {
-                body.innerHTML = warnHTML('rose', 'octagon-alert', conv.contra + ' — Select a different target medication. The engine refuses to generate an unsafe schedule.');
+
+            // Block: Naltrexone (mirrors iOS empty state, verbatim copy)
+            if (s.profile === 'naltrexone') {
+                body.innerHTML = '<div class="empty-state">' +
+                    '<i data-lucide="ban" style="color:var(--rose);"></i>' +
+                    '<strong style="color:var(--rose);font-size:0.9375rem;">Opioid Blockade Active</strong>' +
+                    '<p style="margin-top:0.5rem;">Patient is on Naltrexone/Vivitrol. Taper calculator is not applicable.</p>' +
+                    '</div>';
                 lucide.createIcons(); return;
             }
 
-            var result = generateSchedule(s.startMME, s.rate, s.duration === 'long', conv);
-            var unitLabel = s.duration === 'long' ? 'months' : 'weeks';
-            var totalPeriods = result.series.length - 1;
+            // Block: Pregnant (mirrors iOS empty state, verbatim copy)
+            if (s.pregnant) {
+                body.innerHTML = '<div class="empty-state">' +
+                    '<i data-lucide="user-round-x" style="color:var(--label-3);"></i>' +
+                    '<strong style="font-size:0.9375rem;color:var(--label-2);">Calculation Blocked</strong>' +
+                    '<p style="margin-top:0.5rem;">Please consult addiction specialist or OB/GYN for perinatal opioid management.</p>' +
+                    '</div>';
+                lucide.createIcons(); return;
+            }
 
-            var html = '<div class="summary-strip">' +
+            // Block: Contraindicated target drug (mirrors iOS empty state, verbatim copy)
+            if (conv.contra) {
+                body.innerHTML = '<div class="empty-state">' +
+                    '<i data-lucide="octagon-x" style="color:var(--rose);"></i>' +
+                    '<strong style="color:var(--rose);font-size:0.9375rem;">Target Drug Contraindicated</strong>' +
+                    '<p style="margin-top:0.5rem;">This opioid cannot be used safely with the patient\'s current organ function. Please select a different target medication.</p>' +
+                    '</div>';
+                lucide.createIcons(); return;
+            }
+
+            var result = generateSchedule(s.startMME, s.rate, s.duration === 'long', conv, s);
+            var unitLabel = s.duration === 'long' ? 'months' : 'weeks';
+            var totalPeriods = result.weeksTotal;
+
+            var html = renderChart(result.series, s.duration === 'long');
+
+            html += '<div class="summary-strip">' +
                 '<div class="summary-cell"><div class="k">Starting Dose</div><div class="v">' + s.startMME + ' <small>MME/day</small></div></div>' +
                 '<div class="summary-cell"><div class="k">Duration</div><div class="v">' + totalPeriods + ' <small>' + unitLabel + '</small></div></div>' +
                 '<div class="summary-cell"><div class="k">Target</div><div class="v">' + (s.drug === 'mme' ? 'MME' : esc(d.name)) + ' <small>' + (s.drug === 'mme' ? '' : 'PO') + '</small></div></div>' +
                 '</div>';
 
-            html += renderChart(result.series, s.duration === 'long');
-
-            html += '<div class="table-wrap"><table class="schedule"><thead><tr><th>Period</th><th>MME/day</th>' +
-                (s.drug !== 'mme' ? '<th>' + esc(d.name) + ' (' + d.unit + '/day)</th>' : '') +
-                '<th>Instruction</th></tr></thead><tbody>';
+            // Table — drug dose as primary display when a specific drug is selected (mirrors iOS rows)
+            var showDrugDose = s.drug !== 'mme';
+            html += '<div class="table-wrap"><table class="schedule"><thead><tr>' +
+                '<th>Period</th>' +
+                '<th>' + (showDrugDose ? esc(d.name) + ' (' + d.unit + '/day)' : 'MME/day') + '</th>' +
+                '<th>Instruction</th>' +
+                '</tr></thead><tbody>';
 
             result.steps.forEach(function (st) {
                 var stop = st.dose < 0.1;
-                var instrClass = stop ? 'instr stop' : (st.instruction === 'Hold Dose' ? 'instr hold' : 'instr');
-                html += '<tr><td class="period">' + esc(st.label) + '</td>' +
-                    '<td class="mme">' + (stop ? 'Discontinue' : st.dose.toFixed(1)) + '</td>' +
-                    (s.drug !== 'mme' ? '<td class="drug">' + (stop ? '—' : st.drugDose.toFixed(1)) + '</td>' : '') +
-                    '<td>' + (st.instruction ? '<span class="' + instrClass + '">' + esc(st.instruction) + '</span>' : '') + '</td></tr>';
+                var instrClass = stop ? 'instr stop' : (st.instruction.indexOf('Hold') === 0 ? 'instr hold' : (st.instruction.indexOf('Extend') === 0 ? 'instr extend' : 'instr'));
+                var doseCell = '';
+                if (stop) {
+                    doseCell = '<span class="dose-primary" style="color:var(--rose);">Discontinue</span>';
+                } else if (showDrugDose) {
+                    doseCell = '<span class="dose-primary">' + fmtDose(st.drugDose) + ' ' + d.unit + '/day</span>' +
+                               '<span class="dose-sub">' + st.displayMME.toFixed(1) + ' MME/day</span>';
+                } else {
+                    doseCell = '<span class="dose-primary" style="color:var(--teal-dark);">' + st.dose.toFixed(1) + ' MME/day</span>';
+                }
+                html += '<tr>' +
+                    '<td class="period">' + esc(st.label) + '</td>' +
+                    '<td class="dose-cell">' + doseCell + '</td>' +
+                    '<td>' + (st.instruction ? '<span class="' + instrClass + '">' + esc(st.instruction) + '</span>' : '') + '</td>' +
+                    '</tr>';
             });
             html += '</tbody></table></div>';
+
+            // Footer safety cards (verbatim iOS TaperScheduleView footer copy)
+            html += '<div class="clinical-note amber" style="margin-top:1rem;">' +
+                '<i data-lucide="hand" style="width:1rem;height:1rem;flex-shrink:0;margin-top:0.0625rem;"></i>' +
+                '<span><strong>Pause if Withdrawal Occurs.</strong> Anxiety, insomnia, diaphoresis, tachycardia. Hold dose until resolved.</span>' +
+                '</div>';
+
+            html += '<div class="clinical-note rose" style="margin-top:0.5rem;">' +
+                '<i data-lucide="alert-triangle" style="width:1rem;height:1rem;flex-shrink:0;margin-top:0.0625rem;"></i>' +
+                '<span><strong>Loss of Tolerance Alert.</strong> Patients are at increased risk for overdose during and shortly after tapering due to decreased tolerance. Return to previous dose could be fatal.</span>' +
+                '</div>';
+
+            html += '<div class="clinical-note teal" style="margin-top:0.5rem;">' +
+                '<i data-lucide="history" style="width:1rem;height:1rem;flex-shrink:0;margin-top:0.0625rem;"></i>' +
+                '<span><strong>Interval Strategy (&lt;10 MME Daily).</strong> When tapering below 10 MME is difficult with tablets, extend the dosing interval (e.g., Once Daily) before stopping completely. Do not use liquid micro-dosing.</span>' +
+                '</div>';
+
+            html += '<div class="clinical-note teal" style="margin-top:0.5rem;">' +
+                '<i data-lucide="leaf" style="width:1rem;height:1rem;flex-shrink:0;margin-top:0.0625rem;"></i>' +
+                '<span><strong>Medical Cannabis (Adjuvant).</strong> Consider as adjuvant for dose reduction (Regulated states only). Evidence suggests potential to lower opioid requirements by 22&ndash;51% during taper.</span>' +
+                '</div>';
 
             html += '<button type="button" class="copy-btn" id="copy-btn"><i data-lucide="clipboard-copy" style="width:1rem;height:1rem;"></i> Copy Plan as Text</button>';
             body.innerHTML = html;
 
+            /* — Copy plan (mirrors iOS copySchedule format) — */
             document.getElementById('copy-btn').addEventListener('click', function () {
-                var lines = ['Opioid Taper Plan (DEMO — Educational Only)',
+                var perinatal = s.pregnant ? 'Pregnant' : (s.breastfeeding ? 'Breastfeeding' : 'N/A');
+                var lines = [
+                    'Opioid Taper Plan (DEMO — Educational Only)',
                     'Starting Dose: ' + s.startMME + ' MME/day',
-                    'Target: ' + d.name + (s.drug === 'mme' ? '' : ' PO'),
-                    'Renal: ' + s.renal + ' | Hepatic: ' + s.hepatic,
-                    'Strategy: ' + (s.duration === 'long' ? 'Slow Taper (' + s.rate + '% monthly, exponential)' : 'CDC 2-Phase Protocol (' + s.rate + '%/step)'),
-                    ''];
+                    'Target Medication: ' + d.raw,
+                    'Context:',
+                    '- Profile: ' + PROFILE_RAW[s.profile],
+                    '- Renal: ' + RENAL_RAW[s.renal],
+                    '- Hepatic: ' + HEPATIC_RAW[s.hepatic],
+                    '- Perinatal: ' + perinatal,
+                    'Mode: ' + (s.duration === 'long' ? 'Long Term (>1yr)' : 'Short Term (<1yr)'),
+                    'Strategy: ' + (s.duration === 'long' ? 'Slow Taper (' + s.rate + '% Monthly)' : 'CDC 2-Phase Protocol'),
+                    'Limit: 5 MME Jump-Off (Interval Extension)',
+                    ''
+                ];
                 result.steps.forEach(function (st) {
-                    lines.push(st.label + ': ' + (st.dose < 0.1 ? 'Discontinue' : st.dose.toFixed(1) + ' MME/day' +
-                        (s.drug !== 'mme' ? ' (' + st.drugDose.toFixed(1) + ' ' + d.unit + ' ' + d.name + ')' : '')) +
-                        (st.instruction ? ' — ' + st.instruction : ''));
+                    var doseStr = st.dose < 0.1 ? 'Discontinue' : st.displayMME.toFixed(1) + ' MME/day';
+                    var line;
+                    if (s.drug === 'mme') {
+                        line = st.label + ': ' + doseStr;
+                    } else {
+                        var drugStr = st.dose < 0.1 ? 'Discontinue' : fmtDose(st.drugDose) + ' ' + d.unit + '/day ' + d.name;
+                        line = st.label + ': ' + drugStr + ' [' + doseStr + ']';
+                    }
+                    if (st.instruction) line += ' (' + st.instruction + ')';
+                    lines.push(line);
                 });
-                lines.push('', 'Generated by the Precision Analgesia Taper Engine demo — precision.lifelinemedtech.org');
+                lines.push('', 'WARNING: Pause taper if withdrawal symptoms occur. Consult provider immediately for severe symptoms.');
+                lines.push('', 'DISCLAIMER: This calculation is for informational purposes. Individual patient physiology varies. Clinical decisions should be individualized. (Lifeline Medical Technologies)');
+                lines.push('Generated by the Precision Analgesia Taper Engine demo — precision.lifelinemedtech.org');
                 navigator.clipboard.writeText(lines.join('\n')).then(function () {
                     var b = document.getElementById('copy-btn');
                     b.innerHTML = '<i data-lucide="check" style="width:1rem;height:1rem;"></i> Copied';
@@ -686,20 +1060,31 @@
             lucide.createIcons();
         }
 
-        /* ===== Wiring ===== */
-        function wireSegment(id, key) {
-            var seg = document.getElementById(id);
-            seg.addEventListener('click', function (e) {
+        /* ===== Input wiring ===== */
+        function wireGrid(id, key) {
+            var grid = document.getElementById(id);
+            grid.addEventListener('click', function (e) {
                 var btn = e.target.closest('button'); if (!btn) return;
-                seg.querySelectorAll('button').forEach(function (b) { b.classList.remove('on'); });
-                btn.classList.add('on');
+                grid.querySelectorAll('button').forEach(function (b) {
+                    b.classList.remove('on', 'c-teal', 'c-amber', 'c-rose', 'c-purple', 'c-gray');
+                });
+                btn.classList.add('on', btn.dataset.color);
                 state[key] = btn.dataset.val;
                 render();
             });
         }
-        wireSegment('duration-seg', 'duration');
-        wireSegment('renal-seg', 'renal');
-        wireSegment('hepatic-seg', 'hepatic');
+        wireGrid('profile-grid', 'profile');
+        wireGrid('renal-grid', 'renal');
+        wireGrid('hepatic-grid', 'hepatic');
+
+        var durationSeg = document.getElementById('duration-seg');
+        durationSeg.addEventListener('click', function (e) {
+            var btn = e.target.closest('button'); if (!btn) return;
+            durationSeg.querySelectorAll('button').forEach(function (b) { b.classList.remove('on'); });
+            btn.classList.add('on');
+            state.duration = btn.dataset.val;
+            render();
+        });
 
         document.getElementById('startMME').addEventListener('input', function () {
             var v = parseFloat(this.value);
@@ -708,6 +1093,8 @@
         });
         document.getElementById('drug').addEventListener('change', function () { state.drug = this.value; render(); });
         document.getElementById('rate').addEventListener('input', function () { state.rate = parseInt(this.value, 10); render(); });
+        document.getElementById('pregnant').addEventListener('change', function () { state.pregnant = this.checked; render(); });
+        document.getElementById('breastfeeding').addEventListener('change', function () { state.breastfeeding = this.checked; render(); });
 
         render();
         lucide.createIcons();

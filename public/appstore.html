@@ -22,12 +22,15 @@
     <!-- Navbar -->
     <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="index.html" class="flex items-center gap-2 group">
-                <div class="w-8 h-8 bg-clinical-teal rounded-lg flex items-center justify-center text-white font-bold group-hover:bg-teal-700 transition">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-clinical-teal rounded-lg flex items-center justify-center text-white font-bold">
                     <i data-lucide="activity" class="w-5 h-5"></i>
                 </div>
-                <span class="font-bold text-slate-800 tracking-tight">Precision Analgesia</span>
-            </a>
+                <div class="flex flex-col leading-tight">
+                    <a href="index.html" class="font-bold text-slate-800 tracking-tight hover:text-clinical-teal transition">Precision Analgesia</a>
+                    <a href="https://lifelinemedtech.org" target="_blank" rel="noopener noreferrer" class="text-[10px] text-slate-400 hover:text-clinical-teal transition">by Lifeline Med Tech ↗</a>
+                </div>
+            </div>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
                 <a href="index.html" class="hover:text-clinical-teal transition">Home</a>
                 <a href="integration.html" class="hover:text-clinical-teal transition">Integration Guide</a>
