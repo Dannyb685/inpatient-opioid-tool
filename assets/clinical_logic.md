@@ -1,3 +1,5 @@
+> ⚠️ **STALE** — the OIRD table below previously showed a superseded 5-factor variant (corrected in place 2026-07-01). The canonical 14-factor PRODIGY/RIOSORD model (CR-2026-004, 2026-07-01) lives in `backend/app/clinical/oird_scoring.py` + `clinical_rules_spec.md`. Do not implement or quote from this file — use the SSOT.
+
 # Clinical Logic: Selection & Risk Assessment
 
 The Inpatient Opioid Tool implements validated clinical scoring and consensus guidelines for medication selection, centered around the **Selection & Risk** profile.
@@ -13,19 +15,26 @@ To ensure maximum clinical utility and avoid "cognitive sprawl," the tool is str
 
 The tool incorporates the PRODIGY (PRediction of Opioid-induced respiratory Depression In patients on General medication units) score to identify patients at high risk for opioid-induced respiratory depression (OIRD).
 
-### Scoring Parameters (Validated)
+### Scoring Parameters (Canonical 14-factor model, CR-2026-004 — source: `backend/app/clinical/oird_scoring.py`)
 
-- **Age**:
-  - < 60: 0 pts
-  - 60-69: +8 pts
-  - 70-79: +12 pts
-  - ≥ 80: +16 pts
-- **Sex**: Male (+8 pts)
-- **Opioid Naivety**: +3 pts
-- **Sleep Disordered Breathing (SDB)**: +5 pts
-- **Chronic Heart Failure (CHF)**: +7 pts
+- **History of opioid overdose**: +25 pts
+- **Age ≥ 80 years**: +16 pts
+- **Age 70-79 years**: +12 pts
+- **Age 60-69 years**: +8 pts
+- **Psychiatric history**: +10 pts
+- **Concurrent benzodiazepine use**: +9 pts
+- **Male sex**: +8 pts
+- **Renal impairment**: +8 pts
+- **Congestive Heart Failure (CHF)**: +7 pts
+- **Hepatic failure**: +7 pts
+- **High-dose opioid therapy (≥100 MME/day)**: +7 pts
+- **Obstructive Sleep Apnea (OSA)**: +5 pts
+- **Chronic Obstructive Pulmonary Disease (COPD)**: +5 pts
+- **Opioid-naive status**: +3 pts
 
-### Risk Stratification (Validated)
+*Provenance: 5 canonical PRODIGY factors (Khanna et al., Anesth Analg 2020 — age bands, male sex, OSA, opioid-naive, CHF); RIOSORD-derived factors (Gupta et al., Anesth Analg 2018 — overdose history, concurrent benzodiazepines, COPD); remaining factors (psychiatric history, renal impairment, hepatic failure, high-dose MME) are venture-specific additions matching the iOS reference implementation.*
+
+### Risk Stratification
 
 - **High Risk (≥ 15 pts)**: High probability of OIRD. Requires continuous capnography + pulse oximetry. Nursing assessment q1h x 6h then q2h.
 - **Intermediate Risk (8-14 pts)**: Moderate probability. Consider continuous capnography. Nursing assessment q4h.

@@ -1,5 +1,8 @@
 # Precision Analgesia — 10,000 Foot Site Overview
 
+> [!NOTE]
+> **Updated 2026-07-01.** Descriptions below were revised to match the corrected live site: "forcing function"/"hardwired" language was replaced with advisory-with-documented-override framing (REG-D), and the "$95B" burden figure was replaced with the sourced $78.5B/yr (Florence et al., *Medical Care* 2016). The previously cited "Asante Rogue verdict" claim was **retired 2026-07-01** — it was a 2024 *lawsuit* about criminal fentanyl diversion, unrelated to dosing CDS; see `Analgesia Precision EHR/Investor Materials/metrics_sheet.md`.
+
 ## The Core Product Story (What This Actually Is)
 
 Lifeline Medical Technologies has built **one clinical algorithm** — a proprietary Clinical Validation Engine for inpatient opioid safety — and is delivering it through **two channels**:
@@ -9,7 +12,7 @@ graph TD
     A["Precision Analgesia<br/>Clinical Validation Engine"] --> B["Channel 1: iOS App<br/>(For Individual Clinicians)"]
     A --> C["Channel 2: EMR Integration<br/>(For Health Systems)"]
     B --> D["App Store / TestFlight<br/>Bedside decision support tool"]
-    C --> E["SMART on FHIR / CDS Hooks<br/>Enterprise forcing functions"]
+    C --> E["SMART on FHIR / CDS Hooks<br/>Enterprise advisory safeguards (documented override)"]
     
     style A fill:#007A87,color:#fff
     style B fill:#1e293b,color:#fff
@@ -19,7 +22,7 @@ graph TD
 | | **iOS App** | **EMR Integration** |
 |---|---|---|
 | **Audience** | Individual clinicians, residents, pharmacists | CMIOs, CFOs, IT leaders at health systems |
-| **Value Prop** | Bedside calculator, risk scoring, OUD workflows | Hardwired safety gates inside Epic/Cerner |
+| **Value Prop** | Bedside calculator, risk scoring, OUD workflows | Advisory safety guidance inside Epic/Cerner, with a full audit trail of documented overrides |
 | **Revenue Model** | Free (beta) → subscription/free? | Enterprise licensing |
 | **Status** | In TestFlight beta | Prospective (needs hospital partner) |
 
@@ -61,7 +64,7 @@ graph LR
 
 1. **The enterprise pitch is strong.** The `integration.html` page is comprehensive — business case, capabilities, architecture, timeline, regulatory, and funding mechanism. This is genuinely investor/CMIO-grade content.
 
-2. **Clinical credibility.** Every claim cites real sources (PRODIGY Trial, CDC 2022, NCCN 2025, Asante Rogue verdict). The "Glass Box" transparency positioning is compelling.
+2. **Clinical credibility.** Every claim cites real sources (PRODIGY Trial / Khanna et al. 2020, CDC 2022, NCCN 2025, Florence et al. 2016). The "Glass Box" transparency positioning is compelling. *(An earlier version of the site and of this overview cited an "Asante Rogue verdict" — that claim was retired 2026-07-01; see `metrics_sheet.md`.)*
 
 3. **The Showcase page is well-executed.** Real screenshots organized by clinical pillars with lightbox viewing. Honest, no fake ratings. Links to TestFlight work.
 
@@ -76,7 +79,7 @@ graph LR
 ### 1. The Two Audiences Are Muddled
 
 > [!IMPORTANT]
-> The homepage opens with enterprise/executive language ("The Logic Layer for Inpatient Stewardship", "$78.5B economic burden", "EMR-integrated forcing functions") but the primary CTA is "Demo the iOS Beta." A CMIO won't download TestFlight. A resident looking for a calculator will bounce from the liability headline.
+> The homepage opens with enterprise/executive language ("The Logic Layer for Inpatient Stewardship", "$78.5B economic burden", "EMR-integrated, advisory decision support") but the primary CTA is "Demo the iOS Beta." A CMIO won't download TestFlight. A resident looking for a calculator will bounce from the liability headline.
 
 **The site doesn't clearly answer:** *"Is this a phone app I can use right now, or is this something my hospital needs to buy?"*
 

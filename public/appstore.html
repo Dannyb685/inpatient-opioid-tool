@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Precision Analgesia | Clinical Feature Showcase</title>
-    <meta name="description" content="In-depth clinical showcase of Precision Analgesia by Lifeline Medical Technologies. Explore GFR gating, pharmacokinetic conversions, OUD tools, and CDS compliance.">
+    <meta name="description" content="In-depth clinical showcase of Precision Analgesia by Lifeline Medical Technologies. Explore GFR gating, tiered equianalgesic conversions, OUD tools, and CDS compliance.">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -103,10 +103,10 @@
                         Pillar 01: Safety &amp; Risk Stratification
                     </div>
                     <h2 class="text-2xl md:text-3xl font-extrabold text-clinical-slate tracking-tight">
-                        Flagging Vulnerability &amp; Enforcing GFR Limits
+                        Flagging Vulnerability &amp; Surfacing GFR Limits
                     </h2>
                     <p class="text-sm text-slate-600 leading-relaxed font-light">
-                        Manual opioid safety assessments are often missed or inconsistent on busy hospital floors. Precision Analgesia automates risk scoring to safeguard patients before scripts are active.
+                        Manual opioid safety assessments are often missed or inconsistent on busy hospital floors. Precision Analgesia automates risk scoring and surfaces a specific, guideline-cited recommendation at the moment of prescribing, which the clinician reviews and can accept, adjust, or override, with every override logged.
                     </p>
                     
                     <div class="space-y-4 pt-2">
@@ -123,7 +123,7 @@
                             <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
                             <div>
                                 <h4 class="text-xs font-bold text-slate-800">Organ-Specific Guardrails (Renal Gating)</h4>
-                                <p class="text-[11px] text-slate-500 mt-0.5">GFR-gating logic flags active metabolites (e.g. Morphine accumulation). The system automatically enforces a 50% dose reduction warning for compromised renal clearance.</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">GFR-gating logic flags active metabolites (e.g. Morphine accumulation) and surfaces a recommended ~50% dose reduction for compromised renal clearance, which the clinician reviews and can accept or override, with the override logged.</p>
                             </div>
                         </div>
                         <!-- Bullet 3 -->
@@ -169,10 +169,10 @@
                         Pillar 02: Precision dosing &amp; Tapering
                     </div>
                     <h2 class="text-2xl md:text-3xl font-extrabold text-clinical-slate tracking-tight">
-                        Replacing Static Tables with Pharmacokinetic Modeling
+                        Replacing Single-Ratio Charts with Dose-Dependent Tiered Conversions
                     </h2>
                     <p class="text-sm text-slate-600 leading-relaxed font-light">
-                        Standard equianalgesic conversion charts fail to model variable half-lives, incomplete cross-tolerance, or slow patch accumulations. Precision Analgesia replaces static formulas with dynamic math.
+                        Standard single-ratio equianalgesic charts ignore dose-dependent potency shifts, incomplete cross-tolerance, and slow patch accumulation. Precision Analgesia applies dose-dependent tiered conversion tables (7 tiers for methadone, VA/DoD 2022 + NCCN 2025) with automatic cross-tolerance reductions, dose caps, a conservative geriatric override, and a hard refusal above 1200 MME.
                     </p>
                     
                     <div class="space-y-4 pt-2">
@@ -189,7 +189,7 @@
                             <div class="bg-teal-50 text-clinical-teal p-1 rounded-md mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
                             <div>
                                 <h4 class="text-xs font-bold text-slate-800">Complex Conversion Matrices</h4>
-                                <p class="text-[11px] text-slate-500 mt-0.5">Built-in algorithms for variable half-life Methadone titrations, Fentanyl and Buprenorphine patch conversions, and continuous IV infusions.</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Built-in logic for tiered, dose-dependent Methadone conversions, Fentanyl and Buprenorphine patch conversions, and continuous IV infusions.</p>
                             </div>
                         </div>
                         <!-- Bullet 3 -->
@@ -301,19 +301,19 @@
                         Regulatory &amp; Compliance Specifications
                     </h3>
                     <p class="text-xs text-slate-500 leading-relaxed">
-                        Precision Analgesia operates strictly under clear regulatory guardrails to verify it operates as an informational logic layer rather than an active medical device.
+                        Precision Analgesia is designed around clear regulatory guardrails intended to support its self-assessed positioning as an informational logic layer rather than an active medical device.
                     </p>
-                    
+
                     <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-3">
                         <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                             <i data-lucide="shield-check" class="text-emerald-600 w-4 h-4"></i>
                             Non-Device Clinical Decision Support (CDS)
                         </h4>
                         <p class="text-[11px] text-slate-600 leading-relaxed font-light">
-                            Precision Analgesia is positioned as a Non-Device Clinical Decision Support software tool under <strong>the 21st Century Cures Act</strong>. The software presents clinical guidelines (CDC 2022, NCCN 2025, and FDA guidelines) transparently, displaying all formulas, equianalgesic ratios, and sources directly in the application's "Algorithm Transparency" and "Citations" interfaces.
+                            Precision Analgesia is <strong>self-assessed</strong> as a Non-Device Clinical Decision Support software tool under <strong>the 21st Century Cures Act</strong> (statutory criteria in effect since 2016), consistent with FDA's January 6, 2026 CDS guidance — pending confirmatory review by regulatory counsel; no confirmatory classification memo has been obtained. The software presents clinical guidelines (CDC 2022, NCCN 2025, and FDA guidelines) transparently, displaying all formulas, equianalgesic ratios, and sources directly in the application's "Algorithm Transparency" and "Citations" interfaces.
                         </p>
                         <p class="text-[11px] text-slate-600 leading-relaxed font-light">
-                            It does not directly control, configure, or administer patient dosing hardware (such as infusion pumps), nor does it replace the diagnostic or treatment path decided by the licensed practitioner.
+                            It does not directly control, configure, or administer patient dosing hardware (such as infusion pumps), nor does it replace the diagnostic or treatment path decided by the licensed practitioner. Every recommendation is presented as advisory: the clinician sees the reasoning and can accept, adjust, or override it, with all overrides logged. The only non-overridable rule is a pediatric gate blocking codeine/tramadol prescribing under age 12, per FDA Black Box warnings.
                         </p>
                     </div>
                 </div>
@@ -364,7 +364,7 @@
                     <span class="text-xs text-slate-500">by Lifeline Medical Technologies, LLC</span>
                 </div>
                 <p class="text-xs text-slate-500">
-                    Non-Device Clinical Decision Support Tool — 21st Century Cures Act.
+                    Self-assessed Non-Device Clinical Decision Support Tool — 21st Century Cures Act (pending counsel review).
                 </p>
             </div>
             <div class="flex flex-col items-center md:items-end gap-2 text-xs">

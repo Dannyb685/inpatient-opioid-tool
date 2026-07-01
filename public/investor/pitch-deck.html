@@ -141,10 +141,10 @@
     </div>
   </div>
   <h1>The <span class="grad-teal">Active Safety Net</span><br>for Inpatient Opioid Prescribing</h1>
-  <p class="subtitle">A SMART on FHIR Clinical Decision Support engine that intercepts dangerous opioid orders <em>before</em> they reach the patient — designed to embed silently inside Epic and Cerner.</p>
+  <p class="subtitle">A SMART on FHIR Clinical Decision Support engine that surfaces a specific, actionable, guideline-cited recommendation at the moment of prescribing — which the clinician reviews and can accept or override, with every override logged — designed to embed inside Epic and Cerner.</p>
   <div style="display:flex;gap:10px;margin-top:36px;flex-wrap:wrap;justify-content:center">
     <span class="badge bt">🏥 Enterprise B2B SaaS</span>
-    <span class="badge be">🔬 FDA Non-Device CDS Exempt</span>
+    <span class="badge be">🔬 Self-Assessed Non-Device CDS</span>
     <span class="badge ba">💊 Opioid Safety</span>
   </div>
   <div style="margin-top:52px;font-size:.7rem;color:var(--text-muted)">CONFIDENTIAL — FOR INVESTOR REVIEW ONLY</div>
@@ -165,14 +165,14 @@
         <div style="margin-top:12px;font-size:.65rem;color:var(--text-muted)">Florence et al., Medical Care 2016</div>
       </div>
       <div class="card card-rose">
-        <div class="stat-num grad-rose">$303M</div>
-        <div class="stat-label">Single "Failure to Monitor" verdict (Asante Rogue Regional). Malpractice is now a nine-figure systemic threat.</div>
-        <div style="margin-top:12px;font-size:.65rem;color:var(--text-muted)">Oregon Court of Appeals, 2023</div>
+        <div class="stat-num grad-rose">Litigation Risk</div>
+        <div class="stat-label">Opioid-dosing and monitoring failures are an active, growing category of hospital liability exposure nationally.</div>
+        <div style="margin-top:12px;font-size:.65rem;color:var(--text-muted)">Illustrative framing — not a specific case citation</div>
       </div>
       <div class="card card-rose">
         <div class="stat-num grad-rose">46%</div>
-        <div class="stat-label">Floor patients experience opioid-induced respiratory depression. Manual nursing checks miss the vast majority.</div>
-        <div style="margin-top:12px;font-size:.65rem;color:var(--text-muted)">PRODIGY Trial, Anesthesia & Analgesia (2020)</div>
+        <div class="stat-label">Of monitored inpatients on continuous monitoring experienced opioid-induced respiratory depression (OIRD) events. Manual nursing checks miss the vast majority.</div>
+        <div style="margin-top:12px;font-size:.65rem;color:var(--text-muted)">Khanna AK et al., Anesthesia & Analgesia, 2020;131(4):1012-1024 (PRODIGY Trial)</div>
       </div>
     </div>
     <div class="g2" style="margin-top:16px">
@@ -186,8 +186,8 @@
       <div class="card" style="display:flex;gap:14px;align-items:flex-start">
         <div style="font-size:26px;flex-shrink:0">💰</div>
         <div>
-          <h3 style="font-size:.95rem;margin-bottom:5px">Settlement Abatement Funds — Eligible Use</h3>
-          <p style="font-size:.82rem;color:var(--text-secondary);line-height:1.55">Exhibit E of the National Opioid Settlement <strong style="color:var(--foreground)">explicitly lists point-of-care decision support</strong> as an approved abatement use. Hospitals can apply for funding through state and county abatement programs.</p>
+          <h3 style="font-size:.95rem;margin-bottom:5px">Settlement Abatement Funds — Potentially Eligible Use</h3>
+          <p style="font-size:.82rem;color:var(--text-secondary);line-height:1.55">Point-of-care decision support is a <strong style="color:var(--foreground)">potentially eligible, discretionary remediation-spend category</strong> under a hospital's Exhibit E settlement allocation — subject to that hospital's own settlement administrator and state-specific allowable-use rules. Not a designated or guaranteed funding source.</p>
         </div>
       </div>
     </div>
@@ -227,15 +227,15 @@
         <div class="badge be" style="margin-bottom:14px">Precision Analgesia</div>
         <h3 style="margin-bottom:14px;color:var(--emerald)">The Active Safety Net</h3>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;gap:10px"><span class="chk">✓</span><span style="font-size:.83rem;color:var(--text-secondary)">Silently monitors CPOE in the background via CDS Hooks</span></div>
+          <div style="display:flex;gap:10px"><span class="chk">✓</span><span style="font-size:.83rem;color:var(--text-secondary)">Monitors CPOE in the background via CDS Hooks</span></div>
           <div style="display:flex;gap:10px"><span class="chk">✓</span><span style="font-size:.83rem;color:var(--text-secondary)">Auto-pulls weight, labs, meds from FHIR — <strong style="color:var(--foreground)">zero manual entry</strong></span></div>
-          <div style="display:flex;gap:10px"><span class="chk">✓</span><span style="font-size:.83rem;color:var(--text-secondary)">Intercepts dangerous orders <em>at the moment of signing</em></span></div>
+          <div style="display:flex;gap:10px"><span class="chk">✓</span><span style="font-size:.83rem;color:var(--text-secondary)">Surfaces a specific recommendation <em>at the moment of prescribing</em> — clinician reviews and accepts or overrides, with the override logged</span></div>
           <div style="display:flex;gap:10px"><span class="chk">✓</span><span style="font-size:.83rem;color:var(--text-secondary)">Returns specific, actionable guidance (not just "warning")</span></div>
           <div style="display:flex;gap:10px"><span class="chk">✓</span><span style="font-size:.83rem;color:var(--text-secondary)">CYP2D6 pharmacogenomics, OIRD scoring, renal/hepatic gating</span></div>
         </div>
         <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(16,185,129,.2)">
           <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted)">Result</div>
-          <div style="font-size:1rem;font-weight:700;color:var(--emerald);margin-top:4px">Automatic. Specific. Defensible.</div>
+          <div style="font-size:1rem;font-weight:700;color:var(--emerald);margin-top:4px">Proactive. Specific. Documented.</div>
         </div>
       </div>
     </div>
@@ -279,10 +279,10 @@
     <div class="card" style="margin-top:16px;background:rgba(14,165,233,.06);border-color:rgba(14,165,233,.2);display:flex;gap:18px;align-items:center">
       <div style="font-size:1.8rem">🏛️</div>
       <div style="flex:1">
-        <div style="font-size:.875rem;font-weight:700;margin-bottom:4px">The Traceability Ledger — Our FDA Criterion 4 Shield</div>
-        <div style="font-size:.78rem;color:var(--text-secondary);line-height:1.5">Every recommendation shows the exact formula, conversion factor, and guideline citation. The clinician can independently verify the math. This is legally defensible — not a black box.</div>
+        <div style="font-size:.875rem;font-weight:700;margin-bottom:4px">The Traceability Ledger — Supporting Our Self-Assessed Criterion D Posture</div>
+        <div style="font-size:.78rem;color:var(--text-secondary);line-height:1.5">Every recommendation shows the exact formula, conversion factor, and guideline citation. The clinician can independently verify the math and is not primarily relying on the software. This is designed to be legally defensible — not a black box — pending confirmatory review by regulatory counsel.</div>
       </div>
-      <span class="badge be" style="flex-shrink:0">FDA Non-Device CDS</span>
+      <span class="badge be" style="flex-shrink:0">Self-Assessed Non-Device CDS</span>
     </div>
   </div>
 </div>
@@ -346,18 +346,18 @@
   <div class="slide-label">Defensibility</div>
   <div style="width:100%;max-width:1080px">
     <div class="eyebrow">Regulatory & Security Moats</div>
-    <h2>We bypassed the two graveyards <span class="grad-teal">before we started building.</span></h2>
+    <h2>Designed from day one to <span class="grad-teal">avoid the two graveyards.</span></h2>
     <div class="div"></div>
     <div class="g2" style="margin-top:24px;gap:16px">
       <div class="moat" style="background:rgba(16,185,129,.05);border-color:rgba(16,185,129,.25)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
           <div style="width:38px;height:38px;background:rgba(16,185,129,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🏛️</div>
-          <div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald)">The FDA Moat</div><div style="font-weight:700;font-size:.9rem">Non-Device CDS Exemption</div></div>
+          <div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald)">The FDA Opportunity</div><div style="font-weight:700;font-size:.9rem">Self-Assessed Non-Device CDS Posture</div></div>
         </div>
-        <p style="font-size:.82rem;color:var(--text-secondary);line-height:1.55;margin-bottom:14px">FDA's January 2026 guidance created a "Non-Device CDS" exemption for deterministic rules a clinician can independently verify. Our Traceability Ledger satisfies <strong style="color:var(--foreground)">Criterion 4</strong> — engineered from day one.</p>
+        <p style="font-size:.82rem;color:var(--text-secondary);line-height:1.55;margin-bottom:14px">FDA's January 2026 guidance describes a "Non-Device CDS" pathway for deterministic rules a clinician can independently verify. Our Traceability Ledger is engineered to support <strong style="color:var(--foreground)">Criterion D</strong> — but this is a self-assessment, pending confirmatory review by regulatory counsel, not a guaranteed or settled classification.</p>
         <div class="card" style="padding:10px 14px;background:rgba(16,185,129,.08)">
-          <div style="font-size:.875rem;font-weight:700;color:var(--emerald)">Saves ~$2M + 2 Years</div>
-          <div style="font-size:.7rem;color:var(--text-secondary);margin-top:2px">vs. 510(k) SaMD clearance required for AI/ML competitors</div>
+          <div style="font-size:.875rem;font-weight:700;color:var(--emerald)">Potential to avoid ~$2M + 2 years</div>
+          <div style="font-size:.7rem;color:var(--text-secondary);margin-top:2px">vs. 510(k) SaMD clearance required for AI/ML competitors — if the self-assessment holds up under counsel review</div>
         </div>
       </div>
       <div class="moat" style="background:rgba(14,165,233,.05);border-color:rgba(14,165,233,.25)">
@@ -365,9 +365,9 @@
           <div style="width:38px;height:38px;background:rgba(14,165,233,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🛡️</div>
           <div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--teal)">The CISO Moat</div><div style="font-weight:700;font-size:.9rem">Zero-PHI Architecture</div></div>
         </div>
-        <p style="font-size:.82rem;color:var(--text-secondary);line-height:1.55;margin-bottom:14px">All calculations happen in-memory, discarded after the HTTP response. <strong style="color:var(--foreground)">No database. No PHI at rest. No HIPAA BAA complexity.</strong> Every hospital CISO's nightmare — a data breach — is architecturally impossible.</p>
+        <p style="font-size:.82rem;color:var(--text-secondary);line-height:1.55;margin-bottom:14px">All calculations happen in-memory, discarded after the HTTP response. <strong style="color:var(--foreground)">No database. No PHI at rest.</strong> A BAA template exists and will require counsel review and execution before any PHI-adjacent pilot. A hospital CISO's biggest fear — a data breach of stored PHI — is architecturally reduced.</p>
         <div class="card" style="padding:10px 14px;background:rgba(14,165,233,.08)">
-          <div style="font-size:.875rem;font-weight:700;color:var(--teal)">Ships past security review in weeks, not years</div>
+          <div style="font-size:.875rem;font-weight:700;color:var(--teal)">Designed to ship past security review faster than a PHI-storing system</div>
         </div>
       </div>
       <div class="moat" style="background:rgba(245,158,11,.05);border-color:rgba(245,158,11,.25)">
@@ -380,9 +380,9 @@
       <div class="moat" style="background:rgba(129,140,248,.05);border-color:rgba(129,140,248,.25)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
           <div style="width:38px;height:38px;background:rgba(129,140,248,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">💰</div>
-          <div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#818CF8">The Funding Moat</div><div style="font-weight:700;font-size:.9rem">Settlement-Funded Sales</div></div>
+          <div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#818CF8">The Funding Angle</div><div style="font-weight:700;font-size:.9rem">Settlement-Eligible Sales Motion</div></div>
         </div>
-        <p style="font-size:.82rem;color:var(--text-secondary);line-height:1.55">Point-of-care CDS is an <strong style="color:var(--foreground)">Exhibit E eligible use</strong> of National Opioid Settlement abatement funds. Qualifying hospitals can pay with settlement money — easing the capital budget conversation.</p>
+        <p style="font-size:.82rem;color:var(--text-secondary);line-height:1.55">Point-of-care CDS is a <strong style="color:var(--foreground)">potentially eligible, discretionary Exhibit E remediation category</strong> of National Opioid Settlement abatement funds — subject to each hospital's own settlement administrator and state rules. Not a guaranteed or designated funding source, but a conversation that can ease the capital budget objection.</p>
       </div>
     </div>
   </div>
@@ -398,19 +398,19 @@
     <div class="div"></div>
     <div class="g3" style="margin-top:24px">
       <div class="card card-glow" style="text-align:center;padding:28px 20px">
-        <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:6px">TAM</div>
+        <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:6px">TAM (Illustrative Estimate)</div>
         <div class="stat-num grad-teal">$6.8B</div>
-        <div class="stat-label" style="margin-top:8px">U.S. hospital CDS / patient safety software market (2026)</div>
+        <div class="stat-label" style="margin-top:8px">U.S. hospital CDS / patient safety software market (2026) — modeled estimate, needs independent sourcing</div>
       </div>
       <div class="card" style="text-align:center;padding:28px 20px">
-        <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:6px">SAM</div>
+        <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:6px">SAM (Illustrative Estimate)</div>
         <div class="stat-num" style="color:var(--teal)">$1.4B</div>
-        <div class="stat-label" style="margin-top:8px">Inpatient opioid safety & analgesic stewardship software segment</div>
+        <div class="stat-label" style="margin-top:8px">Inpatient opioid safety & analgesic stewardship software segment — modeled estimate, needs independent sourcing</div>
       </div>
       <div class="card" style="text-align:center;padding:28px 20px">
-        <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:6px">SOM (Year 3)</div>
+        <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:6px">SOM (Year 3 Model)</div>
         <div class="stat-num grad-emerald">$87M</div>
-        <div class="stat-label" style="margin-top:8px">350 hospital systems × $250K ARR — conservative 6% share</div>
+        <div class="stat-label" style="margin-top:8px">Modeled assumption: 350 hospital systems × $250K ARR — a 3-year financial-model projection, not a researched figure</div>
       </div>
     </div>
     <div class="g2" style="margin-top:16px">
@@ -420,15 +420,15 @@
           <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border)"><span style="font-size:.83rem;color:var(--text-secondary)">Total U.S. acute care hospitals</span><span style="font-weight:700">6,090</span></div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border)"><span style="font-size:.83rem;color:var(--text-secondary)">Epic-affiliated hospitals</span><span style="font-weight:700">~2,800</span></div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border)"><span style="font-size:.83rem;color:var(--text-secondary)">Hospitals with opioid settlement exposure</span><span style="font-weight:700">~4,100</span></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span style="font-size:.83rem;color:var(--text-secondary)">Hospitals with active abatement funds</span><span style="font-weight:700;color:var(--amber)">~1,200</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span style="font-size:.83rem;color:var(--text-secondary)">Hospitals with a discretionary abatement allocation (illustrative estimate)</span><span style="font-weight:700;color:var(--amber)">~1,200</span></div>
         </div>
       </div>
       <div class="card">
         <h3 style="font-size:.95rem;margin-bottom:14px">Why Now — Four Simultaneous Tailwinds</h3>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;gap:8px"><span style="color:var(--teal);flex-shrink:0">▶</span><span style="font-size:.8rem;color:var(--text-secondary)">FDA Jan 2026 guidance created a clear non-device exemption path</span></div>
-          <div style="display:flex;gap:8px"><span style="color:var(--teal);flex-shrink:0">▶</span><span style="font-size:.8rem;color:var(--text-secondary)">Settlement abatement funds (Exhibit E eligible use) defuse budget objections</span></div>
-          <div style="display:flex;gap:8px"><span style="color:var(--teal);flex-shrink:0">▶</span><span style="font-size:.8rem;color:var(--text-secondary)">Epic App Orchard actively recruits SMART on FHIR CDS partners</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--teal);flex-shrink:0">▶</span><span style="font-size:.8rem;color:var(--text-secondary)">FDA Jan 2026 guidance describes a non-device CDS pathway (self-assessed, pending counsel confirmation)</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--teal);flex-shrink:0">▶</span><span style="font-size:.8rem;color:var(--text-secondary)">Settlement abatement funds (potentially Exhibit E-eligible, discretionary) can ease budget objections</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--teal);flex-shrink:0">▶</span><span style="font-size:.8rem;color:var(--text-secondary)">Epic Connection Hub is an established channel for SMART on FHIR CDS partners</span></div>
           <div style="display:flex;gap:8px"><span style="color:var(--teal);flex-shrink:0">▶</span><span style="font-size:.8rem;color:var(--text-secondary)">CMS opioid quality metrics now tied to hospital reimbursement</span></div>
         </div>
       </div>
@@ -457,7 +457,7 @@
           <td><strong>MDCalc / UpToDate</strong><br><span style="font-size:.7rem;color:var(--text-secondary)">SMART calculators</span></td>
           <td style="color:var(--text-secondary)">Reactive reference the doctor must launch</td>
           <td><span style="color:var(--rose)">5% usage rate.</span> Used in the cafeteria, not the CPOE.</td>
-          <td style="color:var(--emerald)">Proactive. Monitors CPOE silently. Fires before the order is signed.</td>
+          <td style="color:var(--emerald)">Proactive. Monitors CPOE in the background. Surfaces guidance at the moment of prescribing.</td>
         </tr>
         <tr>
           <td><strong>Bamboo / NarxCare</strong><br><span style="font-size:.7rem;color:var(--text-secondary)">PDMP database</span></td>
@@ -468,14 +468,14 @@
         <tr>
           <td><strong>AI/ML CDS Startups</strong><br><span style="font-size:.7rem;color:var(--text-secondary)">Predictive AI</span></td>
           <td style="color:var(--text-secondary)">ML overdose risk models, hundreds of EHR variables</td>
-          <td><span style="color:var(--rose)">FDA 2026 requires 510(k).</span> $2M+ / 2 years. CISOs refuse.</td>
-          <td style="color:var(--emerald)">Deterministic. Non-SaMD. CISO-safe. Pre-cleared.</td>
+          <td><span style="color:var(--rose)">Likely needs 510(k) SaMD clearance.</span> $2M+ / 2 years. CISOs wary.</td>
+          <td style="color:var(--emerald)">Deterministic. Self-assessed non-SaMD posture. CISO-friendly design.</td>
         </tr>
         <tr class="us">
           <td><strong style="color:var(--teal)">Precision Analgesia ✓</strong><br><span style="font-size:.7rem;color:var(--text-secondary)">SMART on FHIR CDS</span></td>
           <td style="color:var(--text-secondary)">Proactive CDS Hook engine, FHIR auto-population, deterministic transparent math</td>
           <td style="color:var(--emerald)">—</td>
-          <td style="color:var(--emerald)">Inpatient. Proactive. Non-Device CDS. CISO-safe. Settlement-funded.</td>
+          <td style="color:var(--emerald)">Inpatient. Proactive. Self-assessed Non-Device CDS. CISO-friendly design. Settlement-eligible sales angle.</td>
         </tr>
       </tbody>
     </table>
@@ -496,7 +496,7 @@
           <div class="badge bt" style="margin-bottom:14px">Primary Revenue</div>
           <h3 style="font-size:1rem;margin-bottom:8px">Enterprise SaaS — Health System Licensing</h3>
           <div class="stat-num grad-teal" style="font-size:2.4rem;margin:10px 0">$150K–$350K</div>
-          <div style="font-size:.83rem;color:var(--text-secondary)">Annual contract per hospital system — priced as a fraction of one prevented malpractice verdict.</div>
+          <div style="font-size:.83rem;color:var(--text-secondary)">Annual contract per hospital system — priced as a small fraction of the national $78.5B/yr opioid economic burden (Florence et al., Medical Care 2016) that hospitals help absorb.</div>
           <div style="margin-top:18px;display:flex;flex-direction:column;gap:7px">
             <div style="display:flex;justify-content:space-between;font-size:.78rem"><span style="color:var(--text-secondary)">Implementation & onboarding</span><span>$15–30K one-time</span></div>
             <div style="display:flex;justify-content:space-between;font-size:.78rem"><span style="color:var(--text-secondary)">Base SaaS license</span><span>$120–250K/yr</span></div>
@@ -514,18 +514,18 @@
         <div class="card">
           <h3 style="font-size:.9rem;margin-bottom:14px">Unit Economics (Per Hospital System)</h3>
           <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border)"><span style="font-size:.82rem;color:var(--text-secondary)">Avg. single preventable opioid verdict</span><span style="font-weight:700;color:var(--rose)">$8–15M</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border)"><span style="font-size:.82rem;color:var(--text-secondary)">National annual opioid economic burden</span><span style="font-weight:700;color:var(--rose)">$78.5B (Florence et al. 2016)</span></div>
             <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border)"><span style="font-size:.82rem;color:var(--text-secondary)">Annual cost of our integration</span><span style="font-weight:700;color:var(--teal)">$150–350K</span></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border)"><span style="font-size:.82rem;color:var(--text-secondary)">Hospital ROI (1 prevented event / 10 yrs)</span><span style="font-weight:700;color:var(--emerald)">~30x</span></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span style="font-size:.82rem;color:var(--text-secondary)">Settlement abatement eligibility</span><span style="font-weight:700;color:var(--amber)">Exhibit E</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border)"><span style="font-size:.82rem;color:var(--text-secondary)">Hospital ROI framing</span><span style="font-weight:700;color:var(--emerald)">Modeled estimate — needs validation</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span style="font-size:.82rem;color:var(--text-secondary)">Settlement abatement eligibility</span><span style="font-weight:700;color:var(--amber)">Potentially Exhibit E — discretionary</span></div>
           </div>
         </div>
         <div class="card">
           <h3 style="font-size:.9rem;margin-bottom:14px">Go-To-Market Motion</h3>
           <div style="display:flex;flex-direction:column;gap:9px">
-            <div style="display:flex;gap:8px;align-items:flex-start"><div style="width:20px;height:20px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0">1</div><span style="font-size:.78rem;color:var(--text-secondary)"><strong style="color:var(--foreground)">Epic App Orchard</strong> → inbound discovery from 2,800 hospital network</span></div>
-            <div style="display:flex;gap:8px;align-items:flex-start"><div style="width:20px;height:20px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0">2</div><span style="font-size:.78rem;color:var(--text-secondary)"><strong style="color:var(--foreground)">CMIO champion</strong> path — iOS app creates awareness, CMIO requests enterprise eval</span></div>
-            <div style="display:flex;gap:8px;align-items:flex-start"><div style="width:20px;height:20px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0">3</div><span style="font-size:.78rem;color:var(--text-secondary)"><strong style="color:var(--foreground)">Settlement framing</strong> — hospital legal identifies abatement funding, kills budget objection</span></div>
+            <div style="display:flex;gap:8px;align-items:flex-start"><div style="width:20px;height:20px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0">1</div><span style="font-size:.78rem;color:var(--text-secondary)"><strong style="color:var(--foreground)">Epic Connection Hub</strong> → planned channel for inbound discovery across the ~2,800-hospital Epic network</span></div>
+            <div style="display:flex;gap:8px;align-items:flex-start"><div style="width:20px;height:20px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0">2</div><span style="font-size:.78rem;color:var(--text-secondary)"><strong style="color:var(--foreground)">CMIO champion</strong> path — iOS app creates awareness, targeting CMIO-requested enterprise evals</span></div>
+            <div style="display:flex;gap:8px;align-items:flex-start"><div style="width:20px;height:20px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0">3</div><span style="font-size:.78rem;color:var(--text-secondary)"><strong style="color:var(--foreground)">Settlement framing</strong> — hospital legal explores discretionary abatement funding, potentially easing the budget conversation</span></div>
             <div style="display:flex;gap:8px;align-items:flex-start"><div style="width:20px;height:20px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0">4</div><span style="font-size:.78rem;color:var(--text-secondary)"><strong style="color:var(--foreground)">Shadow Mode</strong> — 90-day silent run proves error detection rate before go-live</span></div>
           </div>
         </div>
@@ -543,9 +543,9 @@
     <h2>Engine built. <span class="grad-teal">Ready for the track.</span></h2>
     <div class="div"></div>
     <div class="g4" style="margin-top:22px">
-      <div class="card" style="text-align:center;padding:20px 14px"><div class="stat-num grad-teal" style="font-size:1.8rem">21,000+</div><div class="stat-label">Lines of production code (frontend + backend)</div></div>
+      <div class="card" style="text-align:center;padding:20px 14px"><div class="stat-num grad-teal" style="font-size:1.8rem">21,000+</div><div class="stat-label">Lines of production code across the EHR product (frontend + backend)</div></div>
       <div class="card" style="text-align:center;padding:20px 14px"><div class="stat-num grad-teal" style="font-size:1.8rem">25</div><div class="stat-label">Clinical React components (6 major workflow modules)</div></div>
-      <div class="card" style="text-align:center;padding:20px 14px"><div class="stat-num grad-teal" style="font-size:1.8rem">18/18</div><div class="stat-label">Backend clinical logic tests passing (pytest)</div></div>
+      <div class="card" style="text-align:center;padding:20px 14px"><div class="stat-num grad-teal" style="font-size:1.8rem">368</div><div class="stat-label">Automated clinical tests passing (264 iOS validation scenarios + 104 backend pytest tests)</div></div>
       <div class="card" style="text-align:center;padding:20px 14px"><div class="stat-num grad-teal" style="font-size:1.8rem">15</div><div class="stat-label">Clinical API endpoints (rate limited + JWT auth)</div></div>
     </div>
     <div class="g2" style="margin-top:14px">
@@ -567,8 +567,8 @@
           <div style="display:flex;gap:8px"><span style="color:var(--amber)">○</span><span style="font-size:.79rem;color:var(--text-secondary)">Prove FHIR R4 on Epic Sandbox synthetic patients</span></div>
           <div style="display:flex;gap:8px"><span style="color:var(--amber)">○</span><span style="font-size:.79rem;color:var(--text-secondary)">Wire FHIR Write-Back → live 1-click Naloxone co-prescribing</span></div>
           <div style="display:flex;gap:8px"><span style="color:var(--amber)">○</span><span style="font-size:.79rem;color:var(--text-secondary)">AKI trending — last 3 creatinine values, not just today's</span></div>
-          <div style="display:flex;gap:8px"><span style="color:var(--amber)">○</span><span style="font-size:.79rem;color:var(--text-secondary)">Submit to Epic App Orchard — activate inbound discovery</span></div>
-          <div style="display:flex;gap:8px"><span style="color:var(--amber)">○</span><span style="font-size:.79rem;color:var(--text-secondary)">Sign first pilot hospital for Shadow Mode deployment</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--amber)">○</span><span style="font-size:.79rem;color:var(--text-secondary)">Submit to Epic Connection Hub — activate inbound discovery channel</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--amber)">○</span><span style="font-size:.79rem;color:var(--text-secondary)">Target first pilot hospital for a Shadow Mode deployment (no pilot signed yet)</span></div>
         </div>
       </div>
     </div>
@@ -610,11 +610,11 @@
             </div>
             <div style="display:flex;gap:14px;align-items:flex-start">
               <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0"><div style="width:9px;height:9px;background:var(--teal);border-radius:50%"></div><div style="width:2px;flex:1;background:var(--card-border);min-height:28px"></div></div>
-              <div style="padding-bottom:10px"><div style="font-size:.6rem;color:var(--teal);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Month 6</div><div style="font-size:.79rem;margin-top:2px">First pilot hospital signed. Shadow Mode live. CDS Hooks on <code style="font-size:.7rem">medication-prescribe</code>.</div></div>
+              <div style="padding-bottom:10px"><div style="font-size:.6rem;color:var(--teal);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Month 6</div><div style="font-size:.79rem;margin-top:2px">Target: first pilot hospital signed. Target: Shadow Mode live. CDS Hooks on <code style="font-size:.7rem">medication-prescribe</code>.</div></div>
             </div>
             <div style="display:flex;gap:14px;align-items:flex-start">
               <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0"><div style="width:9px;height:9px;background:var(--teal);border-radius:50%"></div><div style="width:2px;flex:1;background:var(--card-border);min-height:28px"></div></div>
-              <div style="padding-bottom:10px"><div style="font-size:.6rem;color:var(--teal);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Month 9</div><div style="font-size:.79rem;margin-top:2px">Shadow Mode data proves error detection rate. First $250K contract signed. App Orchard listed.</div></div>
+              <div style="padding-bottom:10px"><div style="font-size:.6rem;color:var(--teal);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Month 9</div><div style="font-size:.79rem;margin-top:2px">Target: Shadow Mode data demonstrates error-detection rate. Target: first $250K contract signed. Epic Connection Hub listing target.</div></div>
             </div>
             <div style="display:flex;gap:14px;align-items:flex-start">
               <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0"><div style="width:9px;height:9px;border:2px solid var(--teal);border-radius:50%"></div></div>
@@ -623,8 +623,8 @@
           </div>
         </div>
         <div class="card card-emerald" style="padding:18px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:1.1rem">💡</span><h3 style="font-size:.9rem">The Settlement-Funded Sales Insight</h3></div>
-          <p style="font-size:.78rem;color:var(--text-secondary);line-height:1.5">Where settlement abatement funding applies, hospitals pay for our integration <strong style="color:var(--foreground)">without a capital budget approval</strong>. This compresses an 18-month enterprise sales cycle to 4–6 months. Our seed capital funds us to the first 5 settlement-funded contracts.</p>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:1.1rem">💡</span><h3 style="font-size:.9rem">The Settlement-Eligible Sales Insight</h3></div>
+          <p style="font-size:.78rem;color:var(--text-secondary);line-height:1.5">Where a hospital's own settlement administrator approves point-of-care CDS as a discretionary Exhibit E remediation use, the integration <strong style="color:var(--foreground)">may not require a separate capital budget approval</strong> — not a guaranteed or designated funding source. Where this framing applies, we believe it can compress an 18-month enterprise sales cycle to roughly 4–6 months. Our seed capital funds our first push toward settlement-eligible contracts.</p>
         </div>
       </div>
     </div>
@@ -638,7 +638,7 @@
   <div style="text-align:center;max-width:780px">
     <div class="eyebrow">The Verdict</div>
     <h1>You are not buying a <span class="grad-rose">calculator.</span><br>You are buying a <span class="grad-teal">hospital safety mandate.</span></h1>
-    <p style="font-size:1.05rem;color:var(--text-secondary);line-height:1.65;margin-top:26px;max-width:620px;margin-left:auto;margin-right:auto">Every hospital without this tool is writing opioid orders without a safety net. One prevented verdict pays for 50 years of our contract. The clinical engine is built. The regulatory path is clear. The settlement funds are ready.</p>
+    <p style="font-size:1.05rem;color:var(--text-secondary);line-height:1.65;margin-top:26px;max-width:620px;margin-left:auto;margin-right:auto">Every hospital without this tool is writing opioid orders without a safety net, against a national $78.5B/yr opioid economic burden (Florence et al., 2016) and a well-documented alert-fatigue problem. The clinical engine is built. Our regulatory posture is self-assessed as favorable, pending confirmatory review by counsel. Settlement funds are a potentially eligible, discretionary funding angle — not a guarantee.</p>
     <div style="margin-top:36px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
       <div class="card" style="padding:18px 28px;text-align:center"><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:4px">Website</div><div style="font-weight:700;color:var(--teal)">precision.lifelinemedtech.org</div></div>
       <div class="card" style="padding:18px 28px;text-align:center"><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:4px">iOS Beta</div><div style="font-weight:700;color:var(--teal)">TestFlight</div></div>

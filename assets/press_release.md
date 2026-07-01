@@ -1,3 +1,5 @@
+> ⚠️ **DRAFT — NEVER ISSUED.** Describes an aspirational launch and a pricing model that does not exist (no paid tier; product is in TestFlight beta). Do not publish or quote without full rewrite against metrics_sheet.md.
+
 # FOR IMMEDIATE RELEASE
 
 **Opioid Precision Launches: A New Standard for Inpatient Safety and Clinical Decision Support**

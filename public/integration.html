@@ -79,7 +79,7 @@
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-clinical-teal to-cyan-500">Directly Inside Your EMR</span>
             </h1>
             <p class="text-lg md:text-xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed font-light">
-                Precision Analgesia's clinical validation engine integrates with Epic, Cerner, and Meditech via <strong>SMART on FHIR</strong> and <strong>CDS Hooks</strong> — transforming standalone decision support into enterprise-grade, EHR-embedded forcing functions.
+                Precision Analgesia's clinical validation engine integrates with Epic, Cerner, and Meditech via <strong>SMART on FHIR</strong> and <strong>CDS Hooks</strong> — surfacing a specific, actionable, guideline-cited recommendation at the moment of prescribing, which the clinician reviews and can accept or override, with the override logged.
             </p>
             <div class="flex gap-4 flex-col sm:flex-row justify-center">
                 <a href="mailto:dan@lifelinemedtech.org?subject=Integration%20Demo%20Request" class="bg-clinical-teal text-white px-8 py-4 rounded-xl font-semibold hover:bg-teal-700 transition shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2">
@@ -97,17 +97,17 @@
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-4 text-slate-900">The Business Case for Integration</h2>
-                <p class="text-slate-600 max-w-2xl mx-auto">Opioid complications are no longer just clinical errors — they are existential legal and financial threats that demand systemic, hardwired solutions.</p>
+                <p class="text-slate-600 max-w-2xl mx-auto">Opioid complications are no longer just clinical errors — they are serious legal and financial risks that demand systemic, workflow-integrated decision support.</p>
             </div>
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200 hover:border-clinical-rose transition group">
                     <div class="w-12 h-12 bg-clinical-rose/10 rounded-xl flex items-center justify-center text-clinical-rose mb-6">
                         <i data-lucide="trending-up" class="w-6 h-6"></i>
                     </div>
-                    <h3 class="text-4xl font-extrabold text-slate-900 mb-2">$95.43B</h3>
-                    <p class="text-sm font-bold text-clinical-rose uppercase tracking-wide mb-4"><i data-lucide="alert-triangle" class="w-3 h-3 inline mr-1" aria-hidden="true"></i>Annual System Burden</p>
+                    <h3 class="text-4xl font-extrabold text-slate-900 mb-2">$78.5B</h3>
+                    <p class="text-sm font-bold text-clinical-rose uppercase tracking-wide mb-4"><i data-lucide="alert-triangle" class="w-3 h-3 inline mr-1" aria-hidden="true"></i>Annual Economic Burden</p>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        Opioid Use Disorder accounts for <strong>7.86% of all hospital expenditures</strong>. A single OIRD episode creates a <strong>$3,500 cost variance</strong> per case.
+                        Prescription opioid misuse and overdose cost the U.S. economy <strong>$78.5B per year</strong> (Florence CS et al., <em>Medical Care</em>, 2016;54(10):901-906 — 2013 national data). A national macro figure, not a single hospital's or event's cost.
                     </p>
                 </div>
                 <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200 hover:border-clinical-amber transition group">
@@ -117,17 +117,17 @@
                     <h3 class="text-4xl font-extrabold text-slate-900 mb-2">46%</h3>
                     <p class="text-sm font-bold text-clinical-amber uppercase tracking-wide mb-4">Undetected Risk</p>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        The <strong>PRODIGY Trial</strong> revealed 46% of floor patients experience respiratory depression. Manual nursing checks miss the vast majority of these events.
+                        In the <strong>PRODIGY trial</strong>, 46% of monitored inpatients on continuous monitoring experienced opioid-induced respiratory depression (OIRD) events (Khanna AK et al., <em>Anesthesia &amp; Analgesia</em>, 2020;131(4):1012-1024 — general-care-floor patients on parenteral opioids). Manual nursing checks miss the vast majority of these events.
                     </p>
                 </div>
                 <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200 hover:border-clinical-teal transition group">
                     <div class="w-12 h-12 bg-clinical-teal/10 rounded-xl flex items-center justify-center text-clinical-teal mb-6">
                         <i data-lucide="bell-off" class="w-6 h-6"></i>
                     </div>
-                    <h3 class="text-4xl font-extrabold text-slate-900 mb-2">90%</h3>
+                    <h3 class="text-4xl font-extrabold text-slate-900 mb-2">70-90%</h3>
                     <p class="text-sm font-bold text-clinical-teal uppercase tracking-wide mb-4">Alert Fatigue</p>
                     <p class="text-slate-600 text-sm leading-relaxed">
-                        Soft warning popups are <strong>bypassed 90% of the time</strong> by clinicians. BPA-integrated forcing functions — not passive alerts — are required to change behavior.
+                        An estimated <strong>70-90% of drug safety alerts in EHR systems are overridden</strong> by clinicians (van der Sijs et al., <em>JAMIA</em> 2006; Phansalkar et al., <em>JAMIA</em> 2013). Specific, actionable, guideline-cited recommendations at the moment of prescribing — not generic popups — are needed to change behavior.
                     </p>
                 </div>
             </div>
@@ -143,7 +143,7 @@
                     <div>
                         <h3 class="text-2xl font-bold mb-3">The Liability Shift: From Malpractice to Corporate Negligence</h3>
                         <p class="text-slate-400 leading-relaxed">
-                            Recent verdicts (e.g., <strong class="text-white">Asante Rogue — $303 Million</strong>) establish that hospitals are directly liable for systemic "Failure to Monitor" defects. Passive warnings no longer provide safe harbor. The legal standard now demands <strong class="text-white">hardwired safeguards</strong> embedded at the point of prescribing.
+                            Opioid-related adverse events increasingly expose hospitals to systemic "failure to monitor" and corporate-negligence liability theories, on top of the $78.5B/year national economic burden of prescription opioid misuse (Florence CS et al., 2016) and the 70-90% EHR alert-override rate documented in the literature. Passive warnings no longer provide safe harbor. The legal standard increasingly favors <strong class="text-white">documented, guideline-cited safeguards</strong> at the point of prescribing.
                         </p>
                     </div>
                 </div>
@@ -191,10 +191,10 @@
                     </div>
                     <h3 class="text-xl font-bold mb-3">10-Rule Safety Gate Engine</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Mandatory safety checks for renal failure, hepatic decompensation, pregnancy, pediatrics, QTc prolongation, and geriatrics. <strong class="text-slate-200">BPA-integrated forcing functions</strong> — not bypassable alerts.
+                        A 10-rule deterministic safety engine plus OIRD risk scoring (PRODIGY), MME threshold logic, CDC naloxone co-prescribing prompts, and pharmacogenomic guidance — covering renal failure, hepatic decompensation, pregnancy, pediatrics, QTc prolongation, and geriatrics. <strong class="text-slate-200">Advisory with documented override</strong>: the clinician reviews the recommendation and reasoning, then accepts, adjusts, or overrides it, with every override logged. The sole exception is a non-overridable pediatric gate (blocks codeine/tramadol under age 12, per FDA Black Box warnings).
                     </p>
                     <div class="mt-4 flex flex-wrap gap-2">
-                        <span class="text-xs text-white bg-white/10 px-2 py-1 rounded-full">Hard Gates</span>
+                        <span class="text-xs text-white bg-white/10 px-2 py-1 rounded-full">Advisory + Override</span>
                         <span class="text-xs text-white bg-white/10 px-2 py-1 rounded-full">10 Rules</span>
                         <span class="text-xs text-white bg-white/10 px-2 py-1 rounded-full">Auto-Applied</span>
                     </div>
@@ -254,10 +254,10 @@
                     </div>
                     <h3 class="text-xl font-bold mb-3">Clinical Validation Suite</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        <strong class="text-slate-200">167 automated test scenarios</strong> across 10 suites. Every recommendation hyperlinked to source guideline — full "Glass Box" transparency for independent clinician review.
+                        <strong class="text-slate-200">368 automated clinical tests</strong> (264 iOS validation scenarios + 104 backend pytest tests). Every recommendation hyperlinked to source guideline — full "Glass Box" transparency for independent clinician review.
                     </p>
                     <div class="mt-4 flex flex-wrap gap-2">
-                        <span class="text-xs text-white bg-white/10 px-2 py-1 rounded-full">167 Tests</span>
+                        <span class="text-xs text-white bg-white/10 px-2 py-1 rounded-full">368 Tests</span>
                         <span class="text-xs text-white bg-white/10 px-2 py-1 rounded-full">Glass Box</span>
                         <span class="text-xs text-white bg-white/10 px-2 py-1 rounded-full">Auditable</span>
                     </div>
@@ -323,12 +323,12 @@
                                 <i data-lucide="shield-check" class="w-4 h-4"></i> BPA Integration
                             </div>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4">Real-Time Intervention at Point of Prescribing</h3>
+                        <h3 class="text-2xl font-bold mb-4">Real-Time Recommendation at Point of Prescribing</h3>
                         <p class="text-slate-400 leading-relaxed mb-6">
-                            When a clinician selects or signs an opioid order, Epic fires a CDS Hook to our service endpoint. The Precision Analgesia engine evaluates all 10 safety rules in real-time and returns actionable cards — warnings, dose adjustments, and alternative recommendations.
+                            When a clinician selects or signs an opioid order, Epic fires a CDS Hook to our service endpoint. The Precision Analgesia engine evaluates all 10 safety rules in real-time and returns actionable cards — warnings, dose adjustments, and alternative recommendations — that the clinician reviews and can accept, adjust, or override.
                         </p>
                         <p class="text-slate-400 leading-relaxed">
-                            For critical safety gates (renal contraindications, pediatric black box warnings), hospital Epic teams configure <strong class="text-white">Best Practice Advisories (BPAs)</strong> powered by our logic — creating true forcing functions that require clinical justification to override.
+                            For safety gates (renal contraindications, pediatric black box warnings), hospital Epic teams can configure <strong class="text-white">Best Practice Advisories (BPAs)</strong> powered by our logic. Every override is logged. The sole non-overridable rule is the pediatric gate, which blocks codeine/tramadol prescribing under age 12 per FDA Black Box warnings.
                         </p>
                     </div>
                     <div class="flex-shrink-0 md:w-80">
@@ -342,7 +342,7 @@
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="text-white">●</span>
                                 <span class="text-slate-300">order-sign</span>
-                                <span class="text-slate-500 ml-auto text-xs">Final gate</span>
+                                <span class="text-slate-500 ml-auto text-xs">Final review</span>
                             </div>
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="text-white">●</span>
@@ -418,7 +418,7 @@
                     <tbody class="divide-y divide-slate-100">
                         <tr class="hover:bg-slate-50 transition">
                             <td class="p-4 font-semibold text-slate-900">Safety Gates</td>
-                            <td class="p-4"><span class="text-clinical-teal font-semibold">10-rule mandatory engine, auto-applied</span></td>
+                            <td class="p-4"><span class="text-clinical-teal font-semibold">10-rule engine, auto-applied, advisory with documented override</span></td>
                             <td class="p-4 text-slate-400">Manual — clinician must remember</td>
                         </tr>
                         <tr class="hover:bg-slate-50 transition">
@@ -443,7 +443,7 @@
                         </tr>
                         <tr class="hover:bg-slate-50 transition">
                             <td class="p-4 font-semibold text-slate-900">Validation</td>
-                            <td class="p-4"><span class="text-clinical-teal font-semibold">167 automated clinical scenarios</span></td>
+                            <td class="p-4"><span class="text-clinical-teal font-semibold">368 automated clinical tests</span></td>
                             <td class="p-4 text-slate-400">None published</td>
                         </tr>
                         <tr class="hover:bg-slate-50 transition">
@@ -494,7 +494,7 @@
                         <div class="inline-block px-3 py-1 bg-amber-50 text-clinical-amber text-xs font-bold rounded-full mb-3 uppercase" style="color:#F57C00">Phase 2 — Months 2–3</div>
                         <h3 class="text-xl font-bold mb-2 text-slate-900">Hospital Partner Onboarding</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
-                            Security risk assessment and HIPAA BAA execution with partner hospital. Epic staging environment configuration, clinical workflow review with pharmacy and nurse informaticists. Private SMART app registration — no Connection Hub listing required for pilot.
+                            Security risk assessment with a prospective partner hospital. A BAA template exists and requires counsel review and execution before any PHI-adjacent pilot. Epic staging environment configuration, clinical workflow review with pharmacy and nurse informaticists. Private SMART app registration — no Connection Hub listing required for pilot.
                         </p>
                     </div>
                 </div>
@@ -505,7 +505,7 @@
                         <div class="inline-block px-3 py-1 bg-purple-50 text-purple-600 text-xs font-bold rounded-full mb-3 uppercase">Phase 3 — Months 3–4</div>
                         <h3 class="text-xl font-bold mb-2 text-slate-900">Clinical Pilot</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
-                            Limited deployment on select medical-surgical floors. Real-world clinical validation with identified physician champions. Data collection and outcome tracking against baseline metrics.
+                            Planned limited deployment on select medical-surgical floors, targeting real-world clinical validation with physician champions recruited at that time. Data collection and outcome tracking against baseline metrics. No pilot is currently active.
                         </p>
                     </div>
                     <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-purple-500/30 z-10">
@@ -540,7 +540,7 @@
                     Non-Device CDS · 21st Century Cures Act
                 </div>
                 <h2 class="text-3xl font-bold mb-4 text-slate-900">Regulatory &amp; Compliance</h2>
-                <p class="text-slate-600 max-w-2xl mx-auto">Built for Non-Device CDS compliance from the ground up. No 510(k) clearance required — meeting all four FDA criteria by statute means zero device regulatory overhead for your IT department.</p>
+                <p class="text-slate-600 max-w-2xl mx-auto">Built for Non-Device CDS compliance from the ground up. Self-assessed as Non-Device CDS under the 21st Century Cures Act as revised by FDA's January 6, 2026 CDS guidance, pending confirmatory review by regulatory counsel — designed to minimize device regulatory overhead for your IT department.</p>
             </div>
 
             <!-- FDA Four Criteria Summary -->
@@ -599,7 +599,7 @@
                                         <i data-lucide="alert-triangle" class="w-3 h-3"></i> COUNSEL REVIEW
                                     </span>
                                 </div>
-                                <p class="text-xs text-slate-600 leading-relaxed">All safety gates are advisory recommendations with documented overrides (resolved by design, June 2026). A confirmatory counsel memo is planned before EHR BPA integration.</p>
+                                <p class="text-xs text-slate-600 leading-relaxed">All safety gates are advisory recommendations with documented overrides, by design since June 2026 (the sole exception is the non-overridable pediatric gate). A confirmatory counsel memo is planned before EHR BPA integration and has not yet been obtained.</p>
                             </div>
                         </div>
                     </div>
@@ -616,9 +616,9 @@
                         <h3 class="font-bold text-slate-900">Non-Device CDS Classification</h3>
                     </div>
                     <p class="text-sm text-slate-600 leading-relaxed mb-3">
-                        Positioned as <strong>Non-Device Clinical Decision Support under the 21st Century Cures Act</strong>. Our deterministic, fully-traceable engine is designed to meet all four criteria — every safety gate is an advisory with a documented override — with a confirmatory counsel memo planned before BPA integration to confirm the classification (and the resulting 510(k) status).
+                        Self-assessed as <strong>Non-Device Clinical Decision Support under the 21st Century Cures Act</strong>, pending confirmatory review by regulatory counsel. Our deterministic, fully-traceable engine is designed to meet all four criteria — every safety gate is an advisory with a documented override — with a confirmatory counsel memo planned, but not yet commissioned or obtained, before BPA integration to confirm the classification (and the resulting 510(k) status).
                     </p>
-                    <p class="text-xs text-slate-400">Saves 12–24 months vs. SaMD clearance path · Zero post-market surveillance burden</p>
+                    <p class="text-xs text-slate-400">If confirmed, would avoid a SaMD clearance path — not yet a settled or guaranteed outcome</p>
                 </div>
                 <div class="bg-white p-8 rounded-2xl border border-slate-200">
                     <div class="flex items-center gap-3 mb-4">
@@ -652,7 +652,7 @@
                         <h3 class="font-bold text-slate-900">Litigation Defense — Auditable Logs</h3>
                     </div>
                     <p class="text-sm text-slate-600 leading-relaxed mb-3">
-                        Generates auditable logs of every forcing function activation and clinical override. Builds a <strong>defensible record</strong> demonstrating systemic safety infrastructure — directly addressing "failure to monitor" and "corporate negligence" legal theories from verdicts like Asante Rogue ($303M).
+                        Generates auditable logs of every recommendation surfaced and every clinical override. Builds a <strong>defensible record</strong> demonstrating systemic safety infrastructure — directly addressing "failure to monitor" and "corporate negligence" legal theories, against a backdrop of a $78.5B/year national economic burden from prescription opioid misuse (Florence CS et al., 2016) and documented 70-90% EHR alert-override rates (van der Sijs et al., JAMIA 2006; Phansalkar et al., JAMIA 2013).
                     </p>
                     <p class="text-xs text-slate-400">Every override documented · Every gate logged · Complete audit trail</p>
                 </div>
@@ -673,7 +673,7 @@
                         </div>
                         <h3 class="text-2xl font-bold mb-3">Physician-Led Clinical Validation Pathway</h3>
                         <p class="text-slate-400 leading-relaxed mb-4">
-                            The founder is an addiction medicine fellow beginning July 2026 — directly aligned with the platform's core clinical domain: OUD consultation, MOUD induction, COWS scoring, and buprenorphine protocols. This training pathway provides the clinical depth to advance from shadow-mode evaluation to IRB-exempt quality improvement pilot, generating real-world safety metrics that support hospital contract discussions.
+                            The founder is beginning an addiction medicine fellowship at Yale in July 2026 — directly aligned with the platform's core clinical domain: OUD consultation, MOUD induction, COWS scoring, and buprenorphine protocols. This training pathway is intended to provide the clinical depth to advance from shadow-mode evaluation to a quality-improvement pilot expected/anticipated to qualify for IRB-exempt status, subject to Yale's own IRB determination, generating real-world safety metrics intended to support future hospital contract discussions.
                         </p>
                         <div class="grid sm:grid-cols-3 gap-4">
                             <div class="bg-white/10 rounded-lg p-3 text-center">
@@ -686,7 +686,7 @@
                             </div>
                             <div class="bg-white/10 rounded-lg p-3 text-center">
                                 <p class="text-xs text-slate-400">Stage 4 — Planned</p>
-                                <p class="text-sm font-bold text-white">IRB-Exempt QI Pilot</p>
+                                <p class="text-sm font-bold text-white">QI Pilot (Pending IRB Review)</p>
                             </div>
                         </div>
                     </div>
@@ -705,9 +705,9 @@
                 <i data-lucide="banknote" class="w-4 h-4"></i>
                 Funding Mechanism
             </div>
-            <h2 class="text-3xl font-bold text-white mb-4">$651M Acute Care Hospital Settlement</h2>
+            <h2 class="text-3xl font-bold text-white mb-4">Opioid Settlement Funding Pathway</h2>
             <p class="text-teal-100 text-lg leading-relaxed max-w-2xl mx-auto mb-6">
-                Precision Analgesia qualifies as <strong class="text-white">Qualified Abatement Technology</strong>. Hospital CFOs can fund 100% of licensing and integration costs via Opioid Abatement Settlement dollars — <strong class="text-white">zero net cost</strong> to the institution.
+                Precision Analgesia may qualify as a <strong class="text-white">potentially eligible, discretionary remediation-spend category</strong> under a hospital's Exhibit E settlement allocation. Funding is subject to that hospital's own settlement administrator and state-specific allowable-use rules — this is not a designated or guaranteed funding source.
             </p>
             <a href="mailto:dan@lifelinemedtech.org?subject=Settlement%20Funding%20Inquiry" class="inline-flex items-center gap-2 bg-white text-clinical-teal px-8 py-4 rounded-xl font-bold hover:bg-teal-50 transition shadow-lg">
                 <i data-lucide="mail" class="w-5 h-5"></i> Inquire About Funding

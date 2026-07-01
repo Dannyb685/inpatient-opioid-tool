@@ -1,3 +1,5 @@
+> ⚠️ **FOREIGN/HISTORICAL ARTIFACT** — authored for a different project lineage (MyoGuard) in Dec 2025; predates this product's validation system (current: 264 iOS + 104 backend automated tests). Retained for archival purposes only. Not evidence of current validation.
+
 # Clinical Validation Report: Inpatient Opioid Tool (v1.0.0 RC4)
 
 **Date:** December 27, 2025

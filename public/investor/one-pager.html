@@ -323,11 +323,11 @@
     </div>
     <div class="stat-box">
       <div class="stat-value">Exhibit E</div>
-      <div class="stat-label">Settlement Abatement Eligible Use</div>
+      <div class="stat-label">Potentially Eligible, Discretionary Abatement-Spend Category (Not Guaranteed)</div>
     </div>
     <div class="stat-box">
       <div class="stat-value">46%</div>
-      <div class="stat-label">OIRD Rate — PRODIGY Trial</div>
+      <div class="stat-label">of Monitored Inpatients on Continuous Monitoring Had OIRD Events — Khanna et al., Anesth Analg 2020;131(4):1012-1024 (PRODIGY)</div>
     </div>
   </div>
 
@@ -337,16 +337,16 @@
       <div class="card-title">The Problem &amp; Solution</div>
       <div class="section-label">⚠ The Problem</div>
       <ul class="bullet-list">
-        <li>95% of Epic's native CDS alerts are dismissed by clinicians</li>
+        <li>70-90% of drug safety alerts in EHR systems are overridden by clinicians — alert fatigue (van der Sijs et al., JAMIA 2006; Phansalkar et al., JAMIA 2013)</li>
         <li>Doctors click past Boolean warnings — alert fatigue is endemic</li>
-        <li>MDCalc requires 45 seconds of manual entry; utilization &lt;5%</li>
+        <li>MDCalc requires manual entry; low utilization at the point of care</li>
         <li>Opioid-induced respiratory depression kills silently post-order</li>
       </ul>
       <div class="section-label teal">✦ The Solution</div>
       <ul class="bullet-list">
         <li>SMART on FHIR CDS Hook engine — zero manual data entry</li>
-        <li>Auto-pulls patient data; intercepts orders before signing</li>
-        <li>10 deterministic safety rules + OIRD risk scoring (PRODIGY + CDC 2022)</li>
+        <li>Auto-pulls patient data; surfaces a specific, guideline-cited recommendation the clinician can accept or override (override logged)</li>
+        <li>10-rule deterministic safety engine + OIRD risk scoring (PRODIGY), MME threshold logic, CDC naloxone co-prescribing prompts &amp; pharmacogenomic guidance</li>
         <li>&lt;100ms response latency — specific, actionable guidance</li>
       </ul>
     </div>
@@ -356,7 +356,7 @@
       <div class="moat-list">
         <div class="moat-item">
           <div class="moat-num">①</div>
-          <div class="moat-text"><strong>FDA Non-Device CDS Exempt</strong>Saves $2M+ and 2 years vs. regulated software competitors</div>
+          <div class="moat-text"><strong>Self-Assessed Non-Device CDS</strong>Under the 21st Century Cures Act (FDA Jan 2026 CDS guidance), pending confirmatory review by regulatory counsel — a potential path to avoid the cost/timeline of regulated medical device software</div>
         </div>
         <div class="moat-item">
           <div class="moat-num">②</div>
@@ -368,7 +368,7 @@
         </div>
         <div class="moat-item">
           <div class="moat-num">④</div>
-          <div class="moat-text"><strong>Settlement Funding Wedge</strong>Point-of-care CDS is an Exhibit E eligible abatement use</div>
+          <div class="moat-text"><strong>Settlement Funding Wedge</strong>Point-of-care CDS is a potentially eligible, discretionary remediation-spend category under a hospital's Exhibit E settlement allocation — subject to that hospital's own settlement administrator and state rules, not a guaranteed funding source</div>
         </div>
       </div>
     </div>
@@ -378,23 +378,23 @@
   <div class="market-row">
     <div class="market-box">
       <div class="market-label">TAM</div>
-      <div class="market-value">$6.8B</div>
-      <div class="market-sub">U.S. Hospital CDS Market</div>
+      <div class="market-value">$6.8B*</div>
+      <div class="market-sub">U.S. Hospital CDS Market (illustrative estimate)</div>
     </div>
     <div class="market-box">
       <div class="market-label">SAM</div>
-      <div class="market-value">$1.4B</div>
-      <div class="market-sub">Epic-Affiliated Hospitals</div>
+      <div class="market-value">$1.4B*</div>
+      <div class="market-sub">Epic-Affiliated Hospitals (illustrative estimate)</div>
     </div>
     <div class="market-box">
       <div class="market-label">ACV</div>
-      <div class="market-value">$250K</div>
-      <div class="market-sub">Per Hospital System</div>
+      <div class="market-value">$250K*</div>
+      <div class="market-sub">Per Hospital System (modeled assumption)</div>
     </div>
     <div class="market-box">
       <div class="market-label">Year 3 ARR</div>
-      <div class="market-value">$13.5M</div>
-      <div class="market-sub">54 contracts @ $250K</div>
+      <div class="market-value">$13.5M*</div>
+      <div class="market-sub">Modeled projection — 54 contracts @ $250K</div>
     </div>
   </div>
 
@@ -404,19 +404,19 @@
       <div class="card-title">Traction &amp; Build Status</div>
       <div class="traction-row">
         <div class="traction-item">
-          <div class="traction-badge">50,000+ LOC</div>
+          <div class="traction-badge">21,000+ LOC</div>
           Production codebase — TypeScript / Swift / Python
         </div>
         <div class="traction-item">
-          <div class="traction-badge">282 ✓</div>
-          Automated clinical tests passing (264 iOS scenarios + 18 backend)
+          <div class="traction-badge">368 ✓</div>
+          Automated clinical tests passing (264 iOS scenarios + 104 backend)
         </div>
         <div class="traction-item">
           <div class="traction-badge">iOS Beta</div>
           TestFlight deployed — physician review underway
         </div>
         <div class="traction-item">
-          <div class="traction-badge">16 APIs</div>
+          <div class="traction-badge">FHIR R4</div>
           Full FHIR R4 + CDS Hooks 2.0 endpoint coverage
         </div>
         <div class="traction-item">
@@ -429,7 +429,7 @@
     <div class="card">
       <div class="card-title">The Ask</div>
       <div class="ask-amount">$2.5M</div>
-      <div class="ask-sub">Seed · 18-Month Runway · Milestone: 5 Signed Hospital Contracts</div>
+      <div class="ask-sub">Seed · 18-Month Runway · Target Milestone: 5 Signed Hospital Contracts</div>
       <div class="use-bar-wrap"><div class="use-bar"></div></div>
       <div class="use-grid">
         <div class="use-item">
@@ -456,7 +456,7 @@
   <footer class="footer">
     <div class="footer-left">
       <a class="footer-link" href="https://lifeline-med-tech.vercel.app">lifeline-med-tech.vercel.app</a>
-      <span class="footer-company">Lifeline Medical Technologies, Inc.</span>
+      <span class="footer-company">Lifeline Medical Technologies, LLC</span>
     </div>
     <div class="footer-conf">Confidential — For Accredited Investor Review Only · Seed Round 2026</div>
   </footer>
