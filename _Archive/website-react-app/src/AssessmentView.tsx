@@ -36,6 +36,7 @@ export const AssessmentView = () => {
         copd, setCopd,
         benzos, setBenzos,
         psychHistory, setPsychHistory,
+        historyOverdose, setHistoryOverdose,
 
         prodigyScore,
         prodigyRisk
@@ -224,7 +225,7 @@ export const AssessmentView = () => {
         setAdjuvants(adj);
         setWarnings(w);
 
-    }, [renalFunction, hemoStatus, routePreference, giStatus, hepaticFunction, painType, indication, sleepApnea, psychHistory, age, sex, opioidNaive, chf, copd, benzos, homeBuprenorphine, prodigyScore, prodigyRisk]);
+    }, [renalFunction, hemoStatus, routePreference, giStatus, hepaticFunction, painType, indication, sleepApnea, psychHistory, historyOverdose, age, sex, opioidNaive, chf, copd, benzos, homeBuprenorphine, prodigyScore, prodigyRisk]);
 
     const handleCopy = () => {
         const note = `
@@ -239,6 +240,12 @@ ${sleepApnea ? '- Sleep Apnea (+5)' : ''}
 ${opioidNaive ? '- Opioid Naive (+3)' : ''}
 ${chf ? '- Chronic Heart Failure (+7)' : ''}
 ${sex === 'male' ? '- Male Sex (+8)' : ''}
+${benzos ? '- Benzodiazepines (+9)' : ''}
+${copd ? '- COPD (+5)' : ''}
+${psychHistory ? '- Psychiatric History (+10)' : ''}
+${historyOverdose ? '- History of Overdose/SUD (+25)' : ''}
+${(renalFunction === 'impaired' || renalFunction === 'dialysis') ? '- Renal Impairment (+8)' : ''}
+${hepaticFunction === 'failure' ? '- Hepatic Failure (+7)' : ''}
 
 Clinical Recommendations:
 ${recs.map(r => `- ${r.name}: ${r.reason} (${r.detail})`).join('\n')}
@@ -325,6 +332,10 @@ ${warnings.length > 0 ? '\nWarnings:\n' + warnings.map(w => `- ${w}`).join('\n')
                             <label className="flex items-center gap-2 p-2 bg-surface-card rounded-xl border border-border cursor-pointer hover:border-danger/30 transition-all">
                                 <input type="checkbox" checked={psychHistory} onChange={e => setPsychHistory(e.target.checked)} className="w-3.5 h-3.5 accent-danger" />
                                 <span className="text-[11px] font-bold text-text-secondary">Substance / Psych Hx</span>
+                            </label>
+                            <label className="flex items-center gap-2 p-2 bg-surface-card rounded-xl border border-border cursor-pointer hover:border-danger/30 transition-all">
+                                <input type="checkbox" checked={historyOverdose} onChange={e => setHistoryOverdose(e.target.checked)} className="w-3.5 h-3.5 accent-danger" />
+                                <span className="text-[11px] font-bold text-text-secondary">History of Overdose/SUD</span>
                             </label>
                         </div>
                     </div>

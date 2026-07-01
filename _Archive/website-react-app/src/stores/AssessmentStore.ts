@@ -35,6 +35,7 @@ interface PatientAssessmentState {
     copd: boolean;
     benzos: boolean;
     psychHistory: boolean;
+    historyOverdose: boolean;
 
     // Computed / Output State (Optional - can be derived in components, but storing allows easy access)
     prodigyScore: number;
@@ -60,6 +61,7 @@ interface PatientAssessmentState {
     setCopd: (active: boolean) => void;
     setBenzos: (active: boolean) => void;
     setPsychHistory: (active: boolean) => void;
+    setHistoryOverdose: (active: boolean) => void;
 
     // Calculation Logic (can be called by components or middleware)
     updateProdigyScore: () => void;
@@ -89,6 +91,7 @@ export const useAssessmentStore = create<PatientAssessmentState>()(
             copd: false,
             benzos: false,
             psychHistory: false,
+            historyOverdose: false,
 
             prodigyScore: 0,
             prodigyRisk: 'Low',
@@ -108,8 +111,14 @@ export const useAssessmentStore = create<PatientAssessmentState>()(
             },
             setHomeBuprenorphine: (homeBuprenorphine) => set({ homeBuprenorphine }),
 
-            setRenalFunction: (renalFunction) => set({ renalFunction }),
-            setHepaticFunction: (hepaticFunction) => set({ hepaticFunction }),
+            setRenalFunction: (renalFunction) => {
+                set({ renalFunction });
+                get().updateProdigyScore();
+            },
+            setHepaticFunction: (hepaticFunction) => {
+                set({ hepaticFunction });
+                get().updateProdigyScore();
+            },
             setHemoStatus: (hemoStatus) => set({ hemoStatus }),
             setPainType: (painType) => set({ painType }),
             setIndication: (indication) => set({ indication }),
@@ -125,10 +134,34 @@ export const useAssessmentStore = create<PatientAssessmentState>()(
                 set({ chf });
                 get().updateProdigyScore();
             },
-            setCopd: (copd) => set({ copd }),
-            setBenzos: (benzos) => set({ benzos }),
-            setPsychHistory: (psychHistory) => set({ psychHistory }),
+            setCopd: (copd) => {
+                set({ copd });
+                get().updateProdigyScore();
+            },
+            setBenzos: (benzos) => {
+                set({ benzos });
+                get().updateProdigyScore();
+            },
+            setPsychHistory: (psychHistory) => {
+                set({ psychHistory });
+                get().updateProdigyScore();
+            },
+            setHistoryOverdose: (historyOverdose) => {
+                set({ historyOverdose });
+                get().updateProdigyScore();
+            },
 
+            // Canonical PRODIGY + extra-factor scoring (founder-override
+            // canonicalization, 2026-07-01; see
+            // change_requests/CR-2026-004_oird_prodigy_canonicalization.md).
+            // Core PRODIGY factors: Khanna et al., Anesth Analg 2020.
+            // Extra factors: venture-specific additions matching the iOS
+            // reference implementation.
+            //
+            // NOT YET IMPLEMENTED on the website: high-dose MME (>=100, +7).
+            // This store has no MME/dose state (MME lives in a separate
+            // calculator store) — wiring it here needs cross-store plumbing
+            // that's out of scope for this fix. Documented gap, not silent.
             updateProdigyScore: () => {
                 const s = get();
                 let score = 0;
@@ -144,22 +177,34 @@ export const useAssessmentStore = create<PatientAssessmentState>()(
                 // 2. Sex
                 if (s.sex === 'male') score += 8;
 
-                // 3. Naive
+                // 3. Opioid-naive
                 if (s.opioidNaive) score += 3;
 
-                // 4. Sleep Apnea
-                if (s.sleepApnea) score += 5; // Validated PRODIGY weight? iOS code said 5 + 10 etc. Double check logic.
-                // In iOS/Web code: sleep(5), chf(7), male(8), naive(3)
-                // Wait, Web code line 83 says sleep += 5.
-                // Wait, Web code line 284 comment says Sleep Apnea (+10)? UI inconsistency.
-                // PRODIGY paper: Sleep Disordered Breathing = +8? No?
-                // I will replicate the Web Code Logic found in line 84: if (sleepApnea) pScore += 5;
+                // 4. Sleep Apnea (OSA)
                 if (s.sleepApnea) score += 5;
 
                 // 5. CHF
                 if (s.chf) score += 7;
 
-                // Determine Tier
+                // 6. Concurrent benzodiazepines (extra factor)
+                if (s.benzos) score += 9;
+
+                // 7. COPD (extra factor)
+                if (s.copd) score += 5;
+
+                // 8. Psychiatric history (extra factor)
+                if (s.psychHistory) score += 10;
+
+                // 9. History of overdose/SUD (extra factor)
+                if (s.historyOverdose) score += 25;
+
+                // 10. Renal impairment (extra factor) — any tier beyond normal
+                if (s.renalFunction === 'impaired' || s.renalFunction === 'dialysis') score += 8;
+
+                // 11. Hepatic failure (extra factor) — Child-Pugh C only, not "impaired"
+                if (s.hepaticFunction === 'failure') score += 7;
+
+                // Determine Tier (Low <8, Intermediate 8-14, High >=15 — Khanna et al. 2020)
                 let risk: RiskTier = 'Low';
                 if (score >= 15) risk = 'High';
                 else if (score >= 8) risk = 'Intermediate';
@@ -172,6 +217,7 @@ export const useAssessmentStore = create<PatientAssessmentState>()(
                 renalFunction: null, hepaticFunction: null, hemoStatus: null, painType: null,
                 indication: null, routePreference: null, giStatus: null, organSupport: false,
                 sleepApnea: false, chf: false, copd: false, benzos: false, psychHistory: false,
+                historyOverdose: false,
                 prodigyScore: 0, prodigyRisk: 'Low'
             })
         })
